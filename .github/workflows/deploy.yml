@@ -1,0 +1,26 @@
+name: Deploy Demo
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: npm install
+
+      - run: npm run build
+
+      - run: npm install -g firebase-tools
+
+      - run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }} --only hosting

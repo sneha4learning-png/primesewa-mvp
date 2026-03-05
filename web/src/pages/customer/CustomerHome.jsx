@@ -38,7 +38,18 @@ const CustomerHome = () => {
                 const provSnap = await getDocs(collection(db, 'providers'));
                 const allProviders = [];
                 provSnap.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
-                setMockProviders(allProviders.filter(p => p.status === 'active'));
+
+                // Deduplicate by phone to prevent multiple registrations from showing twice
+                const uniqueProvidersMap = new Map();
+                allProviders.forEach(p => {
+                    if (p.phone && !uniqueProvidersMap.has(p.phone)) {
+                        uniqueProvidersMap.set(p.phone, p);
+                    } else if (!p.phone) {
+                        uniqueProvidersMap.set(p.id, p); // Fallback if no phone
+                    }
+                });
+
+                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p => p.status === 'active'));
 
                 const bookSnap = await getDocs(collection(db, 'bookings'));
                 const allMyBookings = [];
@@ -111,14 +122,14 @@ const CustomerHome = () => {
     let displayedProviders = mockProviders.filter(p => p.status === 'active');
 
     if (selectedCategory) {
-        displayedProviders = displayedProviders.filter(p => p.category === selectedCategory);
+        displayedProviders = displayedProviders.filter(p => (p.category || 'Plumbing') === selectedCategory);
     }
 
     if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase();
         displayedProviders = displayedProviders.filter(p =>
-            p.name.toLowerCase().includes(query) ||
-            p.category.toLowerCase().includes(query)
+            (p.name || '').toLowerCase().includes(query) ||
+            (p.category || 'Plumbing').toLowerCase().includes(query)
         );
     } else if (!selectedCategory) {
         // If neither search nor category is active, slice to top 5 out-of-the-box
