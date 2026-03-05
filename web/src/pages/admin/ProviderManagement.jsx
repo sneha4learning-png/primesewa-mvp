@@ -1,0 +1,244 @@
+import { useState, useEffect } from 'react';
+import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink } from 'lucide-react';
+import { db } from '../../firebase/config';
+import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+
+const ProviderManagement = () => {
+    const [providers, setProviders] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedProvider, setSelectedProvider] = useState(null);
+    const [providerBookings, setProviderBookings] = useState([]);
+    const [viewDocumentUrl, setViewDocumentUrl] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProviders = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, 'providers'));
+                const fetched = [];
+                querySnapshot.forEach((doc) => {
+                    fetched.push({ id: doc.id, ...doc.data() });
+                });
+                setProviders(fetched);
+            } catch (err) {
+                console.error("Error fetching providers:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProviders();
+    }, []);
+
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            await updateDoc(doc(db, 'providers', id), { status: newStatus });
+            setProviders(providers.map(p => p.id === id ? { ...p, status: newStatus } : p));
+        } catch (err) {
+            console.error("Error updating status:", err);
+        }
+    };
+
+    const handleViewHistory = async (provider) => {
+        setSelectedProvider(provider);
+        try {
+            const q = query(collection(db, 'bookings'), where('provider', '==', provider.name));
+            const querySnapshot = await getDocs(q);
+            const fetched = [];
+            querySnapshot.forEach((doc) => {
+                fetched.push({ id: doc.id, ...doc.data() });
+            });
+            setProviderBookings(fetched);
+        } catch (err) {
+            console.error("Error fetching provider history:", err);
+        }
+    };
+
+    const filteredProviders = providers.filter(p =>
+        (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.category || 'Plumbing').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h2 className="text-xl font-semibold text-gray-800">Provider Fleet</h2>
+                <div className="relative w-full sm:w-72">
+                    <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search providers..."
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
+                            <th className="px-6 py-4 font-medium">Provider Name</th>
+                            <th className="px-6 py-4 font-medium">Category</th>
+                            <th className="px-6 py-4 font-medium">Contact</th>
+                            <th className="px-6 py-4 font-medium">Jobs Done</th>
+                            <th className="px-6 py-4 font-medium relative">Status</th>
+                            <th className="px-6 py-4 font-medium text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                        {filteredProviders.map(provider => (
+                            <tr key={provider.id} className="hover:bg-blue-50/50 transition-colors">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-semibold text-gray-900">{provider.name}</div>
+                                    <div className="text-xs text-gray-500">ID: {provider.id}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">{provider.category || 'Plumbing'}</span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.phone}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.jobs || 0}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
+                    ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
+                                            provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                                'bg-red-50 text-red-700 border-red-200'}`}>
+                                        {provider.status.charAt(0).toUpperCase() + provider.status.slice(1)}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div className="flex items-center justify-end gap-2">
+                                        {provider.proofDocument && (
+                                            <button onClick={() => setViewDocumentUrl(provider.proofDocument)} className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="View Proof Document">
+                                                <FileText className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                        {provider.status === 'pending' && (
+                                            <>
+                                                <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition-colors" title="Approve">
+                                                    <CheckCircle className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="Reject">
+                                                    <XCircle className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-1.5 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="Suspend">
+                                                    <ShieldOff className="w-5 h-5" />
+                                                </button>
+                                            </>
+                                        )}
+                                        {provider.status === 'active' && (
+                                            <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-1.5 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="Suspend">
+                                                <ShieldOff className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                        {provider.status === 'suspended' && (
+                                            <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition-colors" title="Reactivate">
+                                                <CheckCircle className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                        {provider.status === 'rejected' && (
+                                            <button onClick={() => handleStatusChange(provider.id, 'pending')} className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-colors" title="Review Again">
+                                                <MoreVertical className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                        <button onClick={() => handleViewHistory(provider)} className="p-1.5 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors" title="View Booking History">
+                                            <MoreVertical className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {filteredProviders.length === 0 && (
+                            <tr>
+                                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                                    No providers found matching your search.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Provider Booking History Modal */}
+            {selectedProvider && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden mx-4">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">{selectedProvider.name}'s History</h3>
+                                <p className="text-sm text-gray-500">{selectedProvider.category} • Lifetime Jobs: {providerBookings.length}</p>
+                            </div>
+                            <button onClick={() => setSelectedProvider(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors">
+                                <XCircle className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="p-6 max-h-[60vh] overflow-y-auto">
+                            {providerBookings.length > 0 ? (
+                                <div className="space-y-4">
+                                    {providerBookings.map(b => (
+                                        <div key={b.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:shadow-sm transition-all bg-white">
+                                            <div>
+                                                <p className="font-bold text-gray-900">{b.service}</p>
+                                                <p className="text-sm text-gray-500">{b.date} • Customer: {b.customer}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="font-bold text-emerald-600">₹{b.proposedPrice || b.price}</p>
+                                                <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-gray-500">
+                                    No completed or active jobs found for this provider.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Document Viewer Modal */}
+            {viewDocumentUrl && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
+                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-blue-600" /> Identity / Proof Document
+                                </h3>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <a href={viewDocumentUrl} target="_blank" rel="noreferrer" className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-sm font-medium transition-colors">
+                                    Open in New Tab <ExternalLink className="w-4 h-4" />
+                                </a>
+                                <button onClick={() => setViewDocumentUrl(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors">
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 bg-gray-100 p-8 flex items-center justify-center relative overflow-hidden">
+                            {viewDocumentUrl.includes('mock-storage') ? (
+                                <div className="text-center w-full max-w-md bg-white p-12 rounded-3xl shadow-sm border border-gray-200">
+                                    <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <FileText className="w-12 h-12 text-blue-500" />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-800 mb-2">Simulated Document</h4>
+                                    <p className="text-gray-500 mb-6">In the live app, this will display the actual uploaded PDF/Image via an iframe or img tag.</p>
+                                    <code className="text-xs bg-gray-100 p-2 rounded block break-all text-gray-600 border border-gray-200">
+                                        {viewDocumentUrl}
+                                    </code>
+                                </div>
+                            ) : (
+                                <iframe src={viewDocumentUrl} className="w-full h-full bg-white border-none rounded-xl shadow-inner" title="Document Viewer" />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ProviderManagement;
