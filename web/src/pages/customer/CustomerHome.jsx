@@ -32,12 +32,15 @@ const CustomerHome = () => {
     const [visibleCount, setVisibleCount] = useState(5);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [networkError, setNetworkError] = useState(false);
+    const [dbError, setDbError] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
 
     useEffect(() => {
         const loadDb = async () => {
             const myName = userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer');
 
             try {
+                setDbError(false);
                 const provSnap = await getDocs(collection(db, 'providers'));
                 const allProviders = [];
                 provSnap.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
@@ -48,7 +51,7 @@ const CustomerHome = () => {
                     if (p.phone && !uniqueProvidersMap.has(p.phone)) {
                         uniqueProvidersMap.set(p.phone, p);
                     } else if (!p.phone) {
-                        uniqueProvidersMap.set(p.id, p); // Fallback if no phone
+                        uniqueProvidersMap.set(p.id, p);
                     }
                 });
 
@@ -66,11 +69,14 @@ const CustomerHome = () => {
                 setMockBookings(allMyBookings.filter(b => b.status !== 'completed' && b.status !== 'rejected'));
                 setPastBookings(allMyBookings.filter(b => b.status === 'completed'));
             } catch (err) {
-                console.error("Error loading DB", err);
+                console.error('Firebase Firestore error:', err);
+                setDbError(true);
+            } finally {
+                setLoadingData(false);
             }
         };
         loadDb();
-        const interval = setInterval(loadDb, 2000);
+        const interval = setInterval(loadDb, 5000); // Reduced polling frequency to 5s
         return () => clearInterval(interval);
     }, [userData]);
 

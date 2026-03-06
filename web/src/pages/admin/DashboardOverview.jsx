@@ -26,6 +26,7 @@ const DashboardOverview = () => {
     });
     const [recentBookings, setRecentBookings] = useState([]);
     const [pendingProviders, setPendingProviders] = useState([]);
+    const [dbError, setDbError] = useState(false);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -60,7 +61,8 @@ const DashboardOverview = () => {
                 // Get pending providers
                 setPendingProviders(providers.filter(p => p.status === 'pending'));
             } catch (err) {
-                console.error("Error fetching dashboard stats:", err);
+                console.error('Firebase Firestore error:', err);
+                setDbError(true);
             }
         };
 
@@ -69,6 +71,12 @@ const DashboardOverview = () => {
 
     return (
         <div className="space-y-6">
+            {dbError && (
+                <div className="bg-red-50 border border-red-200 text-red-800 px-5 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
+                    <span className="text-red-500 text-lg">⚠️</span>
+                    <span><strong>Database connection error.</strong> Could not fetch data from Firestore. Check your Firebase credentials and Firestore rules.</span>
+                </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-blue-500" />
                 <StatCard title="Pending Bookings" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-amber-500" />

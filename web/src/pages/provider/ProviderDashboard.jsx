@@ -11,7 +11,8 @@ const ProviderDashboard = () => {
     const [earnings, setEarnings] = useState({ today: 0, week: 0, month: 0 });
     const [negotiatingId, setNegotiatingId] = useState(null);
     const [negotiatedPrice, setNegotiatedPrice] = useState('');
-    const [providerStatus, setProviderStatus] = useState('pending'); // Default to pending for safety
+    const [providerStatus, setProviderStatus] = useState('pending');
+    const [dbError, setDbError] = useState(false);
 
     useEffect(() => {
         // Use userData.name instead of currentUser.displayName
@@ -47,14 +48,15 @@ const ProviderDashboard = () => {
 
                 setEarnings({
                     today: totalEarned,
-                    week: totalEarned * 3, // Mock multiplier for demo
-                    month: totalEarned * 12 // Mock multiplier for demo
+                    week: totalEarned * 3,
+                    month: totalEarned * 12
                 });
-            } catch (e) { console.error(e); }
+                setDbError(false);
+            } catch (e) { console.error('Firebase error:', e); setDbError(true); }
         };
 
         loadDb();
-        const interval = setInterval(loadDb, 2000);
+        const interval = setInterval(loadDb, 5000); // 5s polling
         return () => clearInterval(interval);
 
     }, [currentUser]);
@@ -105,6 +107,12 @@ const ProviderDashboard = () => {
 
     return (
         <div className="space-y-8">
+            {dbError && (
+                <div className="bg-red-50 border border-red-200 text-red-800 px-5 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
+                    <span className="text-lg">⚠️</span>
+                    <span><strong>Database connection error.</strong> Could not load bookings from Firestore. Check your Firebase credentials.</span>
+                </div>
+            )}
             {providerStatus === 'pending' && (
                 <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm flex items-start gap-3">
                     <AlertTriangle className="w-6 h-6 text-amber-500 shrink-0" />
