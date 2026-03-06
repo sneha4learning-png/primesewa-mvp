@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { auth, db } from '../../firebase/config';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { RecaptchaVerifier, signInWithPhoneNumber, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const LoginPage = () => {
@@ -105,6 +105,14 @@ const LoginPage = () => {
                 await setDoc(userDocRef, userDataObj);
             } else {
                 userDataObj = { ...docSnap.data(), uid: user.uid };
+            }
+
+            // ✅ BLOCK CHECK: Prevent blocked users from accessing the app
+            if (userDataObj.status === 'blocked') {
+                await signOut(auth);
+                setError('Your account has been blocked. Please contact support.');
+                setIsLoading(false);
+                return;
             }
 
             setCurrentUser(user);

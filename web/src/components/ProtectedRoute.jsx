@@ -22,10 +22,12 @@ export const ProviderRoute = ({ children }) => {
 };
 
 export const CustomerRoute = ({ children }) => {
-    const { currentUser, loading } = useAuth();
+    const { currentUser, userData, loading } = useAuth();
 
     if (loading) return <div>Loading...</div>;
     if (!currentUser) return <Navigate to="/login" />;
+    // Second layer: if user is blocked, kick them out to login
+    if (userData?.status === 'blocked') return <Navigate to="/login" />;
 
     return children;
 };
