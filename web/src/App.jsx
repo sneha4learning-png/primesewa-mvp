@@ -43,9 +43,7 @@ function App() {
 
           {/* Admin Routes */}
           <Route path="/admin">
-            <Route element={<CustomerLayout />}>
-              <Route index element={<LandingPage />} />
-            </Route>
+            <Route index element={<Navigate to="/admin/app" replace />} />
             <Route path="login" element={<AdminLogin />} />
             <Route path="app" element={<AdminRoute><AdminLayout /></AdminRoute>}>
               <Route index element={<DashboardOverview />} />
@@ -58,9 +56,7 @@ function App() {
 
           {/* Provider Routes */}
           <Route path="/provider">
-            <Route element={<CustomerLayout />}>
-              <Route index element={<LandingPage />} />
-            </Route>
+            <Route index element={<Navigate to="/provider/app" replace />} />
             <Route path="login" element={<ProviderLogin />} />
             <Route path="app" element={<ProviderRoute><ProviderLayout /></ProviderRoute>}>
               <Route index element={<ProviderDashboard />} />
