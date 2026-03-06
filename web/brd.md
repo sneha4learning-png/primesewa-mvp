@@ -192,5 +192,18 @@ Clean, data-dense, minimalist UI optimized for desktop monitors. Utilizing stand
 4.  [ ] **Index Deployment:** Deploy `firestore.indexes.json` to support multi-field sorting on the Bookings dashboard.
 5.  [ ] **Security Rules:** Deploy the web-safe `firestore.rules`.
 6.  [ ] **Hosting Build:** Run `npm run build`. Configure `firebase.json` to serve `index.html` for all routes (SPA setup).
-7.  [ ] **Domain Mapping:** Connect custom domains (e.g., `admin.domain.com` routing to specific logic, or keeping it monolithic `domain.com/admin`).
-8.  [ ] **Go Live:** Fire `firebase deploy --only hosting`.
+10. [ ] **Go Live:** Fire `firebase deploy --only hosting`.
+
+---
+
+## 10. IMPLEMENTED MVP FEATURES (Development Reality)
+
+This section highlights the actual technical and feature decisions made during the MVP development phase:
+*   **Brand Identity:** Integrated the official "PrimeSewa" logo and brand naming consistently across all authentication screens and portal navbars.
+*   **Professional URLs (Flat Routing):** 
+    *   Customer Storefront: ` / ` and `/login`
+    *   Admin System: `/admin` and `/admin/login`
+    *   Provider Portal: `/provider` and `/provider/login`
+*   **Authentication Resiliency:** Implemented Firebase Phone Auth (reCAPTCHA invisible) with a built-in **Dev Mode Fallback** (OTP: 1234, Admin Password: 'admin') to bypass billing restrictions during testing.
+*   **Automated CI/CD:** Defined a `.github/workflows/deploy.yml` pipeline that dynamically injects environment secrets and deploys to Firebase Hosting on every push to the `main` branch.
+*   **Mock State Management:** Utilized persistent local storage via `utils/mockDb.js` alongside Firebase to ensure a seamless end-to-end testing experience for booking logic, provider status toggling, and assignment flows without fully provisioning cloud backends initially.
