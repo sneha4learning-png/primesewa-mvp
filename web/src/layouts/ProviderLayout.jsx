@@ -46,7 +46,7 @@ const ProviderLayout = () => {
                 <div className="h-20 flex items-center px-8 border-b border-white/10 relative z-10">
                     <span className="flex items-center gap-2 transform hover:scale-105 transition-transform cursor-default">
                         <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto" />
-                        <span className="text-xl font-black bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent hidden md:inline-block">Partner Portal</span>
+                        <span className="text-2xl font-bold text-white tracking-tight">PrimeSewa</span>
                     </span>
                 </div>
                 <nav className="flex-1 overflow-y-auto py-8">

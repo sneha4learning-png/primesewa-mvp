@@ -29,6 +29,7 @@ const AdminLayout = () => {
                 <div className="h-20 flex items-center px-8 border-b border-white/10 relative z-10">
                     <span className="flex items-center gap-2 transform hover:scale-105 transition-transform cursor-pointer">
                         <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto" />
+                        <span className="text-2xl font-bold text-white tracking-tight">PrimeSewa</span>
                     </span>
                     <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold text-slate-300 bg-white/10 uppercase tracking-widest whitespace-nowrap">Admin Profile</span>
                 </div>

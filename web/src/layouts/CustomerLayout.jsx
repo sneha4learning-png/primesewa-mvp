@@ -19,6 +19,7 @@ const CustomerLayout = () => {
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-2 group">
                         <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto group-hover:scale-105 transition-transform" />
+                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight">PrimeSewa</span>
                     </Link>
                     <nav className="hidden md:flex items-center gap-8">
                         <Link to="/" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">Home</Link>
