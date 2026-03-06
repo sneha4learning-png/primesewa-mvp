@@ -29,7 +29,7 @@ const AdminLogin = () => {
                         <img src="/logo.png" alt="PrimeSewa Logo" className="h-12 w-auto drop-shadow-md" />
                         <span className="text-3xl font-bold text-white tracking-tight">PrimeSewa</span>
                     </div>
-                    <h2 className="text-3xl font-bold tracking-tight">Admin System</h2>
+                    <h2 className="text-xl font-medium tracking-wide text-slate-400">Admin System</h2>
                     <p className="text-slate-400 mt-2">Authorized Access Only</p>
                 </div>
 
