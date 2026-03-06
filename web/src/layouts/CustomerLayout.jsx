@@ -18,12 +18,7 @@ const CustomerLayout = () => {
             <header className="h-16 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
                     <Link to="/customer" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 rounded-lg outline outline-2 outline-indigo-600 bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl group-hover:scale-110 transition-transform shadow-lg shadow-indigo-600/30">
-                            P
-                        </div>
-                        <span className="text-2xl font-black tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors">
-                            PrimeSeva
-                        </span>
+                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto group-hover:scale-105 transition-transform" />
                     </Link>
                     <nav className="hidden md:flex items-center gap-8">
                         <Link to="/customer" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">Home</Link>

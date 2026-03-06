@@ -38,7 +38,7 @@ const ProviderDashboard = () => {
                 // Filter bookings meant for THIS provider
                 const myBookings = allBookings.filter(b => b.provider === providerName);
 
-                setRequests(myBookings.filter(b => b.status === 'pending'));
+                setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
                 setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
 
                 // Calculate earnings from completed jobs for this provider
@@ -71,7 +71,7 @@ const ProviderDashboard = () => {
         if (!negotiatedPrice) return;
         try {
             await updateDoc(doc(db, 'bookings', req.id), { status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) });
-            setRequests(prev => prev.filter(r => r.id !== req.id));
+            setRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) } : r));
             setNegotiatingId(null);
             setNegotiatedPrice('');
         } catch (e) { console.error(e); }
@@ -237,7 +237,13 @@ const ProviderDashboard = () => {
                                                 </div>
                                             </div>
 
-                                            {negotiatingId === req.id ? (
+                                            {req.status === 'negotiating' ? (
+                                                <div className="flex gap-3">
+                                                    <div className="flex-1 py-3.5 bg-amber-50 border-2 border-amber-100 text-amber-700 font-bold rounded-2xl flex justify-center items-center gap-2">
+                                                        <Clock className="w-5 h-5" /> Quote Sent: ₹{req.proposedPrice} (Waiting for Customer)
+                                                    </div>
+                                                </div>
+                                            ) : negotiatingId === req.id ? (
                                                 <div className="flex gap-3 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                                     <div className="relative flex-1">
                                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black">₹</span>

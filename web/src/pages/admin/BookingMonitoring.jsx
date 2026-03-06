@@ -66,9 +66,11 @@ const BookingMonitoring = () => {
                         >
                             <option value="All">All Statuses</option>
                             <option value="pending">Pending</option>
+                            <option value="negotiating">Negotiating</option>
                             <option value="accepted">Accepted</option>
                             <option value="completed">Completed</option>
                             <option value="cancelled">Cancelled</option>
+                            <option value="rejected">Rejected</option>
                         </select>
                         <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>

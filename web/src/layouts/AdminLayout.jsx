@@ -27,33 +27,35 @@ const AdminLayout = () => {
             <aside className="w-72 bg-[#0B0F19] border-r border-[#1E293B] flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="h-20 flex items-center px-8 border-b border-white/10 relative z-10">
-                    <span className="text-2xl font-black bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent transform hover:scale-105 transition-transform cursor-default">PrimeSewa</span>
+                    <span className="flex items-center gap-2 transform hover:scale-105 transition-transform cursor-pointer">
+                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto" />
+                    </span>
                     <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold text-slate-300 bg-white/10 uppercase tracking-widest whitespace-nowrap">Admin Profile</span>
                 </div>
                 <nav className="flex-1 overflow-y-auto py-8">
                     <ul className="space-y-2 px-4 relative z-10">
                         <li>
-                            <NavLink to="/admin" end className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/admin/app" end className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <LayoutDashboard className="w-5 h-5" /> Dashboard
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/providers" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/admin/app/providers" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <UserCog className="w-5 h-5" /> Provider Fleet
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/bookings" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/admin/app/bookings" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <CalendarDays className="w-5 h-5" /> Live Bookings
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/commissions" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/admin/app/commissions" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <DollarSign className="w-5 h-5" /> Commissions
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/users" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/admin/app/users" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <Users className="w-5 h-5" /> Consumers
                             </NavLink>
                         </li>

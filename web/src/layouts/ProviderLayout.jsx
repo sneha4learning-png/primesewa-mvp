@@ -44,22 +44,25 @@ const ProviderLayout = () => {
             <aside className="w-72 bg-[#0F172A] border-r border-[#1E293B] flex flex-col relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="h-20 flex items-center px-8 border-b border-white/10 relative z-10">
-                    <span className="text-2xl font-black bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent transform hover:scale-105 transition-transform cursor-default">Partner Portal</span>
+                    <span className="flex items-center gap-2 transform hover:scale-105 transition-transform cursor-default">
+                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto" />
+                        <span className="text-xl font-black bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent hidden md:inline-block">Partner Portal</span>
+                    </span>
                 </div>
                 <nav className="flex-1 overflow-y-auto py-8">
                     <ul className="space-y-2 px-4 relative z-10">
                         <li>
-                            <NavLink to="/provider" end className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/provider/app" end className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <Briefcase className="w-5 h-5" /> Service Requests
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/provider/earnings" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/provider/app/earnings" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <DollarSign className="w-5 h-5" /> Earnings Center
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/provider/profile" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            <NavLink to="/provider/app/profile" className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
                                 <UserCircle className="w-5 h-5" /> My Profile
                             </NavLink>
                         </li>

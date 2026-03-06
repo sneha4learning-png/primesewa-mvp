@@ -42,21 +42,31 @@ function App() {
           </Route>
 
           {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-            <Route index element={<DashboardOverview />} />
-            <Route path="providers" element={<ProviderManagement />} />
-            <Route path="bookings" element={<BookingMonitoring />} />
-            <Route path="commissions" element={<CommissionDashboard />} />
-            <Route path="users" element={<UserManagement />} />
+          <Route path="/admin">
+            <Route element={<CustomerLayout />}>
+              <Route index element={<LandingPage />} />
+            </Route>
+            <Route path="login" element={<AdminLogin />} />
+            <Route path="app" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+              <Route index element={<DashboardOverview />} />
+              <Route path="providers" element={<ProviderManagement />} />
+              <Route path="bookings" element={<BookingMonitoring />} />
+              <Route path="commissions" element={<CommissionDashboard />} />
+              <Route path="users" element={<UserManagement />} />
+            </Route>
           </Route>
 
           {/* Provider Routes */}
-          <Route path="/provider/login" element={<ProviderLogin />} />
-          <Route path="/provider" element={<ProviderRoute><ProviderLayout /></ProviderRoute>}>
-            <Route index element={<ProviderDashboard />} />
-            <Route path="earnings" element={<ProviderEarnings />} />
-            <Route path="profile" element={<ProviderProfile />} />
+          <Route path="/provider">
+            <Route element={<CustomerLayout />}>
+              <Route index element={<LandingPage />} />
+            </Route>
+            <Route path="login" element={<ProviderLogin />} />
+            <Route path="app" element={<ProviderRoute><ProviderLayout /></ProviderRoute>}>
+              <Route index element={<ProviderDashboard />} />
+              <Route path="earnings" element={<ProviderEarnings />} />
+              <Route path="profile" element={<ProviderProfile />} />
+            </Route>
           </Route>
 
           {/* Fallback */}
