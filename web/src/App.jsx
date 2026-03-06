@@ -33,19 +33,17 @@ function App() {
       <Router>
         <Routes>
           {/* Public / Customer Routes */}
-          <Route path="/" element={<Navigate to="/" />} />
-          <Route path="/customer" element={<CustomerLayout />}>
+          <Route path="/" element={<CustomerLayout />}>
             <Route index element={<LandingPage />} />
             <Route path="login" element={<LoginPage />} />
-            <Route path="app" element={<CustomerRoute><CustomerHome /></CustomerRoute>} />
+            <Route path="dashboard" element={<CustomerRoute><CustomerHome /></CustomerRoute>} />
             <Route path="profile" element={<CustomerRoute><CustomerProfile /></CustomerRoute>} />
           </Route>
 
           {/* Admin Routes */}
           <Route path="/admin">
-            <Route index element={<Navigate to="/admin" replace />} />
             <Route path="login" element={<AdminLogin />} />
-            <Route path="app" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route path="" element={<AdminRoute><AdminLayout /></AdminRoute>}>
               <Route index element={<DashboardOverview />} />
               <Route path="providers" element={<ProviderManagement />} />
               <Route path="bookings" element={<BookingMonitoring />} />
@@ -56,9 +54,8 @@ function App() {
 
           {/* Provider Routes */}
           <Route path="/provider">
-            <Route index element={<Navigate to="/provider" replace />} />
             <Route path="login" element={<ProviderLogin />} />
-            <Route path="app" element={<ProviderRoute><ProviderLayout /></ProviderRoute>}>
+            <Route path="" element={<ProviderRoute><ProviderLayout /></ProviderRoute>}>
               <Route index element={<ProviderDashboard />} />
               <Route path="earnings" element={<ProviderEarnings />} />
               <Route path="profile" element={<ProviderProfile />} />
