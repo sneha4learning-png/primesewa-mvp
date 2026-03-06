@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
-import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
 
 const ProviderDashboard = () => {
     const { currentUser, userData } = useAuth();
@@ -87,22 +87,41 @@ const ProviderDashboard = () => {
     };
 
     const completeJob = async (job) => {
-        const finalTime = job.time || 'A moment ago';
-        const finalPrice = job.proposedPrice || job.price || job.amount;
+        const finalPrice = job.proposedPrice || job.price || job.amount || 0;
+        const netEarning = parseFloat(finalPrice) * 0.85;
+        const platformCut = parseFloat(finalPrice) * 0.15;
 
         try {
-            await updateDoc(doc(db, 'bookings', job.id), { status: 'completed', time: finalTime, price: finalPrice });
+            // Update booking status
+            await updateDoc(doc(db, 'bookings', job.id), {
+                status: 'completed',
+                completedAt: serverTimestamp(),
+                price: finalPrice
+            });
+
+            // BUG-5: Write commission record to Firestore so Admin commission page shows data
+            await addDoc(collection(db, 'commissions'), {
+                bookingId: job.id,
+                provider: job.provider || userData?.name || 'Unknown',
+                amount: parseFloat(finalPrice),
+                commission: parseFloat(platformCut.toFixed(2)),
+                providerEarning: parseFloat(netEarning.toFixed(2)),
+                service: job.service,
+                customer: job.customer,
+                date: new Date().toISOString().split('T')[0],
+                createdAt: serverTimestamp()
+            });
+
             setActiveJobs(prev => prev.filter(j => j.id !== job.id));
 
-            // Optimistically update earnings
-            const net = finalPrice * 0.85;
+            // Optimistically update earnings display
             setEarnings(prev => ({
                 ...prev,
-                today: prev.today + net,
-                week: prev.week + net,
-                month: prev.month + net
+                today: prev.today + netEarning,
+                week: prev.week + netEarning,
+                month: prev.month + netEarning
             }));
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('Error completing job:', e); }
     };
 
     return (
@@ -187,7 +206,15 @@ const ProviderDashboard = () => {
                                                 <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" /> <span>{job.address}</span>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <Phone className="w-4 h-4 text-slate-400 shrink-0" /> <span className="text-blue-600 hover:text-blue-700 cursor-pointer font-bold">Call {job.customer}</span>
+                                                <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                                                {/* BUG-2: Use tel: link so clicking actually initiates a call */}
+                                                <a
+                                                    href={`tel:${job.customerPhone || job.phone || ''}`}
+                                                    className="text-blue-600 hover:text-blue-700 font-bold underline-offset-2 hover:underline"
+                                                    onClick={e => { if (!job.customerPhone && !job.phone) { e.preventDefault(); alert('Customer phone number not available for this booking.'); } }}
+                                                >
+                                                    Call {job.customer}
+                                                </a>
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{job.time}</span>

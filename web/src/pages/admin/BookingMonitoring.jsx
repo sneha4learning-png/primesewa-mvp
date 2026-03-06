@@ -1,7 +1,70 @@
 import { useState, useEffect } from 'react';
-import { Filter, Search, Calendar, ChevronDown } from 'lucide-react';
+import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
+
+// BUG-6: Review Timeline Modal
+const TimelineModal = ({ booking, onClose }) => {
+    const steps = [
+        { label: 'Booking Created', status: 'done', time: booking.date ? `${booking.date} ${booking.time || ''}` : 'N/A' },
+        { label: 'Provider Assigned', status: booking.status !== 'pending' ? 'done' : 'pending', time: booking.provider || 'Awaiting' },
+        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? 'done' : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice}` : 'Not applicable' },
+        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip'), time: booking.status !== 'pending' ? booking.provider : 'Pending' },
+        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : 'pending', time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price}` : 'Pending' },
+    ];
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-900">Booking Timeline</h3>
+                        <p className="text-sm text-gray-500 mt-0.5">#{booking.id} · {booking.service}</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                        <X className="w-5 h-5 text-gray-500" />
+                    </button>
+                </div>
+
+                <div className="space-y-1">
+                    {steps.filter(s => s.status !== 'skip').map((step, i) => (
+                        <div key={i} className="flex gap-4 items-start">
+                            <div className="flex flex-col items-center">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${step.status === 'done' ? 'bg-emerald-100 text-emerald-600' :
+                                        step.status === 'active' ? 'bg-purple-100 text-purple-600' :
+                                            'bg-gray-100 text-gray-400'
+                                    }`}>
+                                    {step.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> :
+                                        step.status === 'active' ? <Loader2 className="w-4 h-4 animate-spin" /> :
+                                            <Clock className="w-4 h-4" />}
+                                </div>
+                                {i < steps.filter(s => s.status !== 'skip').length - 1 && (
+                                    <div className={`w-0.5 h-8 mt-1 ${step.status === 'done' ? 'bg-emerald-200' : 'bg-gray-200'}`} />
+                                )}
+                            </div>
+                            <div className="pb-4">
+                                <p className={`font-semibold text-sm ${step.status === 'done' ? 'text-gray-900' : step.status === 'active' ? 'text-purple-700' : 'text-gray-400'}`}>
+                                    {step.label}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5">{step.time}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                            booking.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
+                                booking.status === 'negotiating' ? 'bg-purple-100 text-purple-700' :
+                                    booking.status === 'cancelled' || booking.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                        'bg-amber-100 text-amber-700'
+                        }`}>{booking.status}</span>
+                    <p className="text-sm font-bold text-gray-900">₹{booking.proposedPrice || booking.price || booking.amount || '—'}</p>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const BookingMonitoring = () => {
     const [bookings, setBookings] = useState([]);
@@ -11,6 +74,7 @@ const BookingMonitoring = () => {
     const [filterProvider, setFilterProvider] = useState('');
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [timelineBooking, setTimelineBooking] = useState(null); // BUG-6: timeline modal state
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -20,7 +84,6 @@ const BookingMonitoring = () => {
                 querySnapshot.forEach((doc) => {
                     fetched.push({ id: doc.id, ...doc.data() });
                 });
-                // Sort to show newest first (basic reversal since no order is guaranteed if missing timestamps)
                 setBookings(fetched.reverse());
             } catch (err) {
                 console.error("Error fetching bookings:", err);
@@ -34,10 +97,9 @@ const BookingMonitoring = () => {
 
     const filteredBookings = bookings.filter(b => {
         const matchesStatus = filterStatus === 'All' || b.status === filterStatus.toLowerCase();
-        const matchesCategory = filterCategory === 'All' || b.service.toLowerCase().includes(filterCategory.toLowerCase());
-        const matchesProvider = b.provider.toLowerCase().includes(filterProvider.toLowerCase());
-        const matchesDate = filterDate === 'All' || b.date.toLowerCase().includes(filterDate.toLowerCase());
-
+        const matchesCategory = filterCategory === 'All' || (b.service || '').toLowerCase().includes(filterCategory.toLowerCase());
+        const matchesProvider = (b.provider || '').toLowerCase().includes(filterProvider.toLowerCase());
+        const matchesDate = filterDate === 'All' || (b.date || '').toLowerCase().includes(filterDate.toLowerCase());
         return matchesStatus && matchesCategory && matchesProvider && matchesDate;
     });
 
@@ -54,9 +116,11 @@ const BookingMonitoring = () => {
 
     return (
         <div className="space-y-6">
+            {/* BUG-6: Timeline Modal */}
+            {timelineBooking && <TimelineModal booking={timelineBooking} onClose={() => setTimelineBooking(null)} />}
+
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">Booking Monitor</h2>
-
                 <div className="flex items-center gap-3">
                     <div className="relative">
                         <select
@@ -85,42 +149,27 @@ const BookingMonitoring = () => {
 
             {/* Advanced Filters Panel */}
             {showAdvanced && (
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-6 animate-in slide-in-from-top-2">
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Service Category</label>
-                        <select
-                            value={filterCategory}
-                            onChange={(e) => setFilterCategory(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                        >
+                        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             <option value="All">All Categories</option>
                             <option value="Plumbing">Plumbing</option>
                             <option value="Electrical">Electrical</option>
                             <option value="Cleaning">Cleaning</option>
                             <option value="Carpentry">Carpentry</option>
-                            <option value="Repair">Repair</option>
                         </select>
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Provider Name</label>
                         <div className="relative">
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Search by provider..."
-                                value={filterProvider}
-                                onChange={(e) => setFilterProvider(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
+                            <input type="text" placeholder="Search by provider..." value={filterProvider} onChange={(e) => setFilterProvider(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                         </div>
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Date Filter</label>
-                        <select
-                            value={filterDate}
-                            onChange={(e) => setFilterDate(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                        >
+                        <select value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             <option value="All">Any Time</option>
                             <option value="Today">Today</option>
                             <option value="Yesterday">Yesterday</option>
@@ -141,15 +190,13 @@ const BookingMonitoring = () => {
                                 <th className="px-6 py-4 font-medium">Provider</th>
                                 <th className="px-6 py-4 font-medium">Amount</th>
                                 <th className="px-6 py-4 font-medium">Status</th>
-                                <th className="px-6 py-4 font-medium text-right">Overrides</th>
+                                <th className="px-6 py-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredBookings.map(booking => (
                                 <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                        {booking.id}
-                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{booking.id}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{booking.service}</div>
                                         <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
@@ -165,7 +212,13 @@ const BookingMonitoring = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                        <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">Review Timeline</button>
+                                        {/* BUG-6: Review Timeline now opens the modal */}
+                                        <button
+                                            onClick={() => setTimelineBooking(booking)}
+                                            className="text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline underline-offset-2 transition-colors"
+                                        >
+                                            Review Timeline
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -175,7 +228,7 @@ const BookingMonitoring = () => {
                                         <div className="flex justify-center mb-2">
                                             <Search className="w-8 h-8 text-gray-300" />
                                         </div>
-                                        No bookings found for the selected filter.
+                                        {isLoading ? 'Loading bookings...' : 'No bookings found for the selected filter.'}
                                     </td>
                                 </tr>
                             )}

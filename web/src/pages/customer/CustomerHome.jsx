@@ -92,6 +92,8 @@ const CustomerHome = () => {
         };
 
         setPendingBookingData(newBooking);
+        // Also store customer phone so provider can call
+        newBooking.customerPhone = userData?.phone || '';
         setBookingDate('');
         setBookingTime('');
         setBookingAddress('');
@@ -539,7 +541,11 @@ const CustomerHome = () => {
                                     <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
                                         <IndianRupee className="w-5 h-5" />
                                     </div>
-                                    <div className="text-xl font-black text-slate-900">{selectedProviderProfile.price.replace('₹', '').replace('/hr', '')}</div>
+                                    <div className="text-xl font-black text-slate-900">
+                                        {typeof selectedProviderProfile.price === 'string'
+                                            ? selectedProviderProfile.price.replace('₹', '').replace('/hr', '')
+                                            : selectedProviderProfile.price || 'N/A'}
+                                    </div>
                                     <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rate / Hr</div>
                                 </div>
                             </div>

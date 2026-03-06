@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from './config';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
 const AuthContext = createContext(null);
@@ -30,7 +30,17 @@ export const AuthProvider = ({ children }) => {
                     let userDocSnap = await getDoc(userDocRef);
 
                     if (userDocSnap.exists()) {
-                        setUserData({ ...userDocSnap.data(), uid: user.uid });
+                        const data = userDocSnap.data();
+                        // BUG-7: Block blocked users from accessing the app
+                        if (data.status === 'blocked') {
+                            console.warn('User is blocked. Signing out.');
+                            await signOut(auth);
+                            setCurrentUser(null);
+                            setUserData(null);
+                            setLoading(false);
+                            return;
+                        }
+                        setUserData({ ...data, uid: user.uid });
                     } else {
                         // Check if provider
                         let providerDocRef = doc(db, 'providers', user.uid);
