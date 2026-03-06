@@ -1,8 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp } from 'firebase/firestore';
 import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle } from 'lucide-react';
+
+// Prevents any crash inside CustomerHome from showing a completely blank page
+class ErrorBoundary extends Component {
+    constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+    static getDerivedStateFromError(error) { return { hasError: true, error }; }
+    componentDidCatch(error) { console.error('CustomerHome Error:', error); }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center p-8">
+                        <p className="text-red-600 font-bold text-xl mb-2">Something went wrong</p>
+                        <p className="text-gray-500 text-sm mb-4">{this.state.error?.message}</p>
+                        <button onClick={() => this.setState({ hasError: false })} className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700">Try Again</button>
+                    </div>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 const categories = [
     { id: '1', name: 'Plumbing', icon: Droplets, color: 'bg-blue-100 text-blue-600' },
@@ -500,80 +521,92 @@ const CustomerHome = () => {
                 </div>
             )}
 
-            {/* Provider Detail Modal */}
-            {selectedProviderProfile && (
-                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
-                            <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full p-2">
-                                <XCircle className="w-6 h-6" />
-                            </button>
-                        </div>
-                        <div className="px-8 pb-8 -mt-12 relative">
-                            <div className="flex justify-between items-end mb-6">
-                                <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center text-4xl font-black text-indigo-600 border-4 border-white shadow-lg">
-                                    {selectedProviderProfile.name.charAt(0)}
-                                </div>
-                                <button onClick={() => handleBook(selectedProviderProfile)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 hover:shadow-indigo-600/30 transition-all mb-2">
-                                    Book This Pro
+            {/* Provider Detail Modal — All fields null-safe */}
+            {selectedProviderProfile && (() => {
+                const p = selectedProviderProfile;
+                const name = p.name || 'Provider';
+                const initial = name.charAt(0).toUpperCase();
+                const category = p.category || 'General Service';
+                const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating) || 0;
+                const jobs = p.jobs || p.jobCount || 0;
+                const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0
+                    ? p.serviceAreas.join(', ')
+                    : 'Ahmedabad';
+                const priceDisplay = p.price
+                    ? (typeof p.price === 'string'
+                        ? p.price.replace('₹', '').replace('/hr', '')
+                        : p.price)
+                    : 'N/A';
+
+                return (
+                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setSelectedProviderProfile(null)}>
+                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+                            <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
+                                <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full p-2">
+                                    <XCircle className="w-6 h-6" />
                                 </button>
                             </div>
-
-                            <h2 className="text-2xl font-black text-slate-900">{selectedProviderProfile.name}</h2>
-                            <p className="text-slate-500 font-medium">{selectedProviderProfile.category} Specialist • {selectedProviderProfile.serviceAreas ? selectedProviderProfile.serviceAreas.join(', ') : 'Ahmedabad'}</p>
-
-                            <div className="grid grid-cols-3 gap-4 mt-8">
-                                <div className="bg-amber-50 rounded-2xl p-4 text-center border border-amber-100">
-                                    <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
-                                        <Star className="w-5 h-5 fill-current" />
+                            <div className="px-8 pb-8 -mt-12 relative">
+                                <div className="flex justify-between items-end mb-6">
+                                    <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center text-4xl font-black text-indigo-600 border-4 border-white shadow-lg">
+                                        {initial}
                                     </div>
-                                    <div className="text-xl font-black text-slate-900">{selectedProviderProfile.rating}</div>
-                                    <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rating</div>
+                                    <button onClick={() => handleBook(p)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-all mb-2">
+                                        Book This Pro
+                                    </button>
                                 </div>
-                                <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
-                                    <div className="flex items-center justify-center gap-1 text-emerald-600 mb-1">
-                                        <CheckCircle2 className="w-5 h-5" />
-                                    </div>
-                                    <div className="text-xl font-black text-slate-900">{selectedProviderProfile.jobs}</div>
-                                    <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Jobs Done</div>
-                                </div>
-                                <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
-                                    <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
-                                        <IndianRupee className="w-5 h-5" />
-                                    </div>
-                                    <div className="text-xl font-black text-slate-900">
-                                        {typeof selectedProviderProfile.price === 'string'
-                                            ? selectedProviderProfile.price.replace('₹', '').replace('/hr', '')
-                                            : selectedProviderProfile.price || 'N/A'}
-                                    </div>
-                                    <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rate / Hr</div>
-                                </div>
-                            </div>
 
-                            <div className="mt-8">
-                                <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
-                                <div className="space-y-4">
-                                    {/* Mock Reviews */}
-                                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                        <div className="flex gap-2 text-amber-400 mb-2">
-                                            {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(selectedProviderProfile.rating) ? 'fill-current' : 'text-slate-300'}`} />)}
+                                <h2 className="text-2xl font-black text-slate-900">{name}</h2>
+                                <p className="text-slate-500 font-medium">{category} Specialist • {areas}</p>
+
+                                <div className="grid grid-cols-3 gap-4 mt-8">
+                                    <div className="bg-amber-50 rounded-2xl p-4 text-center border border-amber-100">
+                                        <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
+                                            <Star className="w-5 h-5 fill-current" />
                                         </div>
-                                        <p className="text-slate-600 text-sm font-medium">"Very professional and quick service. Highly recommended!"</p>
-                                        <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                        <div className="text-xl font-black text-slate-900">{rating.toFixed(1)}</div>
+                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rating</div>
                                     </div>
-                                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                        <div className="flex gap-2 text-amber-400 mb-2">
-                                            {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                    <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
+                                        <div className="flex items-center justify-center gap-1 text-emerald-600 mb-1">
+                                            <CheckCircle2 className="w-5 h-5" />
                                         </div>
-                                        <p className="text-slate-600 text-sm font-medium">"Arrived on time and solved the issue perfectly."</p>
-                                        <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                        <div className="text-xl font-black text-slate-900">{jobs}</div>
+                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Jobs Done</div>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
+                                        <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                                            <IndianRupee className="w-5 h-5" />
+                                        </div>
+                                        <div className="text-xl font-black text-slate-900">{priceDisplay}</div>
+                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rate / Hr</div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8">
+                                    <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
+                                    <div className="space-y-4">
+                                        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                            <div className="flex gap-2 text-amber-400 mb-2">
+                                                {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-current' : 'text-slate-300'}`} />)}
+                                            </div>
+                                            <p className="text-slate-600 text-sm font-medium">"Very professional and quick service. Highly recommended!"</p>
+                                            <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                        </div>
+                                        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                            <div className="flex gap-2 text-amber-400 mb-2">
+                                                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                            </div>
+                                            <p className="text-slate-600 text-sm font-medium">"Arrived on time and solved the issue perfectly."</p>
+                                            <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
         </div>
     );
 };
