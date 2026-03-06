@@ -109,7 +109,7 @@ const LoginPage = () => {
 
             setCurrentUser(user);
             setUserData(userDataObj);
-            navigate('/customer/app');
+            navigate('/dashboard');
         } catch (err) {
             console.error("OTP Verify Error", err);
             setError('Invalid OTP. Please try again.');

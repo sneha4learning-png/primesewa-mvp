@@ -25,7 +25,7 @@ export const CustomerRoute = ({ children }) => {
     const { currentUser, loading } = useAuth();
 
     if (loading) return <div>Loading...</div>;
-    if (!currentUser) return <Navigate to="/customer/login" />;
+    if (!currentUser) return <Navigate to="/login" />;
 
     return children;
 };

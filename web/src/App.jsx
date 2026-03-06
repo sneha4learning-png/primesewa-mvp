@@ -33,7 +33,7 @@ function App() {
       <Router>
         <Routes>
           {/* Public / Customer Routes */}
-          <Route path="/" element={<Navigate to="/customer" />} />
+          <Route path="/" element={<Navigate to="/" />} />
           <Route path="/customer" element={<CustomerLayout />}>
             <Route index element={<LandingPage />} />
             <Route path="login" element={<LoginPage />} />
@@ -43,7 +43,7 @@ function App() {
 
           {/* Admin Routes */}
           <Route path="/admin">
-            <Route index element={<Navigate to="/admin/app" replace />} />
+            <Route index element={<Navigate to="/admin" replace />} />
             <Route path="login" element={<AdminLogin />} />
             <Route path="app" element={<AdminRoute><AdminLayout /></AdminRoute>}>
               <Route index element={<DashboardOverview />} />
@@ -56,7 +56,7 @@ function App() {
 
           {/* Provider Routes */}
           <Route path="/provider">
-            <Route index element={<Navigate to="/provider/app" replace />} />
+            <Route index element={<Navigate to="/provider" replace />} />
             <Route path="login" element={<ProviderLogin />} />
             <Route path="app" element={<ProviderRoute><ProviderLayout /></ProviderRoute>}>
               <Route index element={<ProviderDashboard />} />
@@ -66,7 +66,7 @@ function App() {
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/customer" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -156,7 +156,7 @@ const ProviderLogin = () => {
 
             setCurrentUser(user);
             setUserData({ uid: user.uid, role: 'provider', name: providerName });
-            navigate('/provider/app');
+            navigate('/provider');
         } catch (err) {
             console.error("OTP Verify Error", err);
             setError('Invalid OTP. Please try again.');
