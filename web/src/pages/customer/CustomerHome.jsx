@@ -102,14 +102,19 @@ const CustomerHome = () => {
     }, [userData]);
 
     const handleBook = (provider) => {
-        // Create a draft pending booking
+        // Safely parse price whether it's a string (e.g. '₹500/hr') or a number
+        const rawPrice = provider.price;
+        const parsedPrice = typeof rawPrice === 'number'
+            ? rawPrice
+            : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
+
         const newBooking = {
             id: `B${Math.floor(Math.random() * 10000)}`,
-            service: selectedCategory || 'General Service',
+            service: selectedCategory || provider.category || 'General Service',
             status: 'pending',
-            provider: provider.name,
+            provider: provider.name || 'Provider',
             customer: userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer'),
-            price: parseInt(provider.price.replace('₹', '').replace('/hr', '')) || 500
+            price: parsedPrice
         };
 
         setPendingBookingData(newBooking);
@@ -585,22 +590,28 @@ const CustomerHome = () => {
 
                                 <div className="mt-8">
                                     <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
-                                    <div className="space-y-4">
-                                        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                            <div className="flex gap-2 text-amber-400 mb-2">
-                                                {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-current' : 'text-slate-300'}`} />)}
+                                    {jobs > 0 ? (
+                                        <div className="space-y-4">
+                                            <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                                <div className="flex gap-2 text-amber-400 mb-2">
+                                                    {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-current' : 'text-slate-300'}`} />)}
+                                                </div>
+                                                <p className="text-slate-600 text-sm font-medium">"Very professional and quick service. Highly recommended!"</p>
+                                                <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
                                             </div>
-                                            <p className="text-slate-600 text-sm font-medium">"Very professional and quick service. Highly recommended!"</p>
-                                            <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
-                                        </div>
-                                        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                            <div className="flex gap-2 text-amber-400 mb-2">
-                                                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                            <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                                <div className="flex gap-2 text-amber-400 mb-2">
+                                                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                                </div>
+                                                <p className="text-slate-600 text-sm font-medium">"Arrived on time and solved the issue perfectly."</p>
+                                                <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
                                             </div>
-                                            <p className="text-slate-600 text-sm font-medium">"Arrived on time and solved the issue perfectly."</p>
-                                            <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl text-center">
+                                            <p className="text-slate-400 font-medium text-sm">No reviews yet — be the first to book!</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
