@@ -29,6 +29,9 @@ const CustomerHome = () => {
     const [bookingAddress, setBookingAddress] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [visibleCount, setVisibleCount] = useState(5);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [networkError, setNetworkError] = useState(false);
 
     useEffect(() => {
         const loadDb = async () => {
@@ -93,6 +96,9 @@ const CustomerHome = () => {
 
     const confirmBooking = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return; // NT-015: prevent duplicate submissions
+        setIsSubmitting(true);
+        setNetworkError(false);
 
         const finalBookingData = {
             service: selectedCategory || 'General Service',
@@ -107,14 +113,25 @@ const CustomerHome = () => {
             createdAt: serverTimestamp()
         };
 
-        setBookingStep(2);
-
         try {
             await addDoc(collection(db, 'bookings'), finalBookingData);
+            setBookingStep(2);
             setTimeout(() => setBookingStep(0), 3000);
         } catch (err) {
             console.error("Error confirming booking:", err);
-            setBookingStep(0);
+            setNetworkError(true); // EC-003: show retry message
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleCancelBooking = async (bookingId) => {
+        try {
+            const { updateDoc, doc } = await import('firebase/firestore');
+            await updateDoc(doc(db, 'bookings', bookingId), { status: 'cancelled' });
+            setMockBookings(prev => prev.filter(b => b.id !== bookingId));
+        } catch (err) {
+            console.error('Cancel error:', err);
         }
     };
 
@@ -132,8 +149,7 @@ const CustomerHome = () => {
             (p.category || 'Plumbing').toLowerCase().includes(query)
         );
     } else if (!selectedCategory) {
-        // If neither search nor category is active, slice to top 5 out-of-the-box
-        displayedProviders = displayedProviders.slice(0, 5);
+        // EC-006: pagination via load-more (no hard slice)
     }
 
     if (ratingFilter !== '0') {
@@ -226,9 +242,16 @@ const CustomerHome = () => {
                             <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Issue Description (Optional)</label>
                             <input type="text" value={bookingDesc} onChange={(e) => setBookingDesc(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., Fan regulator is not working" />
                         </div>
+                        {networkError && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-medium flex items-center gap-2">
+                                ⚠️ Network error. Please check your connection and try again.
+                            </div>
+                        )}
                         <div className="pt-6 flex gap-4">
-                            <button type="button" onClick={() => setBookingStep(0)} className="px-8 py-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-600 hover:border-slate-300 hover:bg-slate-50 w-full transition-all">Cancel</button>
-                            <button type="submit" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl font-bold text-white hover:from-blue-700 hover:to-indigo-700 w-full shadow-lg shadow-indigo-600/30 hover:-translate-y-1 transition-all">Confirm Request</button>
+                            <button type="button" onClick={() => { setBookingStep(0); setNetworkError(false); }} className="px-8 py-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-600 hover:border-slate-300 hover:bg-slate-50 w-full transition-all">Cancel</button>
+                            <button type="submit" disabled={isSubmitting} className={`px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl font-bold text-white w-full shadow-lg shadow-indigo-600/30 transition-all ${isSubmitting ? 'opacity-60 cursor-not-allowed' : 'hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-1'}`}>
+                                {isSubmitting ? 'Submitting...' : 'Confirm Request'}
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -297,7 +320,7 @@ const CustomerHome = () => {
                                 </select>
                             </div>
                             <div className="space-y-4">
-                                {displayedProviders.length > 0 ? displayedProviders.map(provider => (
+                                {displayedProviders.slice(0, visibleCount).map(provider => (
                                     <div key={provider.id} className="group bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-xl hover:border-slate-200 transition-all duration-300">
                                         <div className="flex items-center gap-6">
                                             <div className="relative">
@@ -328,10 +351,20 @@ const CustomerHome = () => {
                                             </button>
                                         </div>
                                     </div>
-                                )) : (
+                                ))}
+                                {displayedProviders.length === 0 && (
                                     <div className="p-12 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                                         <p className="text-slate-500 font-medium">No active providers found for this category.</p>
                                     </div>
+                                )}
+                                {/* EC-006: Load More Pagination */}
+                                {visibleCount < displayedProviders.length && (
+                                    <button
+                                        onClick={() => setVisibleCount(c => c + 5)}
+                                        className="w-full py-4 mt-2 border-2 border-dashed border-slate-200 rounded-3xl text-slate-500 font-bold hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/50 transition-all"
+                                    >
+                                        Load More Providers ({displayedProviders.length - visibleCount} remaining)
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -376,6 +409,17 @@ const CustomerHome = () => {
                                                         className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm shadow-md transition-colors"
                                                     >
                                                         Accept ₹{b.proposedPrice}
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {/* EC-008: Cancel button for accepted / pending bookings */}
+                                            {(b.status === 'accepted' || b.status === 'pending') && (
+                                                <div className="mt-3 pt-3 border-t border-slate-100">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleCancelBooking(b.id); }}
+                                                        className="w-full py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs transition-colors border border-red-100"
+                                                    >
+                                                        Cancel Booking
                                                     </button>
                                                 </div>
                                             )}
