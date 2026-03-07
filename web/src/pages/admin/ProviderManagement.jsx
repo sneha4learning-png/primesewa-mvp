@@ -200,9 +200,15 @@ const ProviderManagement = () => {
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Experience</p>
                                         <p className="font-bold text-gray-800">{selectedProvider.yearsExperience !== undefined ? `${selectedProvider.yearsExperience} years` : <span className="text-gray-400 font-normal">Not provided</span>}</p>
                                     </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Document</p>
-                                        <p className="font-bold text-gray-800 text-xs truncate">{selectedProvider.proofDocumentName || <span className="text-gray-400 font-normal">No file</span>}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 col-span-2">
+                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Identity Document</p>
+                                        {selectedProvider.proofDocument ? (
+                                            <a href={selectedProvider.proofDocument} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm">
+                                                <img src={selectedProvider.proofDocument} alt="ID Proof" className="w-full h-auto object-cover" />
+                                            </a>
+                                        ) : (
+                                            <p className="font-bold text-gray-800 text-sm truncate">{selectedProvider.proofDocumentName || <span className="text-gray-400 font-normal">No picture provided</span>}</p>
+                                        )}
                                     </div>
                                 </div>
                                 {selectedProvider.workDescription && (
