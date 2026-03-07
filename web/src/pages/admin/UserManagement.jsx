@@ -110,8 +110,8 @@ const UserManagement = () => {
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
+                <table className="w-full text-left border-collapse min-w-[800px]">
                     <thead>
                         <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
                             <th className="px-6 py-4 font-medium">Customer Details</th>
