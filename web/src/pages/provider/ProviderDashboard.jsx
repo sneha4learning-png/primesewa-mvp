@@ -86,10 +86,18 @@ const ProviderDashboard = () => {
         } catch (e) { console.error(e); }
     };
 
+    const updateTrackingStatus = async (job, status) => {
+        try {
+            await updateDoc(doc(db, 'bookings', job.id), { trackingStatus: status });
+            setActiveJobs(prev => prev.map(j => j.id === job.id ? { ...j, trackingStatus: status } : j));
+        } catch (e) { console.error('Tracking update error:', e); }
+    };
+
     const completeJob = async (job) => {
-        const finalPrice = job.proposedPrice || job.price || job.amount || 0;
-        const netEarning = parseFloat(finalPrice) * 0.85;
-        const platformCut = parseFloat(finalPrice) * 0.15;
+        const rawPrice = job.proposedPrice || job.price || job.amount || 0;
+        const finalPrice = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
+        const netEarning = finalPrice * 0.85;
+        const platformCut = finalPrice * 0.15;
 
         try {
             // Update booking status
@@ -103,7 +111,7 @@ const ProviderDashboard = () => {
             await addDoc(collection(db, 'commissions'), {
                 bookingId: job.id,
                 provider: job.provider || userData?.name || 'Unknown',
-                amount: parseFloat(finalPrice),
+                amount: finalPrice,
                 commission: parseFloat(platformCut.toFixed(2)),
                 providerEarning: parseFloat(netEarning.toFixed(2)),
                 service: job.service,
@@ -220,6 +228,25 @@ const ProviderDashboard = () => {
                                                 <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{job.time}</span>
                                             </div>
                                         </div>
+                                        {/* Live Tracker Status Buttons */}
+                                        <div className="mb-4">
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Update Your Status</p>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {[
+                                                    { key: 'enroute', label: '🚗 En Route', color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
+                                                    { key: 'arrived', label: '📍 Arrived', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
+                                                    { key: 'inprogress', label: '🔧 In Progress', color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' },
+                                                ].map(s => (
+                                                    <button
+                                                        key={s.key}
+                                                        onClick={() => updateTrackingStatus(job, s.key)}
+                                                        className={`py-2 text-xs font-bold rounded-xl border transition-all ${s.color} ${job.trackingStatus === s.key ? 'ring-2 ring-offset-1 ring-current' : ''}`}
+                                                    >
+                                                        {s.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                         <button onClick={() => completeJob(job)} className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-900/20 active:scale-[0.98]">
                                             <CheckCircle className="w-5 h-5 text-emerald-400" /> Mark as Completed
                                         </button>
@@ -327,7 +354,7 @@ const ProviderDashboard = () => {
                     </div>
                 </>
             )}
-        </div>
+        </div >
     );
 };
 

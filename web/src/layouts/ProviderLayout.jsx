@@ -2,8 +2,8 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
-import { getProviders, updateProviderOnlineStatus } from '../utils/mockDb';
-
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 const ProviderLayout = () => {
     const { userData, setUserData, setCurrentUser } = useAuth();
     const navigate = useNavigate();
@@ -18,22 +18,35 @@ const ProviderLayout = () => {
     };
 
     useEffect(() => {
-        const providerName = userData?.name;
-        if (providerName) {
-            const providers = getProviders();
-            const me = providers.find(p => p.name === providerName);
-            if (me) {
-                setIsOnline(me.isOnline || false);
-                setProviderId(me.id);
+        const fetchStatus = async () => {
+            if (userData?.uid) {
+                try {
+                    const docSnap = await getDoc(doc(db, 'providers', userData.uid));
+                    if (docSnap.exists()) {
+                        setIsOnline(docSnap.data().isOnline || false);
+                        setProviderId(userData.uid);
+                    }
+                } catch (e) {
+                    console.error("Error fetching online status:", e);
+                }
             }
-        }
+        };
+        fetchStatus();
     }, [userData]);
 
-    const toggleOnlineStatus = () => {
+    const toggleOnlineStatus = async () => {
         if (!providerId) return;
         const newStatus = !isOnline;
         setIsOnline(newStatus);
-        updateProviderOnlineStatus(providerId, newStatus);
+        try {
+            await updateDoc(doc(db, 'providers', providerId), {
+                isOnline: newStatus
+            });
+        } catch (e) {
+            console.error("Error updating online status:", e);
+            // Revert on failure
+            setIsOnline(!newStatus);
+        }
     };
 
     const providerName = userData?.name || 'Provider Dashboard';

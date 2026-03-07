@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
-import { getProviders } from '../../utils/mockDb';
+import { db } from '../../firebase/config';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { UserCircle, Star, Briefcase, Phone, Tag, MapPin } from 'lucide-react';
 
 const ProviderProfile = () => {
@@ -8,18 +9,47 @@ const ProviderProfile = () => {
     const [profile, setProfile] = useState(null);
 
     useEffect(() => {
-        const providerName = userData?.name || currentUser?.displayName;
-        if (!providerName) return;
+        const fetchProfile = async () => {
+            // First check by UID if available, fallback to name matching for older docs
+            if (userData?.uid) {
+                try {
+                    const q = query(collection(db, 'providers'), where('uid', '==', userData.uid));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        setProfile(querySnapshot.docs[0].data());
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error fetching provider profile by UID:", e);
+                }
+            }
 
-        const loadDb = () => {
-            const providers = getProviders();
-            const me = providers.find(p => p.name === providerName);
-            if (me) {
-                setProfile(me);
+            // Name fallback
+            const providerName = userData?.name || currentUser?.displayName;
+            if (providerName) {
+                try {
+                    const q = query(collection(db, 'providers'), where('name', '==', providerName));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        setProfile(querySnapshot.docs[0].data());
+                    } else {
+                        // Keep a pending profile state so UI doesn't crash if totally missing
+                        setProfile({
+                            name: providerName,
+                            category: userData?.category || 'Service',
+                            status: userData?.status || 'pending',
+                            phone: userData?.phone || '',
+                            jobs: 0,
+                            rating: 0
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error fetching provider profile by Name:", e);
+                }
             }
         };
 
-        loadDb();
+        fetchProfile();
     }, [currentUser, userData]);
 
     if (!profile) return <div className="p-8 text-center">Loading Profile...</div>;
@@ -80,8 +110,8 @@ const ProviderProfile = () => {
                                         <p className="text-sm text-gray-500 font-medium">Operating Areas</p>
                                         <div className="flex flex-wrap gap-2 mt-1">
                                             {profile.serviceAreas && profile.serviceAreas.length > 0 ? (
-                                                profile.serviceAreas.map((area, i) => (
-                                                    <span key={i} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200">{area}</span>
+                                                (typeof profile.serviceAreas === 'string' ? profile.serviceAreas.split(',') : profile.serviceAreas).map((area, i) => (
+                                                    <span key={i} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200">{area.trim()}</span>
                                                 ))
                                             ) : (
                                                 <span className="text-gray-400 text-sm">Not Specifed</span>
@@ -110,14 +140,18 @@ const ProviderProfile = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500 font-medium">Customer Rating</p>
-                                        <div className="flex items-center gap-2">
-                                            <p className="font-bold text-gray-900">{profile.rating} / 5.0</p>
-                                            <div className="flex">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className={`w-4 h-4 ${i < Math.floor(profile.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} />
-                                                ))}
+                                        {profile.jobs > 0 ? (
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-bold text-gray-900">{profile.rating} / 5.0</p>
+                                                <div className="flex">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star key={i} className={`w-4 h-4 ${i < Math.floor(profile.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} />
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <p className="text-sm font-bold text-slate-400 mt-1">No ratings yet</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>

@@ -23,7 +23,13 @@ const ProviderLogin = () => {
         category: 'Plumbing',
         price: '',
         serviceAreas: '',
-        proofDocument: null
+        proofDocument: null,
+        idProofType: 'Aadhaar',
+        idProofNumber: '',
+        yearsExperience: '',
+        workDescription: '',
+        previousWorkSample: '',
+        proofOfWorkImages: []
     });
 
     const [providers, setProviders] = useState([]);
@@ -147,7 +153,15 @@ const ProviderLogin = () => {
                     category: signupData.category,
                     price: `₹${signupData.price}/hr`,
                     serviceAreas: signupData.serviceAreas,
-                    rating: 5.0,
+                    // Identity & Work Records
+                    idProofType: signupData.idProofType,
+                    idProofNumber: signupData.idProofNumber,
+                    yearsExperience: parseInt(signupData.yearsExperience) || 0,
+                    workDescription: signupData.workDescription,
+                    previousWorkSample: signupData.previousWorkSample,
+                    proofOfWorkImageNames: signupData.proofOfWorkImages?.map(f => f.name) || [],
+                    proofDocumentName: signupData.proofDocument?.name || '',
+                    rating: 0,
                     jobs: 0
                 };
             }
@@ -212,8 +226,61 @@ const ProviderLogin = () => {
                             <p className="text-xs text-slate-500 mt-1">Separate multiple areas with commas</p>
                         </div>
 
+                        {/* === IDENTITY PROOF SECTION === */}
+                        <div className="pt-2 border-t border-slate-700">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Identity Proof</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">ID Type</label>
+                                    <select required className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500" value={signupData.idProofType} onChange={e => setSignupData({ ...signupData, idProofType: e.target.value })}>
+                                        <option value="Aadhaar">Aadhaar Card</option>
+                                        <option value="PAN">PAN Card</option>
+                                        <option value="Driving License">Driving License</option>
+                                        <option value="Voter ID">Voter ID</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">ID Number</label>
+                                    <input required type="text" className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500" value={signupData.idProofNumber} onChange={e => setSignupData({ ...signupData, idProofNumber: e.target.value })} placeholder="e.g. XXXX-XXXX-XXXX" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* === WORK RECORDS SECTION === */}
+                        <div className="pt-2 border-t border-slate-700">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Previous Work Records</p>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Years of Experience</label>
+                                    <input required type="number" min="0" max="50" className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500" value={signupData.yearsExperience} onChange={e => setSignupData({ ...signupData, yearsExperience: e.target.value })} placeholder="e.g. 5" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Work Description</label>
+                                    <textarea required rows={3} className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500 resize-none" value={signupData.workDescription} onChange={e => setSignupData({ ...signupData, workDescription: e.target.value })} placeholder="Describe your experience, past employers, or notable projects..." />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Previous Work Photos (Optional)</label>
+                                    <label className={`w-full flex justify-center items-center gap-2 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all ${signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' : 'border-slate-600 bg-slate-900/50 hover:bg-slate-900 text-blue-400'}`}>
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={e => setSignupData({ ...signupData, proofOfWorkImages: Array.from(e.target.files) })}
+                                        />
+                                        {signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? (
+                                            <><CheckCircle2 className="w-5 h-5" /> <span className="font-bold text-sm">{signupData.proofOfWorkImages.length} Photos Selected</span></>
+                                        ) : (
+                                            <><UploadCloud className="w-5 h-5" /> <span className="font-bold text-sm">Click to Upload Work Photos</span></>
+                                        )}
+                                    </label>
+                                    <p className="text-xs text-slate-500 mt-1">Select multiple images to build your portfolio</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Identity / Proof Document</label>
+                            <label className="block text-sm font-medium text-slate-300 mb-1">Identity Document Upload</label>
                             <label className={`w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed rounded-xl cursor-pointer transition-all ${signupData.proofDocument ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' : 'border-slate-600 bg-slate-900/50 hover:bg-slate-900 text-blue-400'}`}>
                                 <input
                                     required

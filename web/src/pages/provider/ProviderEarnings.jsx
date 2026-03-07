@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
-import { getCommissions } from '../../utils/mockDb';
+import { db } from '../../firebase/config';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { Wallet, IndianRupee, CalendarDays, ArrowUpRight } from 'lucide-react';
 
 const ProviderEarnings = () => {
@@ -12,32 +13,38 @@ const ProviderEarnings = () => {
         const providerName = userData?.name || currentUser?.displayName;
         if (!providerName) return;
 
-        const loadDb = () => {
-            const allCommissions = getCommissions();
-            // In the mock Db, provider commissions denote the platform cut
-            // but the `amount` is the total price the customer paid
-            // and `commission` is the platform's 15% cut.
-            // provider net = amount - commission
+        const loadDb = async () => {
+            try {
+                const q = query(collection(db, 'commissions'), where('provider', '==', providerName));
+                const querySnapshot = await getDocs(q);
 
-            const myCommissions = allCommissions.filter(c => c.provider === providerName);
-            setEarningsLog(myCommissions.reverse());
+                const myCommissions = [];
+                let totalNet = 0;
+                let totalGross = 0;
 
-            let totalNet = 0;
-            let totalGross = 0;
-            myCommissions.forEach(c => {
-                totalGross += c.amount;
-                totalNet += (c.amount - c.commission);
-            });
+                querySnapshot.forEach((doc) => {
+                    const c = { id: doc.id, ...doc.data() };
+                    myCommissions.push(c);
+                    totalGross += c.amount || 0;
+                    totalNet += c.providerEarning || (c.amount - c.commission);
+                });
 
-            setStats({
-                total: totalGross,
-                paid: totalNet,
-                pending: totalGross - totalNet // Platform Fees Deducted
-            });
+                // Sort newest first
+                myCommissions.sort((a, b) => new Date(b.createdAt?.toDate?.() || b.date) - new Date(a.createdAt?.toDate?.() || a.date));
+
+                setEarningsLog(myCommissions);
+                setStats({
+                    total: totalGross,
+                    paid: totalNet,
+                    pending: totalGross - totalNet // Platform Fees Deducted
+                });
+            } catch (err) {
+                console.error("Error fetching provider earnings:", err);
+            }
         };
 
         loadDb();
-        const interval = setInterval(loadDb, 2000);
+        const interval = setInterval(loadDb, 5000);
         return () => clearInterval(interval);
     }, [currentUser, userData]);
 
@@ -98,7 +105,7 @@ const ProviderEarnings = () => {
                                             -₹{log.commission.toFixed(0)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 flex justify-end items-center gap-1">
-                                            <ArrowUpRight className="w-4 h-4" /> ₹{(log.amount - log.commission).toFixed(0)}
+                                            <ArrowUpRight className="w-4 h-4" /> ₹{(log.providerEarning || (log.amount - log.commission)).toFixed(0)}
                                         </td>
                                     </tr>
                                 ))}

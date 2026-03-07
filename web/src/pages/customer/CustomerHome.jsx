@@ -430,6 +430,36 @@ const CustomerHome = () => {
                                                 <p className="font-black text-slate-900 text-lg">₹{b.proposedPrice || b.price}</p>
                                             </div>
 
+                                            {b.status === 'accepted' && (
+                                                <div className="mt-5 pt-4 border-t border-slate-100">
+                                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Live Status</p>
+                                                    <div className="relative flex justify-between px-2">
+                                                        <div className="absolute top-2.5 left-2 right-2 h-1 bg-slate-100 rounded"></div>
+                                                        <div className={`absolute top-2.5 left-2 h-1 rounded transition-all duration-500 ${b.trackingStatus === 'inprogress' ? 'w-[calc(100%-1rem)] bg-emerald-500' :
+                                                            b.trackingStatus === 'arrived' ? 'w-[66%] bg-blue-500' :
+                                                                b.trackingStatus === 'enroute' ? 'w-[33%] bg-blue-500' :
+                                                                    'w-0 bg-blue-500'
+                                                            }`}></div>
+
+                                                        {[{ step: 'assigned', label: 'Assigned' }, { step: 'enroute', label: 'On Way' }, { step: 'arrived', label: 'Arrived' }, { step: 'inprogress', label: 'Working' }].map((s, i) => {
+                                                            const isPast =
+                                                                b.trackingStatus === 'inprogress' ? true :
+                                                                    b.trackingStatus === 'arrived' ? i <= 2 :
+                                                                        b.trackingStatus === 'enroute' ? i <= 1 :
+                                                                            i === 0;
+                                                            return (
+                                                                <div key={s.step} className="relative z-10 flex flex-col items-center gap-1.5 min-w-[3rem]">
+                                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors duration-500 bg-white ${isPast ? (b.trackingStatus === 'inprogress' ? 'border-emerald-500' : 'border-blue-500') : 'border-slate-200'}`}>
+                                                                        {isPast && <div className={`w-2 h-2 rounded-full ${b.trackingStatus === 'inprogress' ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>}
+                                                                    </div>
+                                                                    <span className={`text-[10px] font-bold text-center leading-tight ${isPast ? 'text-slate-800' : 'text-slate-400'}`}>{s.label}</span>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {b.status === 'negotiating' && (
                                                 <div className="mt-5 pt-4 border-t border-slate-100 flex gap-3">
                                                     <button
@@ -569,7 +599,7 @@ const CustomerHome = () => {
                                         <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
                                             <Star className="w-5 h-5 fill-current" />
                                         </div>
-                                        <div className="text-xl font-black text-slate-900">{rating.toFixed(1)}</div>
+                                        <div className="text-xl font-black text-slate-900">{jobs > 0 ? rating.toFixed(1) : 'N/A'}</div>
                                         <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rating</div>
                                     </div>
                                     <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
@@ -589,6 +619,15 @@ const CustomerHome = () => {
                                 </div>
 
                                 <div className="mt-8">
+                                    <h3 className="font-bold text-slate-900 text-lg mb-4">Previous Work Portfolio</h3>
+                                    <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                                        <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80" alt="Work sample 1" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&q=80" alt="Work sample 2" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                        <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400&q=80" alt="Work sample 3" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 border-t border-slate-100 pt-8">
                                     <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
                                     {jobs > 0 ? (
                                         <div className="space-y-4">

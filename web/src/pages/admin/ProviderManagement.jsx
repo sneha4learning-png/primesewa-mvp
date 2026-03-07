@@ -162,38 +162,85 @@ const ProviderManagement = () => {
 
             {/* Provider Booking History Modal */}
             {selectedProvider && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden mx-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setSelectedProvider(null)}>
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden mx-4 max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">{selectedProvider.name}'s History</h3>
-                                <p className="text-sm text-gray-500">{selectedProvider.category} • Lifetime Jobs: {providerBookings.length}</p>
+                                <h3 className="text-xl font-bold text-gray-900">{selectedProvider.name}</h3>
+                                <p className="text-sm text-gray-500">{selectedProvider.category} • {selectedProvider.phone}</p>
                             </div>
                             <button onClick={() => setSelectedProvider(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors">
                                 <XCircle className="w-6 h-6" />
                             </button>
                         </div>
-                        <div className="p-6 max-h-[60vh] overflow-y-auto">
-                            {providerBookings.length > 0 ? (
-                                <div className="space-y-4">
-                                    {providerBookings.map(b => (
-                                        <div key={b.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:shadow-sm transition-all bg-white">
-                                            <div>
-                                                <p className="font-bold text-gray-900">{b.service}</p>
-                                                <p className="text-sm text-gray-500">{b.date} • Customer: {b.customer}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-bold text-emerald-600">₹{b.proposedPrice || b.price}</p>
-                                                <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
-                                            </div>
-                                        </div>
-                                    ))}
+                        <div className="overflow-y-auto flex-1">
+                            {/* Identity & Work Records — shown for review */}
+                            <div className="p-6 border-b border-gray-100">
+                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Identity & Credentials</h4>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">ID Type</p>
+                                        <p className="font-bold text-gray-800">{selectedProvider.idProofType || <span className="text-gray-400 font-normal">Not provided</span>}</p>
+                                    </div>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">ID Number</p>
+                                        <p className="font-bold text-gray-800">{selectedProvider.idProofNumber || <span className="text-gray-400 font-normal">Not provided</span>}</p>
+                                    </div>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Experience</p>
+                                        <p className="font-bold text-gray-800">{selectedProvider.yearsExperience !== undefined ? `${selectedProvider.yearsExperience} years` : <span className="text-gray-400 font-normal">Not provided</span>}</p>
+                                    </div>
+                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Document</p>
+                                        <p className="font-bold text-gray-800 text-xs truncate">{selectedProvider.proofDocumentName || <span className="text-gray-400 font-normal">No file</span>}</p>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="text-center py-8 text-gray-500">
-                                    No completed or active jobs found for this provider.
-                                </div>
-                            )}
+                                {selectedProvider.workDescription && (
+                                    <div className="mt-4 bg-blue-50 rounded-xl p-4 border border-blue-100">
+                                        <p className="text-xs text-blue-600 font-bold uppercase mb-1">Work Description</p>
+                                        <p className="text-sm text-gray-700">{selectedProvider.workDescription}</p>
+                                    </div>
+                                )}
+                                {selectedProvider.previousWorkSample && (
+                                    <div className="mt-3">
+                                        <a href={selectedProvider.previousWorkSample} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline font-semibold">
+                                            <ExternalLink className="w-4 h-4" /> View Portfolio / Work Sample
+                                        </a>
+                                    </div>
+                                )}
+                                {selectedProvider.status === 'pending' && (
+                                    <div className="mt-4 flex gap-3">
+                                        <button onClick={() => { handleStatusChange(selectedProvider.id, 'active'); setSelectedProvider(null); }} className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm transition-colors">
+                                            ✓ Approve Provider
+                                        </button>
+                                        <button onClick={() => { handleStatusChange(selectedProvider.id, 'rejected'); setSelectedProvider(null); }} className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-sm border border-red-200 transition-colors">
+                                            ✕ Reject
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            {/* Booking History */}
+                            <div className="p-6">
+                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Booking History ({providerBookings.length} jobs)</h4>
+                                {providerBookings.length > 0 ? (
+                                    <div className="space-y-3">
+                                        {providerBookings.map(b => (
+                                            <div key={b.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:shadow-sm transition-all bg-white">
+                                                <div>
+                                                    <p className="font-bold text-gray-900">{b.service}</p>
+                                                    <p className="text-sm text-gray-500">{b.date} • Customer: {b.customer}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold text-emerald-600">₹{b.proposedPrice || b.price}</p>
+                                                    <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 text-gray-400 text-sm">No booking history yet.</div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

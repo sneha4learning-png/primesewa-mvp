@@ -1,0 +1,7 @@
+1. in customer app profile view of partner is redirecting to blank page
+2. in customer page while clicking on call customer nothing happens
+3. In provider panel profile details not working correctly 
+4. in provider panle in earning center not showing correct data even provider has completed job today
+5 in admin commision page not showing any listing even one job completed today
+6. in admin panel on clickin revieww timeline from live booking, nothing happens
+6. block consumer should not able to login in customer apap but it allows 

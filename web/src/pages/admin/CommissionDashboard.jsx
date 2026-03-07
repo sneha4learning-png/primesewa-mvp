@@ -29,7 +29,8 @@ const CommissionDashboard = () => {
                 const derivedCommissions = completedBookings
                     .filter(b => !trackedBookingIds.has(b.id))
                     .map(b => {
-                        const amount = parseFloat(b.proposedPrice || b.price || b.amount || 0);
+                        const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                        const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
                         return {
                             id: `derived-${b.id}`,
                             bookingId: b.id,

@@ -31,11 +31,11 @@ const TimelineModal = ({ booking, onClose }) => {
                         <div key={i} className="flex gap-4 items-start">
                             <div className="flex flex-col items-center">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${step.status === 'done' ? 'bg-emerald-100 text-emerald-600' :
-                                        step.status === 'active' ? 'bg-purple-100 text-purple-600' :
-                                            'bg-gray-100 text-gray-400'
+                                    step.status === 'active' ? 'bg-purple-100 text-purple-600' :
+                                        'bg-gray-100 text-gray-400'
                                     }`}>
                                     {step.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> :
-                                        step.status === 'active' ? <Loader2 className="w-4 h-4 animate-spin" /> :
+                                        step.status === 'active' ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> :
                                             <Clock className="w-4 h-4" />}
                                 </div>
                                 {i < steps.filter(s => s.status !== 'skip').length - 1 && (
@@ -54,10 +54,10 @@ const TimelineModal = ({ booking, onClose }) => {
 
                 <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                            booking.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
-                                booking.status === 'negotiating' ? 'bg-purple-100 text-purple-700' :
-                                    booking.status === 'cancelled' || booking.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                        'bg-amber-100 text-amber-700'
+                        booking.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
+                            booking.status === 'negotiating' ? 'bg-purple-100 text-purple-700' :
+                                booking.status === 'cancelled' || booking.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                    'bg-amber-100 text-amber-700'
                         }`}>{booking.status}</span>
                     <p className="text-sm font-bold text-gray-900">₹{booking.proposedPrice || booking.price || booking.amount || '—'}</p>
                 </div>
