@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
@@ -76,7 +76,10 @@ const ProviderLayout = () => {
                     <li><NavLink to="/provider/profile" className={navLinkClass} onClick={() => setSidebarOpen(false)}><UserCircle className="w-5 h-5" /> My Profile</NavLink></li>
                 </ul>
             </nav>
-            <div className="p-4 border-t border-white/10 relative z-10">
+            <div className="p-4 border-t border-white/10 relative z-10 space-y-3">
+                <Link to="/" className="flex items-center justify-center gap-3 px-4 py-3 w-full text-indigo-300 font-bold rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 shadow-inner transition-all duration-300">
+                    🏠 Customer Portal
+                </Link>
                 <button onClick={handleLogout} className="flex items-center justify-center gap-3 px-4 py-3 w-full text-slate-300 font-medium rounded-xl hover:bg-rose-500/20 hover:text-rose-400 border border-transparent hover:border-rose-500/30 transition-all duration-300">
                     <LogOut className="w-5 h-5" /> Secure Logout
                 </button>

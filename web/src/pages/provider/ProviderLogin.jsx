@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { auth, db } from '../../firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
@@ -319,6 +319,11 @@ const ProviderLogin = () => {
                         <p className="text-center text-sm text-slate-400 mt-4">
                             Already a partner? <button type="button" onClick={() => setIsSignup(false)} className="text-blue-400 font-bold hover:underline">Log In</button>
                         </p>
+                        <div className="mt-8 pt-6 border-t border-slate-700">
+                            <Link to="/login" className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-bold rounded-xl border border-white/10 transition-all">
+                                🏠 Switch to Customer Portal
+                            </Link>
+                        </div>
                     </form>
                 ) : step === 1 ? (
                     <form onSubmit={handleSendOtp} className="space-y-6">
@@ -351,6 +356,11 @@ const ProviderLogin = () => {
                         <p className="text-center text-sm text-slate-400 mt-4">
                             Want to join our platform? <button type="button" onClick={() => setIsSignup(true)} className="text-blue-400 font-bold hover:underline">Sign Up</button>
                         </p>
+                        <div className="mt-8 pt-6 border-t border-slate-700">
+                            <Link to="/login" className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-bold rounded-xl border border-white/10 transition-all">
+                                🏠 Switch to Customer Portal
+                            </Link>
+                        </div>
                     </form>
                 ) : (
                     <form onSubmit={handleVerifyOtp} className="space-y-6">

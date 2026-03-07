@@ -27,6 +27,7 @@ const CustomerLayout = () => {
 
                         {currentUser ? (
                             <div className="flex items-center gap-6 ml-4 border-l border-gray-200 pl-6">
+                                <Link to="/provider" className="text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
                                 <Link to="/dashboard" className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100 transition-colors">My Dashboard</Link>
                                 <Link to="/profile" className="text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors">My Profile</Link>
                                 <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2 text-sm font-bold border border-rose-200 text-rose-600 bg-rose-50 rounded-full hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-600/20 transition-all">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { auth, db } from '../../firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber, signOut } from 'firebase/auth';
@@ -190,6 +190,19 @@ const LoginPage = () => {
                         >
                             {isLoading ? 'Sending...' : 'Send OTP'}
                         </button>
+                        <div className="pt-6 border-t border-slate-700 flex flex-col gap-3">
+                            <p className="text-center text-sm text-slate-400">
+                                Are you a service provider?
+                            </p>
+                            <div className="flex gap-4">
+                                <Link to="/provider/login?signup=true" className="flex-1 py-2.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-bold rounded-xl text-center border border-indigo-500/20 transition-all">
+                                    Join as a Partner
+                                </Link>
+                                <Link to="/provider/login" className="flex-1 py-2.5 bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl text-center border border-slate-600 transition-all">
+                                    Partner Login
+                                </Link>
+                            </div>
+                        </div>
                     </form>
                 ) : (
                     <form onSubmit={handleVerifyOtp} className="space-y-6">
