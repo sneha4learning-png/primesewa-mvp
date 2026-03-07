@@ -18,9 +18,26 @@ const CommissionDashboard = () => {
                 // 2. Fetch completed bookings and derive commission records for any
                 //    that don't already have an entry in the commissions collection
                 const bookSnap = await getDocs(collection(db, 'bookings'));
-                const completedBookings = bookSnap.docs
-                    .map(d => ({ id: d.id, ...d.data() }))
-                    .filter(b => b.status === 'completed');
+                const rawBookings = bookSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // Group by provider and keep only 5 completed
+                const completedCounts = new Map();
+                const filteredCompleted = [];
+
+                // Sort by date/createdAt to get strictly first 5
+                const sortedAll = rawBookings.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+
+                sortedAll.forEach(b => {
+                    if (b.status === 'completed') {
+                        const count = completedCounts.get(b.provider) || 0;
+                        if (count < 5) {
+                            filteredCompleted.push(b);
+                            completedCounts.set(b.provider, count + 1);
+                        }
+                    }
+                });
+
+                const completedBookings = filteredCompleted;
 
                 // Build a set of booking IDs already tracked in commissions
                 const trackedBookingIds = new Set(dbCommissions.map(c => c.bookingId));

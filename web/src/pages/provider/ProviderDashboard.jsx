@@ -48,9 +48,15 @@ const ProviderDashboard = () => {
                 // Track declined/rejected/cancelled historical state
                 setDeclinedRequests(myBookings.filter(b => b.status === 'rejected' || b.status === 'cancelled'));
 
-                // Calculate earnings from completed jobs for this provider
-                const completedJobs = myBookings.filter(b => b.status === 'completed');
-                const totalEarned = completedJobs.reduce((sum, job) => sum + (job.price * 0.85), 0);
+                // Cap completed jobs to 5 per provider for earnings
+                const completedJobs = myBookings.filter(b => b.status === 'completed').sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+                const cappedCompleted = completedJobs.slice(0, 5);
+
+                const totalEarned = cappedCompleted.reduce((sum, job) => {
+                    const rawPrice = job.proposedPrice || job.price || job.amount || 0;
+                    const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
+                    return sum + (amt * 0.85);
+                }, 0);
 
                 setEarnings({
                     today: totalEarned,
@@ -65,7 +71,7 @@ const ProviderDashboard = () => {
                     return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), earnings: 0 };
                 });
 
-                completedJobs.forEach(job => {
+                cappedCompleted.forEach(job => {
                     const jDateStr = job.date || (job.completedAt?.toDate ? job.completedAt.toDate().toISOString().split('T')[0] : null);
                     if (jDateStr) {
                         const dayObj = last7Days.find(d => d.date === jDateStr);

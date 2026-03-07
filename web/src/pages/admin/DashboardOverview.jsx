@@ -41,25 +41,44 @@ const DashboardOverview = () => {
                     getDocs(collection(db, 'commissions'))
                 ]);
 
-                const bookings = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const allBookings = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const dbCommissions = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
+                // Filter to keep only 5 completed requests per provider
+                const completedCounts = new Map();
+                const filteredBookings = [];
+
+                // Sort by date to get the first 5
+                const sortedAll = [...allBookings].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+
+                sortedAll.forEach(b => {
+                    if (b.status === 'completed') {
+                        const count = completedCounts.get(b.provider) || 0;
+                        if (count < 5) {
+                            filteredBookings.push(b);
+                            completedCounts.set(b.provider, count + 1);
+                        }
+                    } else {
+                        filteredBookings.push(b);
+                    }
+                });
+
+                const bookings = filteredBookings;
                 const pendingBookingsCount = bookings.filter(b => b.status === 'pending').length;
                 const activeProvidersCount = providers.filter(p => p.status === 'active').length;
 
                 const trackedBookingIds = new Set(dbCommissions.map(c => c.bookingId));
-                let totalCommission = dbCommissions.reduce((sum, c) => sum + Number(c.commission || 0), 0);
-                let totalRevenue = dbCommissions.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+                let totalCommission = 0;
+                let totalRevenue = 0;
 
+                // Only count commissions and revenue for the filtered bookings
                 const completedBookings = bookings.filter(b => b.status === 'completed');
                 completedBookings.forEach(b => {
-                    if (!trackedBookingIds.has(b.id)) {
-                        const rawPrice = b.proposedPrice || b.price || b.amount || 0;
-                        const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                        totalRevenue += amount;
-                        totalCommission += amount * 0.15;
-                    }
+                    const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                    const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                    totalRevenue += amount;
+                    totalCommission += amount * 0.15;
                 });
 
                 // Generate Chart Data (Last 7 Days)
@@ -85,8 +104,11 @@ const DashboardOverview = () => {
                 });
                 setChartData(last7Days);
 
-                // Top 5 Providers
-                const activeProvs = providers.filter(p => p.status === 'active');
+                // Top 5 Providers based on filtered jobs
+                const activeProvs = providers.filter(p => p.status === 'active').map(p => ({
+                    ...p,
+                    jobs: completedCounts.get(p.name) || 0
+                }));
                 activeProvs.sort((a, b) => {
                     const ratingA = parseFloat(a.rating) || 0;
                     const ratingB = parseFloat(b.rating) || 0;

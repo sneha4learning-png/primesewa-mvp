@@ -14,10 +14,28 @@ const ProviderManagement = () => {
     useEffect(() => {
         const fetchProviders = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, 'providers'));
+                const [pSnap, bSnap] = await Promise.all([
+                    getDocs(collection(db, 'providers')),
+                    getDocs(collection(db, 'bookings'))
+                ]);
+
+                const allBookings = bSnap.docs.map(d => d.data());
+                const completedCounts = new Map();
+                allBookings.forEach(b => {
+                    if (b.status === 'completed') {
+                        completedCounts.set(b.provider, (completedCounts.get(b.provider) || 0) + 1);
+                    }
+                });
+
                 const fetched = [];
-                querySnapshot.forEach((doc) => {
-                    fetched.push({ id: doc.id, ...doc.data() });
+                pSnap.forEach((doc) => {
+                    const data = doc.data();
+                    const actualCompleted = completedCounts.get(data.name) || 0;
+                    fetched.push({
+                        id: doc.id,
+                        ...data,
+                        jobs: Math.min(actualCompleted, 5) // Cap at 5 for display as per requirement
+                    });
                 });
                 setProviders(fetched);
             } catch (err) {
@@ -48,6 +66,7 @@ const ProviderManagement = () => {
             querySnapshot.forEach((doc) => {
                 fetched.push({ id: doc.id, ...doc.data() });
             });
+            // Keep all history in the modal but counts were capped in the table
             setProviderBookings(fetched);
         } catch (err) {
             console.error("Error fetching provider history:", err);
@@ -183,31 +202,43 @@ const ProviderManagement = () => {
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-1">ID Number</p>
                                         <p className="font-bold text-gray-800">{selectedProvider.idProofNumber || <span className="text-gray-400 font-normal">Not provided</span>}</p>
                                     </div>
-                                    {/* Experience removed as per instruction */}
+                                    {/* Work Description explicitly removed below */}
                                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 col-span-2">
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Identity Document</p>
-                                        {selectedProvider.proofDocument ? (
-                                            <a href={selectedProvider.proofDocument} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm">
-                                                <img src={selectedProvider.proofDocument} alt="ID Proof" className="w-full h-auto object-cover" />
-                                            </a>
-                                        ) : (
-                                            <p className="font-bold text-gray-800 text-sm truncate">{selectedProvider.proofDocumentName || <span className="text-gray-400 font-normal">No picture provided</span>}</p>
+                                        <a href={selectedProvider.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=800&q=80"} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm">
+                                            <img
+                                                src={selectedProvider.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                                alt="ID Proof"
+                                                className="w-full h-auto object-cover"
+                                            />
+                                        </a>
+                                        {!selectedProvider.proofDocument && (
+                                            <p className="text-[10px] text-gray-400 mt-1 italic">Showing sample document (Original not uploaded)</p>
                                         )}
                                     </div>
                                 </div>
-                                {selectedProvider.workDescription && (
-                                    <div className="mt-4 bg-blue-50 rounded-xl p-4 border border-blue-100">
-                                        <p className="text-xs text-blue-600 font-bold uppercase mb-1">Work Description</p>
-                                        <p className="text-sm text-gray-700">{selectedProvider.workDescription}</p>
-                                    </div>
-                                )}
-                                {selectedProvider.previousWorkSample && (
-                                    <div className="mt-3">
-                                        <a href={selectedProvider.previousWorkSample} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline font-semibold">
-                                            <ExternalLink className="w-4 h-4" /> View Portfolio / Work Sample
+                                {/* Removed workDescription rendering here */}
+                                <div className="mt-4">
+                                    <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Work Portfolio / Sample</p>
+                                    <div className="flex gap-3 overflow-x-auto pb-2">
+                                        <a href={selectedProvider.previousWorkSample || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&q=80"} target="_blank" rel="noreferrer" className="block w-32 h-24 rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity flex-shrink-0">
+                                            <img src={selectedProvider.previousWorkSample || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=300&q=80"} alt="Work 1" className="w-full h-full object-cover" />
                                         </a>
+                                        <div className="w-32 h-24 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
+                                            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=300&q=80" alt="Work 2" className="w-full h-full object-cover" />
+                                        </div>
+                                        <div className="w-32 h-24 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
+                                            <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=300&q=80" alt="Work 3" className="w-full h-full object-cover" />
+                                        </div>
                                     </div>
-                                )}
+                                    {selectedProvider.previousWorkSample && (
+                                        <div className="mt-2 text-right">
+                                            <a href={selectedProvider.previousWorkSample} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline font-semibold">
+                                                <ExternalLink className="w-3 h-3" /> External Link
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
                                 {selectedProvider.status === 'pending' && (
                                     <div className="mt-4 flex gap-3">
                                         <button onClick={() => { handleStatusChange(selectedProvider.id, 'active'); setSelectedProvider(null); }} className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm transition-colors">

@@ -5,3 +5,12 @@
 5 in admin commision page not showing any listing even one job completed today
 6. in admin panel on clickin revieww timeline from live booking, nothing happens
 6. block consumer should not able to login in customer apap but it allows 
+
+1. [SOLVED] Remove work desicirotion details
+2. [SOLVED] add dummy images for identiy proof and work done
+3. [SOLVED] In history it hows general service we have already correc this so recheck code
+4. [SOLVED] ssuspnded provider are not able to login until they get activate again
+5. [SOLVED] in admin panel there will be option to acitvate again suspended provider
+[DONE] implemented 5 completed requests cap for each provider for metrics and dashboard
+
+make sure all issues solvs correctly

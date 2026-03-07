@@ -147,7 +147,7 @@ const CustomerHome = () => {
         setNetworkError(false);
 
         const finalBookingData = {
-            service: selectedCategory || pendingBookingData.service || 'General Service',
+            service: selectedCategory || (pendingBookingData ? pendingBookingData.service : null) || 'General Service',
             status: 'pending',
             provider: pendingBookingData.provider,
             providerPhone: pendingBookingData.providerPhone || '',

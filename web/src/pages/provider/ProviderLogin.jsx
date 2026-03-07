@@ -39,8 +39,8 @@ const ProviderLogin = () => {
     useEffect(() => {
         const fetchProviders = async () => {
             try {
-                const q = query(collection(db, 'providers'), where('status', '==', 'active'));
-                const querySnapshot = await getDocs(q);
+                // Fetch all providers so we can check status during login
+                const querySnapshot = await getDocs(collection(db, 'providers'));
                 const fetched = [];
                 querySnapshot.forEach((doc) => fetched.push(doc.data()));
                 setProviders(fetched);
@@ -130,7 +130,13 @@ const ProviderLogin = () => {
                 providerName = signupData.name;
             } else {
                 const cleanPhoneTarget = phoneNumber.replace('+91', '');
-                const selectedProv = providers.find(p => p.phone.includes(cleanPhoneTarget));
+                const selectedProv = providers.find(p => p.phone && p.phone.includes(cleanPhoneTarget));
+
+                if (selectedProv && selectedProv.status === 'suspended') {
+                    setError("Your account is currently suspended. Please contact Admin.");
+                    setIsLoading(false);
+                    return;
+                }
                 providerName = selectedProv ? selectedProv.name : 'Unknown Provider';
             }
 
@@ -142,7 +148,6 @@ const ProviderLogin = () => {
                 name: providerName,
                 phone: `+91${user.phoneNumber ? user.phoneNumber.replace('+91', '') : (isSignup ? signupData.phone : phoneNumber)}`,
                 role: 'provider',
-                status: isSignup ? 'pending' : 'active',
                 createdAt: serverTimestamp()
             };
 
@@ -150,14 +155,13 @@ const ProviderLogin = () => {
             if (isSignup) {
                 providerData = {
                     ...providerData,
+                    status: 'pending',
                     category: signupData.category,
                     price: `₹${signupData.price}/hr`,
                     serviceAreas: signupData.serviceAreas,
                     // Identity & Work Records
                     idProofType: signupData.idProofType,
                     idProofNumber: signupData.idProofNumber,
-                    yearsExperience: parseInt(signupData.yearsExperience) || 0,
-                    workDescription: signupData.workDescription,
                     previousWorkSample: signupData.previousWorkSample,
                     proofOfWorkImageNames: signupData.proofOfWorkImages?.map(f => f.name) || [],
                     proofDocumentName: signupData.proofDocument?.name || '',
@@ -169,7 +173,9 @@ const ProviderLogin = () => {
             await setDoc(userDocRef, providerData, { merge: true });
 
             setCurrentUser(user);
-            setUserData({ uid: user.uid, role: 'provider', name: providerName });
+            setUserData({
+                uid: user.uid, role: 'provider', name: providerName
+            });
             navigate('/provider');
         } catch (err) {
             console.error("OTP Verify Error", err);
@@ -251,10 +257,6 @@ const ProviderLogin = () => {
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Previous Work Records</p>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-1">Work Description (Optional)</label>
-                                    <textarea rows={3} className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500 resize-none" value={signupData.workDescription} onChange={e => setSignupData({ ...signupData, workDescription: e.target.value })} placeholder="Describe your past employers, or notable projects..." />
-                                </div>
-                                <div>
                                     <label className="block text-sm font-medium text-slate-300 mb-1">Previous Work Photos (Optional)</label>
                                     <label className={`w-full flex justify-center items-center gap-2 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all ${signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' : 'border-slate-600 bg-slate-900/50 hover:bg-slate-900 text-blue-400'}`}>
                                         <input
@@ -312,8 +314,8 @@ const ProviderLogin = () => {
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                 >
                                     <option value="" disabled className="text-slate-500">Choose your account</option>
-                                    {providers.map(p => {
-                                        const phoneStr = p.phone.replace('+91', '');
+                                    {providers.filter(p => p.status !== 'suspended').map(p => {
+                                        const phoneStr = (p.phone || '').replace('+91', '');
                                         return <option key={p.phone} value={phoneStr}>{p.name} ({phoneStr})</option>;
                                     })}
                                 </select>
