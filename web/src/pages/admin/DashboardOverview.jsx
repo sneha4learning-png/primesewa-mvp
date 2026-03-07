@@ -225,7 +225,7 @@ const DashboardOverview = () => {
                                 <div key={b.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100">
                                     <div>
                                         <p className="font-semibold text-gray-900">{b.service}</p>
-                                        <p className="text-xs text-gray-500">{b.customer} • {b.provider}</p>
+                                        <p className="text-xs text-gray-500">{b.customer || 'Unknown'} • {b.provider || 'Unassigned'}</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="font-bold text-gray-900">₹{b.proposedPrice || b.price}</p>

@@ -161,18 +161,18 @@ const ProviderProfile = () => {
                     <div className="mt-8 pt-6 border-t border-gray-100">
                         <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 pb-2">Identity Verification</h3>
                         <div className="flex flex-col items-center sm:items-start gap-4">
-                            <div className="w-full max-w-[240px] rounded-xl overflow-hidden border border-gray-200 shadow-sm transition-transform hover:scale-[1.02]">
+                            <div className="w-full max-w-[240px] min-h-[160px] bg-slate-50 rounded-xl overflow-hidden border border-gray-200 shadow-sm transition-transform hover:scale-[1.02] relative">
                                 <img
-                                    src={profile.proofDocument && profile.proofDocument.startsWith('http') ? profile.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                    src={(typeof profile.proofDocument === 'string' && profile.proofDocument.startsWith('http')) ? profile.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
                                     alt="ID Proof"
-                                    className="w-full h-auto object-cover"
+                                    className="w-full h-full object-cover"
                                     onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
                                 />
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-gray-800">{profile.idProofType || 'Aadhaar'} Number</p>
                                 <p className="text-sm text-gray-600 font-medium">{profile.idProofNumber || 'XXXX-XXXX-XXXX'}</p>
-                                {(!profile.proofDocument || !profile.proofDocument.startsWith('http')) && (
+                                {(!(typeof profile.proofDocument === 'string' && profile.proofDocument.startsWith('http'))) && (
                                     <p className="text-[10px] text-amber-600 mt-2 font-bold italic bg-amber-50 px-2 py-1 rounded inline-block">Verification Document Pending (Showing Sample)</p>
                                 )}
                             </div>

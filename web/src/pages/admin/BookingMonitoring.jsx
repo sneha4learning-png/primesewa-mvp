@@ -172,8 +172,8 @@ const BookingMonitoring = () => {
                                             <Calendar className="w-3 h-3" /> {booking.date}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{booking.customer}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{booking.provider}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{booking.customer || 'Unknown'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{booking.provider || 'Unassigned'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{booking.proposedPrice || booking.price || booking.amount}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-md border text-xs font-semibold capitalize ${getStatusColor(booking.status)}`}>

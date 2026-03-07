@@ -64,8 +64,26 @@ const CommissionDashboard = () => {
                         };
                     });
 
-                // Merge both sources
-                const rawAllRecords = [...dbCommissions, ...derivedCommissions];
+                // Merge both sources and populate missing fields in dbCommissions
+                const rawAllRecords = [
+                    ...dbCommissions.map(c => {
+                        // If fields are missing in commission doc, try to find them in the booking mapping
+                        if (!c.provider || !c.service) {
+                            const relatedBooking = rawBookings.find(b => b.id === c.bookingId);
+                            if (relatedBooking) {
+                                return {
+                                    ...c,
+                                    provider: c.provider || relatedBooking.provider || 'Unknown',
+                                    service: c.service || relatedBooking.service || '—',
+                                    customer: c.customer || relatedBooking.customer || '—',
+                                    date: c.date || relatedBooking.date || new Date().toISOString().split('T')[0]
+                                };
+                            }
+                        }
+                        return { ...c, provider: c.provider || 'Unknown', service: c.service || '—' };
+                    }),
+                    ...derivedCommissions
+                ];
 
                 // CRITICAL FIX: Ensure the 5-job-per-provider cap is applied to ALL displayed records
                 const recordsByProvider = new Map();

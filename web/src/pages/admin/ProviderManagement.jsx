@@ -243,16 +243,16 @@ const ProviderManagement = () => {
                                     {/* Work Description explicitly removed below */}
                                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 col-span-2">
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Identity Document</p>
-                                        <a href={selectedProvider.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=800&q=80"} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm">
+                                        <a href={(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http')) ? selectedProvider.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=800&q=80"} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] min-h-[140px] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm relative">
                                             <img
-                                                src={selectedProvider.proofDocument && selectedProvider.proofDocument.startsWith('http') ? selectedProvider.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                                src={(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http')) ? selectedProvider.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
                                                 alt="ID Proof"
-                                                className="w-full h-auto object-cover"
+                                                className="w-full h-full object-cover"
                                                 onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
                                             />
                                         </a>
-                                        {(!selectedProvider.proofDocument || !selectedProvider.proofDocument.startsWith('http')) && (
-                                            <p className="text-[10px] text-amber-600 mt-2 font-bold italic">Showing sample ID (Original not available)</p>
+                                        {(!(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http'))) && (
+                                            <p className="text-[10px] text-amber-600 mt-2 font-bold italic bg-amber-50 px-2 py-1 rounded inline-block">Showing sample ID (Verification pending)</p>
                                         )}
                                     </div>
                                 </div>
