@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { auth, db } from '../../firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
@@ -35,6 +35,15 @@ const ProviderLogin = () => {
     const [providers, setProviders] = useState([]);
     const { setCurrentUser, setUserData } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        // Check for signup query param
+        const searchParams = new URLSearchParams(location.search);
+        if (searchParams.get('signup') === 'true') {
+            setIsSignup(true);
+        }
+    }, [location.search]);
 
     useEffect(() => {
         const fetchProviders = async () => {

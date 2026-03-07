@@ -90,7 +90,7 @@ const LandingPage = () => {
                             <Link to="/dashboard" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                                 Book a Service <ArrowRight className="w-5 h-5" />
                             </Link>
-                            <Link to="/provider" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-full font-bold text-lg text-white border border-white/10 transition-all">
+                            <Link to="/provider/login?signup=true" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-full font-bold text-lg text-white border border-white/10 transition-all">
                                 Become a Partner
                             </Link>
                         </div>
@@ -140,44 +140,188 @@ const LandingPage = () => {
                 </div>
             </section>
 
+            {/* Service Categories */}
+            <section className="py-24 px-4 bg-white">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                        <div className="max-w-2xl">
+                            <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Services at your doorstep</h2>
+                            <p className="mt-4 text-slate-600 text-lg">Choose from our wide range of professional home services in Ahmedabad.</p>
+                        </div>
+                        <Link to="/dashboard" className="text-blue-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
+                            View all services <ArrowRight className="w-5 h-5" />
+                        </Link>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {[
+                            { name: 'Plumbing', icon: '🚰', bg: 'bg-blue-50', color: 'text-blue-600' },
+                            { name: 'Electrical', icon: '⚡', bg: 'bg-amber-50', color: 'text-amber-600' },
+                            { name: 'Cleaning', icon: '🧹', bg: 'bg-emerald-50', color: 'text-emerald-600' },
+                            { name: 'Carpentry', icon: '🔨', bg: 'bg-rose-50', color: 'text-rose-600' }
+                        ].map((service, i) => (
+                            <Link key={i} to="/dashboard" className="group p-8 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-transparent transition-all duration-300 text-center">
+                                <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform">{service.icon}</span>
+                                <h4 className="font-bold text-slate-900">{service.name}</h4>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* Features Layer */}
-            <section className="py-24 px-4 bg-slate-50 relative z-20 -mt-10 rounded-t-[3rem]">
+            <section className="py-24 px-4 bg-slate-50">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16 max-w-2xl mx-auto">
-                        <h2 className="text-3xl font-bold text-slate-900">Why choose PrimeSewa?</h2>
-                        <p className="mt-4 text-slate-600 text-lg">Experience the easiest way to book trusted professionals for your home.</p>
+                        <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Why PrimeSewa?</h2>
+                        <p className="mt-4 text-slate-600 text-lg">We've built a platform that puts quality and trust first.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Feature 1 */}
                         <div className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
-                            <div className="w-16 h-16 bg-blue-50 group-hover:bg-blue-600 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300">
+                            <div className="w-16 h-16 bg-blue-50 group-hover:bg-blue-600 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300 shadow-sm">
                                 <ShieldCheck className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors duration-300" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Verified Partners</h3>
-                            <p className="text-slate-600 leading-relaxed font-light">Every provider undergoes strict background checks and skill verification before they can accept a single job on our platform.</p>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Vetted & Verified</h3>
+                            <p className="text-slate-600 leading-relaxed font-light">Every partner undergoes a 3-step verification process including background checks and skill assessments.</p>
                         </div>
 
                         {/* Feature 2 */}
                         <div className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
-                            <div className="w-16 h-16 bg-emerald-50 group-hover:bg-emerald-500 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300">
+                            <div className="w-16 h-16 bg-emerald-50 group-hover:bg-emerald-500 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300 shadow-sm">
                                 <Clock className="w-8 h-8 text-emerald-600 group-hover:text-white transition-colors duration-300" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Instant Booking</h3>
-                            <p className="text-slate-600 leading-relaxed font-light">Stop waiting days for a callback. Book in 3 clicks and our active providers start confirming your request within minutes.</p>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Fastest Turnaround</h3>
+                            <p className="text-slate-600 leading-relaxed font-light">Forget waiting for calls. Our instant-match system ensures a professional is assigned within minutes.</p>
                         </div>
 
                         {/* Feature 3 */}
                         <div className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
-                            <div className="w-16 h-16 bg-amber-50 group-hover:bg-amber-500 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300">
+                            <div className="w-16 h-16 bg-amber-50 group-hover:bg-amber-500 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300 shadow-sm">
                                 <Star className="w-8 h-8 text-amber-600 group-hover:text-white transition-colors duration-300" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Quality Assured</h3>
-                            <p className="text-slate-600 leading-relaxed font-light">Your satisfaction is our metric. Providers must maintain high ratings, and you only pay upon job completion.</p>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Quality First</h3>
+                            <p className="text-slate-600 leading-relaxed font-light">Transparent pricing and a satisfaction guarantee. You only pay once the job is completed to your liking.</p>
                         </div>
                     </div>
                 </div>
             </section>
+
+            {/* How it Works */}
+            <section className="py-24 px-4 bg-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-indigo-50/30 -skew-x-12 translate-x-1/2"></div>
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <div className="space-y-8">
+                            <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-tight">Book a professional <br /> in 3 simple steps</h2>
+
+                            <div className="space-y-8 mt-12">
+                                <div className="flex gap-6 group">
+                                    <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 font-bold text-xl group-hover:scale-110 transition-transform">1</div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-slate-900">Choose your service</h4>
+                                        <p className="text-slate-500 mt-2">Select the service you need from our extensive range of home solutions.</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-6 group">
+                                    <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 font-bold text-xl group-hover:scale-110 transition-transform">2</div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-slate-900">Set Date & Time</h4>
+                                        <p className="text-slate-500 mt-2">Pick a schedule that works for you. We provide slots all through the week.</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-6 group">
+                                    <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 font-bold text-xl group-hover:scale-110 transition-transform">3</div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-slate-900">Sit back and relax</h4>
+                                        <p className="text-slate-500 mt-2">Our verified professional will arrive punctually and get the job done right.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                            <div className="bg-slate-900 p-8 rounded-[2rem] shadow-2xl space-y-6 max-w-sm mx-auto">
+                                <div className="flex items-center gap-4 border-b border-slate-800 pb-6">
+                                    <div className="w-12 h-12 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                                        <CheckCircle2 className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-indigo-400 text-xs font-bold uppercase tracking-widest">Confirmation</p>
+                                        <p className="text-white font-bold">Booking Scheduled</p>
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-slate-500 italic">Service</span>
+                                        <span className="text-white font-medium">Power Fixing</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-slate-500 italic">Date</span>
+                                        <span className="text-white font-medium">Tomorrow, 10:00 AM</span>
+                                    </div>
+                                </div>
+                                <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+                                    <div className="flex -space-x-2">
+                                        <div className="w-8 h-8 rounded-full border-2 border-slate-900 bg-blue-500"></div>
+                                        <div className="w-8 h-8 rounded-full border-2 border-slate-900 bg-indigo-500"></div>
+                                    </div>
+                                    <span className="text-xs text-slate-400">12+ active pros near you</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="py-20 px-4 bg-slate-900 text-white">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-slate-800 pb-16">
+                        <div className="col-span-1 md:col-span-1 space-y-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-indigo-600 rounded-lg">
+                                    <ShieldCheck className="w-6 h-6 text-white" />
+                                </div>
+                                <span className="text-2xl font-bold tracking-tight">PrimeSewa</span>
+                            </div>
+                            <p className="text-slate-400 leading-relaxed font-light">The most trusted home service platform in Ahmedabad. Quality services, guaranteed.</p>
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">For Customers</h4>
+                            <ul className="space-y-4 text-slate-400 text-sm">
+                                <li><Link to="/dashboard" className="hover:text-white transition-colors">Book a Service</Link></li>
+                                <li><Link to="/dashboard" className="hover:text-white transition-colors">Service Areas</Link></li>
+                                <li><Link to="/login" className="hover:text-white transition-colors">Customer Login</Link></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">For Partners</h4>
+                            <ul className="space-y-4 text-slate-400 text-sm">
+                                <li><Link to="/provider/login?signup=true" className="hover:text-white transition-colors font-bold text-indigo-400">Join as a Partner</Link></li>
+                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Partner Portal</Link></li>
+                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Earnings Dashboard</Link></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">Contact</h4>
+                            <ul className="space-y-4 text-slate-400 text-sm italic font-medium">
+                                <li>support@primesewa.com</li>
+                                <li>+91 90000 00000</li>
+                                <li className="not-italic text-slate-500">Bodakdev, Ahmedabad</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="pt-10 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
+                        <p>© 2026 PrimeSewa Technologies. All rights reserved.</p>
+                        <div className="flex gap-8">
+                            <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
+                            <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };
