@@ -2,7 +2,7 @@ import { useState, useEffect, Component } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
@@ -124,6 +124,7 @@ const CustomerHome = () => {
             service: selectedCategory || provider.category || 'General Service',
             status: 'pending',
             provider: provider.name || 'Provider',
+            providerPhone: provider.phone || '',
             customer: userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer'),
             price: parsedPrice
         };
@@ -149,7 +150,9 @@ const CustomerHome = () => {
             service: selectedCategory || 'General Service',
             status: 'pending',
             provider: pendingBookingData.provider,
+            providerPhone: pendingBookingData.providerPhone || '',
             customer: userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer'),
+            customerPhone: pendingBookingData.customerPhone || '',
             price: parseInt(pendingBookingData.price) || 500,
             date: bookingDate,
             time: bookingTime,
@@ -489,10 +492,19 @@ const CustomerHome = () => {
                                             )}
                                             {/* EC-008: Cancel button for accepted / pending bookings */}
                                             {(b.status === 'accepted' || b.status === 'pending') && (
-                                                <div className="mt-3 pt-3 border-t border-slate-100">
+                                                <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2">
+                                                    {b.status === 'accepted' && (
+                                                        <a
+                                                            href={`tel:${b.providerPhone || b.phone || ''}`}
+                                                            onClick={(e) => { e.stopPropagation(); if (!b.providerPhone && !b.phone) { e.preventDefault(); alert("Provider phone number is not available."); } }}
+                                                            className="flex-1 py-1.5 flex items-center justify-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 font-bold rounded-xl text-xs transition-colors border border-green-100"
+                                                        >
+                                                            <Phone className="w-3.5 h-3.5" /> Call Provider
+                                                        </a>
+                                                    )}
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); handleCancelBooking(b.id); }}
-                                                        className="w-full py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs transition-colors border border-red-100"
+                                                        className="flex-1 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs transition-colors border border-red-100"
                                                     >
                                                         Cancel Booking
                                                     </button>
