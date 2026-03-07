@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "VITE_FIREBASE_API_KEY=$FB_API_KEY" > .env
           echo "VITE_FIREBASE_AUTH_DOMAIN=$FB_AUTH_DOMAIN" >> .env
-          echo "VITE_FIREBASE_PROJECT_ID=$FB_PROJECT_ID" >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=primeseva-mvp" >> .env
           echo "VITE_FIREBASE_STORAGE_BUCKET=$FB_STORAGE_BUCKET" >> .env
           echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$FB_SENDER_ID" >> .env
           echo "VITE_FIREBASE_APP_ID=$FB_APP_ID" >> .env
@@ -50,6 +50,6 @@ jobs:
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}'
-          projectId: '${{ secrets.VITE_FIREBASE_PROJECT_ID }}'
+          projectId: 'primeseva-mvp'
           channelId: live
           entryPoint: ./web
