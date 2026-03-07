@@ -83,6 +83,8 @@ const ProviderManagement = () => {
                             <th className="px-6 py-4 font-medium">Category</th>
                             <th className="px-6 py-4 font-medium">Contact</th>
                             <th className="px-6 py-4 font-medium">Jobs Done</th>
+                            <th className="px-6 py-4 font-medium">Identity</th>
+                            <th className="px-6 py-4 font-medium">Work Details</th>
                             <th className="px-6 py-4 font-medium relative">Status</th>
                             <th className="px-6 py-4 font-medium text-right">Actions</th>
                         </tr>
@@ -99,6 +101,14 @@ const ProviderManagement = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.phone}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.jobs || 0}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-semibold text-gray-900">{provider.idProofType || 'N/A'}</div>
+                                    <div className="text-xs text-gray-500">{provider.idProofNumber || 'No ID'}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-semibold text-gray-900">{provider.yearsExperience !== undefined ? `${provider.yearsExperience} Years` : 'N/A'}</div>
+                                    <div className="text-xs text-gray-500 max-w-[120px] truncate" title={provider.workDescription}>{provider.workDescription || 'No details'}</div>
+                                </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
@@ -151,7 +161,7 @@ const ProviderManagement = () => {
                         ))}
                         {filteredProviders.length === 0 && (
                             <tr>
-                                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                                <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                                     No providers found matching your search.
                                 </td>
                             </tr>

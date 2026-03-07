@@ -7,10 +7,10 @@ import { collection, getDocs } from 'firebase/firestore';
 const TimelineModal = ({ booking, onClose }) => {
     const steps = [
         { label: 'Booking Created', status: 'done', time: booking.date ? `${booking.date} ${booking.time || ''}` : 'N/A' },
-        { label: 'Provider Assigned', status: booking.status !== 'pending' ? 'done' : 'pending', time: booking.provider || 'Awaiting' },
-        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? 'done' : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice}` : 'Not applicable' },
-        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip'), time: booking.status !== 'pending' ? booking.provider : 'Pending' },
-        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : 'pending', time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price}` : 'Pending' },
+        { label: 'Provider Assigned', status: booking.status !== 'pending' ? 'done' : 'pending', time: booking.status !== 'pending' ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : 'Awaiting' },
+        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? 'done' : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice} • ${booking.date} ${booking.time || ''}` : 'Not applicable' },
+        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip'), time: ['accepted', 'completed'].includes(booking.status) ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : 'Pending' },
+        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : 'pending', time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price} • ${booking.date} ${booking.time || ''}` : 'Pending' },
     ];
 
     return (
