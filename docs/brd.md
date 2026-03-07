@@ -19,8 +19,8 @@ The system will facilitate connecting Customers in Ahmedabad with local verified
 ## PHASE 1 – WEB SYSTEM ARCHITECTURE
 
 ### 1.1 Core Web Modules
-1.  **Customer Web App:** A responsive web application optimized for mobile browsers allowing users to discover services and book providers.
-2.  **Provider Web Panel:** A secure portal for service partners to accept/reject jobs, view booking details, and track payouts.
+1.  **Customer Web App:** A responsive web application optimized for mobile browsers allowing users to discover services, book providers, and track their arrival in real-time.
+2.  **Provider Web Panel:** A secure portal for service partners to accept/reject jobs, view booking details, track payouts, and update their live tracking status.
 3.  **Admin Dashboard:** The primary operational control system for the business owners to govern the entire marketplace.
 
 ### 1.2 Layered Architecture
@@ -48,10 +48,9 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 
 ### B. Provider Management Module
 **Features:** 
-*   Data table listing all registered providers.
-*   Approve / Reject action buttons for pending registrations.
-*   Suspend / Reactivate action buttons for active/suspended providers.
-*   View provider profile and historical bookings.
+*   Data table listing all registered providers with consolidated detail views (merging profile, identity proofs, and history into a single modal).
+*   Icon-driven action buttons (Approve, Reject, Suspend, Reactivate) with intuitive tooltips.
+*   View provider profile, submitted identity proofs, experience details, and historical bookings.
 **Firestore Updates:** Updates the `status` ('active', 'suspended', 'pending', 'rejected') field in the `/providers` collection.
 **Edge Case Handling:** Suspending an active provider triggers a backend check to flag any currently 'pending' or 'accepted' bookings for Admin manual reassignment.
 
@@ -94,7 +93,7 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 6.  **Provider Detail:** Provider initial avatar, ratings, total jobs completed, price estimations.
 7.  **Booking Form:** Captures exact service address and optional issue description via modal overlay.
 8.  **Booking Confirmation:** Success card and status entry placed into "Current Activity".
-9.  **Booking Status / History:** Live timeline (`pending` > `negotiating` > `accepted` > `completed`). Support for Accepting/Declining custom price proposals.
+9.  **Booking Status / History:** Live timeline (`pending` > `negotiating` > `accepted` > `completed`). Support for Accepting/Declining custom price proposals. Post-acceptance, a live tracker lets customers monitor provider arrival status.
 10. **Rating:** Interactive 5-star rating component appears in the "Past Bookings" list once the job is marked `completed`.
 
 ---
@@ -103,9 +102,9 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 *Accessible via `/provider`*
 
 **Screens & Flow:**
-1.  **Login:** Firebase Phone Auth UI (Mock OTP for MVP).
+1.  **Registration / Login:** Firebase Phone Auth UI (Mock OTP for MVP). Registration requires submitting verifiable identity proof and a portfolio of previous work experience.
 2.  **Dashboard (`/provider`):** Incoming leads and active jobs. Allows accepting, rejecting, or proposing custom prices with instant UI feedback.
-3.  **Active Booking Detail:** Shows customer address, price, and status. Includes a button to mark the job as "Completed".
+3.  **Active Booking Detail:** Shows customer address, price, and status. Providers can update their arrival tracking status. Includes a button to mark the job as "Completed".
 4.  **Earnings Dashboard (`/provider/earnings`):** Financial ledger showing clear breakdown of Gross Job Total, 15% Platform Fee, and Net Earnings.
 5.  **Profile (`/provider/profile`):** Read-only view of current ratings, jobs completed, registered phone, and active status.
 

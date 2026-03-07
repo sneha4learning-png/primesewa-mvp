@@ -73,6 +73,7 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 - **Current Activity** sidebar: live view of all active bookings
 - Status badges: `pending` → `accepted` → `completed`
 - Negotiation alert: if provider proposes different price, customer can **Accept** or **Decline**
+- **Live Tracker**: Customers can monitor provider arrival in real-time for accepted jobs
 - **Cancel Booking**: cancel any `pending` or `accepted` job
 
 #### Rate & Review
@@ -86,8 +87,9 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 
 #### Registration & Onboarding
 - Enter name, phone, service category, price per hour/job
+- Upload recognizable identity proof (Aadhar/PAN/Voter ID) and detail previous work experience
 - Registration saved to Firestore `providers` collection with `status: pending`
-- Admin must approve before provider can receive work
+- Admin must verify identity documents and approve before provider can receive work
 
 #### Authentication
 - OTP login matching registered phone number
@@ -138,9 +140,9 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 - Pending provider approvals list with quick-review links
 
 #### Provider Fleet Management (`/admin/providers`)
-- Full table of all registered providers
-- Provider details: name, category, phone, rating, status
-- Actions: **Approve** (pending → active) · **Suspend** · **Reactivate**
+- Full table of all registered providers with consolidated detail view merging profile and timeline histories
+- Provider details: name, category, phone, rating, status, identity proofs, and experience
+- Action icons: **Approve** (pending → active) · **Suspend** · **Reactivate**
 - Status change reflects immediately in Firestore
 
 #### Live Booking Monitor (`/admin/bookings`)
@@ -185,6 +187,8 @@ Customer selects provider & fills form
               │    └──────┘      [status: rejected]
               │         │
               │  [status: accepted]
+              │         │
+              │    Live Tracking (Provider updates arrival status)
               │         │
               │    Provider does job
               │         │

@@ -156,7 +156,6 @@ const CustomerHome = () => {
             price: parseInt(pendingBookingData.price) || 500,
             date: bookingDate,
             time: bookingTime,
-            address: bookingAddress,
             description: bookingDesc,
             createdAt: serverTimestamp()
         };
@@ -281,10 +280,6 @@ const CustomerHome = () => {
                                     <input required type="time" value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" />
                                 </div>
                             </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Service Address</label>
-                            <textarea required value={bookingAddress} onChange={(e) => setBookingAddress(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" rows="3" placeholder="Enter full address..."></textarea>
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Issue Description (Optional)</label>
