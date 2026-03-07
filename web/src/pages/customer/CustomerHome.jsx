@@ -631,8 +631,8 @@ const CustomerHome = () => {
 
                 return (
                     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setSelectedProviderProfile(null)}>
-                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-                            <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
+                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                            <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0">
                                 <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full p-2">
                                     <XCircle className="w-6 h-6" />
                                 </button>
