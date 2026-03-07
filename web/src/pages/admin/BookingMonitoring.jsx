@@ -1,74 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2 } from 'lucide-react';
-import { db } from '../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
+import TimelineModal from '../../components/TimelineModal';
 
 // BUG-6: Review Timeline Modal
-const TimelineModal = ({ booking, onClose }) => {
-    const isFailed = ['rejected', 'cancelled'].includes(booking.status);
 
-    const steps = [
-        { label: 'Booking Created', status: 'done', time: booking.date ? `${booking.date} ${booking.time || ''}` : 'N/A' },
-        { label: 'Provider Assigned', status: booking.status !== 'pending' ? 'done' : 'pending', time: booking.status !== 'pending' ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : 'Awaiting' },
-        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? (isFailed && booking.status === 'rejected' ? 'failed' : 'done') : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice} • ${booking.date} ${booking.time || ''}` : 'Not applicable' },
-        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (isFailed ? 'failed' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip')), time: ['accepted', 'completed'].includes(booking.status) ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : (isFailed ? 'Declined/Cancelled' : 'Pending') },
-        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : (isFailed ? 'skip' : 'pending'), time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price} • ${booking.date} ${booking.time || ''}` : 'Pending' },
-    ];
-
-    return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h3 className="text-xl font-bold text-gray-900">Booking Timeline</h3>
-                        <p className="text-sm text-gray-500 mt-0.5">#{booking.id} · {booking.service}</p>
-                    </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                        <X className="w-5 h-5 text-gray-500" />
-                    </button>
-                </div>
-
-                <div className="space-y-1">
-                    {steps.filter(s => s.status !== 'skip').map((step, i) => (
-                        <div key={i} className="flex gap-4 items-start">
-                            <div className="flex flex-col items-center">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${step.status === 'done' ? 'bg-emerald-100 text-emerald-600' :
-                                    step.status === 'active' ? 'bg-purple-100 text-purple-600' :
-                                        step.status === 'failed' ? 'bg-rose-100 text-rose-600' :
-                                            'bg-gray-100 text-gray-400'
-                                    }`}>
-                                    {step.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> :
-                                        step.status === 'failed' ? <XCircle className="w-4 h-4" /> :
-                                            step.status === 'active' ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> :
-                                                <Clock className="w-4 h-4" />}
-                                </div>
-                                {i < steps.filter(s => s.status !== 'skip').length - 1 && (
-                                    <div className={`w-0.5 h-8 mt-1 ${step.status === 'done' ? 'bg-emerald-200' : step.status === 'failed' ? 'bg-rose-200' : 'bg-gray-200'}`} />
-                                )}
-                            </div>
-                            <div className="pb-4">
-                                <p className={`font-semibold text-sm ${step.status === 'done' ? 'text-gray-900' : step.status === 'active' ? 'text-purple-700' : step.status === 'failed' ? 'text-rose-700' : 'text-gray-400'}`}>
-                                    {step.label}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-0.5">{step.time}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                        booking.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
-                            booking.status === 'negotiating' ? 'bg-purple-100 text-purple-700' :
-                                booking.status === 'cancelled' || booking.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                    'bg-amber-100 text-amber-700'
-                        }`}>{booking.status}</span>
-                    <p className="text-sm font-bold text-gray-900">₹{booking.proposedPrice || booking.price || booking.amount || '—'}</p>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const BookingMonitoring = () => {
     const [bookings, setBookings] = useState([]);

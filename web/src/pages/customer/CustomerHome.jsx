@@ -693,9 +693,10 @@ const CustomerHome = () => {
                                     <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                         <div className="w-24 h-24 rounded-xl overflow-hidden shadow-sm border border-white">
                                             <img
-                                                src={p.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                                src={p.proofDocument && p.proofDocument.startsWith('http') ? p.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
                                                 alt="ID Proof"
                                                 className="w-full h-full object-cover"
+                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
                                             />
                                         </div>
                                         <div>

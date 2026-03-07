@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink } from 'lucide-react';
-import { db } from '../../firebase/config';
 import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+import TimelineModal from '../../components/TimelineModal';
 
 const ProviderManagement = () => {
     const [providers, setProviders] = useState([]);
@@ -9,6 +7,7 @@ const ProviderManagement = () => {
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [providerBookings, setProviderBookings] = useState([]);
     const [viewDocumentUrl, setViewDocumentUrl] = useState(null);
+    const [timelineBooking, setTimelineBooking] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -80,6 +79,7 @@ const ProviderManagement = () => {
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            {timelineBooking && <TimelineModal booking={timelineBooking} onClose={() => setTimelineBooking(null)} />}
             <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h2 className="text-xl font-semibold text-gray-800">Provider Fleet</h2>
                 <div className="relative w-full sm:w-72">
@@ -207,13 +207,14 @@ const ProviderManagement = () => {
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Identity Document</p>
                                         <a href={selectedProvider.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=800&q=80"} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm">
                                             <img
-                                                src={selectedProvider.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                                src={selectedProvider.proofDocument && selectedProvider.proofDocument.startsWith('http') ? selectedProvider.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
                                                 alt="ID Proof"
                                                 className="w-full h-auto object-cover"
+                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
                                             />
                                         </a>
-                                        {!selectedProvider.proofDocument && (
-                                            <p className="text-[10px] text-gray-400 mt-1 italic">Showing sample document (Original not uploaded)</p>
+                                        {(!selectedProvider.proofDocument || !selectedProvider.proofDocument.startsWith('http')) && (
+                                            <p className="text-[10px] text-amber-600 mt-2 font-bold italic">Showing sample ID (Original not available)</p>
                                         )}
                                     </div>
                                 </div>
@@ -261,9 +262,17 @@ const ProviderManagement = () => {
                                                     <p className="font-bold text-gray-900">{b.service}</p>
                                                     <p className="text-sm text-gray-500">{b.date} • Customer: {b.customer}</p>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="font-bold text-emerald-600">₹{b.proposedPrice || b.price}</p>
-                                                    <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
+                                                <div className="text-right flex flex-col items-end gap-2">
+                                                    <div>
+                                                        <p className="font-bold text-emerald-600">₹{b.proposedPrice || b.price}</p>
+                                                        <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setTimelineBooking(b)}
+                                                        className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100 transition-colors border border-indigo-100"
+                                                    >
+                                                        Journey
+                                                    </button>
                                                 </div>
                                             </div>
                                         ))}
