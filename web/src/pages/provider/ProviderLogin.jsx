@@ -50,9 +50,18 @@ const ProviderLogin = () => {
             try {
                 // Fetch all providers so we can check status during login
                 const querySnapshot = await getDocs(collection(db, 'providers'));
-                const fetched = [];
-                querySnapshot.forEach((doc) => fetched.push(doc.data()));
-                setProviders(fetched);
+                const fetchedMap = new Map();
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const phone = data.phone?.replace('+91', '') || doc.id;
+                    // Only keep the most recent if there are duplicates (or any)
+                    if (!fetchedMap.has(phone)) {
+                        fetchedMap.set(phone, data);
+                    }
+                });
+
+                setProviders(Array.from(fetchedMap.values()));
             } catch (err) {
                 console.error("Error fetching providers:", err);
             }
