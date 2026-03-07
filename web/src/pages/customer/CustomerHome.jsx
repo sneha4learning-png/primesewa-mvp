@@ -3,6 +3,7 @@ import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp } from 'firebase/firestore';
 import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
 class ErrorBoundary extends Component {
@@ -41,6 +42,7 @@ const CustomerHome = () => {
     const [pastBookings, setPastBookings] = useState([]);
     const [pendingBookingData, setPendingBookingData] = useState(null);
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
+    const [chartData, setChartData] = useState([]);
 
     // New Feature States
     const [ratingFilter, setRatingFilter] = useState('0');
@@ -88,7 +90,16 @@ const CustomerHome = () => {
                 });
 
                 setMockBookings(allMyBookings.filter(b => b.status !== 'completed' && b.status !== 'rejected'));
-                setPastBookings(allMyBookings.filter(b => b.status === 'completed'));
+                const pBookings = allMyBookings.filter(b => b.status === 'completed');
+                setPastBookings(pBookings);
+
+                const categoryCounts = {};
+                pBookings.forEach(b => {
+                    const cat = b.service || 'Other';
+                    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+                });
+                const cData = Object.keys(categoryCounts).map(k => ({ name: k, value: categoryCounts[k] }));
+                setChartData(cData);
             } catch (err) {
                 console.error('Firebase Firestore error:', err);
                 setDbError(true);
@@ -500,6 +511,39 @@ const CustomerHome = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Service Breakdown Chart */}
+                        {chartData.length > 0 && (
+                            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                                <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3">
+                                    Service Breakdown
+                                </h2>
+                                <div className="h-48">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={chartData}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={45}
+                                                outerRadius={75}
+                                                paddingAngle={5}
+                                                dataKey="value"
+                                                stroke="none"
+                                            >
+                                                {chartData.map((entry, index) => {
+                                                    const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+                                                    return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />;
+                                                })}
+                                            </Pie>
+                                            <Tooltip
+                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Past Bookings & Ratings */}
                         {pastBookings.length > 0 && (

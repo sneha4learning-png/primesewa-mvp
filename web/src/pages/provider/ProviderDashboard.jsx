@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, doc, updateDoc, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
@@ -13,6 +14,7 @@ const ProviderDashboard = () => {
     const [negotiatedPrice, setNegotiatedPrice] = useState('');
     const [providerStatus, setProviderStatus] = useState('pending');
     const [dbError, setDbError] = useState(false);
+    const [chartData, setChartData] = useState([]);
 
     useEffect(() => {
         // Use userData.name instead of currentUser.displayName
@@ -51,6 +53,27 @@ const ProviderDashboard = () => {
                     week: totalEarned * 3,
                     month: totalEarned * 12
                 });
+
+                // Generate chart data (last 7 days)
+                const last7Days = Array.from({ length: 7 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (6 - i));
+                    return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), earnings: 0 };
+                });
+
+                completedJobs.forEach(job => {
+                    const jDateStr = job.date || (job.completedAt?.toDate ? job.completedAt.toDate().toISOString().split('T')[0] : null);
+                    if (jDateStr) {
+                        const dayObj = last7Days.find(d => d.date === jDateStr);
+                        if (dayObj) {
+                            const rawPrice = job.proposedPrice || job.price || job.amount || 0;
+                            const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                            dayObj.earnings += amt * 0.85;
+                        }
+                    }
+                });
+                setChartData(last7Days);
+
                 setDbError(false);
             } catch (e) { console.error('Firebase error:', e); setDbError(true); }
         };
@@ -184,6 +207,25 @@ const ProviderDashboard = () => {
                         <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-center hover:shadow-lg transition-all duration-300">
                             <div className="text-slate-500 text-sm font-bold mb-3 uppercase tracking-wider">This Month</div>
                             <h2 className="text-3xl font-black text-slate-800 tracking-tight">₹{earnings.month.toFixed(0)}</h2>
+                        </div>
+                    </div>
+
+                    {/* Chart Container */}
+                    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 mb-8">
+                        <h3 className="text-xl font-black text-slate-800 mb-6">Earnings (Last 7 Days)</h3>
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                                        cursor={{ fill: '#f8fafc' }}
+                                    />
+                                    <Bar dataKey="earnings" name="Earnings (₹)" fill="#6366f1" radius={[4, 4, 0, 0]} barSize={32} />
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
 

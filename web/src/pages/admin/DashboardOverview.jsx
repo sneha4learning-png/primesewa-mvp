@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2 } from 'lucide-react';
+import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { db } from '../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
 
@@ -27,6 +28,8 @@ const DashboardOverview = () => {
     const [recentBookings, setRecentBookings] = useState([]);
     const [pendingProviders, setPendingProviders] = useState([]);
     const [dbError, setDbError] = useState(false);
+    const [chartData, setChartData] = useState([]);
+    const [topProviders, setTopProviders] = useState([]);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -57,6 +60,39 @@ const DashboardOverview = () => {
                         totalCommission += amount * 0.15;
                     }
                 });
+
+                // Generate Chart Data (Last 7 Days)
+                const last7Days = Array.from({ length: 7 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (6 - i));
+                    return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), bookings: 0, revenue: 0 };
+                });
+
+                bookings.forEach(b => {
+                    // Approximate date from createdAt if missing
+                    const bDateStr = b.date || (b.createdAt?.toDate ? b.createdAt.toDate().toISOString().split('T')[0] : null);
+                    if (bDateStr) {
+                        const dayObj = last7Days.find(d => d.date === bDateStr);
+                        if (dayObj) {
+                            dayObj.bookings += 1;
+                            if (b.status === 'completed') {
+                                const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                                dayObj.revenue += typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                            }
+                        }
+                    }
+                });
+                setChartData(last7Days);
+
+                // Top 5 Providers
+                const activeProvs = providers.filter(p => p.status === 'active');
+                activeProvs.sort((a, b) => {
+                    const ratingA = parseFloat(a.rating) || 0;
+                    const ratingB = parseFloat(b.rating) || 0;
+                    if (ratingB !== ratingA) return ratingB - ratingA;
+                    return (b.jobs || 0) - (a.jobs || 0);
+                });
+                setTopProviders(activeProvs.slice(0, 5));
 
                 setStats({
                     totalBookings: bookings.length,
@@ -93,6 +129,64 @@ const DashboardOverview = () => {
                 <StatCard title="Pending Bookings" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-amber-500" />
                 <StatCard title="Active Providers" value={stats.activeProviders} icon={Users} colorClass="bg-indigo-500" />
                 <StatCard title="Commission Earned" value={`₹${stats.commissionEarned.toFixed(0)}`} icon={DollarSign} colorClass="bg-emerald-500" />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Revenue Chart */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">Revenue & Bookings (Last 7 Days)</h3>
+                    <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ fill: '#f8fafc' }}
+                                />
+                                <Bar yAxisId="left" dataKey="revenue" name="Revenue (₹)" fill="#10b981" radius={[4, 4, 0, 0]} barSize={24} />
+                                <Bar yAxisId="right" dataKey="bookings" name="Bookings" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={24} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Top 5 Providers */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-between">
+                        Top Rated Providers <Link to="/admin/providers" className="text-sm text-blue-600 hover:underline">View All</Link>
+                    </h3>
+                    {topProviders.length > 0 ? (
+                        <div className="space-y-4">
+                            {topProviders.map((p, index) => (
+                                <div key={p.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all bg-white relative overflow-hidden group">
+                                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${index === 0 ? 'bg-amber-400' : index === 1 ? 'bg-slate-300' : index === 2 ? 'bg-amber-700' : 'bg-transparent'}`}></div>
+                                    <div className="flex items-center gap-4 ml-2">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-lg border border-slate-200">
+                                            {p.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-900 leading-tight">{p.name}</p>
+                                            <p className="text-xs text-slate-500 font-medium">{p.category} Specialist</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="flex items-center justify-end gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded text-sm font-bold border border-amber-100 mb-1">
+                                            <Star className="w-3.5 h-3.5 fill-current" /> {p.rating || 0}
+                                        </div>
+                                        <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{p.jobs || 0} Jobs</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-slate-500 text-sm py-12 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50">
+                            Not enough data to determine top providers
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
