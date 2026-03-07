@@ -83,8 +83,7 @@ const ProviderManagement = () => {
                             <th className="px-6 py-4 font-medium">Category</th>
                             <th className="px-6 py-4 font-medium">Contact</th>
                             <th className="px-6 py-4 font-medium">Jobs Done</th>
-                            <th className="px-6 py-4 font-medium">Identity</th>
-                            <th className="px-6 py-4 font-medium">Work Details</th>
+                            <th className="px-6 py-4 font-medium">Rate</th>
                             <th className="px-6 py-4 font-medium relative">Status</th>
                             <th className="px-6 py-4 font-medium text-right">Actions</th>
                         </tr>
@@ -101,14 +100,7 @@ const ProviderManagement = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.phone}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.jobs || 0}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-semibold text-gray-900">{provider.idProofType || 'N/A'}</div>
-                                    <div className="text-xs text-gray-500">{provider.idProofNumber || 'No ID'}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-semibold text-gray-900">{provider.yearsExperience !== undefined ? `${provider.yearsExperience} Years` : 'N/A'}</div>
-                                    <div className="text-xs text-gray-500 max-w-[120px] truncate" title={provider.workDescription}>{provider.workDescription || 'No details'}</div>
-                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{provider.price || 'N/A'}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
@@ -118,12 +110,10 @@ const ProviderManagement = () => {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div className="flex items-center justify-end gap-2">
-                                        {provider.proofDocument && (
-                                            <button onClick={() => setViewDocumentUrl(provider.proofDocument)} className="px-3 py-1.5 text-blue-700 font-bold bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="View Document">
-                                                <FileText className="w-4 h-4" /> Docs
-                                            </button>
-                                        )}
+                                    <div className="flex items-center justify-end gap-2 flex-wrap max-w-[300px]">
+                                        <button onClick={() => setSelectedProvider(provider)} className="px-3 py-1.5 text-blue-700 font-bold bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="View Full Profile">
+                                            <Search className="w-4 h-4" /> View Details
+                                        </button>
                                         {provider.status === 'pending' && (
                                             <>
                                                 <button onClick={() => handleStatusChange(provider.id, 'active')} className="px-3 py-1.5 text-green-700 font-bold bg-green-50 border border-green-200 hover:bg-green-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Approve">

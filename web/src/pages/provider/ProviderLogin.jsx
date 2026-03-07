@@ -218,7 +218,7 @@ const ProviderLogin = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-1">Base Hourly Rate (₹)</label>
-                            <input required type="number" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500" value={signupData.price} onChange={e => setSignupData({ ...signupData, price: e.target.value })} placeholder="e.g. 400" />
+                            <input required type="number" min="50" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500" value={signupData.price} onChange={e => setSignupData({ ...signupData, price: e.target.value })} placeholder="e.g. 400" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-1">Service Areas (Ahmedabad)</label>
@@ -251,12 +251,8 @@ const ProviderLogin = () => {
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Previous Work Records</p>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-1">Years of Experience</label>
-                                    <input required type="number" min="0" max="50" className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500" value={signupData.yearsExperience} onChange={e => setSignupData({ ...signupData, yearsExperience: e.target.value })} placeholder="e.g. 5" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-1">Work Description</label>
-                                    <textarea required rows={3} className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500 resize-none" value={signupData.workDescription} onChange={e => setSignupData({ ...signupData, workDescription: e.target.value })} placeholder="Describe your experience, past employers, or notable projects..." />
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Work Description (Optional)</label>
+                                    <textarea rows={3} className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:ring-2 focus:ring-blue-500 resize-none" value={signupData.workDescription} onChange={e => setSignupData({ ...signupData, workDescription: e.target.value })} placeholder="Describe your past employers, or notable projects..." />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-slate-300 mb-1">Previous Work Photos (Optional)</label>
