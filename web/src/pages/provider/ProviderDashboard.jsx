@@ -349,6 +349,16 @@ const ProviderDashboard = () => {
                                                 <div className="flex items-center gap-3">
                                                     <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{req.time}</span>
                                                 </div>
+                                                <div className="flex items-center gap-3">
+                                                    <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                                                    <a
+                                                        href={`tel:${req.customerPhone || req.phone || ''}`}
+                                                        className="text-blue-600 hover:text-blue-700 font-bold underline-offset-2 hover:underline"
+                                                        onClick={e => { if (!req.customerPhone && !req.phone) { e.preventDefault(); alert('Customer phone number not available for this booking.'); } }}
+                                                    >
+                                                        Call {req.customer}
+                                                    </a>
+                                                </div>
                                             </div>
 
                                             {req.status === 'negotiating' ? (
