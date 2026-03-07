@@ -39,13 +39,24 @@ const DashboardOverview = () => {
 
                 const bookings = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                const commissions = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const dbCommissions = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
                 const pendingBookingsCount = bookings.filter(b => b.status === 'pending').length;
                 const activeProvidersCount = providers.filter(p => p.status === 'active').length;
 
-                const totalCommission = commissions.reduce((sum, c) => sum + Number(c.commission || 0), 0);
-                const totalRevenue = commissions.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+                const trackedBookingIds = new Set(dbCommissions.map(c => c.bookingId));
+                let totalCommission = dbCommissions.reduce((sum, c) => sum + Number(c.commission || 0), 0);
+                let totalRevenue = dbCommissions.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+
+                const completedBookings = bookings.filter(b => b.status === 'completed');
+                completedBookings.forEach(b => {
+                    if (!trackedBookingIds.has(b.id)) {
+                        const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                        const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                        totalRevenue += amount;
+                        totalCommission += amount * 0.15;
+                    }
+                });
 
                 setStats({
                     totalBookings: bookings.length,
@@ -81,7 +92,7 @@ const DashboardOverview = () => {
                 <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-blue-500" />
                 <StatCard title="Pending Bookings" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-amber-500" />
                 <StatCard title="Active Providers" value={stats.activeProviders} icon={Users} colorClass="bg-indigo-500" />
-                <StatCard title="Commission Earned" value={`₹${stats.commissionEarned}`} icon={DollarSign} colorClass="bg-emerald-500" />
+                <StatCard title="Commission Earned" value={`₹${stats.commissionEarned.toFixed(0)}`} icon={DollarSign} colorClass="bg-emerald-500" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
