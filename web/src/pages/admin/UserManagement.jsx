@@ -9,6 +9,8 @@ const UserManagement = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
     const [userBookings, setUserBookings] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -84,6 +86,14 @@ const UserManagement = () => {
         u.phone.includes(searchTerm)
     );
 
+    // Pagination logic
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+    const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -113,7 +123,7 @@ const UserManagement = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {filteredUsers.map(user => (
+                        {paginatedUsers.map(user => (
                             <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm font-semibold text-gray-900">{user.name}</div>
@@ -154,42 +164,27 @@ const UserManagement = () => {
                 </table>
             </div>
 
-            {/* User Activity Modal */}
-            {selectedUser && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden mx-4">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900">{selectedUser.name}'s History</h3>
-                                <p className="text-sm text-gray-500">Lifetime Bookings tracked here: {userBookings.length}</p>
-                            </div>
-                            <button onClick={() => setSelectedUser(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors flex items-center justify-center">
-                                <span className="text-2xl font-bold leading-none">&times;</span>
-                            </button>
-                        </div>
-                        <div className="p-6 max-h-[60vh] overflow-y-auto">
-                            {userBookings.length > 0 ? (
-                                <div className="space-y-4">
-                                    {userBookings.map(b => (
-                                        <div key={b.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:shadow-sm transition-all bg-white">
-                                            <div>
-                                                <p className="font-bold text-gray-900">{b.service}</p>
-                                                <p className="text-sm text-gray-500">{b.date || 'No Date'} • Provider: {b.provider}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-bold text-emerald-600">₹{b.proposedPrice || b.price}</p>
-                                                <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-8 text-gray-500 space-y-3">
-                                    <Activity className="w-10 h-10 text-gray-300 mx-auto" />
-                                    <p>No booking history found for this user.</p>
-                                </div>
-                            )}
-                        </div>
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between bg-white px-6 py-4 border-t border-gray-200">
+                    <div className="text-sm text-gray-500 font-medium">
+                        Showing <span className="text-gray-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-gray-900">{Math.min(currentPage * itemsPerPage, filteredUsers.length)}</span> of <span className="text-gray-900">{filteredUsers.length}</span> consumers
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                        >
+                            Next
+                        </button>
                     </div>
                 </div>
             )}

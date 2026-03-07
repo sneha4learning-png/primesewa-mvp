@@ -7,6 +7,8 @@ const CommissionDashboard = () => {
     const [commissions, setCommissions] = useState([]);
     const [totalCommission, setTotalCommission] = useState(0);
     const [timeRange, setTimeRange] = useState('All');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 8;
 
     useEffect(() => {
         const fetchCommissions = async () => {
@@ -109,6 +111,14 @@ const CommissionDashboard = () => {
         fetchCommissions();
     }, [timeRange]);
 
+    // Pagination logic
+    const totalPages = Math.ceil(commissions.length / itemsPerPage);
+    const paginatedRecords = commissions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [timeRange]);
+
     const handleExportCSV = () => {
         if (commissions.length === 0) return alert('No data to export');
         const headers = ['Record ID', 'Booking ID', 'Date', 'Provider', 'Job Amount', 'Platform Cut (15%)'];
@@ -194,7 +204,7 @@ const CommissionDashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {commissions.map(c => (
+                            {paginatedRecords.map(c => (
                                 <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4 text-sm text-blue-600 font-mono">{c.bookingId?.slice(0, 12)}…</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{c.date}</td>
@@ -204,7 +214,7 @@ const CommissionDashboard = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 text-right">+ ₹{c.commission}</td>
                                 </tr>
                             ))}
-                            {commissions.length === 0 && (
+                            {paginatedRecords.length === 0 && (
                                 <tr>
                                     <td colSpan="6" className="px-6 py-12 text-center text-gray-400 text-sm">
                                         No completed jobs in the selected period.
@@ -215,6 +225,31 @@ const CommissionDashboard = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between bg-white px-6 py-4 border border-gray-200 rounded-xl shadow-sm mt-4">
+                    <div className="text-sm text-gray-500 font-medium">
+                        Showing <span className="text-gray-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-gray-900">{Math.min(currentPage * itemsPerPage, commissions.length)}</span> of <span className="text-gray-900">{commissions.length}</span> records
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

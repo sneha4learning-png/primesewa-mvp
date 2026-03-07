@@ -17,6 +17,12 @@ const ProviderDashboard = () => {
     const [dbError, setDbError] = useState(false);
     const [chartData, setChartData] = useState([]);
 
+    // Pagination states
+    const [activePage, setActivePage] = useState(1);
+    const [requestPage, setRequestPage] = useState(1);
+    const [historyPage, setHistoryPage] = useState(1);
+    const itemsPerPage = 3;
+
     useEffect(() => {
         // Use userData.name instead of currentUser.displayName
         const providerName = userData?.name || currentUser?.displayName;
@@ -105,6 +111,15 @@ const ProviderDashboard = () => {
         return () => clearInterval(interval);
 
     }, [currentUser]);
+
+    // Pagination logic
+    const paginatedActive = activeJobs.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
+    const paginatedRequests = requests.slice((requestPage - 1) * itemsPerPage, requestPage * itemsPerPage);
+    const paginatedHistory = declinedRequests.slice((historyPage - 1) * 6, historyPage * 6); // 6 for history grid
+
+    const totalActivePages = Math.ceil(activeJobs.length / itemsPerPage);
+    const totalRequestPages = Math.ceil(requests.length / itemsPerPage);
+    const totalHistoryPages = Math.ceil(declinedRequests.length / 6);
 
     const acceptRequest = async (req) => {
         try {
@@ -267,7 +282,7 @@ const ProviderDashboard = () => {
                                 Active Jobs
                             </h2>
                             <div className="space-y-5">
-                                {activeJobs.map(job => (
+                                {paginatedActive.map(job => (
                                     <div key={job.id} className="bg-white p-7 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 relative overflow-hidden group">
                                         <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 rounded-l-3xl"></div>
                                         <div className="flex justify-between items-start mb-5">
@@ -285,7 +300,6 @@ const ProviderDashboard = () => {
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                                                {/* BUG-2: Use tel: link so clicking actually initiates a call */}
                                                 <a
                                                     href={`tel:${job.customerPhone || job.phone || ''}`}
                                                     className="text-blue-600 hover:text-blue-700 font-bold underline-offset-2 hover:underline"
@@ -322,6 +336,13 @@ const ProviderDashboard = () => {
                                         </button>
                                     </div>
                                 ))}
+                                {totalActivePages > 1 && (
+                                    <div className="flex justify-center items-center gap-4 mt-4 bg-white p-4 rounded-2xl border border-slate-100">
+                                        <button onClick={() => setActivePage(p => Math.max(1, p - 1))} disabled={activePage === 1} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
+                                        <span className="text-sm font-bold text-slate-600">{activePage} / {totalActivePages}</span>
+                                        <button onClick={() => setActivePage(p => Math.min(totalActivePages, p + 1))} disabled={activePage === totalActivePages} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
+                                    </div>
+                                )}
                                 {activeJobs.length === 0 && (
                                     <div className="p-12 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
                                         <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
@@ -346,7 +367,7 @@ const ProviderDashboard = () => {
                                 Incoming Requests
                             </h2>
                             <div className="space-y-5">
-                                {requests.map(req => (
+                                {paginatedRequests.map(req => (
                                     <div key={req.id} className="bg-white p-7 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-300 relative group overflow-hidden">
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full blur-3xl group-hover:bg-indigo-50/50 transition-colors pointer-events-none"></div>
                                         <div className="relative z-10">
@@ -421,6 +442,13 @@ const ProviderDashboard = () => {
                                         </div>
                                     </div>
                                 ))}
+                                {totalRequestPages > 1 && (
+                                    <div className="flex justify-center items-center gap-4 mt-4 bg-white p-4 rounded-2xl border border-slate-100">
+                                        <button onClick={() => setRequestPage(p => Math.max(1, p - 1))} disabled={requestPage === 1} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
+                                        <span className="text-sm font-bold text-slate-600">{requestPage} / {totalRequestPages}</span>
+                                        <button onClick={() => setRequestPage(p => Math.min(totalRequestPages, p + 1))} disabled={requestPage === totalRequestPages} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
+                                    </div>
+                                )}
                                 {requests.length === 0 && (
                                     <div className="p-12 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
                                         <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
@@ -441,7 +469,7 @@ const ProviderDashboard = () => {
                                 Closed & Declined Requests
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {declinedRequests.map(job => (
+                                {paginatedHistory.map(job => (
                                     <div key={job.id} className="bg-white p-5 rounded-box border border-slate-200 opacity-75 hover:opacity-100 transition-opacity">
                                         <div className="flex justify-between items-start mb-3">
                                             <div>
@@ -461,11 +489,18 @@ const ProviderDashboard = () => {
                                     </div>
                                 ))}
                             </div>
+                            {totalHistoryPages > 1 && (
+                                <div className="flex justify-center items-center gap-4 mt-8 bg-white p-4 rounded-2xl border border-slate-100 w-fit mx-auto">
+                                    <button onClick={() => setHistoryPage(p => Math.max(1, p - 1))} disabled={historyPage === 1} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
+                                    <span className="text-sm font-bold text-slate-600">{historyPage} / {totalHistoryPages}</span>
+                                    <button onClick={() => setHistoryPage(p => Math.min(totalHistoryPages, p + 1))} disabled={historyPage === totalHistoryPages} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </>
             )}
-        </div >
+        </div>
     );
 };
 

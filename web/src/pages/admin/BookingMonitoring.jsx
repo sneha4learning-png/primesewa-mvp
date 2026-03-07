@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2 } from 'lucide-react';
+import { db } from '../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
 import TimelineModal from '../../components/TimelineModal';
 
@@ -12,7 +15,9 @@ const BookingMonitoring = () => {
     const [filterProvider, setFilterProvider] = useState('');
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [timelineBooking, setTimelineBooking] = useState(null); // BUG-6: timeline modal state
+    const [timelineBooking, setTimelineBooking] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -40,6 +45,15 @@ const BookingMonitoring = () => {
         const matchesDate = filterDate === 'All' || (b.date || '').toLowerCase().includes(filterDate.toLowerCase());
         return matchesStatus && matchesCategory && matchesProvider && matchesDate;
     });
+
+    // Pagination logic
+    const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
+    const paginatedBookings = filteredBookings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filterStatus, filterDate, filterCategory, filterProvider]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -133,7 +147,7 @@ const BookingMonitoring = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredBookings.map(booking => (
+                            {paginatedBookings.map(booking => (
                                 <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{booking.id}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -151,7 +165,6 @@ const BookingMonitoring = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                        {/* BUG-6: Review Timeline now opens the modal */}
                                         <button
                                             onClick={() => setTimelineBooking(booking)}
                                             className="text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline underline-offset-2 transition-colors"
@@ -161,7 +174,7 @@ const BookingMonitoring = () => {
                                     </td>
                                 </tr>
                             ))}
-                            {filteredBookings.length === 0 && (
+                            {paginatedBookings.length === 0 && (
                                 <tr>
                                     <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
                                         <div className="flex justify-center mb-2">
@@ -175,6 +188,31 @@ const BookingMonitoring = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between bg-white px-6 py-4 border border-gray-200 rounded-xl shadow-sm mt-4">
+                    <div className="text-sm text-gray-500 font-medium">
+                        Showing <span className="text-gray-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="text-gray-900">{Math.min(currentPage * itemsPerPage, filteredBookings.length)}</span> of <span className="text-gray-900">{filteredBookings.length}</span> results
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
