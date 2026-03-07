@@ -49,7 +49,6 @@ const CustomerHome = () => {
     const [selectedProviderProfile, setSelectedProviderProfile] = useState(null);
     const [bookingDate, setBookingDate] = useState('');
     const [bookingTime, setBookingTime] = useState('');
-    const [bookingAddress, setBookingAddress] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(5);
@@ -134,7 +133,6 @@ const CustomerHome = () => {
         newBooking.customerPhone = userData?.phone || '';
         setBookingDate('');
         setBookingTime('');
-        setBookingAddress('');
         setBookingDesc('');
         setSelectedProviderProfile(null);
         setBookingStep(1);
