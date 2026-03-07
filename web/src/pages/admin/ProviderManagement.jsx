@@ -120,40 +120,40 @@ const ProviderManagement = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div className="flex items-center justify-end gap-2">
                                         {provider.proofDocument && (
-                                            <button onClick={() => setViewDocumentUrl(provider.proofDocument)} className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="View Proof Document">
-                                                <FileText className="w-5 h-5" />
+                                            <button onClick={() => setViewDocumentUrl(provider.proofDocument)} className="px-3 py-1.5 text-blue-700 font-bold bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="View Document">
+                                                <FileText className="w-4 h-4" /> Docs
                                             </button>
                                         )}
                                         {provider.status === 'pending' && (
                                             <>
-                                                <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition-colors" title="Approve">
-                                                    <CheckCircle className="w-5 h-5" />
+                                                <button onClick={() => handleStatusChange(provider.id, 'active')} className="px-3 py-1.5 text-green-700 font-bold bg-green-50 border border-green-200 hover:bg-green-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Approve">
+                                                    <CheckCircle className="w-4 h-4" /> Approve
                                                 </button>
-                                                <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="Reject">
-                                                    <XCircle className="w-5 h-5" />
+                                                <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="px-3 py-1.5 text-red-700 font-bold bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Reject">
+                                                    <XCircle className="w-4 h-4" /> Reject
                                                 </button>
-                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-1.5 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="Suspend">
-                                                    <ShieldOff className="w-5 h-5" />
+                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="px-3 py-1.5 text-amber-700 font-bold bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Suspend">
+                                                    <ShieldOff className="w-4 h-4" /> Suspend
                                                 </button>
                                             </>
                                         )}
                                         {provider.status === 'active' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-1.5 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="Suspend">
-                                                <ShieldOff className="w-5 h-5" />
+                                            <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="px-3 py-1.5 text-amber-700 font-bold bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Suspend">
+                                                <ShieldOff className="w-4 h-4" /> Suspend
                                             </button>
                                         )}
                                         {provider.status === 'suspended' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition-colors" title="Reactivate">
-                                                <CheckCircle className="w-5 h-5" />
+                                            <button onClick={() => handleStatusChange(provider.id, 'active')} className="px-3 py-1.5 text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Reactivate">
+                                                <CheckCircle className="w-4 h-4" /> Reactivate
                                             </button>
                                         )}
                                         {provider.status === 'rejected' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'pending')} className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-colors" title="Review Again">
-                                                <MoreVertical className="w-5 h-5" />
+                                            <button onClick={() => handleStatusChange(provider.id, 'pending')} className="px-3 py-1.5 text-slate-700 font-bold bg-slate-100 border border-slate-200 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Review Again">
+                                                <MoreVertical className="w-4 h-4" /> Review
                                             </button>
                                         )}
-                                        <button onClick={() => handleViewHistory(provider)} className="p-1.5 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors" title="View Booking History">
-                                            <MoreVertical className="w-5 h-5" />
+                                        <button onClick={() => handleViewHistory(provider)} className="px-3 py-1.5 text-indigo-700 font-bold bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="View Booking History">
+                                            <MoreVertical className="w-4 h-4" /> History
                                         </button>
                                     </div>
                                 </td>
