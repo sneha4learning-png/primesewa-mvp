@@ -159,6 +159,26 @@ const ProviderProfile = () => {
                     </div>
 
                     <div className="mt-8 pt-6 border-t border-gray-100">
+                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 pb-2">Identity Verification</h3>
+                        <div className="flex flex-col items-center sm:items-start gap-4">
+                            <div className="w-full max-w-[240px] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                                <img
+                                    src={profile.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                    alt="ID Proof"
+                                    className="w-full h-auto object-cover"
+                                />
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-gray-800">{profile.idProofType || 'Aadhaar'} Number</p>
+                                <p className="text-sm text-gray-600 font-medium">{profile.idProofNumber || 'XXXX-XXXX-XXXX'}</p>
+                                {!profile.proofDocument && (
+                                    <p className="text-[10px] text-amber-600 mt-2 font-bold italic">Verification Document Pending Upload (Showing Sample)</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-gray-100">
                         <p className="text-sm text-gray-500 text-center">To update these details, please contact platform support.</p>
                     </div>
                 </div>

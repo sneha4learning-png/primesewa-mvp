@@ -688,6 +688,24 @@ const CustomerHome = () => {
                                     </div>
                                 </div>
 
+                                <div className="mt-8">
+                                    <h3 className="font-bold text-slate-900 text-lg mb-4">Identity Verification</h3>
+                                    <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                        <div className="w-24 h-24 rounded-xl overflow-hidden shadow-sm border border-white">
+                                            <img
+                                                src={p.proofDocument || "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                                alt="ID Proof"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{p.idProofType || 'Identity Document'}</p>
+                                            <p className="text-slate-800 font-bold">{p.idProofNumber || 'XXXX-XXXX-XXXX'}</p>
+                                            <p className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded inline-block mt-2">✓ VERIFIED PARTNER</p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="mt-8 border-t border-slate-100 pt-8">
                                     <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
                                     {jobs > 0 ? (

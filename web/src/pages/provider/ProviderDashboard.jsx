@@ -52,16 +52,28 @@ const ProviderDashboard = () => {
                 const completedJobs = myBookings.filter(b => b.status === 'completed').sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
                 const cappedCompleted = completedJobs.slice(0, 5);
 
-                const totalEarned = cappedCompleted.reduce((sum, job) => {
-                    const rawPrice = job.proposedPrice || job.price || job.amount || 0;
-                    const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
-                    return sum + (amt * 0.85);
-                }, 0);
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(now.getDate() - 7);
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(now.getMonth() - 1);
+
+                const getEarningsForPeriod = (startDate) => {
+                    return cappedCompleted.filter(job => {
+                        const jobDate = new Date(job.date || job.completedAt?.toDate?.() || 0);
+                        return jobDate >= startDate;
+                    }).reduce((sum, job) => {
+                        const rawPrice = job.proposedPrice || job.price || job.amount || 0;
+                        const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
+                        return sum + (amt * 0.85);
+                    }, 0);
+                };
 
                 setEarnings({
-                    today: totalEarned,
-                    week: totalEarned * 3,
-                    month: totalEarned * 12
+                    today: getEarningsForPeriod(new Date(new Date().setHours(0, 0, 0, 0))),
+                    week: getEarningsForPeriod(oneWeekAgo),
+                    month: getEarningsForPeriod(oneMonthAgo)
                 });
 
                 // Generate chart data (last 7 days)

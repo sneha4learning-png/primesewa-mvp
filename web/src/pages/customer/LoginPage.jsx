@@ -102,9 +102,18 @@ const LoginPage = () => {
             };
 
             if (!docSnap.exists()) {
+                // Check if a customer with this phone already exists to avoid dupes with different casing
+                // Actually Firestore doc ID is the UID from Auth, which is unique per phone.
+                // So we just need to make sure we don't overwrite a good name with a lowercased one if it exists.
                 await setDoc(userDocRef, userDataObj);
             } else {
-                userDataObj = { ...docSnap.data(), uid: user.uid };
+                const existingData = docSnap.data();
+                // If the names match case-insensitively, keep the existing name to avoid flip-flopping
+                if (existingData.name && existingData.name.toLowerCase() === customerName.toLowerCase()) {
+                    userDataObj = { ...existingData, uid: user.uid };
+                } else {
+                    userDataObj = { ...existingData, ...userDataObj, uid: user.uid };
+                }
             }
 
             // ✅ BLOCK CHECK: Prevent blocked users from accessing the app
