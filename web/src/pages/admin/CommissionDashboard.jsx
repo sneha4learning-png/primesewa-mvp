@@ -63,7 +63,25 @@ const CommissionDashboard = () => {
                     });
 
                 // Merge both sources
-                const allRecords = [...dbCommissions, ...derivedCommissions];
+                const rawAllRecords = [...dbCommissions, ...derivedCommissions];
+
+                // CRITICAL FIX: Ensure the 5-job-per-provider cap is applied to ALL displayed records
+                const recordsByProvider = new Map();
+                const cappedRecords = [];
+
+                // Sort by date to ensure we pick the first 5 chronologically
+                const sortedRecords = rawAllRecords.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+
+                sortedRecords.forEach(c => {
+                    const provider = c.provider || 'Unknown';
+                    const count = recordsByProvider.get(provider) || 0;
+                    if (count < 5) {
+                        cappedRecords.push(c);
+                        recordsByProvider.set(provider, count + 1);
+                    }
+                });
+
+                const allRecords = cappedRecords;
 
                 // Apply time filter
                 const today = new Date();
