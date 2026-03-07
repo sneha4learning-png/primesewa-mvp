@@ -642,9 +642,14 @@ const CustomerHome = () => {
                                     <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center text-4xl font-black text-indigo-600 border-4 border-white shadow-lg">
                                         {initial}
                                     </div>
-                                    <button onClick={() => handleBook(p)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-all mb-2">
-                                        Book This Pro
-                                    </button>
+                                    <div className="flex flex-col gap-2 mb-2 items-end">
+                                        <a href={`tel:${p.phone || ''}`} onClick={e => { if (!p.phone) { e.preventDefault(); alert('Phone number not available'); } }} className="px-8 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl border border-green-200 hover:bg-green-100 transition-all shadow-sm flex items-center justify-center gap-2">
+                                            <Phone className="w-4 h-4" /> Call Pro
+                                        </a>
+                                        <button onClick={() => handleBook(p)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-all">
+                                            Book This Pro
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <h2 className="text-2xl font-black text-slate-900">{name}</h2>

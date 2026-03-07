@@ -26,6 +26,7 @@ const DashboardOverview = () => {
         activeProviders: 0
     });
     const [recentBookings, setRecentBookings] = useState([]);
+    const [recentDeclined, setRecentDeclined] = useState([]);
     const [pendingProviders, setPendingProviders] = useState([]);
     const [dbError, setDbError] = useState(false);
     const [chartData, setChartData] = useState([]);
@@ -103,7 +104,8 @@ const DashboardOverview = () => {
                 });
 
                 // Get top 3 recent bookings (simulated by taking the last 3)
-                setRecentBookings([...bookings].reverse().slice(0, 3));
+                setRecentBookings([...bookings].filter(b => b.status !== 'rejected' && b.status !== 'cancelled').reverse().slice(0, 3));
+                setRecentDeclined([...bookings].filter(b => b.status === 'rejected' || b.status === 'cancelled').reverse().slice(0, 3));
 
                 // Get pending providers
                 setPendingProviders(providers.filter(p => p.status === 'pending'));
@@ -254,6 +256,28 @@ const DashboardOverview = () => {
                     )}
                 </div>
             </div>
+
+            {/* Declined Bookings Section */}
+            {recentDeclined.length > 0 && (
+                <div className="bg-rose-50/50 rounded-xl border border-rose-100 p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold text-rose-900 mb-4 flex items-center gap-2">
+                        Recent Declined Requests
+                    </h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {recentDeclined.map(b => (
+                            <div key={b.id} className="flex flex-col p-4 rounded-lg bg-white border border-rose-100 shadow-sm opacity-90 transition-opacity hover:opacity-100">
+                                <div className="flex justify-between items-start mb-2">
+                                    <p className="font-bold text-slate-800">{b.service}</p>
+                                    <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${b.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                        {b.status}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-slate-500 font-medium mb-2">{b.customer} • {b.provider}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
