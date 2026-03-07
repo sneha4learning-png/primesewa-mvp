@@ -111,40 +111,37 @@ const ProviderManagement = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div className="flex items-center justify-end gap-2 flex-wrap max-w-[300px]">
-                                        <button onClick={() => setSelectedProvider(provider)} className="px-3 py-1.5 text-blue-700 font-bold bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="View Full Profile">
-                                            <Search className="w-4 h-4" /> View Details
+                                        <button onClick={() => handleViewHistory(provider)} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors shadow-sm border border-blue-100" title="View Details & History">
+                                            <Search className="w-4 h-4" />
                                         </button>
                                         {provider.status === 'pending' && (
                                             <>
-                                                <button onClick={() => handleStatusChange(provider.id, 'active')} className="px-3 py-1.5 text-green-700 font-bold bg-green-50 border border-green-200 hover:bg-green-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Approve">
-                                                    <CheckCircle className="w-4 h-4" /> Approve
+                                                <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors shadow-sm border border-green-100" title="Approve Provider">
+                                                    <CheckCircle className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="px-3 py-1.5 text-red-700 font-bold bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Reject">
-                                                    <XCircle className="w-4 h-4" /> Reject
+                                                <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm border border-red-100" title="Reject Provider">
+                                                    <XCircle className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="px-3 py-1.5 text-amber-700 font-bold bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Suspend">
-                                                    <ShieldOff className="w-4 h-4" /> Suspend
+                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend Provider">
+                                                    <ShieldOff className="w-4 h-4" />
                                                 </button>
                                             </>
                                         )}
                                         {provider.status === 'active' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="px-3 py-1.5 text-amber-700 font-bold bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Suspend">
-                                                <ShieldOff className="w-4 h-4" /> Suspend
+                                            <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend Provider">
+                                                <ShieldOff className="w-4 h-4" />
                                             </button>
                                         )}
                                         {provider.status === 'suspended' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'active')} className="px-3 py-1.5 text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Reactivate">
-                                                <CheckCircle className="w-4 h-4" /> Reactivate
+                                            <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm border border-emerald-100" title="Reactivate Provider">
+                                                <CheckCircle className="w-4 h-4" />
                                             </button>
                                         )}
                                         {provider.status === 'rejected' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'pending')} className="px-3 py-1.5 text-slate-700 font-bold bg-slate-100 border border-slate-200 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="Review Again">
-                                                <MoreVertical className="w-4 h-4" /> Review
+                                            <button onClick={() => handleStatusChange(provider.id, 'pending')} className="p-2 text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors shadow-sm border border-slate-100" title="Review Again">
+                                                <MoreVertical className="w-4 h-4" />
                                             </button>
                                         )}
-                                        <button onClick={() => handleViewHistory(provider)} className="px-3 py-1.5 text-indigo-700 font-bold bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm" title="View Booking History">
-                                            <MoreVertical className="w-4 h-4" /> History
-                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -186,10 +183,7 @@ const ProviderManagement = () => {
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-1">ID Number</p>
                                         <p className="font-bold text-gray-800">{selectedProvider.idProofNumber || <span className="text-gray-400 font-normal">Not provided</span>}</p>
                                     </div>
-                                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Experience</p>
-                                        <p className="font-bold text-gray-800">{selectedProvider.yearsExperience !== undefined ? `${selectedProvider.yearsExperience} years` : <span className="text-gray-400 font-normal">Not provided</span>}</p>
-                                    </div>
+                                    {/* Experience removed as per instruction */}
                                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 col-span-2">
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Identity Document</p>
                                         {selectedProvider.proofDocument ? (
