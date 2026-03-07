@@ -1,5 +1,5 @@
 # AntiGravity - Hyperlocal Service Booking MVP
-## Business Requirement Document (BRD)
+## Business Requirement Document (BRD) - [STATUS: UPDATED & IMPLEMENTED]
 
 **Project Code:** AG-WEB-MVP
 **Target City:** Ahmedabad
