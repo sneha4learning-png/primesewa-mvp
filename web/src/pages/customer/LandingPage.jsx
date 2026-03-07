@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Clock, Star, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
 import { useAuth } from '../../firebase/AuthContext';
-import { getBookings, getProviders } from '../../utils/mockDb';
 import { useState, useEffect } from 'react';
+import { db } from '../../firebase/config';
+import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
 const LandingPage = () => {
     const { userData } = useAuth();
@@ -10,31 +11,53 @@ const LandingPage = () => {
     const [providerDetails, setProviderDetails] = useState(null);
 
     useEffect(() => {
-        if (!userData) return;
-
-        const checkActive = () => {
-            const myName = userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer');
-            const allBookings = getBookings();
-
-            // Find active booking for user (accepted or pending)
-            const active = allBookings.find(b => b.customer === myName && (b.status === 'accepted' || b.status === 'pending' || b.status === 'negotiating'));
-
-            if (active) {
-                setActiveBooking(active);
-                // Try to get provider details for rating
-                const allProviders = getProviders();
-                const matchedProvider = allProviders.find(p => p.name === active.provider);
-                if (matchedProvider) {
-                    setProviderDetails(matchedProvider);
+        const fetchHeroData = async () => {
+            try {
+                // 1. Fetch Top Rated Provider as default
+                const topProviderQuery = query(
+                    collection(db, 'providers'),
+                    where('status', '==', 'active'),
+                    orderBy('rating', 'desc'),
+                    limit(1)
+                );
+                const topSnap = await getDocs(topProviderQuery);
+                if (!topSnap.empty) {
+                    const topProvider = topSnap.docs[0].data();
+                    setProviderDetails(topProvider);
                 }
-            } else {
-                setActiveBooking(null);
-                setProviderDetails(null);
+
+                // 2. Fetch Active Booking if user is logged in
+                if (userData?.uid || userData?.name) {
+                    const identifier = userData.name || userData.displayName;
+                    const bookingsQuery = query(
+                        collection(db, 'bookings'),
+                        where('customer', '==', identifier),
+                        where('status', 'in', ['accepted', 'pending', 'negotiating', 'arrived', 'started'])
+                    );
+                    const bSnap = await getDocs(bookingsQuery);
+                    if (!bSnap.empty) {
+                        const active = { id: bSnap.docs[0].id, ...bSnap.docs[0].data() };
+                        setActiveBooking(active);
+
+                        // If we have an active booking, fetch THAT provider's details specifically
+                        if (active.provider) {
+                            const pQuery = query(collection(db, 'providers'), where('name', '==', active.provider));
+                            const pSnap = await getDocs(pQuery);
+                            if (!pSnap.empty) {
+                                setProviderDetails(pSnap.docs[0].data());
+                            }
+                        }
+                    } else {
+                        setActiveBooking(null);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching hero data:", err);
             }
         };
 
-        checkActive();
-        const interval = setInterval(checkActive, 3000);
+        fetchHeroData();
+        const interval = setInterval(fetchHeroData, 10000); // Check every 10s for updates
         return () => clearInterval(interval);
     }, [userData]);
     return (
@@ -88,28 +111,28 @@ const LandingPage = () => {
                     <div className="hidden lg:block relative">
                         <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-3xl rotate-3 opacity-30 blur-2xl"></div>
                         <div className="relative bg-slate-800/50 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden aspect-[4/3]">
-                            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop" alt="Professional Handyman" className="w-full h-full object-cover mix-blend-overlay opacity-60" />
+                            <img src={providerDetails?.previousWorkSample || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop"} alt="Professional Handyman" className="w-full h-full object-cover mix-blend-overlay opacity-60" />
                             <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${activeBooking ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-600'} shadow-md`}>
-                                            {activeBooking ? activeBooking.provider.charAt(0) : 'A'}
+                                            {(activeBooking?.provider || providerDetails?.name || 'A').charAt(0).toUpperCase()}
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-white">{activeBooking ? activeBooking.provider : 'Amit Patel'}</h4>
-                                            <p className="text-indigo-200 text-sm">{activeBooking ? activeBooking.service : 'Expert Electrician'}</p>
+                                            <h4 className="font-bold text-white">{activeBooking?.provider || providerDetails?.name || 'Finding Partner...'}</h4>
+                                            <p className="text-indigo-200 text-sm">{activeBooking?.service || providerDetails?.category || 'Expert Service'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1 text-amber-400">
                                         <Star className="w-5 h-5 fill-current" />
-                                        <span className="font-bold text-white">{providerDetails ? providerDetails.rating : '4.9'}</span>
+                                        <span className="font-bold text-white">{providerDetails?.rating || '5.0'}</span>
                                     </div>
                                 </div>
                                 <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                                    <div className={`w-full h-full bg-gradient-to-r ${activeBooking?.status === 'accepted' ? 'from-emerald-400 to-emerald-500 animate-pulse' : 'from-blue-400 to-blue-500'}`}></div>
+                                    <div className={`w-full h-full bg-gradient-to-r ${activeBooking?.status === 'accepted' || activeBooking?.status === 'arrived' || activeBooking?.status === 'started' ? 'from-emerald-400 to-emerald-500 animate-pulse' : 'from-blue-400 to-blue-500'}`}></div>
                                 </div>
-                                <p className={`text-xs text-center mt-2 font-medium tracking-wide uppercase ${activeBooking?.status === 'accepted' ? 'text-emerald-400' : 'text-blue-300'}`}>
-                                    {activeBooking ? (activeBooking.status === 'accepted' ? 'On the way to job' : 'Finding Provider...') : 'Top Rated Partner'}
+                                <p className={`text-[10px] text-center mt-2 font-bold tracking-widest uppercase ${activeBooking?.status === 'accepted' || activeBooking?.status === 'arrived' || activeBooking?.status === 'started' ? 'text-emerald-400' : 'text-blue-300'}`}>
+                                    {activeBooking ? (activeBooking.status === 'accepted' ? 'Partner is on the way' : activeBooking.status === 'arrived' ? 'Partner has arrived' : activeBooking.status === 'started' ? 'Job in progress' : 'Finding Provider...') : 'Top Rated Partner'}
                                 </p>
                             </div>
                         </div>
