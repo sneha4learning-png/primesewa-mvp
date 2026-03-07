@@ -5,12 +5,14 @@ import { collection, getDocs } from 'firebase/firestore';
 
 // BUG-6: Review Timeline Modal
 const TimelineModal = ({ booking, onClose }) => {
+    const isFailed = ['rejected', 'cancelled'].includes(booking.status);
+
     const steps = [
         { label: 'Booking Created', status: 'done', time: booking.date ? `${booking.date} ${booking.time || ''}` : 'N/A' },
         { label: 'Provider Assigned', status: booking.status !== 'pending' ? 'done' : 'pending', time: booking.status !== 'pending' ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : 'Awaiting' },
-        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? 'done' : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice} • ${booking.date} ${booking.time || ''}` : 'Not applicable' },
-        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip'), time: ['accepted', 'completed'].includes(booking.status) ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : 'Pending' },
-        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : 'pending', time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price} • ${booking.date} ${booking.time || ''}` : 'Pending' },
+        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? (isFailed && booking.status === 'rejected' ? 'failed' : 'done') : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice} • ${booking.date} ${booking.time || ''}` : 'Not applicable' },
+        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (isFailed ? 'failed' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip')), time: ['accepted', 'completed'].includes(booking.status) ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : (isFailed ? 'Declined/Cancelled' : 'Pending') },
+        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : (isFailed ? 'skip' : 'pending'), time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price} • ${booking.date} ${booking.time || ''}` : 'Pending' },
     ];
 
     return (
@@ -32,18 +34,20 @@ const TimelineModal = ({ booking, onClose }) => {
                             <div className="flex flex-col items-center">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${step.status === 'done' ? 'bg-emerald-100 text-emerald-600' :
                                     step.status === 'active' ? 'bg-purple-100 text-purple-600' :
-                                        'bg-gray-100 text-gray-400'
+                                        step.status === 'failed' ? 'bg-rose-100 text-rose-600' :
+                                            'bg-gray-100 text-gray-400'
                                     }`}>
                                     {step.status === 'done' ? <CheckCircle2 className="w-4 h-4" /> :
-                                        step.status === 'active' ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> :
-                                            <Clock className="w-4 h-4" />}
+                                        step.status === 'failed' ? <XCircle className="w-4 h-4" /> :
+                                            step.status === 'active' ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> :
+                                                <Clock className="w-4 h-4" />}
                                 </div>
                                 {i < steps.filter(s => s.status !== 'skip').length - 1 && (
-                                    <div className={`w-0.5 h-8 mt-1 ${step.status === 'done' ? 'bg-emerald-200' : 'bg-gray-200'}`} />
+                                    <div className={`w-0.5 h-8 mt-1 ${step.status === 'done' ? 'bg-emerald-200' : step.status === 'failed' ? 'bg-rose-200' : 'bg-gray-200'}`} />
                                 )}
                             </div>
                             <div className="pb-4">
-                                <p className={`font-semibold text-sm ${step.status === 'done' ? 'text-gray-900' : step.status === 'active' ? 'text-purple-700' : 'text-gray-400'}`}>
+                                <p className={`font-semibold text-sm ${step.status === 'done' ? 'text-gray-900' : step.status === 'active' ? 'text-purple-700' : step.status === 'failed' ? 'text-rose-700' : 'text-gray-400'}`}>
                                     {step.label}
                                 </p>
                                 <p className="text-xs text-gray-500 mt-0.5">{step.time}</p>
@@ -108,7 +112,8 @@ const BookingMonitoring = () => {
             case 'completed': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
             case 'accepted': return 'bg-blue-100 text-blue-800 border-blue-200';
             case 'pending': return 'bg-amber-100 text-amber-800 border-amber-200';
-            case 'cancelled': return 'bg-red-100 text-red-800 border-red-200';
+            case 'cancelled': return 'bg-orange-100 text-orange-800 border-orange-200';
+            case 'rejected': return 'bg-rose-100 text-rose-800 border-rose-200';
             case 'negotiating': return 'bg-purple-100 text-purple-800 border-purple-200';
             default: return 'bg-gray-100 text-gray-800 border-gray-200';
         }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
@@ -9,6 +9,7 @@ const ProviderDashboard = () => {
     const { currentUser, userData } = useAuth();
     const [requests, setRequests] = useState([]);
     const [activeJobs, setActiveJobs] = useState([]);
+    const [declinedRequests, setDeclinedRequests] = useState([]); // EC-009
     const [earnings, setEarnings] = useState({ today: 0, week: 0, month: 0 });
     const [negotiatingId, setNegotiatingId] = useState(null);
     const [negotiatedPrice, setNegotiatedPrice] = useState('');
@@ -43,6 +44,9 @@ const ProviderDashboard = () => {
 
                 setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
                 setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
+
+                // Track declined/rejected/cancelled historical state
+                setDeclinedRequests(myBookings.filter(b => b.status === 'rejected' || b.status === 'cancelled'));
 
                 // Calculate earnings from completed jobs for this provider
                 const completedJobs = myBookings.filter(b => b.status === 'completed');
@@ -105,7 +109,13 @@ const ProviderDashboard = () => {
     const rejectRequest = async (id) => {
         try {
             await updateDoc(doc(db, 'bookings', id), { status: 'rejected' });
-            setRequests(prev => prev.filter(r => r.id !== id));
+
+            // Move from requests to declinedRequests
+            const req = requests.find(r => r.id === id);
+            if (req) {
+                setRequests(prev => prev.filter(r => r.id !== id));
+                setDeclinedRequests(prev => [{ ...req, status: 'rejected' }, ...prev]);
+            }
         } catch (e) { console.error(e); }
     };
 
@@ -394,6 +404,37 @@ const ProviderDashboard = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* EC-009: Declined or Cancelled History */}
+                    {declinedRequests.length > 0 && (
+                        <div className="bg-slate-50 border-2 border-slate-100 rounded-3xl p-8 mb-8">
+                            <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                                <XCircle className="w-6 h-6 text-slate-400" />
+                                Closed & Declined Requests
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {declinedRequests.map(job => (
+                                    <div key={job.id} className="bg-white p-5 rounded-box border border-slate-200 opacity-75 hover:opacity-100 transition-opacity">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h4 className="font-bold text-slate-800">{job.service}</h4>
+                                                <p className="text-xs text-slate-500">#{job.id}</p>
+                                            </div>
+                                            <span className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                {job.status}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm font-medium text-slate-500 mb-1">
+                                            ₹{job.proposedPrice || job.price || job.amount}
+                                        </div>
+                                        <div className="text-xs text-slate-400 flex items-center gap-1">
+                                            <Calendar className="w-3.5 h-3.5" /> {job.date}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </>
             )}
         </div >
