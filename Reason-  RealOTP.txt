@@ -1,0 +1,22 @@
+1. Why it's falling back to "Dev Mode" (1234)
+In the code for 
+
+LoginPage.jsx
+ and 
+
+ProviderLogin.jsx
+, there is a "safety net" I've implemented:
+
+The App tries to send a real SMS first using signInWithPhoneNumber.
+If Firebase returns an error (like billing-not-enabled or a configuration error), the app automatically switches to Dev Mode so you aren't locked out of your own app during testing.
+2. Common Reasons Real OTP Fails:
+Firebase Billing: Firebase Phone Auth requires a dedicated setup. While there is a free tier (10 free SMS/day for some regions), Firebase often requires you to switch to the Blaze (Pay-as-you-go) Plan to enable the service for production.
+Domain Whitelisting: The URL primeseva-mvp.web.app must be added to the "Authorized Domains" list in your Firebase Authentication settings.
+ReCAPTCHA: Real OTP requires a ReCAPTCHA check to prevent spam. If this isn't configured correctly in the Firebase Console, the SMS won't send.
+3. How to Enable "Actual" OTP:
+If you want to move away from 1234 and use real SMS, you need to do these steps in your Firebase Console:
+
+Enable Phone Auth: Go to Authentication > Sign-in method and enable Phone.
+Upgrade to Blaze Plan: This is the most common fix. Go to the bottom left of the Firebase console and upgrade from "Spark" to "Blaze". You only pay if you exceed the high free limits.
+Authorized Domains: Ensure primeseva-mvp.web.app and localhost are listed under Authentication > Settings > Authorized domains.
+Test Numbers: You can also add your own phone number as a "Test Number" in the Firebase console and assign it a specific code (like 888888) so you can test "real" flows without actually spending SMS credits.

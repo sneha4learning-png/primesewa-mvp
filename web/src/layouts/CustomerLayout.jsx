@@ -4,9 +4,11 @@ import { LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 const CustomerLayout = () => {
-    const { currentUser, logout } = useAuth();
+    const { currentUser, userData, logout } = useAuth();
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const isProvider = userData?.role === 'provider';
 
     const handleLogout = async () => {
         setMobileMenuOpen(false);
@@ -33,7 +35,7 @@ const CustomerLayout = () => {
 
                         {currentUser ? (
                             <div className="flex items-center gap-6 ml-4 border-l border-gray-200 pl-6">
-                                <Link to="/provider" className="text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
+                                <Link to={isProvider ? "/provider" : "/provider/login"} className="text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
                                 <Link to="/dashboard" className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100 transition-colors">My Dashboard</Link>
                                 <Link to="/profile" className="text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors">My Profile</Link>
                                 <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2 text-sm font-bold border border-rose-200 text-rose-600 bg-rose-50 rounded-full hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-600/20 transition-all">
@@ -42,7 +44,7 @@ const CustomerLayout = () => {
                             </div>
                         ) : (
                             <div className="flex items-center gap-4 ml-4 border-l border-gray-200 pl-6">
-                                <Link to="/provider" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">Become a Partner</Link>
+                                <Link to="/provider/login?signup=true" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">Become a Partner</Link>
                                 <Link to="/login" className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-indigo-600/20 hover:shadow-lg hover:-translate-y-0.5">
                                     Sign In
                                 </Link>
@@ -79,7 +81,7 @@ const CustomerLayout = () => {
                         {currentUser ? (
                             <>
                                 <div className="h-px bg-gray-100 my-1" />
-                                <Link to="/provider" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition-colors">
+                                <Link to={isProvider ? "/provider" : "/provider/login"} onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition-colors">
                                     🤝 Provider Portal
                                 </Link>
                                 <Link to="/dashboard" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 bg-indigo-50 font-bold hover:bg-indigo-100 transition-colors">
@@ -98,7 +100,7 @@ const CustomerLayout = () => {
                         ) : (
                             <>
                                 <div className="h-px bg-gray-100 my-1" />
-                                <Link to="/provider" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                                <Link to="/provider/login?signup=true" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                                     🤝 Become a Partner
                                 </Link>
                                 <Link to="/login" onClick={closeMobileMenu} className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-white font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md mt-2">
