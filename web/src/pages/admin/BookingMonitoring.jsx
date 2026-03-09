@@ -153,37 +153,37 @@ const BookingMonitoring = () => {
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
                     {/* Desktop Table View */}
-                    <table className="hidden md:table w-full text-left border-collapse min-w-[900px]">
+                    <table className="hidden lg:table w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
-                                <th className="px-6 py-4 font-medium">Booking ID</th>
-                                <th className="px-6 py-4 font-medium">Date & Service</th>
-                                <th className="px-6 py-4 font-medium">Customer</th>
-                                <th className="px-6 py-4 font-medium">Provider</th>
-                                <th className="px-6 py-4 font-medium">Amount</th>
-                                <th className="px-6 py-4 font-medium">Status</th>
-                                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                                <th className="px-3 py-4 font-medium">Booking ID</th>
+                                <th className="px-3 py-4 font-medium">Date & Service</th>
+                                <th className="px-3 py-4 font-medium">Customer</th>
+                                <th className="px-3 py-4 font-medium">Provider</th>
+                                <th className="px-3 py-4 font-medium">Amount</th>
+                                <th className="px-3 py-4 font-medium">Status</th>
+                                <th className="px-3 py-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {paginatedBookings.map(booking => (
                                 <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{booking.id}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{booking.id}</td>
+                                    <td className="px-3 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{booking.service}</div>
                                         <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                                             <Calendar className="w-3 h-3" /> {booking.date}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{booking.customer || 'Unknown'}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{booking.provider || 'Unassigned'}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{booking.proposedPrice || booking.price || booking.amount}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.customer || 'Unknown'}</td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.provider || 'Unassigned'}</td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{booking.proposedPrice || booking.price || booking.amount}</td>
+                                    <td className="px-3 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-md border text-xs font-semibold capitalize ${getStatusColor(booking.status)}`}>
                                             {booking.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                    <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
                                         <button
                                             onClick={() => setTimelineBooking(booking)}
                                             className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all border border-indigo-100 shadow-sm"
@@ -198,7 +198,7 @@ const BookingMonitoring = () => {
                     </table>
 
                     {/* Mobile Card View */}
-                    <div className="md:hidden divide-y divide-gray-100">
+                    <div className="lg:hidden divide-y divide-gray-100">
                         {paginatedBookings.map(booking => (
                             <div key={booking.id} className="p-4 space-y-3">
                                 <div className="flex justify-between items-start">
