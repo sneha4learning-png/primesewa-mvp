@@ -1,82 +1,71 @@
 import { useState } from 'react';
 import { db } from '../../firebase/config';
-import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, writeBatch, doc } from 'firebase/firestore';
 
 const CleanupPage = () => {
-    const [log, setLog] = useState(['Click to start cleanup...']);
-    const [running, setRunning] = useState(false);
+    const [status, setStatus] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const runCleanup = async () => {
-        setRunning(true);
-        const addLog = (msg) => setLog(prev => [...prev, msg]);
-        addLog('🚀 Starting Cleanup...');
-
+        setLoading(true);
+        setStatus('Cleaning up providers...');
         try {
-            const provSnap = await getDocs(collection(db, 'providers'));
-            const allProviders = [];
-            provSnap.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
+            const snapshot = await getDocs(collection(db, 'providers'));
+            const batch = writeBatch(db);
+            const providers = [];
 
-            addLog(`Found ${allProviders.length} provider records.`);
+            snapshot.forEach(d => providers.push({ id: d.id, ...d.data() }));
 
-            const nameGroups = {};
-            allProviders.forEach(p => {
-                const name = p.name?.toLowerCase().trim();
-                if (!name) return;
-                if (!nameGroups[name]) nameGroups[name] = [];
-                nameGroups[name].push(p);
-            });
+            // 1. Identify duplicates and normalize
+            const seen = new Map();
+            const toDelete = [];
 
-            for (const name in nameGroups) {
-                const records = nameGroups[name];
-                if (records.length > 1) {
-                    addLog(`Found ${records.length} records for "${name}". Deduping...`);
+            providers.forEach(p => {
+                const rawName = p.name || 'Unknown';
+                const nameKey = rawName.toLowerCase().trim();
 
-                    // Priority: Has UID > Active > More Jobs
-                    records.sort((a, b) => {
-                        const aReal = !!a.uid;
-                        const bReal = !!b.uid;
-                        if (aReal !== bReal) return bReal ? 1 : -1;
-                        if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
-                        return (b.jobs || 0) - (a.jobs || 0);
-                    });
+                // Normalization Logic
+                const updates = {
+                    name: rawName.trim(),
+                    status: (p.status || 'active').toLowerCase().trim(),
+                    isOnline: p.isOnline === true || String(p.isOnline) === 'true',
+                    category: p.category || 'Service'
+                };
 
-                    const [keep, ...remove] = records;
-                    addLog(`KEEPING ID: ${keep.id}`);
-
-                    for (const r of remove) {
-                        await deleteDoc(doc(db, 'providers', r.id));
-                        addLog(`DELETED ID: ${r.id}`);
-                    }
+                // Specific Fix: Sneha Services -> Carpentry
+                if (nameKey.includes('sneha')) {
+                    updates.category = 'Carpentry';
+                    updates.status = 'active';
                 }
-            }
 
-            // Set test states: Ensure 3 specific pros are Online, others Offline
-            addLog('Setting test online/offline states...');
-            const finalSnap = await getDocs(collection(db, 'providers'));
-            let count = 0;
-            const promises = [];
-            finalSnap.forEach(d => {
-                const isSneha = d.data().name?.toLowerCase().includes('sneha');
-                const isDeepak = d.data().name?.toLowerCase().includes('deepak');
-
-                // Keep Deepak Online, Sneha Offline for testing
-                let online = count < 3 && !isSneha;
-                if (isDeepak) online = true;
-                if (isSneha) online = false;
-
-                promises.push(updateDoc(doc(db, 'providers', d.id), {
-                    isOnline: online,
-                    status: 'active' // Ensure they are active too
-                }));
-                count++;
+                if (seen.has(nameKey)) {
+                    const existing = seen.get(nameKey);
+                    // If current has UID but existing doesn't, swap and delete existing
+                    if (p.uid && !existing.uid) {
+                        toDelete.push(existing.id);
+                        seen.set(nameKey, p);
+                        batch.update(doc(db, 'providers', p.id), updates);
+                    } else {
+                        toDelete.push(p.id);
+                    }
+                } else {
+                    seen.set(nameKey, p);
+                    batch.update(doc(db, 'providers', p.id), updates);
+                }
             });
-            await Promise.all(promises);
 
-            addLog('✅ Cleanup and Seeding Finished!');
+            // 2. Perform deletions
+            toDelete.forEach(id => {
+                batch.delete(doc(db, 'providers', id));
+            });
+
+            await batch.commit();
+            setStatus(`✅ Done! Cleaned up ${toDelete.length} duplicates and normalized all records. Sneha is now in Carpentry.`);
         } catch (err) {
-            addLog(`❌ Error: ${err.message}`);
+            console.error(err);
+            setStatus(`❌ Error: ${err.message}`);
         } finally {
-            setRunning(false);
+            setLoading(false);
         }
     };
 

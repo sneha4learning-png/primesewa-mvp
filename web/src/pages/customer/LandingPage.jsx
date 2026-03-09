@@ -11,55 +11,45 @@ const LandingPage = () => {
     const [providerDetails, setProviderDetails] = useState(null);
 
     useEffect(() => {
-        const fetchHeroData = async () => {
-            try {
-                // 1. Fetch Top Rated Provider as default
-                const topProviderQuery = query(
-                    collection(db, 'providers'),
-                    where('status', '==', 'active'),
-                    where('isOnline', '==', true),
-                    orderBy('rating', 'desc'),
-                    limit(1)
-                );
-                const topSnap = await getDocs(topProviderQuery);
-                if (!topSnap.empty) {
-                    const topProvider = topSnap.docs[0].data();
-                    setProviderDetails(topProvider);
-                }
+        // 1. Listen to Top Rated Active/Online Provider
+        const topProviderQuery = query(
+            collection(db, 'providers'),
+            where('status', '==', 'active'),
+            orderBy('rating', 'desc'),
+            limit(10) // Get top 10 to filter online manually for better robustness
+        );
 
-                // 2. Fetch Active Booking if user is logged in
-                if (userData?.uid || userData?.name) {
-                    const identifier = userData.name || userData.displayName;
-                    const bookingsQuery = query(
-                        collection(db, 'bookings'),
-                        where('customer', '==', identifier),
-                        where('status', 'in', ['accepted', 'pending', 'negotiating', 'arrived', 'started'])
-                    );
-                    const bSnap = await getDocs(bookingsQuery);
-                    if (!bSnap.empty) {
-                        const active = { id: bSnap.docs[0].id, ...bSnap.docs[0].data() };
-                        setActiveBooking(active);
+        const unsubscribeTop = onSnapshot(topProviderQuery, (snapshot) => {
+            const providers = snapshot.docs.map(d => d.data());
+            // Filter online manually to handle type mismatches (string "true" vs boolean)
+            const topOnline = providers.find(p => p.isOnline === true || String(p.isOnline) === 'true');
+            if (topOnline) setProviderDetails(topOnline);
+        });
 
-                        // If we have an active booking, fetch THAT provider's details specifically
-                        if (active.provider) {
-                            const pQuery = query(collection(db, 'providers'), where('name', '==', active.provider));
-                            const pSnap = await getDocs(pQuery);
-                            if (!pSnap.empty) {
-                                setProviderDetails(pSnap.docs[0].data());
-                            }
-                        }
-                    } else {
-                        setActiveBooking(null);
-                    }
+        // 2. Listen to Active Bookings if user is logged in
+        let unsubscribeBooking = () => { };
+        if (userData?.uid || userData?.name) {
+            const identifier = userData.name || userData.displayName;
+            const bookingsQuery = query(
+                collection(db, 'bookings'),
+                where('customer', '==', identifier),
+                where('status', 'in', ['accepted', 'pending', 'negotiating', 'arrived', 'started'])
+            );
+
+            unsubscribeBooking = onSnapshot(bookingsQuery, (snapshot) => {
+                if (!snapshot.empty) {
+                    const active = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                    setActiveBooking(active);
+                } else {
+                    setActiveBooking(null);
                 }
-            } catch (err) {
-                console.error("Error fetching hero data:", err);
-            }
+            });
+        }
+
+        return () => {
+            unsubscribeTop();
+            unsubscribeBooking();
         };
-
-        fetchHeroData();
-        const interval = setInterval(fetchHeroData, 10000); // Check every 10s for updates
-        return () => clearInterval(interval);
     }, [userData]);
     return (
         <div className="flex flex-col min-h-screen">

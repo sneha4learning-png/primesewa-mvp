@@ -1,7 +1,7 @@
 import { useState, useEffect, Component } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
-import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -65,75 +65,84 @@ const CustomerHome = () => {
     const [loadingData, setLoadingData] = useState(true);
 
     useEffect(() => {
-        const loadDb = async () => {
-            const myName = userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer');
+        const myName = userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer');
+        setLoadingData(true);
 
-            try {
-                setDbError(false);
-                const provSnap = await getDocs(collection(db, 'providers'));
-                const allProviders = [];
-                provSnap.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
+        // 1. Listen to ALL Providers in real-time
+        const unsubscribeProviders = onSnapshot(collection(db, 'providers'), (snapshot) => {
+            const allProviders = [];
+            snapshot.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
 
-                // Deduplicate by Name + Phone while prioritizing "real" accounts (those with a uid)
-                const uniqueProvidersMap = new Map();
-                allProviders.forEach(p => {
-                    const name = p.name?.toLowerCase().trim();
-                    if (!name) return;
+            // Deduplicate while prioritizing real accounts and normalizing data
+            const uniqueProvidersMap = new Map();
+            allProviders.forEach(p => {
+                const name = p.name?.toLowerCase().trim();
+                if (!name) return;
 
-                    const existing = uniqueProvidersMap.get(name);
+                const existing = uniqueProvidersMap.get(name);
 
-                    // Priority Criteria:
-                    // 1. A provider with a 'uid' is always preferred over one without (Real vs Mock)
-                    // 2. If both have uid, prefer the 'active' one
-                    // 3. Otherwise, prefer higher job count as a tie-breaker
+                // Priority Criteria: Real UID > Active Status > Job Count
+                const pIsReal = !!p.uid;
+                const eIsReal = !!existing?.uid;
 
-                    const pIsReal = !!p.uid;
-                    const eIsReal = !!existing?.uid;
+                // Normalization Helpers
+                const pStatus = (p.status || '').toLowerCase().trim();
+                const eStatus = (existing?.status || '').toLowerCase().trim();
 
-                    if (!existing ||
-                        (pIsReal && !eIsReal) ||
-                        (pIsReal === eIsReal && p.status === 'active' && existing.status !== 'active') ||
-                        (pIsReal === eIsReal && p.status === existing.status && (p.jobs || 0) > (existing.jobs || 0))
-                    ) {
-                        uniqueProvidersMap.set(name, p);
-                    }
-                });
+                if (!existing ||
+                    (pIsReal && !eIsReal) ||
+                    (pIsReal === eIsReal && pStatus === 'active' && eStatus !== 'active') ||
+                    (pIsReal === eIsReal && pStatus === eStatus && (p.jobs || 0) > (existing.jobs || 0))
+                ) {
+                    uniqueProvidersMap.set(name, p);
+                }
+            });
 
-                // Final Filter: Only show providers who are Active AND Online
-                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p =>
-                    p.status === 'active' && p.isOnline === true
-                ));
+            // Final Online Filter with loose equality check to handle string "true" vs boolean true
+            const filtered = Array.from(uniqueProvidersMap.values()).filter(p => {
+                const isActive = (p.status || '').toLowerCase().trim() === 'active';
+                const isOnline = p.isOnline === true || String(p.isOnline) === 'true';
+                return isActive && isOnline;
+            });
 
-                const bookSnap = await getDocs(collection(db, 'bookings'));
-                const allMyBookings = [];
-                bookSnap.forEach(d => {
-                    const b = d.data();
-                    if (b.customer === myName || b.customer === 'Guest User' || !b.customer) {
-                        allMyBookings.push({ id: d.id, ...b });
-                    }
-                });
+            setMockProviders(filtered);
+            setLoadingData(false);
+            setDbError(false);
+        }, (err) => {
+            console.error('Providers Listener Error:', err);
+            setDbError(true);
+            setLoadingData(false);
+        });
 
-                setMockBookings(allMyBookings.filter(b => b.status !== 'completed' && b.status !== 'rejected'));
-                const pBookings = allMyBookings.filter(b => b.status === 'completed');
-                setPastBookings(pBookings);
+        // 2. Listen to User Bookings in real-time
+        const unsubscribeBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
+            const allMyBookings = [];
+            snapshot.forEach(d => {
+                const b = { id: d.id, ...d.data() };
+                if (b.customer === myName || b.customer === 'Guest User' || !b.customer) {
+                    allMyBookings.push(b);
+                }
+            });
 
-                const categoryCounts = {};
-                pBookings.forEach(b => {
-                    const cat = b.service || 'Other';
-                    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-                });
-                const cData = Object.keys(categoryCounts).map(k => ({ name: k, value: categoryCounts[k] }));
-                setChartData(cData);
-            } catch (err) {
-                console.error('Firebase Firestore error:', err);
-                setDbError(true);
-            } finally {
-                setLoadingData(false);
-            }
+            setMockBookings(allMyBookings.filter(b => b.status !== 'completed' && b.status !== 'rejected' && b.status !== 'cancelled'));
+            const pBookings = allMyBookings.filter(b => b.status === 'completed');
+            setPastBookings(pBookings);
+
+            const categoryCounts = {};
+            pBookings.forEach(b => {
+                const cat = b.service || 'Other';
+                categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+            });
+            const cData = Object.keys(categoryCounts).map(k => ({ name: k, value: categoryCounts[k] }));
+            setChartData(cData);
+        }, (err) => {
+            console.error('Bookings Listener Error:', err);
+        });
+
+        return () => {
+            unsubscribeProviders();
+            unsubscribeBookings();
         };
-        loadDb();
-        const interval = setInterval(loadDb, 5000); // Reduced polling frequency to 5s
-        return () => clearInterval(interval);
     }, [userData]);
 
     const handleBook = (provider) => {
