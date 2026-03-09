@@ -145,7 +145,8 @@ const CommissionDashboard = () => {
                     </span>
                 </div>
                 <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
-                    <table className="w-full text-left border-collapse min-w-[700px]">
+                    {/* Desktop Table */}
+                    <table className="hidden md:table w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
                                 <th className="px-6 py-4 font-medium">Booking ID</th>
@@ -176,6 +177,31 @@ const CommissionDashboard = () => {
                             )}
                         </tbody>
                     </table>
+
+                    {/* Mobile Card List */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {paginatedRecords.map(c => (
+                            <div key={c.id} className="p-4 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{c.bookingId?.slice(0, 10)}…</span>
+                                    <span className="text-xs text-gray-500">{c.date}</span>
+                                </div>
+                                <div className="flex items-start justify-between gap-2">
+                                    <div>
+                                        <p className="font-bold text-gray-900 text-sm">{c.service || '—'}</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">{c.provider}</p>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <p className="text-sm text-gray-600 font-medium">₹{c.amount}</p>
+                                        <p className="text-sm font-bold text-emerald-600">+₹{c.commission}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {paginatedRecords.length === 0 && (
+                            <div className="p-8 text-center text-gray-400 text-sm">No completed jobs in the selected period.</div>
+                        )}
+                    </div>
                 </div>
             </div>
 

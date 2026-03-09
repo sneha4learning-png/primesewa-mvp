@@ -46,22 +46,7 @@ const DashboardOverview = () => {
                 const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const dbCommissions = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                // --- ONE-TIME MIGRATION SCRIPT ---
-                try {
-                    providers.forEach(async (p) => {
-                        let changes = {};
-                        if (!p.category) changes.category = 'Plumbing';
-                        if (!p.price) changes.price = '₹500/hr';
-                        // Clean up bad arrays
-                        if (Array.isArray(p.category) && p.category.length === 0) changes.category = 'Plumbing';
 
-                        if (Object.keys(changes).length > 0) {
-                            await updateDoc(doc(db, 'providers', p.id), changes);
-                            console.log('Migrated provider:', p.name || p.id, changes);
-                        }
-                    });
-                } catch (e) { console.error('Migration error', e); }
-                // ---------------------------------
 
                 // Count completed requests per provider
                 const completedCounts = new Map();
@@ -209,7 +194,7 @@ const DashboardOverview = () => {
                                         </div>
                                         <div>
                                             <p className="font-bold text-slate-900 leading-tight">{p.name}</p>
-                                            <p className="text-xs text-slate-500 font-medium">{p.category} Specialist</p>
+                                            <p className="text-xs text-slate-500 font-medium">{(p.category || 'No Category')} Specialist</p>
                                         </div>
                                     </div>
                                     <div className="text-right">
@@ -278,7 +263,7 @@ const DashboardOverview = () => {
                                         </div>
                                         <div>
                                             <p className="font-semibold text-gray-900">{p.name}</p>
-                                            <p className="text-xs text-gray-500">{p.category} • {p.phone}</p>
+                                            <p className="text-xs text-gray-500">{(p.category || 'No Category')} • {p.phone}</p>
                                         </div>
                                     </div>
                                     <Link to="/admin/providers" className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-medium text-sm rounded-lg transition-colors">

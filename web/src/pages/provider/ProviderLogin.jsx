@@ -203,15 +203,15 @@ const ProviderLogin = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-900 border-t-4 border-blue-500 px-4 py-12">
-            <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-8 text-white">
-                <div className="text-center mb-8 flex flex-col items-center">
+        <div className="min-h-screen flex items-center justify-center bg-slate-900 border-t-4 border-blue-500 px-4 py-8 md:py-12">
+            <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 md:p-8 text-white">
+                <div className="text-center mb-6 md:mb-8 flex flex-col items-center">
                     <div className="flex items-center justify-center gap-3 mb-4">
-                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-12 w-auto drop-shadow-md" />
-                        <span className="text-3xl font-bold text-white tracking-tight">PrimeSewa</span>
+                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-10 md:h-12 w-auto drop-shadow-md" />
+                        <span className="text-2xl md:text-3xl font-bold text-white tracking-tight">PrimeSewa</span>
                     </div>
-                    <h2 className="text-xl font-medium tracking-wide text-slate-400">{isSignup ? 'Become a Partner' : 'Partner Portal'}</h2>
-                    <p className="text-slate-400 mt-2">{isSignup ? 'Join our fleet and start earning today.' : 'Manage your service requests & earnings.'}</p>
+                    <h2 className="text-lg md:text-xl font-medium tracking-wide text-slate-400">{isSignup ? 'Become a Partner' : 'Partner Portal'}</h2>
+                    <p className="text-xs md:text-sm text-slate-400 mt-2">{isSignup ? 'Join our fleet and start earning today.' : 'Manage your service requests & earnings.'}</p>
                 </div>
 
                 {error && (
@@ -221,44 +221,46 @@ const ProviderLogin = () => {
                 )}
 
                 {isSignup && step === 1 ? (
-                    <form onSubmit={handleSendOtp} className="space-y-5">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Full Name</label>
-                            <input required type="text" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500" value={signupData.name} onChange={e => setSignupData({ ...signupData, name: e.target.value })} placeholder="e.g. Ramesh Singh" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Phone Number</label>
-                            <input required type="tel" maxLength={10} className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500" value={signupData.phone} onChange={e => setSignupData({ ...signupData, phone: e.target.value })} placeholder="10-digit mobile number" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Service Category</label>
-                            <select required className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white" value={signupData.category} onChange={e => setSignupData({ ...signupData, category: e.target.value })}>
-                                <option value="Plumbing">Plumbing</option>
-                                <option value="Electrical">Electrical</option>
-                                <option value="Cleaning">Cleaning</option>
-                                <option value="Carpentry">Carpentry</option>
-                                <option value="Painting">Home Painting</option>
-                                <option value="AC Repair">AC Repair & Service</option>
-                                <option value="Appliance Repair">Appliance Repair</option>
-                                <option value="Pest Control">Pest Control</option>
-                                <option value="Salon & Beauty">Salon & Beauty</option>
-                                <option value="Packers & Movers">Packers & Movers</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Base Hourly Rate (₹)</label>
-                            <input required type="number" min="50" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500" value={signupData.price} onChange={e => setSignupData({ ...signupData, price: e.target.value })} placeholder="e.g. 400" />
+                    <form onSubmit={handleSendOtp} className="space-y-4 md:space-y-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Full Name</label>
+                                <input required type="text" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500 text-sm" value={signupData.name} onChange={e => setSignupData({ ...signupData, name: e.target.value })} placeholder="e.g. Ramesh Singh" />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Phone Number</label>
+                                <input required type="tel" maxLength={10} className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500 text-sm" value={signupData.phone} onChange={e => setSignupData({ ...signupData, phone: e.target.value })} placeholder="10-digit mobile number" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Service Category</label>
+                                <select required className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white text-sm" value={signupData.category} onChange={e => setSignupData({ ...signupData, category: e.target.value })}>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Cleaning">Cleaning</option>
+                                    <option value="Carpentry">Carpentry</option>
+                                    <option value="Painting">Home Painting</option>
+                                    <option value="AC Repair">AC Repair & Service</option>
+                                    <option value="Appliance Repair">Appliance Repair</option>
+                                    <option value="Pest Control">Pest Control</option>
+                                    <option value="Salon & Beauty">Salon & Beauty</option>
+                                    <option value="Packers & Movers">Packers & Movers</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Rate (₹/hr)</label>
+                                <input required type="number" min="50" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500 text-sm" value={signupData.price} onChange={e => setSignupData({ ...signupData, price: e.target.value })} placeholder="e.g. 400" />
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-1">Service Areas (Ahmedabad)</label>
-                            <input required type="text" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500" value={signupData.serviceAreas} onChange={e => setSignupData({ ...signupData, serviceAreas: e.target.value })} placeholder="e.g. Vastrapur, Bopal, SG Highway" />
-                            <p className="text-xs text-slate-500 mt-1">Separate multiple areas with commas</p>
+                            <input required type="text" className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-slate-500 text-sm" value={signupData.serviceAreas} onChange={e => setSignupData({ ...signupData, serviceAreas: e.target.value })} placeholder="e.g. Vastrapur, Bopal, SG Highway" />
+                            <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-wider">Comma separated list</p>
                         </div>
 
                         {/* === IDENTITY PROOF SECTION === */}
                         <div className="pt-2 border-t border-slate-700">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Identity Proof</p>
-                            <div className="grid grid-cols-2 gap-3">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Identity Proof</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-300 mb-1">ID Type</label>
                                     <select required className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500" value={signupData.idProofType} onChange={e => setSignupData({ ...signupData, idProofType: e.target.value })}>
@@ -277,10 +279,10 @@ const ProviderLogin = () => {
 
                         {/* === WORK RECORDS SECTION === */}
                         <div className="pt-2 border-t border-slate-700">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Previous Work Records</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Work Records & Verification</p>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-1">Previous Work Photos (Optional)</label>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">Work Photos (Optional)</label>
                                     <label className={`w-full flex justify-center items-center gap-2 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all ${signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' : 'border-slate-600 bg-slate-900/50 hover:bg-slate-900 text-blue-400'}`}>
                                         <input
                                             type="file"
@@ -290,42 +292,39 @@ const ProviderLogin = () => {
                                             onChange={e => setSignupData({ ...signupData, proofOfWorkImages: Array.from(e.target.files) })}
                                         />
                                         {signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? (
-                                            <><CheckCircle2 className="w-5 h-5" /> <span className="font-bold text-sm">{signupData.proofOfWorkImages.length} Photos Selected</span></>
+                                            <><CheckCircle2 className="w-5 h-5" /> <span className="font-bold text-xs">{signupData.proofOfWorkImages.length} Photos Selected</span></>
                                         ) : (
-                                            <><UploadCloud className="w-5 h-5" /> <span className="font-bold text-sm">Click to Upload Work Photos</span></>
+                                            <><UploadCloud className="w-5 h-5" /> <span className="font-bold text-xs text-center">Upload Work Photos</span></>
                                         )}
                                     </label>
-                                    <p className="text-xs text-slate-500 mt-1">Select multiple images to build your portfolio</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-300 mb-1">ID Document Upload</label>
+                                    <label className={`w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all ${signupData.proofDocument ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' : 'border-slate-600 bg-slate-900/50 hover:bg-slate-900 text-blue-400'}`}>
+                                        <input
+                                            required
+                                            type="file"
+                                            className="hidden"
+                                            onChange={e => setSignupData({ ...signupData, proofDocument: e.target.files[0] })}
+                                        />
+                                        {signupData.proofDocument ? (
+                                            <><CheckCircle2 className="w-5 h-5" /> <span className="font-bold text-xs">Document Selected</span></>
+                                        ) : (
+                                            <><UploadCloud className="w-5 h-5" /> <span className="font-bold text-xs text-center">Upload ID Scan</span></>
+                                        )}
+                                    </label>
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-1">Identity Document Upload</label>
-                            <label className={`w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed rounded-xl cursor-pointer transition-all ${signupData.proofDocument ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' : 'border-slate-600 bg-slate-900/50 hover:bg-slate-900 text-blue-400'}`}>
-                                <input
-                                    required
-                                    type="file"
-                                    className="hidden"
-                                    onChange={e => setSignupData({ ...signupData, proofDocument: e.target.files[0] })}
-                                />
-                                {signupData.proofDocument ? (
-                                    <><CheckCircle2 className="w-5 h-5" /> <span className="font-bold text-sm">Document Selected</span></>
-                                ) : (
-                                    <><UploadCloud className="w-5 h-5" /> <span className="font-bold text-sm">Click to Upload Document</span></>
-                                )}
-                            </label>
-                            <p className="text-xs text-slate-500 mt-1">Aadhar, PAN, or Utility Bill (Max 5MB)</p>
-                        </div>
-
-                        <button type="submit" disabled={isLoading} className={`w-full flex justify-center py-3 px-4 rounded-xl shadow-md text-sm font-bold text-white transition-all mt-6 ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
-                            {isLoading ? 'Sending...' : 'Send OTP'}
+                        <button type="submit" disabled={isLoading} className={`w-full flex justify-center py-3.5 px-4 rounded-xl shadow-md text-sm font-bold text-white transition-all mt-6 ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
+                            {isLoading ? 'Sending...' : 'Register & Send OTP'}
                         </button>
-                        <p className="text-center text-sm text-slate-400 mt-4">
+                        <p className="text-center text-xs md:text-sm text-slate-400 mt-4">
                             Already a partner? <button type="button" onClick={() => setIsSignup(false)} className="text-blue-400 font-bold hover:underline">Log In</button>
                         </p>
-                        <div className="mt-8 pt-6 border-t border-slate-700">
-                            <Link to="/login" className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-bold rounded-xl border border-white/10 transition-all">
+                        <div className="mt-6 pt-6 border-t border-slate-700">
+                            <Link to="/login" className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-xs md:text-sm font-bold rounded-xl border border-white/10 transition-all">
                                 🏠 Switch to Customer Portal
                             </Link>
                         </div>
@@ -337,7 +336,7 @@ const ProviderLogin = () => {
                             {providers.length > 0 ? (
                                 <select
                                     required
-                                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-white"
+                                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-white text-sm"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                 >
@@ -348,21 +347,21 @@ const ProviderLogin = () => {
                                     })}
                                 </select>
                             ) : (
-                                <p className="text-sm text-slate-400 bg-slate-900 border border-slate-700 p-3 rounded-xl">No active providers available at the moment.</p>
+                                <p className="text-sm text-slate-400 bg-slate-900 border border-slate-700 p-3 rounded-xl">No active providers available.</p>
                             )}
                         </div>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`w-full flex justify-center py-3 px-4 rounded-xl shadow-md text-sm font-bold text-white transition-all ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                            className={`w-full flex justify-center py-3.5 px-4 rounded-xl shadow-md text-sm font-bold text-white transition-all ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                         >
                             {isLoading ? 'Sending...' : 'Send Login Code'}
                         </button>
-                        <p className="text-center text-sm text-slate-400 mt-4">
+                        <p className="text-center text-xs md:text-sm text-slate-400 mt-4">
                             Want to join our platform? <button type="button" onClick={() => setIsSignup(true)} className="text-blue-400 font-bold hover:underline">Sign Up</button>
                         </p>
-                        <div className="mt-8 pt-6 border-t border-slate-700">
-                            <Link to="/login" className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-bold rounded-xl border border-white/10 transition-all">
+                        <div className="mt-6 pt-6 border-t border-slate-700">
+                            <Link to="/login" className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-xs md:text-sm font-bold rounded-xl border border-white/10 transition-all">
                                 🏠 Switch to Customer Portal
                             </Link>
                         </div>
@@ -380,15 +379,15 @@ const ProviderLogin = () => {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                             />
-                            <p className="text-xs text-center text-slate-400 mt-3">
-                                A 6-digit code would be sent to +91 {isSignup ? signupData.phone : phoneNumber} <br />
-                                <span className="font-medium text-blue-500 mt-1 block">For testing purposes, please enter the verification code: 1234.</span>
+                            <p className="text-[10px] md:text-xs text-center text-slate-400 mt-3">
+                                A code was sent to +91 {isSignup ? signupData.phone : phoneNumber} <br />
+                                <span className="font-medium text-blue-500 mt-1 block">Dev Mode: Please enter 1234.</span>
                             </p>
                         </div>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`w-full flex justify-center py-3 px-4 rounded-xl shadow-md text-sm font-bold text-white transition-all ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                            className={`w-full flex justify-center py-3.5 px-4 rounded-xl shadow-md text-sm font-bold text-white transition-all ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                         >
                             {isLoading ? 'Verifying...' : 'Verify & Access Dashboard'}
                         </button>

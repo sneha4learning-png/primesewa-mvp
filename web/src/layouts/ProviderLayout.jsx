@@ -5,15 +5,14 @@ import { useAuth } from '../firebase/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 const ProviderLayout = () => {
-    const { userData, setUserData, setCurrentUser } = useAuth();
+    const { userData, logout } = useAuth();
     const navigate = useNavigate();
     const [isOnline, setIsOnline] = useState(false);
     const [providerId, setProviderId] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const handleLogout = () => {
-        setUserData(null);
-        setCurrentUser(null);
+    const handleLogout = async () => {
+        await logout();
         navigate('/provider/login');
     };
 

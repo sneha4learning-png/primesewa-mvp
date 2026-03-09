@@ -31,6 +31,13 @@ const categories = [
     { id: '2', name: 'Electrical', icon: Zap, color: 'bg-yellow-100 text-yellow-600' },
     { id: '3', name: 'Cleaning', icon: Sparkles, color: 'bg-emerald-100 text-emerald-600' },
     { id: '4', name: 'Carpentry', icon: Wrench, color: 'bg-orange-100 text-orange-600' },
+    { id: '5', name: 'Painting', icon: Sparkles, color: 'bg-purple-100 text-purple-600' },
+    { id: '6', name: 'AC Repair', icon: Wrench, color: 'bg-cyan-100 text-cyan-600' },
+    { id: '7', name: 'Appliance Repair', icon: Zap, color: 'bg-rose-100 text-rose-600' },
+    { id: '8', name: 'Repair', icon: Wrench, color: 'bg-slate-100 text-slate-600' },
+    { id: '9', name: 'Pest Control', icon: Sparkles, color: 'bg-red-100 text-red-600' },
+    { id: '10', name: 'Salon & Beauty', icon: Sparkles, color: 'bg-pink-100 text-pink-600' },
+    { id: '11', name: 'Packers & Movers', icon: Wrench, color: 'bg-indigo-100 text-indigo-600' },
 ];
 
 const CustomerHome = () => {
@@ -67,17 +74,33 @@ const CustomerHome = () => {
                 const allProviders = [];
                 provSnap.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
 
-                // Deduplicate by phone to prevent multiple registrations from showing twice
+                // Deduplicate by Name + Phone to ensure any duplicate entries for the same pro are merged
                 const uniqueProvidersMap = new Map();
                 allProviders.forEach(p => {
-                    if (p.phone && !uniqueProvidersMap.has(p.phone)) {
-                        uniqueProvidersMap.set(p.phone, p);
-                    } else if (!p.phone) {
-                        uniqueProvidersMap.set(p.id, p);
+                    if (!p.name) return;
+
+                    // Keying by name-only is safest for this mockup data mismatch
+                    const key = p.name.toLowerCase().trim();
+                    const existing = uniqueProvidersMap.get(key);
+
+                    // Priority picking:
+                    // 1. If nothing exists, pick this.
+                    // 2. If this is 'active' and existing isn't, this wins.
+                    // 3. If existing has 'Plumbing' but this one has something else, this wins.
+                    // 4. If this one has more jobs or higher rating, it's likely the "real" profile.
+
+                    const isExistingPlumbing = !existing?.category || existing?.category === 'Plumbing' || existing?.category === 'Service';
+                    const isNewPlumbing = !p.category || p.category === 'Plumbing' || p.category === 'Service';
+
+                    if (!existing ||
+                        (p.status === 'active' && existing.status !== 'active') ||
+                        (isExistingPlumbing && !isNewPlumbing) ||
+                        (p.jobs > (existing.jobs || 0))) {
+                        uniqueProvidersMap.set(key, p);
                     }
                 });
 
-                setMockProviders(Array.from(uniqueProvidersMap.values()).map(p => ({ ...p, category: p.category || 'Plumbing' })).filter(p => p.status === 'active'));
+                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p => p.status === 'active'));
 
                 const bookSnap = await getDocs(collection(db, 'bookings'));
                 const allMyBookings = [];
@@ -145,7 +168,7 @@ const CustomerHome = () => {
         setNetworkError(false);
 
         const finalBookingData = {
-            service: pendingBookingData ? pendingBookingData.service : (selectedCategory || 'Service'),
+            service: pendingBookingData ? pendingBookingData.service : (selectedCategory || 'Plumbing'),
             status: 'pending',
             provider: pendingBookingData.provider,
             providerPhone: pendingBookingData.providerPhone || '',
@@ -184,7 +207,16 @@ const CustomerHome = () => {
     let displayedProviders = mockProviders.filter(p => p.status === 'active');
 
     if (selectedCategory) {
-        displayedProviders = displayedProviders.filter(p => (p.category || 'Plumbing') === selectedCategory);
+        displayedProviders = displayedProviders.filter(p => {
+            const cat = p.category;
+            if (!cat) return false;
+            if (Array.isArray(cat)) return cat.some(c => c.toLowerCase() === selectedCategory.toLowerCase());
+            if (typeof cat === 'string') {
+                if (cat.includes(',')) return cat.split(',').map(c => c.trim().toLowerCase()).includes(selectedCategory.toLowerCase());
+                return cat.toLowerCase() === selectedCategory.toLowerCase();
+            }
+            return false;
+        });
     }
 
     if (searchQuery.trim() !== '') {
@@ -259,7 +291,7 @@ const CustomerHome = () => {
                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
                     <h2 className="text-3xl font-black mb-8 text-slate-900">Confirm Booking {pendingBookingData?.service ? <span className="text-blue-600 block text-xl mt-2">({pendingBookingData.service})</span> : ''}</h2>
                     <form onSubmit={confirmBooking} className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Service Date</label>
                                 <div className="relative">
@@ -325,17 +357,17 @@ const CustomerHome = () => {
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-black text-slate-900 tracking-tight">Categories</h2>
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
                                 {categories.map(cat => (
                                     <button
                                         key={cat.id}
                                         onClick={() => setSelectedCategory(cat.name === selectedCategory ? null : cat.name)}
-                                        className={`flex flex-col items-center p-6 rounded-3xl border-2 transition-all duration-300 ${selectedCategory === cat.name ? 'border-blue-500 bg-blue-50/50 shadow-md scale-100' : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-lg hover:-translate-y-1'}`}
+                                        className={`flex flex-col items-center p-4 md:p-6 rounded-2xl md:rounded-3xl border-2 transition-all duration-300 ${selectedCategory === cat.name ? 'border-blue-500 bg-blue-50/50 shadow-md scale-100' : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-lg hover:-translate-y-1'}`}
                                     >
-                                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform ${cat.color} ${selectedCategory === cat.name ? 'scale-110' : ''}`}>
-                                            <cat.icon className="w-8 h-8" />
+                                        <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-4 transition-transform ${cat.color} ${selectedCategory === cat.name ? 'scale-110' : ''}`}>
+                                            <cat.icon className="w-6 h-6 md:w-8 md:h-8" />
                                         </div>
-                                        <span className={`font-bold ${selectedCategory === cat.name ? 'text-blue-700' : 'text-slate-700'}`}>{cat.name}</span>
+                                        <span className={`text-xs md:text-base font-bold text-center ${selectedCategory === cat.name ? 'text-blue-700' : 'text-slate-700'}`}>{cat.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -358,34 +390,34 @@ const CustomerHome = () => {
                             </div>
                             <div className="space-y-4">
                                 {displayedProviders.slice(0, visibleCount).map(provider => (
-                                    <div key={provider.id} className="group bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-xl hover:border-slate-200 transition-all duration-300">
-                                        <div className="flex items-center gap-6">
-                                            <div className="relative">
+                                    <div key={provider.id} className="group bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0 hover:shadow-xl hover:border-slate-200 transition-all duration-300">
+                                        <div className="flex items-center gap-4 md:gap-6">
+                                            <div className="relative shrink-0">
                                                 <div className="absolute inset-0 bg-blue-500 rounded-full blur group-hover:blur-md transition-all opacity-20"></div>
-                                                <div className="w-16 h-16 relative bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center text-2xl font-black text-slate-600 border-2 border-white shadow-sm">
+                                                <div className="w-14 h-14 md:w-16 md:h-16 relative bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center text-xl md:text-2xl font-black text-slate-600 border-2 border-white shadow-sm">
                                                     {provider.name.charAt(0)}
                                                 </div>
                                             </div>
-                                            <div>
-                                                <h3 className="font-black text-xl text-slate-900">{provider.name}</h3>
-                                                <p className="text-sm font-bold text-indigo-600 mt-1">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Plumbing')}</p>
-                                                <div className="flex items-center flex-wrap gap-2 text-sm font-bold text-slate-500 mt-2">
-                                                    <span className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-1 rounded-md">
-                                                        <Star className="w-4 h-4 fill-current" /> {provider.rating}
+                                            <div className="min-w-0">
+                                                <h3 className="font-black text-lg md:text-xl text-slate-900 truncate">{provider.name}</h3>
+                                                <p className="text-xs md:text-sm font-bold text-indigo-600 mt-0.5 truncate">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Professional Service')}</p>
+                                                <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs md:text-sm font-bold text-slate-500 mt-2">
+                                                    <span className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded-md">
+                                                        <Star className="w-3.5 h-3.5 fill-current" /> {provider.rating}
                                                     </span>
                                                     <span>•</span>
                                                     <span>{provider.jobs} jobs</span>
                                                     <span>•</span>
-                                                    <span className="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">{provider.price}</span>
+                                                    <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md whitespace-nowrap">{provider.price}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col gap-2">
-                                            <button onClick={() => setSelectedProviderProfile(provider)} className="px-6 py-2.5 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 transition-all border border-blue-100">
-                                                View Profile
+                                        <div className="flex flex-row md:flex-col gap-2">
+                                            <button onClick={() => setSelectedProviderProfile(provider)} className="flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2.5 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 transition-all border border-blue-100 text-sm md:text-base">
+                                                View
                                             </button>
-                                            <button onClick={() => handleBook(provider)} className="px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-blue-600 shadow-md shadow-slate-900/20 hover:shadow-blue-600/30 transition-all group-hover:-translate-y-0.5">
-                                                Book Now
+                                            <button onClick={() => handleBook(provider)} className="flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-blue-600 shadow-md shadow-slate-900/20 hover:shadow-blue-600/30 transition-all group-hover:-translate-y-0.5 text-sm md:text-base">
+                                                Book
                                             </button>
                                         </div>
                                     </div>
@@ -607,7 +639,7 @@ const CustomerHome = () => {
                 const p = selectedProviderProfile;
                 const name = p.name || 'Provider';
                 const initial = name.charAt(0).toUpperCase();
-                const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Plumbing');
+                const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Professional Service');
                 const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating) || 0;
                 const jobs = p.jobs || p.jobCount || 0;
                 const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0

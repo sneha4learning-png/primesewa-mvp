@@ -1,26 +1,32 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../firebase/AuthContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 const CustomerLayout = () => {
-    const { currentUser, setUserData, setCurrentUser } = useAuth();
+    const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const handleLogout = () => {
-        setUserData(null);
-        setCurrentUser(null);
+    const handleLogout = async () => {
+        setMobileMenuOpen(false);
+        await logout();
         navigate('/');
     };
+
+    const closeMobileMenu = () => setMobileMenuOpen(false);
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-50">
             {/* Navbar */}
             <header className="h-16 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 group">
+                    <Link to="/" className="flex items-center gap-2 group" onClick={closeMobileMenu}>
                         <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto group-hover:scale-105 transition-transform" />
                         <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight">PrimeSewa</span>
                     </Link>
+
+                    {/* Desktop Nav */}
                     <nav className="hidden md:flex items-center gap-8">
                         <Link to="/" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">Home</Link>
                         <Link to="/dashboard" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">All Services</Link>
@@ -43,8 +49,66 @@ const CustomerLayout = () => {
                             </div>
                         )}
                     </nav>
+
+                    {/* Mobile Hamburger Button */}
+                    <button
+                        className="md:hidden p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label="Toggle navigation menu"
+                    >
+                        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </button>
                 </div>
             </header>
+
+            {/* Mobile Menu Overlay */}
+            {mobileMenuOpen && (
+                <div className="md:hidden fixed inset-0 z-40 flex flex-col pt-16" onClick={closeMobileMenu}>
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+                    <div
+                        className="relative bg-white border-b border-indigo-100 shadow-xl px-4 py-6 flex flex-col gap-4"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <Link to="/" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                            🏠 Home
+                        </Link>
+                        <Link to="/dashboard" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                            🔧 All Services
+                        </Link>
+
+                        {currentUser ? (
+                            <>
+                                <div className="h-px bg-gray-100 my-1" />
+                                <Link to="/provider" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition-colors">
+                                    🤝 Provider Portal
+                                </Link>
+                                <Link to="/dashboard" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 bg-indigo-50 font-bold hover:bg-indigo-100 transition-colors">
+                                    📋 My Dashboard
+                                </Link>
+                                <Link to="/profile" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                                    👤 My Profile
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-rose-600 font-bold hover:bg-rose-50 transition-colors text-left w-full border border-rose-100 mt-2"
+                                >
+                                    <LogOut className="w-5 h-5" /> Logout
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="h-px bg-gray-100 my-1" />
+                                <Link to="/provider" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                                    🤝 Become a Partner
+                                </Link>
+                                <Link to="/login" onClick={closeMobileMenu} className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-white font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md mt-2">
+                                    Sign In
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Main Content */}
             <main className="flex-1">

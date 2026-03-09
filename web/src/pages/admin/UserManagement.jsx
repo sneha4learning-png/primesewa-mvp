@@ -111,7 +111,8 @@ const UserManagement = () => {
             </div>
 
             <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
-                <table className="w-full text-left border-collapse min-w-[800px]">
+                {/* Desktop view (table) */}
+                <table className="hidden md:table w-full text-left border-collapse min-w-[800px]">
                     <thead>
                         <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
                             <th className="px-6 py-4 font-medium">Customer Details</th>
@@ -162,6 +163,44 @@ const UserManagement = () => {
                         ))}
                     </tbody>
                 </table>
+
+                {/* Mobile/Small Screen Grid View */}
+                <div className="md:hidden grid grid-cols-1 divide-y divide-gray-100">
+                    {paginatedUsers.map(user => (
+                        <div key={user.id} className="p-4 flex flex-col gap-4">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <div className="text-sm font-bold text-gray-900">{user.name}</div>
+                                    <div className="text-xs text-gray-500 capitalize">{user.status} • Member Since {user.joined}</div>
+                                </div>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {user.status}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-gray-600">
+                                <div>Phone: <span className="font-semibold">{user.phone}</span></div>
+                                <div>Bookings: <span className="font-bold text-blue-600">{user.totalBookings}</span></div>
+                            </div>
+                            <div className="flex gap-3">
+                                <button onClick={() => handleViewHistory(user)} className="flex-1 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
+                                    <Activity className="w-4 h-4" /> Activity History
+                                </button>
+                                {user.status === 'active' ? (
+                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-red-50 text-red-700 rounded-lg text-xs font-bold">
+                                        Block User
+                                    </button>
+                                ) : (
+                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-green-50 text-green-700 rounded-lg text-xs font-bold">
+                                        Unblock
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    {paginatedUsers.length === 0 && (
+                        <div className="p-8 text-center text-gray-400 text-sm">No users found.</div>
+                    )}
+                </div>
             </div>
 
             {/* Pagination Controls */}

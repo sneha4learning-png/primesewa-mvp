@@ -4,7 +4,7 @@ import { LayoutDashboard, Users, UserCog, CalendarDays, DollarSign, LogOut, Bell
 import { useAuth } from '../firebase/AuthContext';
 
 const AdminLayout = () => {
-    const { setUserData } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const [showNotifications, setShowNotifications] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -15,8 +15,8 @@ const AdminLayout = () => {
         { id: 3, text: 'Weekly commission report generated.', time: '2 days ago', unread: false }
     ];
 
-    const handleLogout = () => {
-        setUserData(null);
+    const handleLogout = async () => {
+        await logout();
         navigate('/admin/login');
     };
 

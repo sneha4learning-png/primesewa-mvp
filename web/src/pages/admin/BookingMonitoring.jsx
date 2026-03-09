@@ -134,7 +134,8 @@ const BookingMonitoring = () => {
 
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
-                    <table className="w-full text-left border-collapse min-w-[900px]">
+                    {/* Desktop Table View */}
+                    <table className="hidden md:table w-full text-left border-collapse min-w-[900px]">
                         <thead>
                             <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
                                 <th className="px-6 py-4 font-medium">Booking ID</th>
@@ -175,18 +176,47 @@ const BookingMonitoring = () => {
                                     </td>
                                 </tr>
                             ))}
-                            {paginatedBookings.length === 0 && (
-                                <tr>
-                                    <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
-                                        <div className="flex justify-center mb-2">
-                                            <Search className="w-8 h-8 text-gray-300" />
-                                        </div>
-                                        {isLoading ? 'Loading bookings...' : 'No bookings found for the selected filter.'}
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {paginatedBookings.map(booking => (
+                            <div key={booking.id} className="p-4 space-y-3">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-xs font-bold text-gray-500 tracking-wider">#{booking.id.slice(0, 8)}</span>
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(booking.status)}`}>
+                                        {booking.status}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <div className="text-sm font-bold text-gray-900">{booking.service}</div>
+                                        <div className="text-xs text-gray-500">{booking.date} • ₹{booking.proposedPrice || booking.price}</div>
+                                    </div>
+                                    <button
+                                        onClick={() => setTimelineBooking(booking)}
+                                        className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl"
+                                    >
+                                        <Clock className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <div className="flex gap-4 text-xs text-gray-500 pt-2 border-t border-gray-50">
+                                    <div>Cust: <span className="font-semibold text-gray-800">{booking.customer || 'N/A'}</span></div>
+                                    <div>Pro: <span className="font-semibold text-gray-800">{booking.provider || 'Unassigned'}</span></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {paginatedBookings.length === 0 && (
+                        <div className="px-6 py-12 text-center text-gray-500">
+                            <div className="flex justify-center mb-2">
+                                <Search className="w-8 h-8 text-gray-300" />
+                            </div>
+                            {isLoading ? 'Loading bookings...' : 'No bookings found.'}
+                        </div>
+                    )}
                 </div>
             </div>
 
