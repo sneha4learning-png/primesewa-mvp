@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { db } from '../../firebase/config';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import TimelineModal from '../../components/TimelineModal';
 
 // BUG-6: Review Timeline Modal
@@ -20,26 +20,28 @@ const BookingMonitoring = () => {
     const itemsPerPage = 5;
 
     useEffect(() => {
-        const fetchBookings = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'bookings'));
-                const allBookings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setIsLoading(true);
 
-                // Sort by createdAt timestamp descending — newest booking appears first
-                const sorted = allBookings.sort((a, b) => {
-                    const tsA = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || new Date(a.date || 0).getTime();
-                    const tsB = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || new Date(b.date || 0).getTime();
-                    return tsB - tsA; // descending: newest first
-                });
-                setBookings(sorted);
-            } catch (err) {
-                console.error("Error fetching bookings:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+        // Real-time listener — new bookings appear instantly without page refresh
+        const unsubscribe = onSnapshot(collection(db, 'bookings'), (snapshot) => {
+            const allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        fetchBookings();
+            // Sort by createdAt timestamp descending — newest booking appears first
+            const sorted = allBookings.sort((a, b) => {
+                const tsA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || new Date(a.date || 0).getTime();
+                const tsB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || new Date(b.date || 0).getTime();
+                return tsB - tsA; // descending: newest first
+            });
+
+            setBookings(sorted);
+            setIsLoading(false);
+        }, (err) => {
+            console.error('Bookings listener error:', err);
+            setIsLoading(false);
+        });
+
+        // Cleanup listener on unmount
+        return () => unsubscribe();
     }, []);
 
     const filteredBookings = bookings.filter(b => {
