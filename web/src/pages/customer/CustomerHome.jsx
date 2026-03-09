@@ -120,7 +120,7 @@ const CustomerHome = () => {
 
         const newBooking = {
             id: `B${Math.floor(Math.random() * 10000)}`,
-            service: provider.category || selectedCategory || 'General Handyman',
+            service: (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Service',
             status: 'pending',
             provider: provider.name || 'Provider',
             providerPhone: provider.phone || '',
@@ -145,7 +145,7 @@ const CustomerHome = () => {
         setNetworkError(false);
 
         const finalBookingData = {
-            service: pendingBookingData ? pendingBookingData.service : (selectedCategory || 'General Handyman'),
+            service: pendingBookingData ? pendingBookingData.service : (selectedCategory || 'Service'),
             status: 'pending',
             provider: pendingBookingData.provider,
             providerPhone: pendingBookingData.providerPhone || '',
@@ -606,7 +606,7 @@ const CustomerHome = () => {
                 const p = selectedProviderProfile;
                 const name = p.name || 'Provider';
                 const initial = name.charAt(0).toUpperCase();
-                const category = p.category || 'General Service';
+                const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Service');
                 const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating) || 0;
                 const jobs = p.jobs || p.jobCount || 0;
                 const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0
