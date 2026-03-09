@@ -321,14 +321,32 @@ const CustomerHome = () => {
                                 <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Service Date</label>
                                 <div className="relative">
                                     <Calendar className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input required type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" />
+                                    <input
+                                        required
+                                        type="date"
+                                        value={bookingDate}
+                                        min={new Date().toISOString().split('T')[0]}
+                                        onChange={(e) => { setBookingDate(e.target.value); setBookingTime(''); }}
+                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                                    />
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Preferred Time</label>
                                 <div className="relative">
                                     <ClockIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input required type="time" value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" />
+                                    <input
+                                        required
+                                        type="time"
+                                        value={bookingTime}
+                                        // If today is selected, disallow times before now; future dates allow any time
+                                        min={bookingDate === new Date().toISOString().split('T')[0]
+                                            ? `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`
+                                            : undefined
+                                        }
+                                        onChange={(e) => setBookingTime(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                                    />
                                 </div>
                             </div>
                         </div>
