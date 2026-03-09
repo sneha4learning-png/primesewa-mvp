@@ -1,7 +1,16 @@
 # AntiGravity MVP
 
 ## Project Overview
-AntiGravity is a home services platform MVP facilitating connections between customers and service providers in Ahmedabad. 
+AntiGravity is a home services platform MVP facilitating connections between customers and service providers in Ahmedabad.
+
+### 4. Responsiveness & Session Management
+- **Auth Persistence:** Explicit `browserLocalPersistence` ensures session survives page reloads.
+- **Mobile Navbar:** Hamburger (☰) menu for Customer Panel with full navigation drawer.
+- **Mobile-First Data Views:**
+  - Admin: Provider Management card-list for small screens.
+  - Admin: Commission Dashboard card-list for small screens.
+  - Provider: Mobile-friendly action buttons and status toggles.
+- **Improved Navigation:** Smarter role-based links to prevent route-guard redirection loops.
 
 ## Completed Features
 ### 1. Admin Panel
