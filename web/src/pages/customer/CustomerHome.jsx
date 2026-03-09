@@ -57,12 +57,21 @@ const CustomerHome = () => {
     const [bookingDate, setBookingDate] = useState('');
     const [bookingTime, setBookingTime] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
+    const [timeError, setTimeError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(5);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [networkError, setNetworkError] = useState(false);
     const [dbError, setDbError] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
+
+    // Returns current time as "HH:MM" string for today's minimum time constraint
+    const getNowTimeStr = () => {
+        const now = new Date();
+        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    };
+
+    const getTodayStr = () => new Date().toISOString().split('T')[0];
 
     useEffect(() => {
         const myName = userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer');
@@ -167,6 +176,7 @@ const CustomerHome = () => {
         setBookingDate('');
         setBookingTime('');
         setBookingDesc('');
+        setTimeError('');
         setSelectedProviderProfile(null);
         setBookingStep(1);
     };
@@ -174,6 +184,16 @@ const CustomerHome = () => {
     const confirmBooking = async (e) => {
         e.preventDefault();
         if (isSubmitting) return; // NT-015: prevent duplicate submissions
+
+        // Validate: if today is selected, the chosen time must be in the future
+        if (bookingDate === getTodayStr() && bookingTime) {
+            const nowStr = getNowTimeStr();
+            if (bookingTime <= nowStr) {
+                setTimeError(`Please select a future time. Current time is ${nowStr}.`);
+                return;
+            }
+        }
+        setTimeError('');
         setIsSubmitting(true);
         setNetworkError(false);
 
@@ -325,7 +345,7 @@ const CustomerHome = () => {
                                         required
                                         type="date"
                                         value={bookingDate}
-                                        min={new Date().toISOString().split('T')[0]}
+                                        min={getTodayStr()}
                                         onChange={(e) => { setBookingDate(e.target.value); setBookingTime(''); }}
                                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
                                     />
@@ -339,15 +359,26 @@ const CustomerHome = () => {
                                         required
                                         type="time"
                                         value={bookingTime}
-                                        // If today is selected, disallow times before now; future dates allow any time
-                                        min={bookingDate === new Date().toISOString().split('T')[0]
-                                            ? `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`
-                                            : undefined
-                                        }
-                                        onChange={(e) => setBookingTime(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                                        min={bookingDate === getTodayStr() ? getNowTimeStr() : undefined}
+                                        onChange={(e) => {
+                                            const selected = e.target.value;
+                                            // Guard: if today is selected, reject past times immediately
+                                            if (bookingDate === getTodayStr() && selected && selected <= getNowTimeStr()) {
+                                                setTimeError(`Please pick a time after ${getNowTimeStr()} for today.`);
+                                                setBookingTime('');
+                                            } else {
+                                                setTimeError('');
+                                                setBookingTime(selected);
+                                            }
+                                        }}
+                                        className={`w-full pl-12 pr-4 py-4 bg-slate-50 border rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 ${timeError ? 'border-red-400' : 'border-slate-200'}`}
                                     />
                                 </div>
+                                {timeError && (
+                                    <p className="text-red-500 text-xs font-bold mt-2 flex items-center gap-1">
+                                        ⚠️ {timeError}
+                                    </p>
+                                )}
                             </div>
                         </div>
                         <div>

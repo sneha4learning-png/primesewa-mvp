@@ -21,7 +21,8 @@ const CommissionDashboard = () => {
                     if (b.status === 'completed') {
                         const rawPrice = b.proposedPrice || b.price || b.amount || 0;
                         const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                        const dateStr = b.completedAt?.toDate ? b.completedAt.toDate().toISOString().split('T')[0] : (b.date || new Date().toISOString().split('T')[0]);
+                        // Use the booking's scheduled date to remain consistent with other dashboards
+                        const dateStr = b.date || (b.completedAt?.toDate ? b.completedAt.toDate().toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
                         // Precise timestamp for sorting — prefer completedAt, then createdAt, then date string
                         const ts = b.completedAt?.toMillis?.() || (b.completedAt?.seconds ?? 0) * 1000
                             || b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000
