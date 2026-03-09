@@ -8,6 +8,8 @@ const ProviderEarnings = () => {
     const { currentUser, userData } = useAuth();
     const [earningsLog, setEarningsLog] = useState([]);
     const [stats, setStats] = useState({ total: 0, pending: 0, paid: 0 });
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     useEffect(() => {
         const providerName = userData?.name || currentUser?.displayName;
@@ -82,7 +84,7 @@ const ProviderEarnings = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-lg shadow-indigo-500/30">
                     <div className="flex items-center gap-3 mb-2 text-indigo-100">
-                        <IndianRupee className="w-5 h-5" /> Total Earned (All Time)
+                        <IndianRupee className="w-5 h-5" /> Total Job Value (Gross)
                     </div>
                     <h2 className="text-3xl font-bold">₹{stats.total.toFixed(0)}</h2>
                 </div>
@@ -114,7 +116,7 @@ const ProviderEarnings = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {earningsLog.map(log => (
+                                {earningsLog.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(log => (
                                     <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 flex items-center gap-2">
                                             <CalendarDays className="w-4 h-4 text-gray-400" /> {new Date(log.date).toLocaleDateString()}
@@ -140,6 +142,13 @@ const ProviderEarnings = () => {
                     <div className="p-12 text-center text-gray-500 bg-gray-50">
                         <Wallet className="w-12 h-12 mx-auto text-gray-300 mb-3" />
                         <p>No earnings history found. Complete jobs to start earning!</p>
+                    </div>
+                )}
+                {earningsLog.length > itemsPerPage && (
+                    <div className="p-4 border-t border-gray-200 flex justify-center items-center gap-4 bg-white">
+                        <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-4 py-2 text-sm font-bold bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 disabled:opacity-50">Prev</button>
+                        <span className="text-sm font-medium text-gray-600">Page {currentPage} of {Math.ceil(earningsLog.length / itemsPerPage)}</span>
+                        <button onClick={() => setCurrentPage(p => Math.min(Math.ceil(earningsLog.length / itemsPerPage), p + 1))} disabled={currentPage === Math.ceil(earningsLog.length / itemsPerPage)} className="px-4 py-2 text-sm font-bold bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 disabled:opacity-50">Next</button>
                     </div>
                 )}
             </div>
