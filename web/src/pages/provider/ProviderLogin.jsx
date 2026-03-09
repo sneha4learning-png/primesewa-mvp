@@ -206,9 +206,8 @@ const ProviderLogin = () => {
         <div className="min-h-screen flex items-center justify-center bg-slate-900 border-t-4 border-blue-500 px-4 py-8 md:py-12">
             <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 md:p-8 text-white">
                 <div className="text-center mb-6 md:mb-8 flex flex-col items-center">
-                    <div className="flex items-center justify-center gap-3 mb-4">
-                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-10 md:h-12 w-auto drop-shadow-md" />
-                        <span className="text-2xl md:text-3xl font-bold text-white tracking-tight">PrimeSewa</span>
+                    <div className="flex items-center justify-center mb-4">
+                        <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-14 md:h-16 w-auto drop-shadow-md" />
                     </div>
                     <h2 className="text-lg md:text-xl font-medium tracking-wide text-slate-400">{isSignup ? 'Become a Partner' : 'Partner Portal'}</h2>
                     <p className="text-xs md:text-sm text-slate-400 mt-2">{isSignup ? 'Join our fleet and start earning today.' : 'Manage your service requests & earnings.'}</p>

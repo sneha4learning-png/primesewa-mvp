@@ -23,9 +23,8 @@ const CustomerLayout = () => {
             {/* Navbar */}
             <header className="h-16 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 group" onClick={closeMobileMenu}>
-                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto group-hover:scale-105 transition-transform" />
-                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight">PrimeSewa</span>
+                    <Link to="/" className="flex items-center group" onClick={closeMobileMenu}>
+                        <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-10 w-auto group-hover:scale-105 transition-transform" />
                     </Link>
 
                     {/* Desktop Nav */}

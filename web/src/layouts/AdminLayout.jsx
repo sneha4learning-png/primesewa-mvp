@@ -29,9 +29,8 @@ const AdminLayout = () => {
         <>
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 relative z-10">
-                <span className="flex items-center gap-2">
-                    <img src="/logo.png" alt="PrimeSewa Logo" className="h-8 w-auto" />
-                    <span className="text-xl font-bold text-white tracking-tight">PrimeSewa</span>
+                <span className="flex items-center">
+                    <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-10 w-auto" />
                 </span>
                 <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                     <X className="w-5 h-5" />

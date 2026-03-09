@@ -69,9 +69,8 @@ const LandingPage = () => {
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
                             Your Home Services, <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
-                                Reimagined.
-                            </span>
+                            <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-12 w-auto mb-4" />
+                            Reimagined.
                         </h1>
                         <p className="text-xl text-slate-300 max-w-lg font-light leading-relaxed">
                             Book verified plumbers, electricians, and cleaners in minutes. Get transparent pricing and professional quality, guaranteed.
@@ -271,12 +270,13 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-slate-800 pb-16">
                         <div className="col-span-1 md:col-span-1 space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-600 rounded-lg">
-                                    <ShieldCheck className="w-6 h-6 text-white" />
-                                </div>
-                                <span className="text-2xl font-bold tracking-tight">PrimeSewa</span>
-                            </div>
+                            <Link to="/" className="flex items-center group">
+                                <img
+                                    src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png"
+                                    alt="Prime Sewa"
+                                    className="h-9 w-auto group-hover:scale-110 transition-transform duration-300 drop-shadow-sm"
+                                />
+                            </Link>
                             <p className="text-slate-400 leading-relaxed font-light">The most trusted home service platform in Ahmedabad. Quality services, guaranteed.</p>
                         </div>
                         <div>

@@ -139,9 +139,8 @@ const LoginPage = () => {
         <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center bg-slate-900 border-t-4 border-blue-500 px-4 py-12">
             <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-8 text-white">
                 <div className="text-center mb-8">
-                    <div className="flex items-center justify-center gap-3 mb-4">
-                        <img src="/logo.png" alt="PrimeSewa Logo" className="h-12 w-auto drop-shadow-md" />
-                        <span className="text-3xl font-bold text-white tracking-tight">PrimeSewa</span>
+                    <div className="flex items-center justify-center mb-4">
+                        <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-16 w-auto drop-shadow-md" />
                     </div>
                     <h2 className="text-3xl font-bold tracking-tight text-white">Welcome Back</h2>
                     <p className="text-slate-400 mt-2">Log in to book or manage services.</p>
