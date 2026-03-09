@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { db } from '../../firebase/config';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex items-center gap-4">
@@ -45,6 +45,23 @@ const DashboardOverview = () => {
                 const allBookings = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const dbCommissions = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // --- ONE-TIME MIGRATION SCRIPT ---
+                try {
+                    providers.forEach(async (p) => {
+                        let changes = {};
+                        if (!p.category) changes.category = 'Plumbing';
+                        if (!p.price) changes.price = '₹500/hr';
+                        // Clean up bad arrays
+                        if (Array.isArray(p.category) && p.category.length === 0) changes.category = 'Plumbing';
+
+                        if (Object.keys(changes).length > 0) {
+                            await updateDoc(doc(db, 'providers', p.id), changes);
+                            console.log('Migrated provider:', p.name || p.id, changes);
+                        }
+                    });
+                } catch (e) { console.error('Migration error', e); }
+                // ---------------------------------
 
                 // Count completed requests per provider
                 const completedCounts = new Map();

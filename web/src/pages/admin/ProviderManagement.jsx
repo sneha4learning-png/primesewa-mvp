@@ -132,7 +132,7 @@ const ProviderManagement = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.phone}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.jobs || 0}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{provider.price || 'N/A'}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{provider.price || '₹500/hr'}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :

@@ -77,7 +77,7 @@ const CustomerHome = () => {
                     }
                 });
 
-                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p => p.status === 'active'));
+                setMockProviders(Array.from(uniqueProvidersMap.values()).map(p => ({ ...p, category: p.category || 'Plumbing' })).filter(p => p.status === 'active'));
 
                 const bookSnap = await getDocs(collection(db, 'bookings'));
                 const allMyBookings = [];
@@ -120,7 +120,7 @@ const CustomerHome = () => {
 
         const newBooking = {
             id: `B${Math.floor(Math.random() * 10000)}`,
-            service: (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Service',
+            service: (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Plumbing',
             status: 'pending',
             provider: provider.name || 'Provider',
             providerPhone: provider.phone || '',
@@ -368,7 +368,7 @@ const CustomerHome = () => {
                                             </div>
                                             <div>
                                                 <h3 className="font-black text-xl text-slate-900">{provider.name}</h3>
-                                                <p className="text-sm font-bold text-indigo-600 mt-1">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Service')}</p>
+                                                <p className="text-sm font-bold text-indigo-600 mt-1">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Plumbing')}</p>
                                                 <div className="flex items-center flex-wrap gap-2 text-sm font-bold text-slate-500 mt-2">
                                                     <span className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-1 rounded-md">
                                                         <Star className="w-4 h-4 fill-current" /> {provider.rating}
@@ -607,7 +607,7 @@ const CustomerHome = () => {
                 const p = selectedProviderProfile;
                 const name = p.name || 'Provider';
                 const initial = name.charAt(0).toUpperCase();
-                const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Service');
+                const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Plumbing');
                 const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating) || 0;
                 const jobs = p.jobs || p.jobCount || 0;
                 const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0
@@ -617,7 +617,7 @@ const CustomerHome = () => {
                     ? (typeof p.price === 'string'
                         ? p.price.replace('₹', '').replace('/hr', '')
                         : p.price)
-                    : 'N/A';
+                    : '500';
 
                 return (
                     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setSelectedProviderProfile(null)}>
