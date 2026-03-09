@@ -100,7 +100,7 @@ const CustomerHome = () => {
                     }
                 });
 
-                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p => p.status === 'active'));
+                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p => p.status === 'active' && p.isOnline === true));
 
                 const bookSnap = await getDocs(collection(db, 'bookings'));
                 const allMyBookings = [];

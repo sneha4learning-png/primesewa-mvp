@@ -17,6 +17,7 @@ const LandingPage = () => {
                 const topProviderQuery = query(
                     collection(db, 'providers'),
                     where('status', '==', 'active'),
+                    where('isOnline', '==', true),
                     orderBy('rating', 'desc'),
                     limit(1)
                 );
