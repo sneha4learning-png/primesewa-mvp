@@ -39,16 +39,20 @@ const CommissionDashboard = () => {
                 });
 
                 // Apply time filter
-                const today = new Date();
+                const todayMidnight = new Date();
+                todayMidnight.setHours(0, 0, 0, 0);
+
                 let filtered = allRecords;
                 if (timeRange === '7days') {
                     const limit = new Date();
                     limit.setDate(limit.getDate() - 7);
+                    limit.setHours(0, 0, 0, 0); // Include full 7th day
                     filtered = allRecords.filter(c => new Date(c.date) >= limit);
                 } else if (timeRange === 'thisMonth') {
+                    const now = new Date();
                     filtered = allRecords.filter(c => {
                         const d = new Date(c.date);
-                        return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+                        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
                     });
                 }
 

@@ -42,7 +42,19 @@ const BookingMonitoring = () => {
         const matchesStatus = filterStatus === 'All' || b.status === filterStatus.toLowerCase();
         const matchesCategory = filterCategory === 'All' || (b.service || '').toLowerCase().includes(filterCategory.toLowerCase());
         const matchesProvider = (b.provider || '').toLowerCase().includes(filterProvider.toLowerCase());
-        const matchesDate = filterDate === 'All' || (b.date || '').toLowerCase().includes(filterDate.toLowerCase());
+
+        // Fix Date Filtering Logic
+        let matchesDate = filterDate === 'All';
+        if (filterDate !== 'All') {
+            const today = new Date();
+            const targetDate = new Date();
+            if (filterDate === 'Yesterday') targetDate.setDate(today.getDate() - 1);
+            if (filterDate === 'Tomorrow') targetDate.setDate(today.getDate() + 1);
+
+            const targetDateStr = targetDate.toISOString().split('T')[0];
+            matchesDate = (b.date || '').includes(targetDateStr);
+        }
+
         return matchesStatus && matchesCategory && matchesProvider && matchesDate;
     });
 
