@@ -368,7 +368,8 @@ const CustomerHome = () => {
                                             </div>
                                             <div>
                                                 <h3 className="font-black text-xl text-slate-900">{provider.name}</h3>
-                                                <div className="flex items-center gap-3 text-sm font-bold text-slate-500 mt-2">
+                                                <p className="text-sm font-bold text-indigo-600 mt-1">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Service')}</p>
+                                                <div className="flex items-center flex-wrap gap-2 text-sm font-bold text-slate-500 mt-2">
                                                     <span className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-1 rounded-md">
                                                         <Star className="w-4 h-4 fill-current" /> {provider.rating}
                                                     </span>
