@@ -14,8 +14,8 @@ const TimelineModal = ({ booking, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
-            <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in slide-in-from-bottom sm:zoom-in duration-300" onClick={e => e.stopPropagation()}>
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white relative">
+            <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col animate-in slide-in-from-bottom sm:zoom-in duration-300" onClick={e => e.stopPropagation()}>
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white relative shrink-0">
                     <h3 className="text-xl font-black">Booking Journey</h3>
                     <p className="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1 opacity-80">#{booking.id.slice(0, 8)} · {booking.service}</p>
                     <button onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors">
@@ -23,7 +23,7 @@ const TimelineModal = ({ booking, onClose }) => {
                     </button>
                 </div>
 
-                <div className="p-8 space-y-2">
+                <div className="p-8 space-y-2 overflow-y-auto">
                     {steps.filter(s => s.status !== 'skip').map((step, i) => (
                         <div key={i} className="flex gap-5 items-start">
                             <div className="flex flex-col items-center">
@@ -55,7 +55,7 @@ const TimelineModal = ({ booking, onClose }) => {
                     ))}
                 </div>
 
-                <div className="bg-slate-50 p-6 border-t border-slate-100 flex justify-between items-center">
+                <div className="bg-slate-50 p-6 border-t border-slate-100 flex justify-between items-center shrink-0">
                     <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Final Status</p>
                         <span className={`px-3 py-1.5 rounded-xl text-xs font-black capitalize border ${booking.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
