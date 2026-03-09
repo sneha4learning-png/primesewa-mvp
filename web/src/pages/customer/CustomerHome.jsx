@@ -303,7 +303,17 @@ const CustomerHome = () => {
             {/* Welcome Header */}
             <div className="mb-12 relative">
                 <div className="absolute top-0 right-10 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none"></div>
-                <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Good {new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">{userData?.uid === 'mock-cust' ? 'Guest' : (userData?.name || 'User')}</span> 👋</h1>
+                <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                    Good {new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                        {(() => {
+                            if (userData?.uid === 'mock-cust') return 'Guest';
+                            const baseName = userData?.name || 'User';
+                            // If name accidentally contains "Services" (from a provider profile), strip it for the greeting
+                            return baseName.split(' ')[0].replace(/Services/gi, '').trim() || 'User';
+                        })()}
+                    </span> 👋
+                </h1>
                 <p className="text-xl font-medium text-slate-500 mt-4 max-w-lg">What service do you need today in Ahmedabad?</p>
             </div>
 
@@ -416,11 +426,11 @@ const CustomerHome = () => {
                                             <div className="relative shrink-0">
                                                 <div className="absolute inset-0 bg-blue-500 rounded-full blur group-hover:blur-md transition-all opacity-20"></div>
                                                 <div className="w-14 h-14 md:w-16 md:h-16 relative bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center text-xl md:text-2xl font-black text-slate-600 border-2 border-white shadow-sm">
-                                                    {provider.name.charAt(0)}
+                                                    {(provider.name || 'P').charAt(0)}
                                                 </div>
                                             </div>
                                             <div className="min-w-0">
-                                                <h3 className="font-black text-lg md:text-xl text-slate-900 truncate">{provider.name}</h3>
+                                                <h3 className="font-black text-lg md:text-xl text-slate-900 truncate">{provider.name || 'Service Partner'}</h3>
                                                 <p className="text-xs md:text-sm font-bold text-indigo-600 mt-0.5 truncate">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Professional Service')}</p>
                                                 <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs md:text-sm font-bold text-slate-500 mt-2">
                                                     <span className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded-md">

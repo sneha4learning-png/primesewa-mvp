@@ -3,7 +3,7 @@ import { ShieldCheck, Star, Clock, CheckCircle2, ChevronRight, MapPin, Phone, Ma
 import { useAuth } from '../../firebase/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, limit, onSnapshot } from 'firebase/firestore';
 
 const LandingPage = () => {
     const { userData } = useAuth();
