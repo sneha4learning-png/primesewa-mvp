@@ -237,6 +237,12 @@ const ProviderLogin = () => {
                                 <option value="Electrical">Electrical</option>
                                 <option value="Cleaning">Cleaning</option>
                                 <option value="Carpentry">Carpentry</option>
+                                <option value="Painting">Home Painting</option>
+                                <option value="AC Repair">AC Repair & Service</option>
+                                <option value="Appliance Repair">Appliance Repair</option>
+                                <option value="Pest Control">Pest Control</option>
+                                <option value="Salon & Beauty">Salon & Beauty</option>
+                                <option value="Packers & Movers">Packers & Movers</option>
                             </select>
                         </div>
                         <div>

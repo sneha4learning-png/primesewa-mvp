@@ -120,7 +120,7 @@ const CustomerHome = () => {
 
         const newBooking = {
             id: `B${Math.floor(Math.random() * 10000)}`,
-            service: selectedCategory || provider.category || 'General Service',
+            service: provider.category || selectedCategory || 'General Handyman',
             status: 'pending',
             provider: provider.name || 'Provider',
             providerPhone: provider.phone || '',
@@ -145,7 +145,7 @@ const CustomerHome = () => {
         setNetworkError(false);
 
         const finalBookingData = {
-            service: selectedCategory || (pendingBookingData ? pendingBookingData.service : null) || 'General Service',
+            service: pendingBookingData ? pendingBookingData.service : (selectedCategory || 'General Handyman'),
             status: 'pending',
             provider: pendingBookingData.provider,
             providerPhone: pendingBookingData.providerPhone || '',
@@ -205,11 +205,7 @@ const CustomerHome = () => {
     displayedProviders.sort((a, b) => b.rating - a.rating);
 
     const handleActivityClick = (booking) => {
-        // We will replace this alert with actual UI or handle it inline.
-        // Alert is fine for completed/pending/accepted, but negotiating needs action.
-        if (booking.status !== 'negotiating') {
-            alert(`Booking Details:\n\nID: ${booking.id}\nService: ${booking.service}\nStatus: ${booking.status.toUpperCase()}\nProvider: ${booking.provider}\nDate: ${booking.date}`);
-        }
+        // Removed intrusive alert popup that caused confusion about changing status
     };
 
     const handleNegotiation = async (id, accept, proposedPrice) => {
@@ -261,7 +257,7 @@ const CustomerHome = () => {
             {bookingStep === 1 ? (
                 <div className="max-w-2xl bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 mx-auto relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                    <h2 className="text-3xl font-black mb-8 text-slate-900">Confirm Booking</h2>
+                    <h2 className="text-3xl font-black mb-8 text-slate-900">Confirm Booking {pendingBookingData?.service ? <span className="text-blue-600 block text-xl mt-2">({pendingBookingData.service})</span> : ''}</h2>
                     <form onSubmit={confirmBooking} className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
