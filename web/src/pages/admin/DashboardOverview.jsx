@@ -116,9 +116,15 @@ const DashboardOverview = () => {
                     activeProviders: activeProvidersCount
                 });
 
-                // Get top 3 recent bookings (simulated by taking the last 3)
-                setRecentBookings([...bookings].filter(b => b.status !== 'rejected' && b.status !== 'cancelled').reverse().slice(0, 3));
-                setRecentDeclined([...bookings].filter(b => b.status === 'rejected' || b.status === 'cancelled').reverse().slice(0, 3));
+                // Get top 3 recent bookings by sorting chronologically descending
+                const sortedRecent = [...bookings].sort((a, b) => {
+                    const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.date || 0).getTime();
+                    const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.date || 0).getTime();
+                    return timeB - timeA;
+                });
+
+                setRecentBookings(sortedRecent.filter(b => b.status !== 'rejected' && b.status !== 'cancelled').slice(0, 3));
+                setRecentDeclined(sortedRecent.filter(b => b.status === 'rejected' || b.status === 'cancelled').slice(0, 3));
 
                 // Get pending providers
                 setPendingProviders(providers.filter(p => p.status === 'pending'));

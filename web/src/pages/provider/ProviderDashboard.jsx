@@ -45,8 +45,12 @@ const ProviderDashboard = () => {
                 const allBookings = [];
                 bookSnap.forEach(d => allBookings.push({ id: d.id, ...d.data() }));
 
-                // Filter bookings meant for THIS provider
-                const myBookings = allBookings.filter(b => b.provider === providerName);
+                // Filter bookings meant for THIS provider and sort them newest first
+                const myBookings = allBookings.filter(b => b.provider === providerName).sort((a, b) => {
+                    const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.date || 0).getTime();
+                    const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.date || 0).getTime();
+                    return timeB - timeA;
+                });
 
                 setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
                 setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
@@ -54,7 +58,8 @@ const ProviderDashboard = () => {
                 // Track completed/declined/rejected/cancelled historical state
                 setDeclinedRequests(myBookings.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status)));
 
-                const completedJobs = myBookings.filter(b => b.status === 'completed').sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+                // Sort ascending strictly for the earnings period calculations if necessary, but here we can just pass the sorted array
+                const completedJobs = myBookings.filter(b => b.status === 'completed');
 
                 const now = new Date();
                 const todayStr = now.toISOString().split('T')[0];
