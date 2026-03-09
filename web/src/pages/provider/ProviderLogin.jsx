@@ -4,7 +4,7 @@ import { useAuth } from '../../firebase/AuthContext';
 import { auth, db } from '../../firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { BriefcaseBusiness, UserPlus, UploadCloud, CheckCircle2 } from 'lucide-react';
+import { Phone, ArrowRight, ShieldCheck, Mail, Lock, User, CheckCircle2, AlertCircle, Eye, EyeOff, Wrench } from 'lucide-react';
 
 const ProviderLogin = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -206,8 +206,11 @@ const ProviderLogin = () => {
         <div className="min-h-screen flex items-center justify-center bg-slate-900 border-t-4 border-blue-500 px-4 py-8 md:py-12">
             <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 md:p-8 text-white">
                 <div className="text-center mb-6 md:mb-8 flex flex-col items-center">
-                    <div className="flex items-center justify-center mb-4">
-                        <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-14 md:h-16 w-auto drop-shadow-md" />
+                    <div className="flex flex-col items-center justify-center mb-6">
+                        <div className="p-4 bg-indigo-600 rounded-3xl shadow-xl shadow-indigo-600/30 mb-4 animate-bounce-slow">
+                            <Wrench className="w-10 h-10 text-white" />
+                        </div>
+                        <span className="text-4xl font-black text-white tracking-tighter">PrimeSewa</span>
                     </div>
                     <h2 className="text-lg md:text-xl font-medium tracking-wide text-slate-400">{isSignup ? 'Become a Partner' : 'Partner Portal'}</h2>
                     <p className="text-xs md:text-sm text-slate-400 mt-2">{isSignup ? 'Join our fleet and start earning today.' : 'Manage your service requests & earnings.'}</p>

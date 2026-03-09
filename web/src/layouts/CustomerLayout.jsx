@@ -1,6 +1,6 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../firebase/AuthContext';
-import { LogOut, Menu, X } from 'lucide-react';
+import { User, LogOut, Menu, X, Bell, ShoppingBag, ShieldCheck, Wrench } from 'lucide-react';
 import { useState } from 'react';
 
 const CustomerLayout = () => {
@@ -23,8 +23,11 @@ const CustomerLayout = () => {
             {/* Navbar */}
             <header className="h-16 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-                    <Link to="/" className="flex items-center group" onClick={closeMobileMenu}>
-                        <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-10 w-auto group-hover:scale-105 transition-transform" />
+                    <Link to="/" className="flex items-center gap-3 group" onClick={closeMobileMenu}>
+                        <div className="p-2 bg-blue-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg shadow-blue-600/20">
+                            <Wrench className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tighter">PrimeSewa</span>
                     </Link>
 
                     {/* Desktop Nav */}

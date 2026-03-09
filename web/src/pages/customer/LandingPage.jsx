@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Clock, Star, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
+import { ShieldCheck, Star, Clock, CheckCircle2, ChevronRight, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin, ArrowRight, Play, Wrench } from 'lucide-react';
 import { useAuth } from '../../firebase/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
@@ -69,8 +69,9 @@ const LandingPage = () => {
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
                             Your Home Services, <br />
-                            <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-12 w-auto mb-4" />
-                            Reimagined.
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
+                                Reimagined.
+                            </span>
                         </h1>
                         <p className="text-xl text-slate-300 max-w-lg font-light leading-relaxed">
                             Book verified plumbers, electricians, and cleaners in minutes. Get transparent pricing and professional quality, guaranteed.
@@ -270,12 +271,11 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-slate-800 pb-16">
                         <div className="col-span-1 md:col-span-1 space-y-6">
-                            <Link to="/" className="flex items-center group">
-                                <img
-                                    src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png"
-                                    alt="Prime Sewa"
-                                    className="h-9 w-auto group-hover:scale-110 transition-transform duration-300 drop-shadow-sm"
-                                />
+                            <Link to="/" className="flex items-center gap-3 group">
+                                <div className="p-2 bg-blue-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg shadow-blue-600/20">
+                                    <Wrench className="w-6 h-6 text-white" />
+                                </div>
+                                <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tighter">PrimeSewa</span>
                             </Link>
                             <p className="text-slate-400 leading-relaxed font-light">The most trusted home service platform in Ahmedabad. Quality services, guaranteed.</p>
                         </div>

@@ -225,7 +225,7 @@ const CustomerHome = () => {
         if ((p.status || '').toLowerCase().trim() !== 'active') return false;
 
         // 2. Category Filter (Robust & Fuzzy)
-        const matchesCategory = selectedCategory === 'All' || (() => {
+        const matchesCategory = !selectedCategory || selectedCategory === 'All' || (() => {
             const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
             const target = selectedCategory.toLowerCase().trim();
 

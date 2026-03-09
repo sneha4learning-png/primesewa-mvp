@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X } from 'lucide-react';
+import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X, Wrench } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -63,9 +63,12 @@ const ProviderLayout = () => {
     const SidebarInner = () => (
         <>
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 relative z-10">
-                <span className="flex items-center">
-                    <img src="https://id-preview--8ba4f3a6-b191-4c9e-8285-32f14b63b82a.lovable.app/images/primesewa-icon.png" alt="Prime Sewa" className="h-10 w-auto" />
+            <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
+                <span className="flex items-center gap-3">
+                    <div className="p-2 bg-indigo-500 rounded-xl shadow-lg shadow-indigo-500/20">
+                        <Wrench className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-2xl font-black text-white tracking-tighter">PrimeSewa</span>
                 </span>
                 <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                     <X className="w-5 h-5" />
