@@ -68,49 +68,37 @@ const CustomerHome = () => {
         const myName = userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer');
         setLoadingData(true);
 
-        // 1. Listen to ALL Providers in real-time
-        const unsubscribeProviders = onSnapshot(collection(db, 'providers'), (snapshot) => {
+        // 1. PERMANENT FIX: Query ONLY active + online providers directly from Firestore.
+        // Previously we fetched ALL providers and filtered client-side, which caused
+        // deduplication race conditions where a stale/offline mock record would shadow
+        // the real online provider record. Querying at source eliminates this entirely.
+        const activeOnlineQuery = query(
+            collection(db, 'providers'),
+            where('status', '==', 'active'),
+            where('isOnline', '==', true)
+        );
+
+        const unsubscribeProviders = onSnapshot(activeOnlineQuery, (snapshot) => {
             const allProviders = [];
             snapshot.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
 
-            // Deduplicate while prioritizing real accounts and normalizing data
+            // Deduplicate by normalized name — keep the one with a real UID (real account)
+            // This handles the edge case where old mock + real account both have isOnline=true
             const uniqueProvidersMap = new Map();
             allProviders.forEach(p => {
-                const name = p.name?.toLowerCase().trim();
-                if (!name) return;
+                const nameKey = (p.name || '').toLowerCase().trim();
+                if (!nameKey) return;
 
-                const existing = uniqueProvidersMap.get(name);
+                const existing = uniqueProvidersMap.get(nameKey);
+                const pIsReal = !!p.uid && !p.uid.startsWith('mock-');
+                const eIsReal = existing && !!existing.uid && !existing.uid.startsWith('mock-');
 
-                // Priority Criteria: Real UID > Active Status > Job Count
-                const pIsReal = !!p.uid;
-                const eIsReal = !!existing?.uid;
-
-                // Normalization Helpers
-                const pStatus = (p.status || '').toLowerCase().trim();
-                const eStatus = (existing?.status || '').toLowerCase().trim();
-
-                const pIsOnline = p.isOnline === true || String(p.isOnline) === 'true';
-                const eIsOnline = existing?.isOnline === true || String(existing?.isOnline) === 'true';
-
-                // PRIORITY: Real UID > Online > Active Status > More Jobs
-                if (!existing ||
-                    (pIsReal && !eIsReal) ||
-                    (pIsReal === eIsReal && pIsOnline && !eIsOnline) ||
-                    (pIsReal === eIsReal && pIsOnline === eIsOnline && pStatus === 'active' && eStatus !== 'active') ||
-                    (pIsReal === eIsReal && pIsOnline === eIsOnline && pStatus === eStatus && (p.jobs || 0) > (existing.jobs || 0))
-                ) {
-                    uniqueProvidersMap.set(name, p);
+                if (!existing || (pIsReal && !eIsReal)) {
+                    uniqueProvidersMap.set(nameKey, p);
                 }
             });
 
-            // Final Online Filter with loose equality check to handle string "true" vs boolean true
-            const filtered = Array.from(uniqueProvidersMap.values()).filter(p => {
-                const isActive = (p.status || '').toLowerCase().trim() === 'active';
-                const isOnline = p.isOnline === true || String(p.isOnline) === 'true';
-                return isActive && isOnline;
-            });
-
-            setMockProviders(filtered);
+            setMockProviders(Array.from(uniqueProvidersMap.values()));
             setLoadingData(false);
             setDbError(false);
         }, (err) => {
