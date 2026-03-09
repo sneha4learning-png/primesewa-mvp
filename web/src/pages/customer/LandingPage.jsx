@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Star, Clock, CheckCircle2, ChevronRight, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin, ArrowRight, Play, Wrench } from 'lucide-react';
+import { ShieldCheck, Star, Clock, CheckCircle2, ChevronRight, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin, ArrowRight, Play, Wrench, Zap } from 'lucide-react';
 import { useAuth } from '../../firebase/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';

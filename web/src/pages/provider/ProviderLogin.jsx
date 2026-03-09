@@ -4,7 +4,7 @@ import { useAuth } from '../../firebase/AuthContext';
 import { auth, db } from '../../firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { Phone, ArrowRight, ShieldCheck, Mail, Lock, User, CheckCircle2, AlertCircle, Eye, EyeOff, Wrench } from 'lucide-react';
+import { Phone, ArrowRight, ShieldCheck, Mail, Lock, User, CheckCircle2, AlertCircle, Eye, EyeOff, Wrench, UploadCloud } from 'lucide-react';
 
 const ProviderLogin = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -90,8 +90,14 @@ const ProviderLogin = () => {
 
         const targetPhone = isSignup ? signupData.phone : phoneNumber;
 
-        if (targetPhone.length !== 10) {
+        // For signup: validate manual phone input length
+        // For login: phone comes from dropdown (already formatted), just check it's not empty
+        if (isSignup && targetPhone.length !== 10) {
             setError('Please enter a valid 10-digit phone number');
+            return;
+        }
+        if (!isSignup && !targetPhone) {
+            setError('Please select a provider account from the list');
             return;
         }
 
