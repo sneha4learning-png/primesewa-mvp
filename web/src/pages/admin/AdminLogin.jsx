@@ -44,9 +44,6 @@ const AdminLogin = () => {
                             value={pwd}
                             onChange={(e) => setPwd(e.target.value)}
                         />
-                        <p className="text-xs text-center text-slate-500 mt-3">
-                            <span className="font-semibold text-blue-400">Dev Note:</span> Password is 'admin'.
-                        </p>
                     </div>
                     <button
                         type="submit"

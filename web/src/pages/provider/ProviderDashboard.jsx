@@ -323,15 +323,24 @@ const ProviderDashboard = () => {
                                                     { key: 'enroute', label: '🚗 En Route', color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
                                                     { key: 'arrived', label: '📍 Arrived', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
                                                     { key: 'inprogress', label: '🔧 In Progress', color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' },
-                                                ].map(s => (
-                                                    <button
-                                                        key={s.key}
-                                                        onClick={() => updateTrackingStatus(job, s.key)}
-                                                        className={`py-2 text-xs font-bold rounded-xl border transition-all ${s.color} ${job.trackingStatus === s.key ? 'ring-2 ring-offset-1 ring-current' : ''}`}
-                                                    >
-                                                        {s.label}
-                                                    </button>
-                                                ))}
+                                                ].map((s, index) => {
+                                                    const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
+                                                    const currentStatusLevel = job.trackingStatus ? statusOrder[job.trackingStatus] || 0 : 0;
+                                                    const thisStatusLevel = statusOrder[s.key];
+                                                    const isPastOrCurrent = currentStatusLevel >= thisStatusLevel;
+                                                    const isCurrent = job.trackingStatus === s.key;
+
+                                                    return (
+                                                        <button
+                                                            key={s.key}
+                                                            onClick={() => updateTrackingStatus(job, s.key)}
+                                                            disabled={isPastOrCurrent}
+                                                            className={`py-2 text-xs font-bold rounded-xl border transition-all ${s.color} ${isCurrent ? 'ring-2 ring-offset-1 ring-current bg-opacity-100' : ''} ${isPastOrCurrent ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                                        >
+                                                            {s.label}
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                         <button onClick={() => completeJob(job)} className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-900/20 active:scale-[0.98]">

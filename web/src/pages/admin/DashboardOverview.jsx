@@ -31,37 +31,7 @@ const DashboardOverview = () => {
     const [dbError, setDbError] = useState(false);
     const [chartData, setChartData] = useState([]);
     const [topProviders, setTopProviders] = useState([]);
-    const [isCleaning, setIsCleaning] = useState(false);
-    const [cleanResult, setCleanResult] = useState('');
 
-    const handleCleanMockData = async () => {
-        if (!window.confirm("Are you sure you want to permanently delete all mock test data (Demo Customer, Cust-XXXX) from the live database?")) return;
-
-        setIsCleaning(true);
-        setCleanResult('');
-        try {
-            const bookingsSnap = await getDocs(collection(db, 'bookings'));
-            let deletedCount = 0;
-
-            // Collect delete promises to run concurrently for speed
-            const deletePromises = [];
-
-            bookingsSnap.forEach(d => {
-                const b = d.data();
-                if (b.customer === 'Demo Customer' || (b.customer && b.customer.startsWith('Cust-')) || b.provider === 'New provider') {
-                    deletePromises.push(deleteDoc(doc(db, 'bookings', d.id)));
-                    deletedCount++;
-                }
-            });
-
-            await Promise.all(deletePromises);
-            setCleanResult(`Successfully purged ${deletedCount} fake test bookings! Refresh the page to see accurate stats.`);
-        } catch (err) {
-            console.error(err);
-            setCleanResult(`Error during cleanup: ${err.message}`);
-        }
-        setIsCleaning(false);
-    };
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -176,26 +146,6 @@ const DashboardOverview = () => {
                     <span><strong>Database connection error.</strong> Could not fetch data from Firestore. Check your Firebase credentials and Firestore rules.</span>
                 </div>
             )}
-
-            {/* Mock Data Cleanup Tool */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-                <div>
-                    <h3 className="text-amber-900 font-bold flex items-center gap-2">
-                        <span className="text-xl">🧹</span> Database Cleanup Tool
-                    </h3>
-                    <p className="text-sm text-amber-700 mt-1">
-                        Notice unusually high stats? Old test scripts generated hundreds of fake bookings in your live database. Click to permanently remove them.
-                    </p>
-                    {cleanResult && <p className="text-emerald-700 font-bold text-sm mt-2 bg-emerald-100 inline-block px-3 py-1 rounded">{cleanResult}</p>}
-                </div>
-                <button
-                    onClick={handleCleanMockData}
-                    disabled={isCleaning}
-                    className="shrink-0 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white text-sm font-bold rounded-lg shadow-sm transition-colors"
-                >
-                    {isCleaning ? 'Cleaning Database...' : 'Purge All Fake Test Data'}
-                </button>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-blue-500" />

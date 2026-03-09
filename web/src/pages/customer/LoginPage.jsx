@@ -65,7 +65,7 @@ const LoginPage = () => {
                 console.warn('Firebase Auth issue detected. Falling back to Dev Mode.');
                 setConfirmationResult('DEV_MODE');
                 setStep(2);
-                setError('For testing purposes, please enter the verification code: 1234 to proceed.');
+                // Don't set error, let the UI handle it normally
             } else {
                 setError(err.message || 'Failed to send OTP. Please try again.');
             }
@@ -219,7 +219,7 @@ const LoginPage = () => {
                             />
                             <p className="text-xs text-center text-slate-400 mt-3">
                                 A 6-digit code would be sent to +91 {phoneNumber} <br />
-                                <span className="font-semibold text-blue-400 mt-1 block italic underline">For testing purposes, please enter the verification code: 1234 to proceed.</span>
+                                <span className="font-medium text-blue-500 mt-1 block">For testing purposes, please enter the verification code: 1234.</span>
                             </p>
                         </div>
                         <button
