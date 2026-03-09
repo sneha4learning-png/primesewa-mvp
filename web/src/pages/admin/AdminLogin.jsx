@@ -16,7 +16,7 @@ const AdminLogin = () => {
         setLoading(true);
 
         // Security Validation (viva-v2)
-        if (pwd === 'admin123') {
+        if (pwd === 'admin') {
             const adminUser = { uid: 'admin-master', role: 'admin', name: 'Super Admin' };
             setCurrentUser(adminUser);
             setUserData(adminUser);
