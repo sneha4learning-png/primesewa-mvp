@@ -49,25 +49,37 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 
 ### 3.1 Customer Portal
 
-| Domain | Key Functionalities |
-|---|---|
-| **Authentication** | • Mobile + Name login<br>• Real OTP (or `1234` dev fallback)<br>• Token-based session survival (Firebase) |
-| **Discovery** | • Browsing by 4 core categories: Plumbing, Electrical, Cleaning, Carpentry<br>• Search & Sorting (Name, Category, Rating 4.0+/4.5+)<br>• Rich Provider Profiles (ratings, history, rates) |
-| **Booking Engine** | • One-click "Book Now" flow<br>• Detailed capture: Issue description, specific Date/Time, Address<br>• Double-booking prevention via button locking |
-| **Live Monitoring** | • **Current Activity** sidebar for real-time status updates<br>• Status transitions (Pending → Accepted → Arrived → Completed)<br>• **Price Negotiation**: Accept/Decline counter-offers from providers |
-| **Reputation** | • Interactive 1-5 star review system after job completion<br>• Real-time reputation updates for providers |
+| Domain | Feature | Description |
+| :--- | :--- | :--- |
+| **Auth** | Login | Mobile number + Name entry followed by OTP verification |
+| **Auth** | Persistence | User remains logged in after page refresh (Firebase Auth) |
+| **Discovery** | Categories | Browse 4 core services: Plumbing, Electrical, Cleaning, Carpentry |
+| **Discovery** | Filtering | Real-time search by name and star rating (4.0+ / 4.5+) |
+| **Discovery** | Profiles | Detailed provider cards with ratings, job history, and rates |
+| **Booking** | Flow | One-click "Book Now" with date, time, and issue description |
+| **Booking** | Controls | Duplicate request prevention (button locking) |
+| **Tracking** | Sidebar | "Current Activity" view for live status updates |
+| **Tracking** | Pipeline | Status states: Pending → Accepted → Arrived → Completed |
+| **Negotiation** | Price | Interface to Accept or Decline counter-offers from partners |
+| **Feedback** | Rating | Post-job star rating updates provider reputation instantly |
 
 ---
 
 ### 3.2 Provider (Partner) Portal
 
-| Domain | Key Functionalities |
-|---|---|
-| **Partner Lifecycle** | • Multi-step registration: Name, Phone, Category, Rate<br>• **Identity Verification**: ID upload (Aadhar/PAN) + Work samples<br>• Admin approval gate (Status starts as `pending`) |
-| **Authentication** | • OTP login verified against registered partner phone<br>• Role check: Redirects away from customer-only pages |
-| **Operations** | • **Online/Offline Switch**: Instantly control visibility to customers<br>• Real-time request feed for incoming leads |
-| **Job Management** | • **Accept/Reject**: One-click leads management<br>• **Price Negotiation**: Propose custom quotes (enters `negotiating` state)<br>• **Active Tracker**: Direct call to customer & "Complete Job" action |
-| **Wallet** | • Aggregated earnings dashboard: Today, This Week, This Month<br>• Net payout calculation (85% of job value) |
+| Domain | Feature | Description |
+| :--- | :--- | :--- |
+| **Signup** | Registration | Forms for Category, Rate, Service Areas, and Experience |
+| **Signup** | Verification | Document upload for identity (Aadhar/PAN) and Work Samples |
+| **Signup** | Approval | Mandatory Admin review before profile becomes visible |
+| **Auth** | Access | Secured login verified against partner status in Firestore |
+| **Operations** | Online Toggle | Header switch to control real-time visibility to customers |
+| **Operations** | Leads | Push-style feed for incoming service requests |
+| **Operations** | Actions | Accept or Reject leads with one click |
+| **Negotiation** | Quotes | Propose custom pricing; status changes to "negotiating" |
+| **Active Jobs** | Tracking | View job details, call customers, and mark jobs as complete |
+| **Earnings** | Dashboard | Automated aggregation: Daily, Weekly, and Monthly income |
+| **Earnings** | Payout | Net earnings calculation (85% of total job value) |
 
 #### Account Status States
 | Status | What Happens |
@@ -80,14 +92,17 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 
 ### 3.3 Admin Panel
 
-| Domain | Key Functionalities |
-|---|---|
-| **Authentication** | • Master password admin login<br>• Security guards for all `/admin/*` routes |
-| **Insights** | • Global KPI Dashboard: Total Bookings, Commissions, Active Fleet<br>• Real-time "Recent Activity" feed |
-| **Fleet Ops** | • **Unified Monitoring**: Approve, Suspend, or Reactivate providers<br>• Identity record review (ID scan verification) |
-| **Finance** | • Automated **15% Commission** calculation on completion<br>• History of all platform revenue records |
-| **Monitoring** | • **Live Booking Monitor**: Advanced filtering by Category, Provider, and Date Range<br>• Detailed booking timelines and history |
-| **Moderation** | • Customer management table<br>• Block/Unblock suspicious or problematic accounts |
+| Domain | Feature | Description |
+| :--- | :--- | :--- |
+| **Auth** | Security | Master password login with RBAC route protection |
+| **Dashboard** | Insights | Real-time KPIs: Total Bookings, Active Fleet, Revenue Leakage |
+| **Dashboard** | Activity | Auto-refreshed feed of latest bookings and approval requests |
+| **Fleet** | Moderation | Table to Approve, Suspend, or Reactivate providers |
+| **Fleet** | Verification | Side-by-side review of ID documents and work history |
+| **Monitoring** | Live View | Full booking table with Advanced Filters (Category, Date, etc.) |
+| **Monitoring** | Timeline | Visual history of every state change for every booking |
+| **Finance** | Revenue | Automated 15% platform commission logging on job completion |
+| **Moderation** | Users | Full control over blocking/unblocking customer accounts |
 
 ---
 
