@@ -13,95 +13,30 @@ const CommissionDashboard = () => {
     useEffect(() => {
         const fetchCommissions = async () => {
             try {
-                // 1. Fetch explicitly written commission records
-                const commSnap = await getDocs(collection(db, 'commissions'));
-                const dbCommissions = commSnap.docs.map(d => ({ id: d.id, source: 'commissions', ...d.data() }));
-
-                // 2. Fetch completed bookings and derive commission records for any
-                //    that don't already have an entry in the commissions collection
+                // Fetch completed bookings as the single source of truth for commissions
                 const bookSnap = await getDocs(collection(db, 'bookings'));
-                const rawBookings = bookSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const allRecords = [];
 
-                // Group by provider and keep only 5 completed
-                const completedCounts = new Map();
-                const filteredCompleted = [];
-
-                // Sort by date/createdAt to get strictly first 5
-                const sortedAll = rawBookings.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-
-                sortedAll.forEach(b => {
+                bookSnap.docs.forEach(d => {
+                    const b = { id: d.id, ...d.data() };
                     if (b.status === 'completed') {
-                        const count = completedCounts.get(b.provider) || 0;
-                        if (count < 5) {
-                            filteredCompleted.push(b);
-                            completedCounts.set(b.provider, count + 1);
-                        }
-                    }
-                });
-
-                const completedBookings = filteredCompleted;
-
-                // Build a set of booking IDs already tracked in commissions
-                const trackedBookingIds = new Set(dbCommissions.map(c => c.bookingId));
-
-                // For untracked completed bookings, generate a synthetic commission record
-                const derivedCommissions = completedBookings
-                    .filter(b => !trackedBookingIds.has(b.id))
-                    .map(b => {
                         const rawPrice = b.proposedPrice || b.price || b.amount || 0;
                         const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                        return {
-                            id: `derived-${b.id}`,
+                        const dateStr = b.completedAt?.toDate ? b.completedAt.toDate().toISOString().split('T')[0] : (b.date || new Date().toISOString().split('T')[0]);
+
+                        allRecords.push({
+                            id: b.id,
                             bookingId: b.id,
                             provider: b.provider || 'Unknown',
+                            service: b.service || '—',
+                            customer: b.customer || '—',
                             amount: amount,
                             commission: parseFloat((amount * 0.15).toFixed(2)),
                             providerEarning: parseFloat((amount * 0.85).toFixed(2)),
-                            service: b.service,
-                            customer: b.customer,
-                            date: b.date || new Date().toISOString().split('T')[0],
-                            source: 'derived'
-                        };
-                    });
-
-                // Merge both sources and populate missing fields in dbCommissions
-                const rawAllRecords = [
-                    ...dbCommissions.map(c => {
-                        // If fields are missing in commission doc, try to find them in the booking mapping
-                        if (!c.provider || !c.service) {
-                            const relatedBooking = rawBookings.find(b => b.id === c.bookingId);
-                            if (relatedBooking) {
-                                return {
-                                    ...c,
-                                    provider: c.provider || relatedBooking.provider || 'Unknown',
-                                    service: c.service || relatedBooking.service || '—',
-                                    customer: c.customer || relatedBooking.customer || '—',
-                                    date: c.date || relatedBooking.date || new Date().toISOString().split('T')[0]
-                                };
-                            }
-                        }
-                        return { ...c, provider: c.provider || 'Unknown', service: c.service || '—' };
-                    }),
-                    ...derivedCommissions
-                ];
-
-                // CRITICAL FIX: Ensure the 5-job-per-provider cap is applied to ALL displayed records
-                const recordsByProvider = new Map();
-                const cappedRecords = [];
-
-                // Sort by date to ensure we pick the first 5 chronologically
-                const sortedRecords = rawAllRecords.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-
-                sortedRecords.forEach(c => {
-                    const provider = c.provider || 'Unknown';
-                    const count = recordsByProvider.get(provider) || 0;
-                    if (count < 5) {
-                        cappedRecords.push(c);
-                        recordsByProvider.set(provider, count + 1);
+                            date: dateStr
+                        });
                     }
                 });
-
-                const allRecords = cappedRecords;
 
                 // Apply time filter
                 const today = new Date();
