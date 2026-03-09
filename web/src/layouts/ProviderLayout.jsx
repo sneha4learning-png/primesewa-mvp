@@ -65,9 +65,7 @@ const ProviderLayout = () => {
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
                 <span className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-500 rounded-xl shadow-lg shadow-indigo-500/20">
-                        <Wrench className="w-6 h-6 text-white" />
-                    </div>
+                    <img src="/logo.png" alt="PrimeSewa" className="w-10 h-10 object-contain shadow-2xl" />
                     <span className="text-2xl font-black text-white tracking-tighter">PrimeSewa</span>
                 </span>
                 <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">

@@ -32,9 +32,7 @@ const AdminLogin = () => {
             <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-8 text-white">
                 <div className="text-center mb-8 flex flex-col items-center">
                     <div className="flex flex-col items-center justify-center mb-6">
-                        <div className="p-4 bg-blue-600 rounded-3xl shadow-xl shadow-blue-600/30 mb-4">
-                            <Wrench className="w-10 h-10 text-white" />
-                        </div>
+                        <img src="/logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain mb-4 drop-shadow-2xl" />
                         <span className="text-4xl font-black text-white tracking-tighter">PrimeSewa</span>
                     </div>
                     <h2 className="text-xl font-medium tracking-wide text-slate-400">Admin System</h2>

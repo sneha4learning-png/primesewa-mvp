@@ -68,6 +68,7 @@ const LandingPage = () => {
                             <span className="text-sm font-medium text-indigo-300 tracking-wide">Ahmedabad's #1 Service Platform</span>
                         </div>
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
+                            <img src="/logo.png" alt="PrimeSewa" className="w-16 h-16 md:w-24 md:h-24 object-contain mb-8 animate-float drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
                             Your Home Services, <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
                                 Reimagined.
@@ -271,11 +272,9 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-slate-800 pb-16">
                         <div className="col-span-1 md:col-span-1 space-y-6">
-                            <Link to="/" className="flex items-center gap-3 group">
-                                <div className="p-2 bg-blue-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg shadow-blue-600/20">
-                                    <Wrench className="w-6 h-6 text-white" />
-                                </div>
-                                <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tighter">PrimeSewa</span>
+                            <Link to="/" className="flex items-center gap-2 group">
+                                <img src="/logo.png" alt="PrimeSewa" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
+                                <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-600 tracking-tighter">PrimeSewa</span>
                             </Link>
                             <p className="text-slate-400 leading-relaxed font-light">The most trusted home service platform in Ahmedabad. Quality services, guaranteed.</p>
                         </div>

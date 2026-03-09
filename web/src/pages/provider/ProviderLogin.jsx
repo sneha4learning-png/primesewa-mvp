@@ -207,9 +207,7 @@ const ProviderLogin = () => {
             <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 md:p-8 text-white">
                 <div className="text-center mb-6 md:mb-8 flex flex-col items-center">
                     <div className="flex flex-col items-center justify-center mb-6">
-                        <div className="p-4 bg-indigo-600 rounded-3xl shadow-xl shadow-indigo-600/30 mb-4 animate-bounce-slow">
-                            <Wrench className="w-10 h-10 text-white" />
-                        </div>
+                        <img src="/logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain mb-4 animate-float drop-shadow-2xl" />
                         <span className="text-4xl font-black text-white tracking-tighter">PrimeSewa</span>
                     </div>
                     <h2 className="text-lg md:text-xl font-medium tracking-wide text-slate-400">{isSignup ? 'Become a Partner' : 'Partner Portal'}</h2>
