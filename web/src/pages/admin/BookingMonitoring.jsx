@@ -25,9 +25,13 @@ const BookingMonitoring = () => {
                 const querySnapshot = await getDocs(collection(db, 'bookings'));
                 const allBookings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // Sort by date/createdAt chronologically
-                const sorted = allBookings.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-                setBookings(sorted.reverse());
+                // Sort by createdAt timestamp descending — newest booking appears first
+                const sorted = allBookings.sort((a, b) => {
+                    const tsA = a.createdAt?.toMillis?.() || a.createdAt?.seconds * 1000 || new Date(a.date || 0).getTime();
+                    const tsB = b.createdAt?.toMillis?.() || b.createdAt?.seconds * 1000 || new Date(b.date || 0).getTime();
+                    return tsB - tsA; // descending: newest first
+                });
+                setBookings(sorted);
             } catch (err) {
                 console.error("Error fetching bookings:", err);
             } finally {
