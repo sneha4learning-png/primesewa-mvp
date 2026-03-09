@@ -17,42 +17,31 @@ const ProviderEarnings = () => {
 
         const loadDb = async () => {
             try {
-                const q = query(collection(db, 'commissions'), where('provider', '==', providerName));
-                const querySnapshot = await getDocs(q);
+                // Fetch completed bookings for this provider as the single source of truth
+                const bookSnap = await getDocs(query(collection(db, 'bookings'), where('provider', '==', providerName), where('status', '==', 'completed')));
 
                 const myCommissions = [];
                 let totalNet = 0;
                 let totalGross = 0;
-                const trackedBookingIds = new Set();
 
-                querySnapshot.forEach((doc) => {
-                    const c = { id: doc.id, ...doc.data() };
-                    myCommissions.push(c);
-                    trackedBookingIds.add(c.bookingId);
-                    totalGross += c.amount || 0;
-                    totalNet += c.providerEarning || (c.amount - c.commission);
-                });
-
-                // Fetch completed bookings for this provider to fill in derived missing records
-                const bookSnap = await getDocs(query(collection(db, 'bookings'), where('provider', '==', providerName), where('status', '==', 'completed')));
                 bookSnap.forEach(doc => {
                     const b = { id: doc.id, ...doc.data() };
-                    if (!trackedBookingIds.has(b.id)) {
-                        const rawPrice = b.proposedPrice || b.price || b.amount || 0;
-                        const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                    const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                    const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
 
-                        myCommissions.push({
-                            id: `derived-${b.id}`,
-                            bookingId: b.id,
-                            provider: b.provider,
-                            amount: amount,
-                            commission: parseFloat((amount * 0.15).toFixed(2)),
-                            providerEarning: parseFloat((amount * 0.85).toFixed(2)),
-                            date: b.date || new Date().toISOString()
-                        });
-                        totalGross += amount;
-                        totalNet += amount * 0.85;
-                    }
+                    const dateStr = b.completedAt?.toDate ? b.completedAt.toDate().toISOString() : (b.date || new Date().toISOString());
+
+                    myCommissions.push({
+                        id: b.id,
+                        bookingId: b.id,
+                        provider: b.provider,
+                        amount: amount,
+                        commission: parseFloat((amount * 0.15).toFixed(2)),
+                        providerEarning: parseFloat((amount * 0.85).toFixed(2)),
+                        date: dateStr
+                    });
+                    totalGross += amount;
+                    totalNet += amount * 0.85;
                 });
 
                 // Sort newest first

@@ -5,7 +5,6 @@ import { auth, db } from '../../firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { BriefcaseBusiness, UserPlus, UploadCloud, CheckCircle2 } from 'lucide-react';
-import { getProviders, addProvider } from '../../utils/mockDb';
 
 const ProviderLogin = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
