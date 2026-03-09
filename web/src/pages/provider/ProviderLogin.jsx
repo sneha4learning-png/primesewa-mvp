@@ -117,7 +117,7 @@ const ProviderLogin = () => {
                 console.warn('Firebase Auth issue detected. Falling back to Dev Mode.');
                 setConfirmationResult('DEV_MODE');
                 setStep(2);
-                setError('Project is in Developer Mode. Since Firebase billing is not yet enabled, actual SMS OTPs are restricted. Please use the developer fallback code.');
+                setError('For testing purposes, please enter the verification code: 1234 to proceed.');
             } else {
                 setError(err.message || 'Failed to send OTP. Please try again.');
             }
@@ -377,7 +377,7 @@ const ProviderLogin = () => {
                             />
                             <p className="text-xs text-center text-slate-400 mt-3">
                                 A 6-digit code would be sent to +91 {isSignup ? signupData.phone : phoneNumber} <br />
-                                <span className="font-semibold text-blue-400 mt-1 block italic underline">Live OTP is disabled as Firebase billing is not active. Please use the developer code 1234 to proceed.</span>
+                                <span className="font-semibold text-blue-400 mt-1 block italic underline">For testing purposes, please enter the verification code: 1234 to proceed.</span>
                             </p>
                         </div>
                         <button
