@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, Download, Filter } from 'lucide-react';
 import { db } from '../../firebase/config';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 const CommissionDashboard = () => {
     const [commissions, setCommissions] = useState([]);
@@ -11,10 +11,9 @@ const CommissionDashboard = () => {
     const itemsPerPage = 8;
 
     useEffect(() => {
-        const fetchCommissions = async () => {
+        // Real-time listener — commission records update instantly when bookings change
+        const unsubscribe = onSnapshot(collection(db, 'bookings'), (bookSnap) => {
             try {
-                // Fetch completed bookings as the single source of truth for commissions
-                const bookSnap = await getDocs(collection(db, 'bookings'));
                 const allRecords = [];
 
                 bookSnap.docs.forEach(d => {
@@ -23,6 +22,10 @@ const CommissionDashboard = () => {
                         const rawPrice = b.proposedPrice || b.price || b.amount || 0;
                         const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
                         const dateStr = b.completedAt?.toDate ? b.completedAt.toDate().toISOString().split('T')[0] : (b.date || new Date().toISOString().split('T')[0]);
+                        // Precise timestamp for sorting — prefer completedAt, then createdAt, then date string
+                        const ts = b.completedAt?.toMillis?.() || (b.completedAt?.seconds ?? 0) * 1000
+                            || b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000
+                            || new Date(b.date || 0).getTime();
 
                         allRecords.push({
                             id: b.id,
@@ -33,20 +36,18 @@ const CommissionDashboard = () => {
                             amount: amount,
                             commission: parseFloat((amount * 0.15).toFixed(2)),
                             providerEarning: parseFloat((amount * 0.85).toFixed(2)),
-                            date: dateStr
+                            date: dateStr,
+                            _ts: ts  // used for sorting only
                         });
                     }
                 });
 
                 // Apply time filter
-                const todayMidnight = new Date();
-                todayMidnight.setHours(0, 0, 0, 0);
-
                 let filtered = allRecords;
                 if (timeRange === '7days') {
                     const limit = new Date();
                     limit.setDate(limit.getDate() - 7);
-                    limit.setHours(0, 0, 0, 0); // Include full 7th day
+                    limit.setHours(0, 0, 0, 0);
                     filtered = allRecords.filter(c => new Date(c.date) >= limit);
                 } else if (timeRange === 'thisMonth') {
                     const now = new Date();
@@ -56,16 +57,18 @@ const CommissionDashboard = () => {
                     });
                 }
 
-                // Sort by newest first
-                const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+                // Sort by timestamp descending — newest record at top
+                const sorted = [...filtered].sort((a, b) => b._ts - a._ts);
                 setCommissions(sorted);
                 setTotalCommission(sorted.reduce((acc, curr) => acc + (curr.commission || 0), 0));
             } catch (err) {
-                console.error('Error fetching commissions:', err);
+                console.error('Error processing commissions:', err);
             }
-        };
+        }, (err) => {
+            console.error('Commission listener error:', err);
+        });
 
-        fetchCommissions();
+        return () => unsubscribe();
     }, [timeRange]);
 
     // Pagination logic
