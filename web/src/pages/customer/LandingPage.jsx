@@ -309,7 +309,7 @@ const LandingPage = () => {
                             <ul className="space-y-4 text-slate-400 text-sm italic font-medium">
                                 <li>support@primesewa.com</li>
                                 <li>+91 90000 00000</li>
-                                <li className="not-italic text-slate-500">SF-10, Prerna Complex, Bodakdev, <br /> Ahmedabad, Gujarat - 380054</li>
+                                <li className="not-italic text-slate-500">Bodakdev, <br /> Ahmedabad</li>
                             </ul>
                         </div>
                     </div>
