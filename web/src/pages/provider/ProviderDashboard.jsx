@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, Calendar } from 'lucide-react';
+import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, Calendar, Star } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
@@ -487,8 +487,14 @@ const ProviderDashboard = () => {
                                             <div>
                                                 <h4 className="font-bold text-slate-800">{job.service}</h4>
                                                 <p className="text-xs text-slate-500">#{job.id}</p>
+                                                {job.ratingGiven && (
+                                                    <div className="flex items-center gap-1 text-amber-500 mt-1">
+                                                        <Star className="w-3.5 h-3.5 fill-current" />
+                                                        <span className="text-xs font-bold w-full truncate">{job.ratingGiven}.0 Rating</span>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <span className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                            <span className={`shrink-0 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
                                                 {job.status}
                                             </span>
                                         </div>

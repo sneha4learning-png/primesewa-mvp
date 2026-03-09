@@ -25,25 +25,9 @@ const BookingMonitoring = () => {
                 const querySnapshot = await getDocs(collection(db, 'bookings'));
                 const allBookings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // CRITICAL: Apply 5-completed-job-per-provider cap for consistency with dashboard
-                const completedCounts = new Map();
-                const filtered = [];
-                // Sort by date/createdAt to keep the first 5 chronologically
+                // Sort by date/createdAt chronologically
                 const sorted = allBookings.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-
-                sorted.forEach(b => {
-                    if (b.status === 'completed') {
-                        const count = completedCounts.get(b.provider) || 0;
-                        if (count < 5) {
-                            filtered.push(b);
-                            completedCounts.set(b.provider, count + 1);
-                        }
-                    } else {
-                        filtered.push(b);
-                    }
-                });
-
-                setBookings(filtered.reverse());
+                setBookings(sorted.reverse());
             } catch (err) {
                 console.error("Error fetching bookings:", err);
             } finally {
