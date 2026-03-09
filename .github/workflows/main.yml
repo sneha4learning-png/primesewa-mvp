@@ -49,9 +49,41 @@ jobs:
 
       - name: Deploy to Firebase Hosting
         working-directory: web
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          FIREBASE_TOKEN_SECRET: ${{ secrets.FIREBASE_TOKEN }}
         run: |
+          set -e
+          echo "=== Pre-deploy diagnostics ==="
+          echo "Node version: $(node -v)"
+          echo "NPM version: $(npm -v)"
+          ls -la firebase.json .firebaserc || echo "WARNING: Firebase config files missing!"
+          ls -la dist/ | head -5 || echo "WARNING: dist/ directory missing or empty!"
+
+          echo "=== Installing Firebase CLI ==="
           npm install -g firebase-tools
-          export GOOGLE_APPLICATION_CREDENTIALS=../service-account.json
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > ../service-account.json
-          firebase deploy --only hosting --project primeseva-mvp
-          rm ../service-account.json
+          firebase --version
+
+          echo "=== Setting up authentication ==="
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT_KEY" ]; then
+            echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > ../service-account.json
+            export GOOGLE_APPLICATION_CREDENTIALS=$(realpath ../service-account.json)
+            echo "Using service account authentication"
+          elif [ -n "$FIREBASE_TOKEN_SECRET" ]; then
+            echo "Using FIREBASE_TOKEN authentication"
+          else
+            echo "ERROR: No authentication credentials found!"
+            echo "Please set either FIREBASE_SERVICE_ACCOUNT_KEY or FIREBASE_TOKEN in GitHub Secrets."
+            exit 1
+          fi
+
+          echo "=== Deploying to Firebase Hosting ==="
+          if [ -n "$FIREBASE_TOKEN_SECRET" ]; then
+            firebase deploy --only hosting --project primeseva-mvp --token "$FIREBASE_TOKEN_SECRET" --debug
+          else
+            firebase deploy --only hosting --project primeseva-mvp --debug
+          fi
+
+          echo "=== Cleanup ==="
+          rm -f ../service-account.json
+          echo "Deployment complete!"
