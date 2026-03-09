@@ -316,8 +316,8 @@ const LandingPage = () => {
                     <div className="pt-10 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
                         <p>© 2026 PrimeSewa Technologies. All rights reserved.</p>
                         <div className="flex gap-8">
-                            <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
-                            <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
+                            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                         </div>
                     </div>
                 </div>
