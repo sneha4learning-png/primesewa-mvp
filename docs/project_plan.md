@@ -49,72 +49,25 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 
 ### 3.1 Customer Portal
 
-#### Authentication
-- Enter name + mobile number → receive OTP → verify → access granted
-- Dev fallback: OTP `1234` (when Firebase Blaze billing not enabled)
-- Session persists across page refreshes (Firebase token)
-
-#### Browse & Discover
-- View 4 service categories: **Plumbing · Electrical · Cleaning · Carpentry**
-- Click any category to filter providers by that service
-- Search providers by name or category
-- Filter providers by star rating (All / 4.0+ / 4.5+)
-- View provider cards: name, rating, job count, price range
-- "View Profile" → full provider detail modal
-
-#### Book a Service
-1. Click **Book Now** on a provider
-2. Fill booking form: date, time, address, issue description
-3. Click **Confirm Request** (button disables to prevent duplicates)
-4. Booking created in Firestore with status `pending`
-5. Success confirmation shown; booking appears in **Current Activity** sidebar
-
-#### Track Bookings
-- **Current Activity** sidebar: live view of all active bookings
-- Status badges: `pending` → `accepted` → `completed`
-- Negotiation alert: if provider proposes different price, customer can **Accept** or **Decline**
-- **Live Tracker**: Customers can monitor provider arrival in real-time for accepted jobs
-- **Cancel Booking**: cancel any `pending` or `accepted` job
-
-#### Rate & Review
-- Completed jobs show in **Past Bookings** section
-- 5-star interactive rating widget
-- Rating submitted updates provider's average score in Firestore
+| Domain | Key Functionalities |
+|---|---|
+| **Authentication** | • Mobile + Name login<br>• Real OTP (or `1234` dev fallback)<br>• Token-based session survival (Firebase) |
+| **Discovery** | • Browsing by 4 core categories: Plumbing, Electrical, Cleaning, Carpentry<br>• Search & Sorting (Name, Category, Rating 4.0+/4.5+)<br>• Rich Provider Profiles (ratings, history, rates) |
+| **Booking Engine** | • One-click "Book Now" flow<br>• Detailed capture: Issue description, specific Date/Time, Address<br>• Double-booking prevention via button locking |
+| **Live Monitoring** | • **Current Activity** sidebar for real-time status updates<br>• Status transitions (Pending → Accepted → Arrived → Completed)<br>• **Price Negotiation**: Accept/Decline counter-offers from providers |
+| **Reputation** | • Interactive 1-5 star review system after job completion<br>• Real-time reputation updates for providers |
 
 ---
 
 ### 3.2 Provider (Partner) Portal
 
-#### Registration & Onboarding
-- Enter name, phone, service category, price per hour/job
-- Upload recognizable identity proof (Aadhar/PAN/Voter ID) and detail previous work experience
-- Registration saved to Firestore `providers` collection with `status: pending`
-- Admin must verify identity documents and approve before provider can receive work
-
-#### Authentication
-- OTP login matching registered phone number
-- Dev fallback: OTP `1234`
-- Status checked from Firestore on every login
-
-#### Online/Offline Toggle
-- Header switch: toggle **Online / Offline** availability
-- Only online providers are shown to customers browsing
-
-#### Service Requests
-- View all incoming `pending` bookings assigned to this provider
-- **Accept**: changes status to `accepted`, moves job to Active Jobs
-- **Reject**: removes from requests, status set to `rejected`
-- **Propose Price**: send a counter-price to the customer (triggers `negotiating` status)
-
-#### Active Jobs
-- View all `accepted` jobs with customer name, address, date/time
-- **Mark Complete**: sets status to `completed`, triggers commission calculation
-- **Call Customer**: initiates phone call to customer's number directly
-
-#### Earnings Dashboard
-- **Today's earnings**: net pay from today's completed jobs (85% of job value)
-- **Weekly earnings**: aggregated from the 7-day window
-- **Monthly earnings**: aggregated from the current month
+| Domain | Key Functionalities |
+|---|---|
+| **Partner Lifecycle** | • Multi-step registration: Name, Phone, Category, Rate<br>• **Identity Verification**: ID upload (Aadhar/PAN) + Work samples<br>• Admin approval gate (Status starts as `pending`) |
+| **Authentication** | • OTP login verified against registered partner phone<br>• Role check: Redirects away from customer-only pages |
+| **Operations** | • **Online/Offline Switch**: Instantly control visibility to customers<br>• Real-time request feed for incoming leads |
+| **Job Management** | • **Accept/Reject**: One-click leads management<br>• **Price Negotiation**: Propose custom quotes (enters `negotiating` state)<br>• **Active Tracker**: Direct call to customer & "Complete Job" action |
+| **Wallet** | • Aggregated earnings dashboard: Today, This Week, This Month<br>• Net payout calculation (85% of job value) |
 
 #### Account Status States
 | Status | What Happens |
@@ -127,39 +80,14 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 
 ### 3.3 Admin Panel
 
-#### Authentication
-- Master password login (no OTP required for Admin in MVP)
-- Role-based `ProtectedRoute` prevents non-admins from accessing `/admin/*`
-
-#### Dashboard Overview
-- **Total Bookings**: count of all bookings in Firestore
-- **Pending Bookings**: bookings still waiting for provider
-- **Active Providers**: providers with `status: active`
-- **Commission Earned**: sum of all commission records (15% of completed jobs)
-- Recent bookings feed (last 3, auto-refreshed)
-- Pending provider approvals list with quick-review links
-
-#### Provider Fleet Management (`/admin/providers`)
-- Full table of all registered providers with consolidated detail view merging profile and timeline histories
-- Provider details: name, category, phone, rating, status, identity proofs, and experience
-- Action icons: **Approve** (pending → active) · **Suspend** · **Reactivate**
-- Status change reflects immediately in Firestore
-
-#### Live Booking Monitor (`/admin/bookings`)
-- Table of all bookings with filters: status, category, provider, date
-- Advanced filter panel (collapsible)
-- Status color badges: Pending (amber) · Accepted (blue) · Completed (green) · Cancelled (red) · Negotiating (purple)
-- "Review Timeline" action per booking
-
-#### Commission Management (`/admin/commissions`)
-- Auto-generated records when any booking status changes to `completed`
-- Commission = **15%** of final/agreed price
-- Provider receives **85%** net
-- CSV export UI (full export requires Cloud Functions — future)
-
-#### Consumer Management (`/admin/users`)
-- Table of all registered customers
-- Actions: **Block** / **Unblock** customer accounts
+| Domain | Key Functionalities |
+|---|---|
+| **Authentication** | • Master password admin login<br>• Security guards for all `/admin/*` routes |
+| **Insights** | • Global KPI Dashboard: Total Bookings, Commissions, Active Fleet<br>• Real-time "Recent Activity" feed |
+| **Fleet Ops** | • **Unified Monitoring**: Approve, Suspend, or Reactivate providers<br>• Identity record review (ID scan verification) |
+| **Finance** | • Automated **15% Commission** calculation on completion<br>• History of all platform revenue records |
+| **Monitoring** | • **Live Booking Monitor**: Advanced filtering by Category, Provider, and Date Range<br>• Detailed booking timelines and history |
+| **Moderation** | • Customer management table<br>• Block/Unblock suspicious or problematic accounts |
 
 ---
 
