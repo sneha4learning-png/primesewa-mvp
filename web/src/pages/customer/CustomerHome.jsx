@@ -89,10 +89,15 @@ const CustomerHome = () => {
                 const pStatus = (p.status || '').toLowerCase().trim();
                 const eStatus = (existing?.status || '').toLowerCase().trim();
 
+                const pIsOnline = p.isOnline === true || String(p.isOnline) === 'true';
+                const eIsOnline = existing?.isOnline === true || String(existing?.isOnline) === 'true';
+
+                // PRIORITY: Real UID > Online > Active Status > More Jobs
                 if (!existing ||
                     (pIsReal && !eIsReal) ||
-                    (pIsReal === eIsReal && pStatus === 'active' && eStatus !== 'active') ||
-                    (pIsReal === eIsReal && pStatus === eStatus && (p.jobs || 0) > (existing.jobs || 0))
+                    (pIsReal === eIsReal && pIsOnline && !eIsOnline) ||
+                    (pIsReal === eIsReal && pIsOnline === eIsOnline && pStatus === 'active' && eStatus !== 'active') ||
+                    (pIsReal === eIsReal && pIsOnline === eIsOnline && pStatus === eStatus && (p.jobs || 0) > (existing.jobs || 0))
                 ) {
                     uniqueProvidersMap.set(name, p);
                 }
@@ -214,38 +219,43 @@ const CustomerHome = () => {
         }
     };
 
-    // Filter providers based on category, rating, and search
-    let displayedProviders = mockProviders.filter(p => p.status === 'active');
+    // Unified Filtering Logic
+    const displayedProviders = mockProviders.filter(p => {
+        // 1. Status Check
+        if ((p.status || '').toLowerCase().trim() !== 'active') return false;
 
-    if (selectedCategory) {
-        displayedProviders = displayedProviders.filter(p => {
-            const cat = p.category;
-            if (!cat) return false;
-            if (Array.isArray(cat)) return cat.some(c => c.toLowerCase() === selectedCategory.toLowerCase());
-            if (typeof cat === 'string') {
-                if (cat.includes(',')) return cat.split(',').map(c => c.trim().toLowerCase()).includes(selectedCategory.toLowerCase());
-                return cat.toLowerCase() === selectedCategory.toLowerCase();
-            }
-            return false;
-        });
-    }
+        // 2. Category Filter (Robust & Fuzzy)
+        const matchesCategory = selectedCategory === 'All' || (() => {
+            const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
+            const target = selectedCategory.toLowerCase().trim();
 
-    if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase();
-        displayedProviders = displayedProviders.filter(p =>
-            (p.name || '').toLowerCase().includes(query) ||
-            (p.category || 'Plumbing').toLowerCase().includes(query)
-        );
-    } else if (!selectedCategory) {
-        // EC-006: pagination via load-more (no hard slice)
-    }
+            return pCats.some(c => {
+                if (c === target) return true;
+                if (target === 'carpentry' && (c.includes('carpent') || c.includes('wood'))) return true;
+                if (target === 'electrical' && (c.includes('electri') || c.includes('light'))) return true;
+                if (target === 'plumbing' && (c.includes('plumb') || c.includes('pipe'))) return true;
+                if (target === 'cleaning' && (c.includes('clean') || c.includes('housekeep'))) return true;
+                return c.includes(target) || target.includes(c);
+            });
+        })();
+        if (!matchesCategory) return false;
 
-    if (ratingFilter !== '0') {
-        displayedProviders = displayedProviders.filter(p => p.rating >= parseFloat(ratingFilter));
-    }
+        // 3. Search Query
+        if (searchQuery.trim() !== '') {
+            const query = searchQuery.toLowerCase();
+            const matchesSearch = (p.name || '').toLowerCase().includes(query) ||
+                (Array.isArray(p.category) ? p.category.join(' ') : (p.category || '')).toLowerCase().includes(query);
+            if (!matchesSearch) return false;
+        }
 
-    // Sort so highest rating is first
-    displayedProviders.sort((a, b) => b.rating - a.rating);
+        // 4. Rating Filter
+        if (ratingFilter !== 'All Ratings') {
+            const minRating = parseFloat(ratingFilter);
+            if ((p.rating || 0) < minRating) return false;
+        }
+
+        return true;
+    }).sort((a, b) => b.rating - a.rating);
 
     const handleActivityClick = (booking) => {
         // Removed intrusive alert popup that caused confusion about changing status

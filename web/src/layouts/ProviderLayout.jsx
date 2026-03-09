@@ -10,6 +10,7 @@ const ProviderLayout = () => {
     const [isOnline, setIsOnline] = useState(false);
     const [providerId, setProviderId] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [statusUpdating, setStatusUpdating] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -36,15 +37,18 @@ const ProviderLayout = () => {
     const toggleOnlineStatus = async () => {
         if (!providerId) return;
         const newStatus = !isOnline;
-        setIsOnline(newStatus);
+        setStatusUpdating(true);
         try {
             await updateDoc(doc(db, 'providers', providerId), {
                 isOnline: newStatus
             });
+            setIsOnline(newStatus);
+            setTimeout(() => setStatusUpdating(false), 2000);
         } catch (e) {
             console.error("Error updating online status:", e);
             // Revert on failure
-            setIsOnline(!newStatus);
+            setIsOnline(isOnline);
+            setStatusUpdating(false);
         }
     };
 
@@ -110,6 +114,11 @@ const ProviderLayout = () => {
                             <Menu className="w-5 h-5" />
                         </button>
                         <h1 className="text-sm lg:text-xl font-black text-slate-800 tracking-tight truncate max-w-[140px] lg:max-w-none">{providerName}</h1>
+                        {statusUpdating && (
+                            <span className="hidden md:inline-block px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full animate-pulse border border-emerald-100 uppercase tracking-widest">
+                                Status Synced
+                            </span>
+                        )}
                     </div>
                     <div className="flex items-center gap-3 lg:gap-5">
                         <button
