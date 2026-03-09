@@ -112,9 +112,15 @@ const CustomerHome = () => {
             const allMyBookings = [];
             snapshot.forEach(d => {
                 const b = { id: d.id, ...d.data() };
-                if (b.customer === myName || b.customer === 'Guest User' || !b.customer) {
-                    allMyBookings.push(b);
-                }
+                // Match by full name OR first name to handle variations (e.g. "Sneha" vs "Sneha Services")
+                const firstName = myName.split(' ')[0].toLowerCase();
+                const bookingCustRaw = (b.customer || '').toLowerCase();
+                const isMyBooking =
+                    bookingCustRaw === myName.toLowerCase() ||
+                    bookingCustRaw === firstName ||
+                    b.customer === 'Guest User' ||
+                    !b.customer;
+                if (isMyBooking) allMyBookings.push(b);
             });
 
             setMockBookings(allMyBookings.filter(b => b.status !== 'completed' && b.status !== 'rejected' && b.status !== 'cancelled'));
@@ -374,19 +380,26 @@ const CustomerHome = () => {
                         {/* Categories */}
                         <div>
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Categories</h2>
+                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Browse Services</h2>
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
                                 {categories.map(cat => (
                                     <button
                                         key={cat.id}
                                         onClick={() => setSelectedCategory(cat.name === selectedCategory ? null : cat.name)}
-                                        className={`flex flex-col items-center p-4 md:p-6 rounded-2xl md:rounded-3xl border-2 transition-all duration-300 ${selectedCategory === cat.name ? 'border-blue-500 bg-blue-50/50 shadow-md scale-100' : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-lg hover:-translate-y-1'}`}
+                                        className={`relative flex flex-col items-center p-4 md:p-5 rounded-2xl border-2 transition-all duration-300 overflow-hidden
+                                            ${selectedCategory === cat.name
+                                                ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg shadow-blue-500/10 scale-[1.03]'
+                                                : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-md hover:-translate-y-1'
+                                            }`}
                                     >
-                                        <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-4 transition-transform ${cat.color} ${selectedCategory === cat.name ? 'scale-110' : ''}`}>
-                                            <cat.icon className="w-6 h-6 md:w-8 md:h-8" />
+                                        {selectedCategory === cat.name && (
+                                            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-500" />
+                                        )}
+                                        <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-2.5 transition-transform ${cat.color} ${selectedCategory === cat.name ? 'scale-110' : ''}`}>
+                                            <cat.icon className="w-6 h-6 md:w-7 md:h-7" />
                                         </div>
-                                        <span className={`text-xs md:text-base font-bold text-center ${selectedCategory === cat.name ? 'text-blue-700' : 'text-slate-700'}`}>{cat.name}</span>
+                                        <span className={`text-xs md:text-sm font-bold text-center leading-tight ${selectedCategory === cat.name ? 'text-blue-700' : 'text-slate-700'}`}>{cat.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -395,9 +408,14 @@ const CustomerHome = () => {
                         {/* Top Providers with Filters */}
                         <div>
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{selectedCategory ? `${selectedCategory} Pros` : 'Top Rated Pros'}</h2>
+                                <div>
+                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                                        {selectedCategory ? `${selectedCategory} Pros` : 'Available Pros'}
+                                    </h2>
+                                    <p className="text-sm text-slate-500 mt-0.5">{displayedProviders.length} online now</p>
+                                </div>
                                 <select
-                                    className="px-4 py-2 border border-slate-200 rounded-xl bg-white font-medium text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="px-4 py-2 border border-slate-200 rounded-xl bg-white font-medium text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                     value={ratingFilter}
                                     onChange={(e) => setRatingFilter(e.target.value)}
                                 >
@@ -409,50 +427,56 @@ const CustomerHome = () => {
                             </div>
                             <div className="space-y-4">
                                 {displayedProviders.slice(0, visibleCount).map(provider => (
-                                    <div key={provider.id} className="group bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0 hover:shadow-xl hover:border-slate-200 transition-all duration-300">
-                                        <div className="flex items-center gap-4 md:gap-6">
+                                    <div key={provider.id} className="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-xl hover:border-indigo-100 transition-all duration-300 hover:-translate-y-0.5">
+                                        <div className="flex items-center gap-4">
+                                            {/* Avatar with online indicator */}
                                             <div className="relative shrink-0">
-                                                <div className="absolute inset-0 bg-blue-500 rounded-full blur group-hover:blur-md transition-all opacity-20"></div>
-                                                <div className="w-14 h-14 md:w-16 md:h-16 relative bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center text-xl md:text-2xl font-black text-slate-600 border-2 border-white shadow-sm">
+                                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xl font-black text-white shadow-md shadow-indigo-500/20">
                                                     {(provider.name || 'P').charAt(0)}
                                                 </div>
+                                                <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full" title="Online" />
                                             </div>
                                             <div className="min-w-0">
-                                                <h3 className="font-black text-lg md:text-xl text-slate-900 truncate">{provider.name || 'Service Partner'}</h3>
-                                                <p className="text-xs md:text-sm font-bold text-indigo-600 mt-0.5 truncate">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Professional Service')}</p>
-                                                <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs md:text-sm font-bold text-slate-500 mt-2">
-                                                    <span className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded-md">
-                                                        <Star className="w-3.5 h-3.5 fill-current" /> {provider.rating}
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <h3 className="font-black text-lg text-slate-900 truncate">{provider.name || 'Service Partner'}</h3>
+                                                </div>
+                                                <p className="text-xs font-bold text-indigo-600 mt-0.5">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Professional Service')}</p>
+                                                <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-2">
+                                                    <span className="flex items-center gap-1 text-amber-500 text-xs font-bold bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
+                                                        <Star className="w-3 h-3 fill-current" /> {provider.rating || '—'}
                                                     </span>
-                                                    <span>•</span>
-                                                    <span>{provider.jobs} jobs</span>
-                                                    <span>•</span>
-                                                    <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md whitespace-nowrap">{provider.price}</span>
+                                                    <span className="text-xs text-slate-400 font-medium">{provider.jobs || 0} jobs</span>
+                                                    <span className="flex items-center gap-0.5 text-emerald-700 text-xs font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
+                                                        ₹{(provider.price || '').toString().replace(/[₹,/a-zA-Z\s]/g, '') || '—'}/hr
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex flex-row md:flex-col gap-2">
-                                            <button onClick={() => setSelectedProviderProfile(provider)} className="flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2.5 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 transition-all border border-blue-100 text-sm md:text-base">
+                                        <div className="flex flex-row md:flex-col gap-2.5 shrink-0">
+                                            <button onClick={() => setSelectedProviderProfile(provider)} className="flex-1 md:flex-none px-5 py-2.5 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold rounded-xl transition-all border border-slate-200 hover:border-blue-200 text-sm">
                                                 View
                                             </button>
-                                            <button onClick={() => handleBook(provider)} className="flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-blue-600 shadow-md shadow-slate-900/20 hover:shadow-blue-600/30 transition-all group-hover:-translate-y-0.5 text-sm md:text-base">
-                                                Book
+                                            <button onClick={() => handleBook(provider)} className="flex-1 md:flex-none px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all text-sm">
+                                                Book Now
                                             </button>
                                         </div>
                                     </div>
                                 ))}
                                 {displayedProviders.length === 0 && (
-                                    <div className="p-12 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
-                                        <p className="text-slate-500 font-medium">No active providers found for this category.</p>
+                                    <div className="p-12 text-center bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-3xl border border-dashed border-slate-200">
+                                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Search className="w-7 h-7 text-blue-400" />
+                                        </div>
+                                        <p className="text-slate-600 font-bold">No online providers for this category.</p>
+                                        <p className="text-slate-400 text-sm mt-1">Check back soon or try another category.</p>
                                     </div>
                                 )}
-                                {/* EC-006: Load More Pagination */}
                                 {visibleCount < displayedProviders.length && (
                                     <button
                                         onClick={() => setVisibleCount(c => c + 5)}
-                                        className="w-full py-4 mt-2 border-2 border-dashed border-slate-200 rounded-3xl text-slate-500 font-bold hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/50 transition-all"
+                                        className="w-full py-4 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-bold hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/50 transition-all"
                                     >
-                                        Load More Providers ({displayedProviders.length - visibleCount} remaining)
+                                        Load More ({displayedProviders.length - visibleCount} remaining)
                                     </button>
                                 )}
                             </div>
@@ -598,57 +622,68 @@ const CustomerHome = () => {
                             </div>
                         )}
 
-                        {/* Past Bookings & Ratings */}
-                        {pastBookings.length > 0 && (
-                            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                                <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3">
-                                    <CheckCircle2 className="text-emerald-500 w-6 h-6" /> Past Bookings
-                                </h2>
-                                <div className="space-y-4">
-                                    {pastBookings.map(b => (
-                                        <div key={b.id} className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="font-bold text-slate-900">{b.service}</span>
-                                                <span className="text-sm font-black text-emerald-600">₹{b.proposedPrice || b.price}</span>
-                                            </div>
-                                            <p className="text-sm font-medium text-slate-500 mb-4">{b.provider} • {b.date}</p>
-
-                                            {!b.rated ? (
-                                                <div className="mt-4 pt-4 border-t border-slate-200">
-                                                    <p className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Rate {b.provider}</p>
-                                                    <div className="flex items-center gap-2 mb-4 cursor-pointer">
-                                                        {[1, 2, 3, 4, 5].map((star) => (
-                                                            <Star
-                                                                key={star}
-                                                                onClick={() => setRatingState({ bookingId: b.id, rating: star })}
-                                                                className={`w-7 h-7 transition-all hover:scale-110 ${ratingState.bookingId === b.id && ratingState.rating >= star ? 'fill-amber-400 text-amber-400' : 'text-slate-200 hover:text-amber-200'}`}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                    {ratingState.bookingId === b.id && ratingState.rating > 0 && (
-                                                        <button
-                                                            onClick={() => submitRating(b)}
-                                                            className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all shadow-md active:scale-95"
-                                                        >
-                                                            Submit Rating
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between">
-                                                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">You rated:</span>
-                                                    <div className="flex gap-1">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <Star key={i} className={`w-4 h-4 ${i < b.ratingGiven ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
+                        {/* Past Bookings & Ratings — always shown with empty state */}
+                        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                            <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+                                <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center">
+                                    <CheckCircle2 className="w-4.5 h-4.5 text-white w-4 h-4" />
                                 </div>
+                                <h2 className="text-lg font-black text-slate-900">Booking History</h2>
+                                {pastBookings.length > 0 && (
+                                    <span className="ml-auto px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-black">{pastBookings.length}</span>
+                                )}
                             </div>
-                        )}
+                            <div className="p-4 space-y-3 max-h-[500px] overflow-y-auto">
+                                {pastBookings.length > 0 ? pastBookings.map(b => (
+                                    <div key={b.id} className="p-4 rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white hover:shadow-sm transition-all">
+                                        <div className="flex justify-between items-start mb-1.5">
+                                            <span className="font-bold text-slate-900 text-sm">{b.service}</span>
+                                            <span className="text-sm font-black text-emerald-600">₹{b.proposedPrice || b.price}</span>
+                                        </div>
+                                        <p className="text-xs font-medium text-slate-500 mb-3">{b.provider} · {b.date || 'N/A'}</p>
+                                        {!b.rated ? (
+                                            <div className="pt-3 border-t border-slate-100">
+                                                <p className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider">Rate this service</p>
+                                                <div className="flex items-center gap-1.5 mb-3 cursor-pointer">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <Star
+                                                            key={star}
+                                                            onClick={() => setRatingState({ bookingId: b.id, rating: star })}
+                                                            className={`w-6 h-6 transition-all hover:scale-110 ${ratingState.bookingId === b.id && ratingState.rating >= star ? 'fill-amber-400 text-amber-400' : 'text-slate-200 hover:text-amber-200'}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {ratingState.bookingId === b.id && ratingState.rating > 0 && (
+                                                    <button
+                                                        onClick={() => submitRating(b)}
+                                                        className="w-full py-2.5 bg-slate-900 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all shadow-sm text-xs"
+                                                    >
+                                                        Submit Rating
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Your rating</span>
+                                                <div className="flex gap-0.5">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star key={i} className={`w-3.5 h-3.5 ${i < b.ratingGiven ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )) : (
+                                    <div className="text-center py-10">
+                                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                            <CheckCircle2 className="w-6 h-6 text-slate-400" />
+                                        </div>
+                                        <p className="text-slate-500 font-medium text-sm">No completed bookings yet.</p>
+                                        <p className="text-slate-400 text-xs mt-1">Book a service to get started!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
