@@ -155,12 +155,19 @@ const ProviderLogin = () => {
                 const cleanPhoneTarget = phoneNumber.replace('+91', '');
                 const selectedProv = providers.find(p => p.phone && p.phone.includes(cleanPhoneTarget));
 
+                // Check approval status before allowing login
                 if (selectedProv && selectedProv.status === 'suspended') {
-                    setError("Your account is currently suspended. Please contact Admin.");
+                    setError('Your account is currently suspended. Please contact Admin.');
                     setIsLoading(false);
                     return;
                 }
-                providerName = selectedProv ? selectedProv.name : 'Unknown Provider';
+                // Block pending (not yet approved) providers from logging in
+                if (!selectedProv || selectedProv.status === 'pending' || !selectedProv.status) {
+                    setError('Your account is pending admin approval. You will be notified once approved.');
+                    setIsLoading(false);
+                    return;
+                }
+                providerName = selectedProv.name;
             }
 
             // Sync with Firestore so routing knows role
@@ -347,10 +354,11 @@ const ProviderLogin = () => {
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                 >
                                     <option value="" disabled className="text-slate-500">Choose your account</option>
-                                    {providers.filter(p => p.status !== 'suspended').map(p => {
-                                        const phoneStr = (p.phone || '').replace('+91', '');
-                                        return <option key={p.phone} value={phoneStr}>{p.name} ({phoneStr})</option>;
-                                    })}
+                                    {/* Only show admin-approved (active) providers in the login dropdown */
+                                        providers.filter(p => p.status === 'active').map(p => {
+                                            const phoneStr = (p.phone || '').replace('+91', '');
+                                            return <option key={p.phone} value={phoneStr}>{p.name} ({phoneStr})</option>;
+                                        })}
                                 </select>
                             ) : (
                                 <p className="text-sm text-slate-400 bg-slate-900 border border-slate-700 p-3 rounded-xl">No active providers available.</p>
