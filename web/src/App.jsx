@@ -14,6 +14,7 @@ import BookingMonitoring from './pages/admin/BookingMonitoring';
 import CommissionDashboard from './pages/admin/CommissionDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import AdminLogin from './pages/admin/AdminLogin';
+import CleanupPage from './pages/admin/CleanupPage';
 
 // Customer Pages
 import LandingPage from './pages/customer/LandingPage';
@@ -64,6 +65,9 @@ function App() {
               <Route path="profile" element={<ProviderProfile />} />
             </Route>
           </Route>
+
+          {/* Temporary Database Cleanup */}
+          <Route path="/db-cleanup" element={<CleanupPage />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />

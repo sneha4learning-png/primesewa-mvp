@@ -74,33 +74,35 @@ const CustomerHome = () => {
                 const allProviders = [];
                 provSnap.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
 
-                // Deduplicate by Name + Phone to ensure any duplicate entries for the same pro are merged
+                // Deduplicate by Name + Phone while prioritizing "real" accounts (those with a uid)
                 const uniqueProvidersMap = new Map();
                 allProviders.forEach(p => {
-                    if (!p.name) return;
+                    const name = p.name?.toLowerCase().trim();
+                    if (!name) return;
 
-                    // Keying by name-only is safest for this mockup data mismatch
-                    const key = p.name.toLowerCase().trim();
-                    const existing = uniqueProvidersMap.get(key);
+                    const existing = uniqueProvidersMap.get(name);
 
-                    // Priority picking:
-                    // 1. If nothing exists, pick this.
-                    // 2. If this is 'active' and existing isn't, this wins.
-                    // 3. If existing has 'Plumbing' but this one has something else, this wins.
-                    // 4. If this one has more jobs or higher rating, it's likely the "real" profile.
+                    // Priority Criteria:
+                    // 1. A provider with a 'uid' is always preferred over one without (Real vs Mock)
+                    // 2. If both have uid, prefer the 'active' one
+                    // 3. Otherwise, prefer higher job count as a tie-breaker
 
-                    const isExistingPlumbing = !existing?.category || existing?.category === 'Plumbing' || existing?.category === 'Service';
-                    const isNewPlumbing = !p.category || p.category === 'Plumbing' || p.category === 'Service';
+                    const pIsReal = !!p.uid;
+                    const eIsReal = !!existing?.uid;
 
                     if (!existing ||
-                        (p.status === 'active' && existing.status !== 'active') ||
-                        (isExistingPlumbing && !isNewPlumbing) ||
-                        (p.jobs > (existing.jobs || 0))) {
-                        uniqueProvidersMap.set(key, p);
+                        (pIsReal && !eIsReal) ||
+                        (pIsReal === eIsReal && p.status === 'active' && existing.status !== 'active') ||
+                        (pIsReal === eIsReal && p.status === existing.status && (p.jobs || 0) > (existing.jobs || 0))
+                    ) {
+                        uniqueProvidersMap.set(name, p);
                     }
                 });
 
-                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p => p.status === 'active' && p.isOnline === true));
+                // Final Filter: Only show providers who are Active AND Online
+                setMockProviders(Array.from(uniqueProvidersMap.values()).filter(p =>
+                    p.status === 'active' && p.isOnline === true
+                ));
 
                 const bookSnap = await getDocs(collection(db, 'bookings'));
                 const allMyBookings = [];
