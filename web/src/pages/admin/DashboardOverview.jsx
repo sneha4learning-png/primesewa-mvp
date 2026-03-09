@@ -45,26 +45,17 @@ const DashboardOverview = () => {
                 const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const dbCommissions = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                // Filter to keep only 5 completed requests per provider
+                // Count completed requests per provider
                 const completedCounts = new Map();
-                const filteredBookings = [];
 
-                // Sort by date to get the first 5
-                const sortedAll = [...allBookings].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-
-                sortedAll.forEach(b => {
+                allBookings.forEach(b => {
                     if (b.status === 'completed') {
                         const count = completedCounts.get(b.provider) || 0;
-                        if (count < 5) {
-                            filteredBookings.push(b);
-                            completedCounts.set(b.provider, count + 1);
-                        }
-                    } else {
-                        filteredBookings.push(b);
+                        completedCounts.set(b.provider, count + 1);
                     }
                 });
 
-                const bookings = filteredBookings;
+                const bookings = allBookings;
                 const pendingBookingsCount = bookings.filter(b => b.status === 'pending').length;
                 const activeProvidersCount = providers.filter(p => p.status === 'active').length;
 

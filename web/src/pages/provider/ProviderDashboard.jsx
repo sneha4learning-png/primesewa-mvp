@@ -51,12 +51,10 @@ const ProviderDashboard = () => {
                 setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
                 setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
 
-                // Track declined/rejected/cancelled historical state
-                setDeclinedRequests(myBookings.filter(b => b.status === 'rejected' || b.status === 'cancelled'));
+                // Track completed/declined/rejected/cancelled historical state
+                setDeclinedRequests(myBookings.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status)));
 
-                // Cap completed jobs to 5 per provider for earnings
                 const completedJobs = myBookings.filter(b => b.status === 'completed').sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-                const cappedCompleted = completedJobs.slice(0, 5);
 
                 const now = new Date();
                 const todayStr = now.toISOString().split('T')[0];
@@ -66,7 +64,7 @@ const ProviderDashboard = () => {
                 oneMonthAgo.setMonth(now.getMonth() - 1);
 
                 const getEarningsForPeriod = (startDate) => {
-                    return cappedCompleted.filter(job => {
+                    return completedJobs.filter(job => {
                         const jobDate = new Date(job.date || job.completedAt?.toDate?.() || 0);
                         return jobDate >= startDate;
                     }).reduce((sum, job) => {
@@ -89,7 +87,7 @@ const ProviderDashboard = () => {
                     return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), earnings: 0 };
                 });
 
-                cappedCompleted.forEach(job => {
+                completedJobs.forEach(job => {
                     const jDateStr = job.date || (job.completedAt?.toDate ? job.completedAt.toDate().toISOString().split('T')[0] : null);
                     if (jDateStr) {
                         const dayObj = last7Days.find(d => d.date === jDateStr);
@@ -465,8 +463,8 @@ const ProviderDashboard = () => {
                     {declinedRequests.length > 0 && (
                         <div className="bg-slate-50 border-2 border-slate-100 rounded-3xl p-8 mb-8">
                             <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                                <XCircle className="w-6 h-6 text-slate-400" />
-                                Closed & Declined Requests
+                                <CheckCircle className="w-6 h-6 text-slate-400" />
+                                Booking History
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {paginatedHistory.map(job => (
@@ -476,7 +474,7 @@ const ProviderDashboard = () => {
                                                 <h4 className="font-bold text-slate-800">{job.service}</h4>
                                                 <p className="text-xs text-slate-500">#{job.id}</p>
                                             </div>
-                                            <span className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                            <span className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
                                                 {job.status}
                                             </span>
                                         </div>
