@@ -1,4 +1,4 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../firebase/AuthContext';
 import { User, LogOut, Menu, X, Bell, ShoppingBag, ShieldCheck, Wrench } from 'lucide-react';
 import { useState } from 'react';
@@ -6,6 +6,7 @@ import { useState } from 'react';
 const CustomerLayout = () => {
     const { currentUser, userData, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const isProvider = userData?.role === 'provider';
@@ -30,14 +31,14 @@ const CustomerLayout = () => {
 
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex items-center gap-8">
-                        <Link to="/" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">Home</Link>
-                        <Link to="/dashboard" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">All Services</Link>
+                        <Link to="/" className={`text-sm font-bold transition-colors ${location.pathname === '/' ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>Home</Link>
+                        <Link to="/dashboard" className={`text-sm font-bold transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>All Services</Link>
 
                         {currentUser ? (
                             <div className="flex items-center gap-6 ml-4 border-l border-gray-200 pl-6">
                                 <Link to={isProvider ? "/provider" : "/provider/login"} className="text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
-                                <Link to="/dashboard" className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100 transition-colors">My Dashboard</Link>
-                                <Link to="/profile" className="text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors">My Profile</Link>
+                                <Link to="/dashboard" className={`text-sm font-bold transition-colors ${location.pathname === '/dashboard' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Dashboard</Link>
+                                <Link to="/profile" className={`text-sm font-bold transition-colors ${location.pathname === '/profile' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Profile</Link>
                                 <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2 text-sm font-bold border border-rose-200 text-rose-600 bg-rose-50 rounded-full hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-600/20 transition-all">
                                     <LogOut className="w-4 h-4" /> Logout
                                 </button>
@@ -71,10 +72,10 @@ const CustomerLayout = () => {
                         className="relative bg-white border-b border-indigo-100 shadow-xl px-4 py-6 flex flex-col gap-4"
                         onClick={e => e.stopPropagation()}
                     >
-                        <Link to="/" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                        <Link to="/" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
                             🏠 Home
                         </Link>
-                        <Link to="/dashboard" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                        <Link to="/dashboard" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
                             🔧 All Services
                         </Link>
 
@@ -84,10 +85,10 @@ const CustomerLayout = () => {
                                 <Link to={isProvider ? "/provider" : "/provider/login"} onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition-colors">
                                     🤝 Provider Portal
                                 </Link>
-                                <Link to="/dashboard" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 bg-indigo-50 font-bold hover:bg-indigo-100 transition-colors">
+                                <Link to="/dashboard" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
                                     📋 My Dashboard
                                 </Link>
-                                <Link to="/profile" onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-bold hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                                <Link to="/profile" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/profile' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
                                     👤 My Profile
                                 </Link>
                                 <button

@@ -155,15 +155,8 @@ const ProviderLogin = () => {
                 const cleanPhoneTarget = phoneNumber.replace('+91', '');
                 const selectedProv = providers.find(p => p.phone && p.phone.includes(cleanPhoneTarget));
 
-                // Check approval status before allowing login
-                if (selectedProv && selectedProv.status === 'suspended') {
-                    setError('Your account is currently suspended. Please contact Admin.');
-                    setIsLoading(false);
-                    return;
-                }
-                // Block pending (not yet approved) providers from logging in
-                if (!selectedProv || selectedProv.status === 'pending' || !selectedProv.status) {
-                    setError('Your account is pending admin approval. You will be notified once approved.');
+                if (!selectedProv) {
+                    setError('Provider account not found. Please contact support.');
                     setIsLoading(false);
                     return;
                 }
@@ -354,8 +347,8 @@ const ProviderLogin = () => {
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                 >
                                     <option value="" disabled className="text-slate-500">Choose your account</option>
-                                    {/* Only show admin-approved (active) providers in the login dropdown */
-                                        providers.filter(p => p.status === 'active').map(p => {
+                                    {/* Show all providers in the login dropdown so they can log in and see their status */
+                                        providers.map(p => {
                                             const phoneStr = (p.phone || '').replace('+91', '');
                                             return <option key={p.phone} value={phoneStr}>{p.name} ({phoneStr})</option>;
                                         })}
