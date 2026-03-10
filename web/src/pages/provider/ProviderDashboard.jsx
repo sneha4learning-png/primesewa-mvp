@@ -9,7 +9,8 @@ const ProviderDashboard = () => {
     const { currentUser, userData } = useAuth();
     const [requests, setRequests] = useState([]);
     const [activeJobs, setActiveJobs] = useState([]);
-    const [declinedRequests, setDeclinedRequests] = useState([]); // EC-009
+    const [historicalBookings, setHistoricalBookings] = useState([]); // All bookings for history
+    const [historyFilter, setHistoryFilter] = useState('All');
     const [earnings, setEarnings] = useState({ today: 0, week: 0, month: 0 });
     const [negotiatingId, setNegotiatingId] = useState(null);
     const [negotiatedPrice, setNegotiatedPrice] = useState('');
@@ -55,8 +56,8 @@ const ProviderDashboard = () => {
                 setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
                 setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
 
-                // Track completed/declined/rejected/cancelled historical state
-                setDeclinedRequests(myBookings.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status)));
+                // Track all historical bookings for filtered views
+                setHistoricalBookings(myBookings);
 
                 // Sort ascending strictly for the earnings period calculations if necessary, but here we can just pass the sorted array
                 const completedJobs = myBookings.filter(b => b.status === 'completed');
@@ -118,17 +119,27 @@ const ProviderDashboard = () => {
     // Pagination logic
     const paginatedActive = activeJobs.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
     const paginatedRequests = requests.slice((requestPage - 1) * itemsPerPage, requestPage * itemsPerPage);
-    const paginatedHistory = declinedRequests.slice((historyPage - 1) * 6, historyPage * 6); // 6 for history grid
+
+    const filteredHistory = historicalBookings.filter(b => {
+        if (historyFilter === 'All') return true;
+        if (historyFilter === 'Pending') return ['pending', 'negotiating'].includes(b.status);
+        if (historyFilter === 'In Progress') return ['accepted'].includes(b.status);
+        if (historyFilter === 'Completed') return ['completed'].includes(b.status);
+        if (historyFilter === 'Cancelled') return ['cancelled', 'rejected'].includes(b.status);
+        return true;
+    });
+    const paginatedHistory = filteredHistory.slice((historyPage - 1) * 6, historyPage * 6); // 6 for history grid
 
     const totalActivePages = Math.ceil(activeJobs.length / itemsPerPage);
     const totalRequestPages = Math.ceil(requests.length / itemsPerPage);
-    const totalHistoryPages = Math.ceil(declinedRequests.length / 6);
+    const totalHistoryPages = Math.ceil(filteredHistory.length / 6);
 
     const acceptRequest = async (req) => {
         try {
             await updateDoc(doc(db, 'bookings', req.id), { status: 'accepted' });
             setRequests(prev => prev.filter(r => r.id !== req.id));
             setActiveJobs(prev => [{ ...req, status: 'accepted' }, ...prev]);
+            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'accepted' } : r));
         } catch (e) { console.error(e); }
     };
 
@@ -137,6 +148,7 @@ const ProviderDashboard = () => {
         try {
             await updateDoc(doc(db, 'bookings', req.id), { status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) });
             setRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) } : r));
+            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) } : r));
             setNegotiatingId(null);
             setNegotiatedPrice('');
         } catch (e) { console.error(e); }
@@ -146,12 +158,12 @@ const ProviderDashboard = () => {
         try {
             await updateDoc(doc(db, 'bookings', id), { status: 'rejected' });
 
-            // Move from requests to declinedRequests
+            // Update requests and history state
             const req = requests.find(r => r.id === id);
             if (req) {
                 setRequests(prev => prev.filter(r => r.id !== id));
-                setDeclinedRequests(prev => [{ ...req, status: 'rejected' }, ...prev]);
             }
+            setHistoricalBookings(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
         } catch (e) { console.error(e); }
     };
 
@@ -159,6 +171,7 @@ const ProviderDashboard = () => {
         try {
             await updateDoc(doc(db, 'bookings', job.id), { trackingStatus: status });
             setActiveJobs(prev => prev.map(j => j.id === job.id ? { ...j, trackingStatus: status } : j));
+            setHistoricalBookings(prev => prev.map(j => j.id === job.id ? { ...j, trackingStatus: status } : j));
         } catch (e) { console.error('Tracking update error:', e); }
     };
 
@@ -190,6 +203,7 @@ const ProviderDashboard = () => {
             });
 
             setActiveJobs(prev => prev.filter(j => j.id !== job.id));
+            setHistoricalBookings(prev => prev.map(j => j.id === job.id ? { ...j, status: 'completed' } : j));
 
             // Optimistically update earnings display
             setEarnings(prev => ({
@@ -473,40 +487,59 @@ const ProviderDashboard = () => {
                         </div>
                     </div>
 
-                    {/* EC-009: Declined or Cancelled History */}
-                    {declinedRequests.length > 0 && (
+                    {/* EC-009: Bookings History View */}
+                    {historicalBookings.length > 0 && (
                         <div className="bg-slate-50 border-2 border-slate-100 rounded-3xl p-8 mb-8">
-                            <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                                <CheckCircle className="w-6 h-6 text-slate-400" />
-                                Booking History
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {paginatedHistory.map(job => (
-                                    <div key={job.id} className="bg-white p-5 rounded-box border border-slate-200 opacity-75 hover:opacity-100 transition-opacity">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <div>
-                                                <h4 className="font-bold text-slate-800">{job.service}</h4>
-                                                <p className="text-xs text-slate-500">#{job.id}</p>
-                                                {job.ratingGiven && (
-                                                    <div className="flex items-center gap-1 text-amber-500 mt-1">
-                                                        <Star className="w-3.5 h-3.5 fill-current" />
-                                                        <span className="text-xs font-bold w-full truncate">{job.ratingGiven}.0 Rating</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <span className={`shrink-0 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
-                                                {job.status}
-                                            </span>
-                                        </div>
-                                        <div className="text-sm font-medium text-slate-500 mb-1">
-                                            ₹{job.proposedPrice || job.price || job.amount}
-                                        </div>
-                                        <div className="text-xs text-slate-400 flex items-center gap-1">
-                                            <Calendar className="w-3.5 h-3.5" /> {job.date}
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                                <h3 className="text-xl font-black text-slate-800 flex items-center gap-2">
+                                    <CheckCircle className="w-6 h-6 text-slate-400" />
+                                    Booking History
+                                </h3>
+                                <select
+                                    value={historyFilter}
+                                    onChange={(e) => { setHistoryFilter(e.target.value); setHistoryPage(1); }}
+                                    className="px-4 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 font-bold text-slate-700 outline-none"
+                                >
+                                    <option value="All">All Bookings</option>
+                                    <option value="Pending">Pending & Quotes</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled & Rejected</option>
+                                </select>
                             </div>
+                            {filteredHistory.length === 0 ? (
+                                <div className="text-center py-10 text-slate-500 font-bold border-2 border-dashed border-slate-200 rounded-2xl">
+                                    No bookings found for the selected filter.
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {paginatedHistory.map(job => (
+                                        <div key={job.id} className="bg-white p-5 rounded-box border border-slate-200 opacity-75 hover:opacity-100 transition-opacity">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div>
+                                                    <h4 className="font-bold text-slate-800">{job.service}</h4>
+                                                    <p className="text-xs text-slate-500">#{job.id}</p>
+                                                    {job.ratingGiven && (
+                                                        <div className="flex items-center gap-1 text-amber-500 mt-1">
+                                                            <Star className="w-3.5 h-3.5 fill-current" />
+                                                            <span className="text-xs font-bold w-full truncate">{job.ratingGiven}.0 Rating</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <span className={`shrink-0 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                    {job.status}
+                                                </span>
+                                            </div>
+                                            <div className="text-sm font-medium text-slate-500 mb-1">
+                                                ₹{job.proposedPrice || job.price || job.amount}
+                                            </div>
+                                            <div className="text-xs text-slate-400 flex items-center gap-1">
+                                                <Calendar className="w-3.5 h-3.5" /> {job.date}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                             {totalHistoryPages > 1 && (
                                 <div className="flex justify-center items-center gap-4 mt-8 bg-white p-4 rounded-2xl border border-slate-100 w-fit mx-auto">
                                     <button onClick={() => setHistoryPage(p => Math.max(1, p - 1))} disabled={historyPage === 1} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>

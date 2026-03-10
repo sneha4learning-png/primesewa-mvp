@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+import { useLocation } from 'react-router-dom';
 import TimelineModal from '../../components/TimelineModal';
 
 const ProviderManagement = () => {
+    const location = useLocation();
     const [providers, setProviders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [providerBookings, setProviderBookings] = useState([]);
     const [viewDocumentUrl, setViewDocumentUrl] = useState(null);
@@ -61,6 +64,15 @@ const ProviderManagement = () => {
         }
     };
 
+    useEffect(() => {
+        if (location.state?.searchTerm) {
+            setSearchTerm(location.state.searchTerm);
+        }
+        if (location.state?.status) {
+            setStatusFilter(location.state.status);
+        }
+    }, [location.state]);
+
     const handleViewHistory = async (provider) => {
         setSelectedProvider(provider);
         try {
@@ -77,10 +89,12 @@ const ProviderManagement = () => {
         }
     };
 
-    const filteredProviders = providers.filter(p =>
-        (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (p.category || 'Plumbing').toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredProviders = providers.filter(p => {
+        const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (p.category || '').toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || p.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
 
     // Pagination logic
     const totalPages = Math.ceil(filteredProviders.length / itemsPerPage);
@@ -88,22 +102,35 @@ const ProviderManagement = () => {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm]);
+    }, [searchTerm, statusFilter]);
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             {timelineBooking && <TimelineModal booking={timelineBooking} onClose={() => setTimelineBooking(null)} />}
             <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h2 className="text-xl font-semibold text-gray-800">Provider Fleet</h2>
-                <div className="relative w-full sm:w-72">
-                    <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search providers..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <div className="flex w-full sm:w-auto gap-3">
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-gray-700 bg-white"
+                    >
+                        <option value="All">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="pending">Pending</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <div className="relative w-full sm:w-64">
+                        <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search providers..."
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -139,7 +166,7 @@ const ProviderManagement = () => {
                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
                                             provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                                                 'bg-red-50 text-red-700 border-red-200'}`}>
-                                        {provider.status.charAt(0).toUpperCase() + provider.status.slice(1)}
+                                        {(provider.status || 'pending').charAt(0).toUpperCase() + (provider.status || 'pending').slice(1)}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -202,7 +229,7 @@ const ProviderManagement = () => {
                                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
                                         provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                                             'bg-red-50 text-red-700 border-red-200'}`}>
-                                    {provider.status.charAt(0).toUpperCase() + provider.status.slice(1)}
+                                    {(provider.status || 'pending').charAt(0).toUpperCase() + (provider.status || 'pending').slice(1)}
                                 </span>
                             </div>
                             <div className="flex items-center gap-3 text-xs text-gray-600 flex-wrap">

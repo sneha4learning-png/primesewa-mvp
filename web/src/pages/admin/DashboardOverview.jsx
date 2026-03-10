@@ -190,7 +190,7 @@ const DashboardOverview = () => {
                                     <div className={`absolute left-0 top-0 bottom-0 w-1 ${index === 0 ? 'bg-amber-400' : index === 1 ? 'bg-slate-300' : index === 2 ? 'bg-amber-700' : 'bg-transparent'}`}></div>
                                     <div className="flex items-center gap-4 ml-2">
                                         <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-lg border border-slate-200">
-                                            {p.name.charAt(0).toUpperCase()}
+                                            {(p.name || 'U').charAt(0).toUpperCase()}
                                         </div>
                                         <div>
                                             <p className="font-bold text-slate-900 leading-tight">{p.name}</p>
@@ -251,7 +251,7 @@ const DashboardOverview = () => {
                 {/* Pending Provider Approvals Stub */}
                 <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-between">
-                        Pending Approvals <Link to="/admin/providers" className="text-sm text-blue-600 hover:underline">Review All</Link>
+                        Pending Approvals <Link to="/admin/providers" state={{ status: 'pending' }} className="text-sm text-blue-600 hover:underline">Review All</Link>
                     </h3>
                     {pendingProviders.length > 0 ? (
                         <div className="space-y-4">
@@ -259,14 +259,14 @@ const DashboardOverview = () => {
                                 <div key={p.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-                                            {p.name.charAt(0)}
+                                            {(p.name || 'U').charAt(0)}
                                         </div>
                                         <div>
                                             <p className="font-semibold text-gray-900">{p.name}</p>
                                             <p className="text-xs text-gray-500">{(p.category || 'No Category')} • {p.phone}</p>
                                         </div>
                                     </div>
-                                    <Link to="/admin/providers" className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-medium text-sm rounded-lg transition-colors">
+                                    <Link to="/admin/providers" state={{ searchTerm: p.name }} className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-medium text-sm rounded-lg transition-colors">
                                         Review
                                     </Link>
                                 </div>

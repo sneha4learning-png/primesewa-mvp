@@ -156,7 +156,6 @@ const BookingMonitoring = () => {
                     <table className="hidden lg:table w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
-                                <th className="px-3 py-4 font-medium">Booking ID</th>
                                 <th className="px-3 py-4 font-medium">Date & Service</th>
                                 <th className="px-3 py-4 font-medium">Customer</th>
                                 <th className="px-3 py-4 font-medium">Provider</th>
@@ -168,7 +167,6 @@ const BookingMonitoring = () => {
                         <tbody className="divide-y divide-gray-100">
                             {paginatedBookings.map(booking => (
                                 <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{booking.id}</td>
                                     <td className="px-3 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{booking.service}</div>
                                         <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
@@ -201,8 +199,7 @@ const BookingMonitoring = () => {
                     <div className="lg:hidden divide-y divide-gray-100">
                         {paginatedBookings.map(booking => (
                             <div key={booking.id} className="p-4 space-y-3">
-                                <div className="flex justify-between items-start">
-                                    <span className="text-xs font-bold text-gray-500 tracking-wider">#{booking.id.slice(0, 8)}</span>
+                                <div className="flex justify-end items-start mb-2">
                                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(booking.status)}`}>
                                         {booking.status}
                                     </span>

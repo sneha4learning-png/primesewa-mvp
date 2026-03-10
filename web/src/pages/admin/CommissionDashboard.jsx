@@ -157,7 +157,6 @@ const CommissionDashboard = () => {
                     <table className="hidden md:table w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
-                                <th className="px-6 py-4 font-medium">Booking ID</th>
                                 <th className="px-6 py-4 font-medium">Date</th>
                                 <th className="px-6 py-4 font-medium">Service</th>
                                 <th className="px-6 py-4 font-medium">Provider</th>
@@ -168,9 +167,8 @@ const CommissionDashboard = () => {
                         <tbody className="divide-y divide-gray-100">
                             {paginatedRecords.map(c => (
                                 <tr key={c.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4 text-sm text-blue-600 font-mono">{c.bookingId?.slice(0, 12)}…</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{c.date}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-700">{c.service || '—'}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-700 font-medium">{c.service || '—'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{c.provider}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 text-right">₹{c.amount}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 text-right">+ ₹{c.commission}</td>
@@ -190,8 +188,7 @@ const CommissionDashboard = () => {
                     <div className="md:hidden divide-y divide-gray-100">
                         {paginatedRecords.map(c => (
                             <div key={c.id} className="p-4 space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{c.bookingId?.slice(0, 10)}…</span>
+                                <div className="flex items-center justify-end mb-2">
                                     <span className="text-xs text-gray-500">{c.date}</span>
                                 </div>
                                 <div className="flex items-start justify-between gap-2">
