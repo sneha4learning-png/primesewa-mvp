@@ -33,7 +33,7 @@ const ProviderEarnings = () => {
 
                     myCommissions.push({
                         id: b.id,
-                        bookingId: b.id,
+                        customer: b.customer || b.userName || 'Unknown Customer',
                         provider: b.provider,
                         amount: amount,
                         commission: parseFloat((amount * 0.15).toFixed(2)),
@@ -98,7 +98,7 @@ const ProviderEarnings = () => {
                             <thead>
                                 <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
                                     <th className="px-6 py-4 font-medium">Date</th>
-                                    <th className="px-6 py-4 font-medium">Job ID</th>
+                                    <th className="px-6 py-4 font-medium">Customer Name</th>
                                     <th className="px-6 py-4 font-medium text-right">Job Total</th>
                                     <th className="px-6 py-4 font-medium text-right text-rose-600">Platform Fee</th>
                                     <th className="px-6 py-4 font-medium text-right text-emerald-600">Your Net Earnings</th>
@@ -110,8 +110,8 @@ const ProviderEarnings = () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 flex items-center gap-2">
                                             <CalendarDays className="w-4 h-4 text-gray-400" /> {new Date(log.date).toLocaleDateString()}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
-                                            #{log.bookingId}
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-700">
+                                            {log.customer}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                                             ₹{log.amount}
