@@ -23,7 +23,8 @@ To provide a seamless, real-time marketplace for home services (Plumbing, Electr
 
 ### 3.1 Customer Module
 *   **Discovery**: Browse services by category (Plumbing, Repair, etc.) with real-time filtering and star-rating sorting.
-*   **Booking Engine**: One-click booking flow that prevents duplicate requests and captures specific job details (address, time, issues).
+*   **Location Intelligence**: Integrated **OpenStreetMap Nominatim** for free address autocomplete and HTML5 Geolocation for one-tap current location capture.
+*   **Booking Engine**: One-click booking flow with **Guest Persistence** (remembers details via `sessionStorage` during login redirection). Captures specific **House/Flat numbers** to ensure provider clarity.
 *   **Live Tracker**: A visual "journey" interface that updates as the provider transitions from `Accepted` → `On the Way` → `Arrived`.
 *   **Rating System**: Post-job feedback loop that directly calculates and updates the provider's reputation.
 
