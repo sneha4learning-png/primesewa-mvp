@@ -69,6 +69,9 @@ const CustomerHome = () => {
     const [loadingData, setLoadingData] = useState(true);
     const [isLocating, setIsLocating] = useState(false);
     const [locationCoords, setLocationCoords] = useState(null);
+    const [addressSuggestions, setAddressSuggestions] = useState([]);
+    const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+    const [addressSearchTimeout, setAddressSearchTimeout] = useState(null);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const serviceImages = [
@@ -192,6 +195,40 @@ const CustomerHome = () => {
             }
         }
     }, [userData]);
+
+    const handleAddressTyping = (e) => {
+        const val = e.target.value;
+        setBookingAddress(val);
+
+        if (addressSearchTimeout) clearTimeout(addressSearchTimeout);
+
+        if (val.trim().length < 4) {
+            setAddressSuggestions([]);
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            setIsSearchingAddress(true);
+            try {
+                // Free OpenStreetMap Nominatim request
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&addressdetails=1&limit=5&countrycodes=in`;
+                const res = await fetch(url);
+                const data = await res.json();
+                setAddressSuggestions(data || []);
+            } catch (err) {
+                console.error("Nominatim search failed", err);
+            } finally {
+                setIsSearchingAddress(false);
+            }
+        }, 600);
+        setAddressSearchTimeout(timeoutId);
+    };
+
+    const handleSelectSuggestion = (place) => {
+        setBookingAddress(place.display_name);
+        setLocationCoords({ lat: parseFloat(place.lat), lng: parseFloat(place.lon) });
+        setAddressSuggestions([]);
+    };
 
     const handleGetLocation = () => {
         if (!navigator.geolocation) {
@@ -560,7 +597,32 @@ const CustomerHome = () => {
                                     {isLocating ? 'Locating...' : 'Use Current Location'}
                                 </button>
                             </div>
-                            <input required type="text" value={bookingAddress} onChange={(e) => setBookingAddress(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., 404 Safal Profitaire, Corporate Road, Prahladnagar, Ahmedabad" />
+                            <div className="relative">
+                                <input required type="text" value={bookingAddress} onChange={handleAddressTyping} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., 404 Safal Profitaire, Corporate Road, Prahladnagar, Ahmedabad" />
+                                {isSearchingAddress && (
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                        <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                                    </div>
+                                )}
+                                {addressSuggestions.length > 0 && (
+                                    <ul className="absolute z-50 w-full bg-white border border-slate-200 rounded-2xl mt-2 shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+                                        {addressSuggestions.map((place, i) => (
+                                            <li key={i}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSelectSuggestion(place)}
+                                                    className="w-full text-left px-5 py-4 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                                                        <span className="text-sm font-medium text-slate-700 line-clamp-2">{place.display_name}</span>
+                                                    </div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
                         </div>
 
                         <div>
