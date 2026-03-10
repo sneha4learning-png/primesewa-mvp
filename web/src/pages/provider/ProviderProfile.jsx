@@ -188,7 +188,30 @@ const ProviderProfile = () => {
                     </div>
 
                     <div className="mt-8 pt-6 border-t border-gray-100">
-                        <p className="text-sm text-gray-500 text-center">To update these details, please contact platform support.</p>
+                        <div className="bg-slate-50 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-200 shadow-inner group">
+                            <div className="flex items-center gap-4 text-center sm:text-left">
+                                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm group-hover:scale-110 transition-transform">
+                                    <UserCircle className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-black text-slate-900">Personal Account</h4>
+                                    <p className="text-[11px] text-slate-500 font-medium">Switch to the customer view to book services.</p>
+                                </div>
+                            </div>
+                            <a
+                                href="/login"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full sm:w-auto px-6 py-2.5 bg-white hover:bg-slate-900 hover:text-white text-slate-900 border border-slate-200 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md"
+                            >
+                                Open Customer Portal
+                                <UserCircle className="w-3.5 h-3.5" />
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                        <p className="text-sm text-gray-500 text-center italic">To update your professional details, please contact platform support.</p>
                     </div>
                 </div>
             </div>
