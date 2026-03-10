@@ -267,7 +267,7 @@ const CustomerHome = () => {
         e.preventDefault();
 
         // If guest user clicks "Confirm Request", save their details and send them to login
-        if (!userData || !userData.uid || userData.uid === 'mock-cust' || userData.uid.startsWith('dev-')) {
+        if (!userData || !userData.uid || userData.uid === 'mock-cust') {
             sessionStorage.setItem('pendingCustomerBooking', JSON.stringify({
                 pendingBookingData,
                 bookingDate,
