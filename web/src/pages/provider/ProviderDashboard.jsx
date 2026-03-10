@@ -275,11 +275,18 @@ const ProviderDashboard = () => {
                                 <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50 p-4 rounded-2xl">
                                     <div className="flex items-start gap-3">
                                         <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
-                                        <div className="flex flex-col">
-                                            {job.houseNo && <span className="font-black text-slate-900 border-b border-slate-100 pb-1 mb-1">{job.houseNo}</span>}
-                                            <span className="text-slate-600">{job.address}</span>
+                                        <div className="flex flex-col w-full">
+                                            {job.houseNo ? (
+                                                <div className="bg-slate-100 px-3 py-1 rounded-lg mb-2 border-l-4 border-indigo-500">
+                                                    <span className="text-[10px] uppercase font-black text-slate-400 block tracking-widest">Door / Flat No</span>
+                                                    <span className="font-black text-slate-900 text-sm">{job.houseNo}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="text-[10px] font-bold text-amber-600 mb-1">⚠️ No house number</div>
+                                            )}
+                                            <span className="text-slate-600 text-sm leading-relaxed">{job.address}</span>
                                             {job.location && (
-                                                <a href={`https://www.google.com/maps?q=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-1 flex items-center gap-1">
+                                                <a href={`https://www.google.com/maps?q=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-2 flex items-center gap-1">
                                                     <Navigation className="w-3 h-3" /> Get Directions
                                                 </a>
                                             )}
@@ -380,11 +387,19 @@ const ProviderDashboard = () => {
                                     <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50/80 p-4 rounded-2xl border border-slate-100/50">
                                         <div className="flex items-start gap-3">
                                             <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
-                                            <div className="flex flex-col">
-                                                {req.houseNo && <span className="font-black text-slate-900 border-b border-indigo-50 pb-1 mb-1">{req.houseNo}</span>}
-                                                <span className="text-slate-600">{req.address}</span>
+                                            <div className="flex flex-col w-full">
+                                                {/* Doorstep detail shown prominently */}
+                                                {(req.houseNo || req.house) ? (
+                                                    <div className="bg-slate-100 px-3 py-1 rounded-lg mb-2 border-l-4 border-indigo-500">
+                                                        <span className="text-[10px] uppercase font-black text-slate-400 block tracking-widest">Door / Flat No</span>
+                                                        <span className="font-black text-slate-900 text-sm">{req.houseNo || req.house}</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-[10px] font-bold text-amber-600 mb-1">⚠️ No house number provided</div>
+                                                )}
+                                                <span className="text-slate-600 text-sm leading-relaxed">{req.address}</span>
                                                 {req.location && (
-                                                    <a href={`https://www.google.com/maps?q=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-1 flex items-center gap-1">
+                                                    <a href={`https://www.google.com/maps?q=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-2 flex items-center gap-1">
                                                         <Navigation className="w-3 h-3" /> View on Map
                                                     </a>
                                                 )}
@@ -512,9 +527,19 @@ const ProviderDashboard = () => {
                                     <div className="text-sm font-medium text-slate-500 mb-1">
                                         ₹{job.proposedPrice || job.price || job.amount}
                                     </div>
-                                    <div className="text-xs text-slate-500 font-medium mb-2 border-t border-slate-50 pt-2 flex items-start gap-1">
-                                        <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-slate-400" />
-                                        <span className="line-clamp-2">{job.address || 'Ahmedabad'}</span>
+                                    <div className="text-xs text-slate-500 font-medium mb-2 border-t border-slate-50 pt-2 flex flex-col gap-1">
+                                        <div className="flex items-start gap-1">
+                                            <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-slate-400" />
+                                            <div className="flex flex-col w-full">
+                                                {job.houseNo ? (
+                                                    <div className="bg-slate-50 px-2 py-0.5 rounded border-l-2 border-slate-400 mb-1">
+                                                        <span className="text-[9px] uppercase font-bold text-slate-400 block tracking-tight">House No</span>
+                                                        <span className="font-bold text-slate-800 text-xs">{job.houseNo}</span>
+                                                    </div>
+                                                ) : null}
+                                                <span className="line-clamp-2 text-slate-500 leading-tight">{job.address || 'Ahmedabad'}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="text-xs text-slate-400 flex items-center gap-1">
                                         <Calendar className="w-3.5 h-3.5" /> {job.date}
