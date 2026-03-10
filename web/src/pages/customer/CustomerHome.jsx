@@ -99,8 +99,7 @@ const CustomerHome = () => {
 
         // 1. Listen to online providers — runs for ALL users (guests AND logged-in)
         const activeOnlineQuery = query(
-            collection(db, 'providers'),
-            where('isOnline', '==', true)
+            collection(db, 'providers')
         );
 
         const unsubscribeProviders = onSnapshot(activeOnlineQuery, (snapshot) => {
@@ -120,7 +119,8 @@ const CustomerHome = () => {
                 }
             });
 
-            setMockProviders(Array.from(uniqueProvidersMap.values()));
+            const finalOnlineProviders = Array.from(uniqueProvidersMap.values()).filter(p => p.isOnline === true);
+            setMockProviders(finalOnlineProviders);
             setLoadingData(false);
             setDbError(false);
         }, (err) => {
