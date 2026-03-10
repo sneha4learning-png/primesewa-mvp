@@ -59,6 +59,7 @@ const CustomerHome = () => {
     const [bookingDate, setBookingDate] = useState('');
     const [bookingTime, setBookingTime] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
+    const [bookingAddress, setBookingAddress] = useState('');
     const [timeError, setTimeError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(5);
@@ -179,6 +180,7 @@ const CustomerHome = () => {
         setBookingDate('');
         setBookingTime('');
         setBookingDesc('');
+        setBookingAddress('');
         setTimeError('');
         setSelectedProviderProfile(null);
         setBookingStep(1);
@@ -217,6 +219,7 @@ const CustomerHome = () => {
             date: bookingDate,
             time: bookingTime,
             description: bookingDesc,
+            address: bookingAddress,
             createdAt: serverTimestamp()
         };
 
@@ -400,6 +403,12 @@ const CustomerHome = () => {
                                 )}
                             </div>
                         </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Service Address *</label>
+                            <input required type="text" value={bookingAddress} onChange={(e) => setBookingAddress(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., 404 Safal Profitaire, Corporate Road, Prahladnagar, Ahmedabad" />
+                        </div>
+
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Issue Description (Optional)</label>
                             <input type="text" value={bookingDesc} onChange={(e) => setBookingDesc(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., Fan regulator is not working" />
