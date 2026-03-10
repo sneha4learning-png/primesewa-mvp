@@ -103,6 +103,15 @@ const ProviderDashboard = () => {
         };
     }, [userData, currentUser]);
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return 'N/A';
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
     // Pagination logic
     const paginatedActive = activeJobs.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
     const paginatedRequests = requests.slice((requestPage - 1) * itemsPerPage, requestPage * itemsPerPage);
@@ -303,7 +312,7 @@ const ProviderDashboard = () => {
                                         </a>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{job.time}</span>
+                                        <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{formatTime(job.time)}</span>
                                     </div>
                                 </div>
                                 {/* Live Tracker Status Buttons */}
@@ -406,7 +415,7 @@ const ProviderDashboard = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{req.time}</span>
+                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{formatTime(req.time)}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Phone className="w-4 h-4 text-slate-400 shrink-0" />

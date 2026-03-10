@@ -44,6 +44,15 @@ const BookingMonitoring = () => {
         return () => unsubscribe();
     }, []);
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return '';
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
     const filteredBookings = bookings.filter(b => {
         const matchesStatus = filterStatus === 'All' || b.status === filterStatus.toLowerCase();
         const matchesCategory = filterCategory === 'All' || (b.service || '').toLowerCase().includes(filterCategory.toLowerCase());
@@ -170,7 +179,7 @@ const BookingMonitoring = () => {
                                     <td className="px-3 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{booking.service}</div>
                                         <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                                            <Calendar className="w-3 h-3" /> {booking.date}
+                                            <Calendar className="w-3 h-3" /> {booking.date} {booking.time && `at ${formatTime(booking.time)}`}
                                         </div>
                                     </td>
                                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.customer || 'Unknown'}</td>
@@ -207,7 +216,7 @@ const BookingMonitoring = () => {
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <div className="text-sm font-bold text-gray-900">{booking.service}</div>
-                                        <div className="text-xs text-gray-500">{booking.date} • ₹{booking.proposedPrice || booking.price}</div>
+                                        <div className="text-xs text-gray-500">{booking.date} at {formatTime(booking.time)} • ₹{booking.proposedPrice || booking.price}</div>
                                     </div>
                                     <button
                                         onClick={() => setTimelineBooking(booking)}

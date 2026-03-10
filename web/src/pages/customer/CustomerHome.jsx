@@ -98,6 +98,15 @@ const CustomerHome = () => {
 
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return 'N/A';
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
     useEffect(() => {
         setLoadingData(true);
 
@@ -815,7 +824,7 @@ const CustomerHome = () => {
                                                             <span className="font-black text-slate-900">{b.service}</span>
                                                             <span className={`px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest ${b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>{b.status}</span>
                                                         </div>
-                                                        <p className="text-sm font-medium text-slate-500 mb-2">{b.date} at {b.time}</p>
+                                                        <p className="text-sm font-medium text-slate-500 mb-2">{b.date} at {formatTime(b.time)}</p>
                                                         {b.description && (
                                                             <div className="bg-slate-50/80 p-2.5 rounded-xl mb-4 border border-slate-100/50">
                                                                 <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-1">Stated Issue</p>

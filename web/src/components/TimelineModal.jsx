@@ -2,14 +2,24 @@ import { X, Clock, CheckCircle2, XCircle } from 'lucide-react';
 
 const TimelineModal = ({ booking, onClose }) => {
     if (!booking) return null;
+
+    const formatTime = (timeStr) => {
+        if (!timeStr) return '';
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
     const isFailed = ['rejected', 'cancelled'].includes(booking.status);
 
     const steps = [
-        { label: 'Booking Created', status: 'done', time: booking.date ? `${booking.date} ${booking.time || ''}` : 'N/A' },
-        { label: 'Provider Assigned', status: booking.status !== 'pending' ? 'done' : 'pending', time: booking.status !== 'pending' ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : 'Awaiting Assignment' },
-        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? (isFailed && booking.status === 'rejected' ? 'failed' : 'done') : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice} • ${booking.date} ${booking.time || ''}` : 'No negotiation needed' },
-        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (isFailed ? 'failed' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip')), time: ['accepted', 'completed'].includes(booking.status) ? `${booking.provider} • ${booking.date} ${booking.time || ''}` : (isFailed ? 'Declined/Cancelled' : 'Awaiting acceptance') },
-        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : (isFailed ? 'skip' : 'pending'), time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price} • ${booking.date} ${booking.time || ''}` : 'Pending completion' },
+        { label: 'Booking Created', status: 'done', time: booking.date ? `${booking.date} ${formatTime(booking.time)}` : 'N/A' },
+        { label: 'Provider Assigned', status: booking.status !== 'pending' ? 'done' : 'pending', time: booking.status !== 'pending' ? `${booking.provider} • ${booking.date} ${formatTime(booking.time)}` : 'Awaiting Assignment' },
+        { label: 'Negotiation', status: booking.status === 'negotiating' ? 'active' : (booking.proposedPrice ? (isFailed && booking.status === 'rejected' ? 'failed' : 'done') : 'skip'), time: booking.proposedPrice ? `Agreed ₹${booking.proposedPrice} • ${booking.date} ${formatTime(booking.time)}` : 'No negotiation needed' },
+        { label: 'Job Accepted', status: ['accepted', 'completed'].includes(booking.status) ? 'done' : (isFailed ? 'failed' : (booking.status === 'pending' || booking.status === 'negotiating' ? 'pending' : 'skip')), time: ['accepted', 'completed'].includes(booking.status) ? `${booking.provider} • ${booking.date} ${formatTime(booking.time)}` : (isFailed ? 'Declined/Cancelled' : 'Awaiting acceptance') },
+        { label: 'Job Completed', status: booking.status === 'completed' ? 'done' : (isFailed ? 'skip' : 'pending'), time: booking.status === 'completed' ? `₹${booking.proposedPrice || booking.price} • ${booking.date} ${formatTime(booking.time)}` : 'Pending completion' },
     ];
 
     return (
