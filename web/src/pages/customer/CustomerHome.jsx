@@ -350,9 +350,24 @@ const CustomerHome = () => {
 
                     {pendingBookingData?.previousWorkSample && (
                         <div className="mb-8">
-                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Provider's Previous Work</label>
-                            <div className="rounded-2xl overflow-hidden h-48 border border-slate-200 shadow-inner">
-                                <img src={pendingBookingData.previousWorkSample} alt="Previous Work Sample" className="w-full h-full object-cover" />
+                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider flex items-center gap-2">
+                                <ShieldCheck className="w-4 h-4 text-blue-500" />
+                                Provider's Previous Work
+                            </label>
+                            <div className="rounded-2xl overflow-hidden h-40 border border-slate-200 shadow-sm relative group">
+                                <img
+                                    src={pendingBookingData.previousWorkSample}
+                                    alt="Previous Work Sample"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    onError={(e) => {
+                                        // Fallback to a clean placeholder if the provider's link (like imgur) is broken
+                                        e.target.onerror = null;
+                                        e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
+                                    }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                    <span className="text-white font-medium text-sm drop-shadow-md">Verified Work Sample</span>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -636,13 +651,23 @@ const CustomerHome = () => {
                                             {(b.status === 'accepted' || b.status === 'pending') && (
                                                 <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2">
                                                     {b.status === 'accepted' && (
-                                                        <a
-                                                            href={`tel:${b.providerPhone || b.phone || ''}`}
-                                                            onClick={(e) => { e.stopPropagation(); if (!b.providerPhone && !b.phone) { e.preventDefault(); alert("Provider phone number is not available."); } }}
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (!userData?.uid) {
+                                                                    navigate('/login');
+                                                                    return;
+                                                                }
+                                                                if (!b.providerPhone && !b.phone) {
+                                                                    alert("Provider phone number is not available.");
+                                                                    return;
+                                                                }
+                                                                window.location.href = `tel:${b.providerPhone || b.phone}`;
+                                                            }}
                                                             className="flex-1 py-1.5 flex items-center justify-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 font-bold rounded-xl text-xs transition-colors border border-green-100"
                                                         >
                                                             <Phone className="w-3.5 h-3.5" /> Call Provider
-                                                        </a>
+                                                        </button>
                                                     )}
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); handleCancelBooking(b.id); }}
@@ -796,9 +821,22 @@ const CustomerHome = () => {
                                         {initial}
                                     </div>
                                     <div className="flex flex-col gap-2 mb-2 items-end">
-                                        <a href={`tel:${p.phone || ''}`} onClick={e => { if (!p.phone) { e.preventDefault(); alert('Phone number not available'); } }} className="px-8 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl border border-green-200 hover:bg-green-100 transition-all shadow-sm flex items-center justify-center gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                if (!userData?.uid) {
+                                                    navigate('/login');
+                                                    return;
+                                                }
+                                                if (!p.phone) {
+                                                    alert('Phone number not available');
+                                                    return;
+                                                }
+                                                window.location.href = `tel:${p.phone}`;
+                                            }}
+                                            className="px-8 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl border border-green-200 hover:bg-green-100 transition-all shadow-sm flex items-center justify-center gap-2"
+                                        >
                                             <Phone className="w-4 h-4" /> Call Pro
-                                        </a>
+                                        </button>
                                         <button onClick={() => handleBook(p)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-all">
                                             Book This Pro
                                         </button>
