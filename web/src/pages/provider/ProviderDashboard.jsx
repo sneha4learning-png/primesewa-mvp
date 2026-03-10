@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Naviga
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
-import { collection, doc, updateDoc, addDoc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { collection, doc, updateDoc, addDoc, query, where, serverTimestamp, onSnapshot, increment, getDocs } from 'firebase/firestore';
 
 const ProviderDashboard = () => {
     const { currentUser, userData } = useAuth();
@@ -184,6 +184,26 @@ const ProviderDashboard = () => {
                 completedAt: serverTimestamp(),
                 price: finalPrice
             });
+
+            // Increment the provider's job counter in the providers collection
+            if (userData?.uid) {
+                const providerRef = doc(db, 'providers', userData.uid);
+                await updateDoc(providerRef, {
+                    jobs: increment(1)
+                });
+            } else {
+                // Fallback for sessions where UID might not be in userData (rare)
+                const provName = job.provider || userData?.name;
+                if (provName) {
+                    const q = query(collection(db, 'providers'), where('name', '==', provName));
+                    const qSnap = await getDocs(q);
+                    if (!qSnap.empty) {
+                        await updateDoc(doc(db, 'providers', qSnap.docs[0].id), {
+                            jobs: increment(1)
+                        });
+                    }
+                }
+            }
 
             // BUG-5: Write commission record to Firestore so Admin commission page shows data
             await addDoc(collection(db, 'commissions'), {

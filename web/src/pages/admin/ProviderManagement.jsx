@@ -41,7 +41,7 @@ const ProviderManagement = () => {
                     fetched.push({
                         id: doc.id,
                         ...data,
-                        jobs: Math.min(actualCompleted, 5) // Cap at 5 for display as per requirement
+                        jobs: actualCompleted
                     });
                 });
                 setProviders(fetched);

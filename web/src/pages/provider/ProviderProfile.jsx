@@ -100,7 +100,7 @@ const ProviderProfile = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500 font-medium">Jobs Completed</p>
-                                        <p className="font-bold text-gray-900">{Math.min(profile.jobs || 0, 5)} Jobs</p>
+                                        <p className="font-bold text-gray-900">{profile.jobs || 0} Jobs</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
