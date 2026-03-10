@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X, Wrench } from 'lucide-react';
+import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X, Wrench, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -11,6 +11,7 @@ const ProviderLayout = () => {
     const [providerId, setProviderId] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [statusUpdating, setStatusUpdating] = useState(false);
+    const [providerStatus, setProviderStatus] = useState('pending');
 
     const handleLogout = async () => {
         await logout();
@@ -23,7 +24,9 @@ const ProviderLayout = () => {
                 try {
                     const docSnap = await getDoc(doc(db, 'providers', userData.uid));
                     if (docSnap.exists()) {
-                        setIsOnline(docSnap.data().isOnline || false);
+                        const dat = docSnap.data();
+                        setIsOnline(dat.isOnline || false);
+                        setProviderStatus(dat.status || 'pending');
                         setProviderId(userData.uid);
                     }
                 } catch (e) {
@@ -73,11 +76,20 @@ const ProviderLayout = () => {
                 </button>
             </div>
             <nav className="flex-1 overflow-y-auto py-8">
-                <ul className="space-y-2 px-4 relative z-10">
-                    <li><NavLink to="/provider" end className={navLinkClass} onClick={() => setSidebarOpen(false)}><Briefcase className="w-5 h-5" /> Service Requests</NavLink></li>
-                    <li><NavLink to="/provider/earnings" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Earnings Center</NavLink></li>
-                    <li><NavLink to="/provider/profile" className={navLinkClass} onClick={() => setSidebarOpen(false)}><UserCircle className="w-5 h-5" /> My Profile</NavLink></li>
-                </ul>
+                {providerStatus === 'active' ? (
+                    <ul className="space-y-2 px-4 relative z-10">
+                        <li><NavLink to="/provider" end className={navLinkClass} onClick={() => setSidebarOpen(false)}><Briefcase className="w-5 h-5" /> Service Requests</NavLink></li>
+                        <li><NavLink to="/provider/earnings" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Earnings Center</NavLink></li>
+                        <li><NavLink to="/provider/profile" className={navLinkClass} onClick={() => setSidebarOpen(false)}><UserCircle className="w-5 h-5" /> My Profile</NavLink></li>
+                    </ul>
+                ) : (
+                    <div className="px-6 py-10 text-center">
+                        <div className="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <UserCircle className="w-6 h-6 text-indigo-400" />
+                        </div>
+                        <p className="text-sm font-medium text-slate-400">Navigation is locked until your account is approved.</p>
+                    </div>
+                )}
             </nav>
             <div className="p-4 border-t border-white/10 relative z-10 space-y-3">
                 <Link to="/" className="flex items-center justify-center gap-3 px-4 py-3 w-full text-indigo-300 font-bold rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 shadow-inner transition-all duration-300">
@@ -122,13 +134,15 @@ const ProviderLayout = () => {
                         )}
                     </div>
                     <div className="flex items-center gap-3 lg:gap-5">
-                        <button
-                            onClick={toggleOnlineStatus}
-                            className={`relative inline-flex h-7 w-14 lg:h-8 lg:w-16 items-center rounded-full transition-colors focus:outline-none ${isOnline ? 'bg-emerald-500' : 'bg-slate-300'}`}
-                        >
-                            <span className="sr-only">Toggle Online Status</span>
-                            <span className={`inline-block h-5 w-5 lg:h-6 lg:w-6 transform rounded-full bg-white transition-transform ${isOnline ? 'translate-x-8 lg:translate-x-9' : 'translate-x-1'}`} />
-                        </button>
+                        {providerStatus === 'active' && (
+                            <button
+                                onClick={toggleOnlineStatus}
+                                className={`relative inline-flex h-7 w-14 lg:h-8 lg:w-16 items-center rounded-full transition-colors focus:outline-none ${isOnline ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                            >
+                                <span className="sr-only">Toggle Online Status</span>
+                                <span className={`inline-block h-5 w-5 lg:h-6 lg:w-6 transform rounded-full bg-white transition-transform ${isOnline ? 'translate-x-8 lg:translate-x-9' : 'translate-x-1'}`} />
+                            </button>
+                        )}
                         <div className="hidden sm:flex flex-col text-right">
                             <span className="text-sm font-bold text-slate-900">Partner Status</span>
                             <span className={`text-xs font-bold flex items-center gap-1.5 justify-end ${isOnline ? 'text-emerald-600' : 'text-slate-500'}`}>
@@ -145,7 +159,39 @@ const ProviderLayout = () => {
                     </div>
                 </header>
                 <div className="flex-1 overflow-y-auto p-4 lg:p-10 relative">
-                    <Outlet />
+                    {providerStatus === 'pending' ? (
+                        <div className="max-w-3xl mx-auto bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-2xl shadow-sm flex items-start gap-4 mt-8">
+                            <AlertTriangle className="w-8 h-8 text-amber-500 shrink-0" />
+                            <div>
+                                <h3 className="text-xl text-amber-800 font-bold mb-2">Account Pending Approval</h3>
+                                <p className="text-amber-700 font-medium">
+                                    Your application is currently being reviewed by our team. You will not receive any service requests until your account is approved.
+                                </p>
+                            </div>
+                        </div>
+                    ) : providerStatus === 'suspended' ? (
+                        <div className="max-w-3xl mx-auto bg-red-50 border-l-4 border-red-500 p-6 rounded-r-2xl shadow-sm flex items-start gap-4 mt-8">
+                            <AlertTriangle className="w-8 h-8 text-red-500 shrink-0" />
+                            <div>
+                                <h3 className="text-xl text-red-800 font-bold mb-2">Account Suspended</h3>
+                                <p className="text-red-700 font-medium">
+                                    Your account has been suspended by the administrator. Please contact support for more information.
+                                </p>
+                            </div>
+                        </div>
+                    ) : providerStatus === 'rejected' ? (
+                        <div className="max-w-3xl mx-auto bg-rose-50 border-l-4 border-rose-500 p-6 rounded-r-2xl shadow-sm flex items-start gap-4 mt-8">
+                            <AlertTriangle className="w-8 h-8 text-rose-500 shrink-0" />
+                            <div>
+                                <h3 className="text-xl text-rose-800 font-bold mb-2">Account Rejected</h3>
+                                <p className="text-rose-700 font-medium">
+                                    Your application was rejected. Please contact support if you believe this is an error.
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <Outlet />
+                    )}
                 </div>
             </main>
         </div>
