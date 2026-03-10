@@ -231,12 +231,12 @@ const ProviderLogin = () => {
                 {serviceImages.map((img, idx) => (
                     <div
                         key={idx}
-                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-40' : 'opacity-0'}`}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-60' : 'opacity-0'}`}
                     >
                         <img src={img} alt="Background" className="w-full h-full object-cover" />
                     </div>
                 ))}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/60 via-[#0B0F19]/80 to-[#0B0F19] backdrop-blur-[2px]"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/50 via-[#0B0F19]/70 to-[#0B0F19]/95"></div>
             </div>
 
             <div className="max-w-md w-full bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 p-6 md:p-8 text-white relative z-10">

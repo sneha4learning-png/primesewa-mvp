@@ -51,13 +51,13 @@ const AdminLogin = () => {
                 {serviceImages.map((img, idx) => (
                     <div
                         key={idx}
-                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-30' : 'opacity-0'}`}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-60' : 'opacity-0'}`}
                     >
                         <img src={img} alt="Service" className="w-full h-full object-cover" />
                     </div>
                 ))}
-                {/* Dark gradient overlay with slight warm tint for admin feel */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/70 via-[#0B0F19]/85 to-[#0B0F19] backdrop-blur-[2px]"></div>
+                {/* Dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/50 via-[#0B0F19]/70 to-[#0B0F19]/95"></div>
                 {/* Subtle red/orange accent for admin authority */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-red-950/20 via-transparent to-blue-950/20"></div>
             </div>
@@ -135,8 +135,8 @@ const AdminLogin = () => {
                             type="submit"
                             disabled={loading}
                             className={`w-full py-4 rounded-2xl font-black text-white transition-all flex items-center justify-center gap-2 mt-2 group ${loading
-                                    ? 'bg-red-700/50 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 shadow-xl shadow-red-900/30 hover:-translate-y-0.5'
+                                ? 'bg-red-700/50 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 shadow-xl shadow-red-900/30 hover:-translate-y-0.5'
                                 }`}
                         >
                             {loading ? 'Authenticating...' : (
