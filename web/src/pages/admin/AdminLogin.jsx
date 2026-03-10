@@ -58,8 +58,8 @@ const AdminLogin = () => {
                 ))}
                 {/* Dark gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/50 via-[#0B0F19]/70 to-[#0B0F19]/95"></div>
-                {/* Subtle red/orange accent for admin authority */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-red-950/20 via-transparent to-blue-950/20"></div>
+                {/* Subtle blue/indigo accent for admin authority */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-950/20 via-transparent to-blue-950/20"></div>
             </div>
 
             {/* Dot indicators */}
@@ -68,7 +68,7 @@ const AdminLogin = () => {
                     <button
                         key={idx}
                         onClick={() => setCurrentImageIndex(idx)}
-                        className={`transition-all duration-300 rounded-full ${idx === currentImageIndex ? 'w-8 h-2 bg-red-400' : 'w-2 h-2 bg-white/20 hover:bg-white/40'}`}
+                        className={`transition-all duration-300 rounded-full ${idx === currentImageIndex ? 'w-8 h-2 bg-indigo-400' : 'w-2 h-2 bg-white/20 hover:bg-white/40'}`}
                     />
                 ))}
             </div>
@@ -84,16 +84,16 @@ const AdminLogin = () => {
             <div className="relative z-10 max-w-md w-full">
                 {/* Admin badge */}
                 <div className="flex justify-center mb-6">
-                    <div className="flex items-center gap-2 px-4 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full">
-                        <ShieldCheck className="w-3.5 h-3.5 text-red-400" />
-                        <span className="text-xs font-black text-red-400 uppercase tracking-widest">Admin Access</span>
+                    <div className="flex items-center gap-2 px-4 py-1.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full">
+                        <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+                        <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Admin Access</span>
                     </div>
                 </div>
 
                 <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 p-8 text-white">
                     <div className="text-center mb-8">
                         <div className="flex flex-col items-center justify-center mb-5">
-                            <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-orange-600 rounded-2xl flex items-center justify-center mb-4 shadow-xl shadow-red-900/40">
+                            <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-xl shadow-indigo-900/40">
                                 <img
                                     src="/logo-v2.png"
                                     alt="PrimeSewa"
@@ -102,7 +102,7 @@ const AdminLogin = () => {
                                 />
                             </div>
                             <span className="text-3xl font-black text-white tracking-tighter">PrimeSewa</span>
-                            <span className="text-xs font-medium text-red-400 mt-1 uppercase tracking-widest">Admin System</span>
+                            <span className="text-xs font-medium text-indigo-400 mt-1 uppercase tracking-widest">Admin System</span>
                         </div>
                         <p className="text-white/40 text-sm">Authorized Personnel Only</p>
                     </div>
@@ -116,7 +116,7 @@ const AdminLogin = () => {
                                     type="password"
                                     value={pwd}
                                     onChange={e => setPwd(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 outline-none text-white tracking-widest placeholder-white/20 transition-all"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 outline-none text-white tracking-widest placeholder-white/20 transition-all"
                                     placeholder="••••••••"
                                     required
                                     autoFocus
@@ -135,8 +135,8 @@ const AdminLogin = () => {
                             type="submit"
                             disabled={loading}
                             className={`w-full py-4 rounded-2xl font-black text-white transition-all flex items-center justify-center gap-2 mt-2 group ${loading
-                                ? 'bg-red-700/50 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 shadow-xl shadow-red-900/30 hover:-translate-y-0.5'
+                                ? 'bg-indigo-700/50 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 shadow-xl shadow-indigo-900/30 hover:-translate-y-0.5'
                                 }`}
                         >
                             {loading ? 'Authenticating...' : (

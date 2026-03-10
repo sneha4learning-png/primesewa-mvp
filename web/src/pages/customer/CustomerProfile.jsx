@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
-import { UserCircle, Phone, Save, CheckCircle2, Shield, Star, Clock, Zap, Edit3 } from 'lucide-react';
+import { UserCircle, Phone, Save, CheckCircle2, Shield, Star, Clock, Zap, Edit3, ExternalLink, Wrench } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { doc, updateDoc } from 'firebase/firestore';
 
@@ -169,6 +169,30 @@ const CustomerProfile = () => {
                             </button>
                         </div>
                     </form>
+                </div>
+
+                {/* Account Type / Switcher Section */}
+                <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden p-8 group hover:border-indigo-100 transition-all duration-500">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
+                        <div className="flex items-center gap-6">
+                            <div className="w-16 h-16 rounded-[1.5rem] bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                                <Wrench className="w-8 h-8" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">Professional Account</h3>
+                                <p className="text-slate-500 font-medium text-sm mt-1">Manage your services, requests, and professional earnings.</p>
+                            </div>
+                        </div>
+                        <a
+                            href="/provider"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-3 transition-all shadow-xl shadow-slate-900/10 hover:shadow-indigo-500/20 hover:-translate-y-1 active:scale-95"
+                        >
+                            Open Provider Portal
+                            <ExternalLink className="w-4.5 h-4.5" />
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

@@ -38,11 +38,12 @@ export const AuthProvider = ({ children }) => {
                         return;
                     }
 
-                    let userDocRef = doc(db, 'users', user.uid);
-                    let userDocSnap = await getDoc(userDocRef);
+                    // Try Provider first to support "Open Provider Hub" from Customer profile
+                    let providerDocRef = doc(db, 'providers', user.uid);
+                    let providerDocSnap = await getDoc(providerDocRef);
 
-                    if (userDocSnap.exists()) {
-                        const data = userDocSnap.data();
+                    if (providerDocSnap.exists()) {
+                        const data = providerDocSnap.data();
                         if (data.status === 'blocked') {
                             await signOut(auth);
                             setCurrentUser(null);
@@ -52,14 +53,24 @@ export const AuthProvider = ({ children }) => {
                             setLoading(false);
                             return;
                         }
-                        const finalData = { ...data, uid: user.uid };
+                        const finalData = { ...data, uid: user.uid, role: 'provider' };
                         setUserData(finalData);
                         localStorage.setItem('ps_userData', JSON.stringify(finalData));
                     } else {
-                        let providerDocRef = doc(db, 'providers', user.uid);
-                        let providerDocSnap = await getDoc(providerDocRef);
-                        if (providerDocSnap.exists()) {
-                            const finalData = { ...providerDocSnap.data(), uid: user.uid, role: 'provider' };
+                        let userDocRef = doc(db, 'users', user.uid);
+                        let userDocSnap = await getDoc(userDocRef);
+                        if (userDocSnap.exists()) {
+                            const data = userDocSnap.data();
+                            if (data.status === 'blocked') {
+                                await signOut(auth);
+                                setCurrentUser(null);
+                                setUserData(null);
+                                localStorage.removeItem('ps_user');
+                                localStorage.removeItem('ps_userData');
+                                setLoading(false);
+                                return;
+                            }
+                            const finalData = { ...data, uid: user.uid, role: 'customer' };
                             setUserData(finalData);
                             localStorage.setItem('ps_userData', JSON.stringify(finalData));
                         } else {
