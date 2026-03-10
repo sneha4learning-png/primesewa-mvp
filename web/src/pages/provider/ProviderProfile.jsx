@@ -39,6 +39,7 @@ const ProviderProfile = () => {
                             category: userData?.category || 'Service',
                             status: userData?.status || 'pending',
                             phone: userData?.phone || '',
+                            serviceAreas: 'Across Ahmedabad',
                             jobs: 0,
                             rating: 0
                         });
@@ -114,7 +115,7 @@ const ProviderProfile = () => {
                                                     <span key={i} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200">{area.trim()}</span>
                                                 ))
                                             ) : (
-                                                <span className="text-gray-400 text-sm italic">Not Specified</span>
+                                                <span className="text-gray-900 text-sm font-bold">Across Ahmedabad</span>
                                             )}
                                         </div>
                                     </div>
