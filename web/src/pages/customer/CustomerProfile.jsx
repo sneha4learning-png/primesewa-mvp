@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
 import { UserCircle, Phone, Save, CheckCircle2, Shield, Star, Clock, Zap, Edit3 } from 'lucide-react';
+import { db } from '../../firebase/config';
+import { doc, updateDoc } from 'firebase/firestore';
 
 const CustomerProfile = () => {
     const { userData, setUserData } = useAuth();
@@ -9,19 +11,27 @@ const CustomerProfile = () => {
     const initialPhone = (userData?.phone || userData?.phoneNumber || '').replace('+91', '');
 
     const [name, setName] = useState(initialName);
-    const [phone, setPhone] = useState(initialPhone);
+    const [phone] = useState(initialPhone);
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
         setIsSaving(true);
-        setTimeout(() => {
-            setUserData(prev => ({ ...prev, name, phone: `+91${phone}` }));
-            setIsSaving(false);
+        try {
+            if (!userData?.uid?.includes('mock-')) {
+                const userRef = doc(db, 'users', userData.uid);
+                await updateDoc(userRef, { name });
+            }
+            setUserData(prev => ({ ...prev, name }));
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
-        }, 1000);
+        } catch (err) {
+            console.error('Error updating name:', err);
+            alert('Failed to update name. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const initial = name ? name.charAt(0).toUpperCase() : 'U';
@@ -30,8 +40,6 @@ const CustomerProfile = () => {
     const stats = [
         { icon: Star, label: 'Bookings', value: '—', color: 'text-amber-500', bg: 'bg-amber-50' },
         { icon: Clock, label: 'Member Since', value: memberSince, color: 'text-blue-500', bg: 'bg-blue-50' },
-        { icon: Shield, label: 'Account', value: 'Verified', color: 'text-emerald-500', bg: 'bg-emerald-50' },
-        { icon: Zap, label: 'Status', value: 'Active', color: 'text-indigo-500', bg: 'bg-indigo-50' },
     ];
 
     return (
@@ -59,25 +67,18 @@ const CustomerProfile = () => {
                             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-4xl font-black text-white border-4 border-white shadow-xl shadow-indigo-600/30 shrink-0">
                                 {initial}
                             </div>
-                            <div className="pb-1">
+                            <div className="pb-1 sm:ml-4">
                                 <h2 className="text-2xl font-black text-slate-900">{name || 'Your Name'}</h2>
-                                <p className="text-slate-500 text-sm font-medium flex items-center gap-1.5 mt-0.5">
-                                    <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                                    Verified Customer · PrimeSewa
+                                <p className="text-slate-500 text-sm font-medium mt-0.5">
+                                    PrimeSewa Customer
                                 </p>
-                            </div>
-                            <div className="sm:ml-auto sm:pb-1">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    Active Member
-                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     {stats.map((s, i) => (
                         <div key={i} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
                             <div className={`w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center mb-3`}>
@@ -97,7 +98,7 @@ const CustomerProfile = () => {
                         </div>
                         <div>
                             <h3 className="font-black text-slate-900">Personal Information</h3>
-                            <p className="text-xs text-slate-500">Update your name and phone number</p>
+                            <p className="text-xs text-slate-500">Update your account name</p>
                         </div>
                     </div>
 
@@ -128,18 +129,17 @@ const CustomerProfile = () => {
                             <div className="space-y-2">
                                 <label className="block text-sm font-bold text-slate-700 uppercase tracking-wider">Mobile Number</label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">+91</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">+91</span>
                                     <input
                                         type="tel"
-                                        required
-                                        maxLength={10}
+                                        readOnly
+                                        disabled
                                         value={phone}
-                                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                                        className="w-full pl-14 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 outline-none"
+                                        className="w-full pl-14 pr-4 py-4 bg-slate-100/50 border border-slate-200 rounded-2xl transition-all font-medium text-slate-400 outline-none cursor-not-allowed"
                                         placeholder="9876543210"
                                     />
                                 </div>
-                                <p className="text-xs font-medium text-slate-400">Used for booking communications</p>
+                                <p className="text-[11px] font-bold text-rose-500/80 uppercase tracking-widest mt-1">Cannot change: Used as login identity</p>
                             </div>
                         </div>
 
