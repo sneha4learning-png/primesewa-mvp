@@ -10,6 +10,22 @@ const LandingPage = () => {
     const [activeBooking, setActiveBooking] = useState(null);
     const [providerDetails, setProviderDetails] = useState(null);
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const serviceImages = [
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop", // Plumbing
+        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop", // Electrical
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop", // Cleaning
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop", // Carpentry
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop"  // Salon
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % serviceImages.length);
+        }, 3000);
+        return () => clearInterval(timer);
+    }, []);
+
     useEffect(() => {
         // 1. Listen to Top Rated Active/Online Provider
         const topProviderQuery = query(
@@ -102,8 +118,24 @@ const LandingPage = () => {
 
                     <div className="hidden lg:block relative">
                         <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-3xl rotate-3 opacity-30 blur-2xl"></div>
-                        <div className="relative bg-slate-800/50 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden aspect-[4/3]">
-                            <img src={providerDetails?.previousWorkSample || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop"} alt="Professional Handyman" className="w-full h-full object-cover mix-blend-overlay opacity-60" />
+                        <div className="relative bg-slate-800 rounded-3xl shadow-2xl overflow-hidden aspect-[4/3] border border-white/10">
+                            {serviceImages.map((img, idx) => (
+                                <img
+                                    key={idx}
+                                    src={img}
+                                    alt="Professional Handyman"
+                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out mix-blend-overlay ${idx === currentImageIndex ? 'opacity-80' : 'opacity-0'}`}
+                                />
+                            ))}
+                            <div className="absolute top-4 right-4 flex gap-2">
+                                {serviceImages.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setCurrentImageIndex(idx)}
+                                        className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-indigo-400 w-6' : 'bg-white/30'}`}
+                                    />
+                                ))}
+                            </div>
                             <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">

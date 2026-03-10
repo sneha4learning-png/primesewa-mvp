@@ -208,9 +208,38 @@ const ProviderLogin = () => {
         }
     };
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const serviceImages = [
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop", // Plumbing
+        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop", // Electrical
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop", // Cleaning
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop", // Carpentry
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop"  // Salon
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % serviceImages.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, []);
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-900 border-t-4 border-blue-500 px-4 py-8 md:py-12">
-            <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 md:p-8 text-white">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 md:py-12 bg-[#0B0F19]">
+            {/* Professional Background Slider */}
+            <div className="absolute inset-0 z-0">
+                {serviceImages.map((img, idx) => (
+                    <div
+                        key={idx}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-40' : 'opacity-0'}`}
+                    >
+                        <img src={img} alt="Background" className="w-full h-full object-cover" />
+                    </div>
+                ))}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/60 via-[#0B0F19]/80 to-[#0B0F19] backdrop-blur-[2px]"></div>
+            </div>
+
+            <div className="max-w-md w-full bg-slate-800/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 p-6 md:p-8 text-white relative z-10">
                 <div className="text-center mb-6 md:mb-8 flex flex-col items-center">
                     <div className="flex flex-col items-center justify-center mb-6">
                         <img src="/logo-v2.png" alt="PrimeSewa" className="h-16 object-contain mb-4 animate-float drop-shadow-2xl" />

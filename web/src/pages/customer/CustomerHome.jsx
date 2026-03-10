@@ -68,6 +68,22 @@ const CustomerHome = () => {
     const [dbError, setDbError] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const serviceImages = [
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1000&auto=format&fit=crop", // Plumbing
+        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1000&auto=format&fit=crop", // Electrical
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000&auto=format&fit=crop", // Cleaning
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=1000&auto=format&fit=crop", // Carpentry
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000&auto=format&fit=crop"  // Salon
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % serviceImages.length);
+        }, 4000);
+        return () => clearInterval(timer);
+    }, []);
+
     // Returns current time as "HH:MM" string for today's minimum time constraint
     const getNowTimeStr = () => {
         const now = new Date();
@@ -325,21 +341,61 @@ const CustomerHome = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-12">
-            {/* Welcome Header */}
-            <div className="mb-12 relative">
+            {/* Hero Section / Welcome Header */}
+            <div className={`mb-12 relative overflow-hidden rounded-[3rem] ${!userData?.uid ? 'bg-slate-900 border border-slate-800 p-8 md:p-16' : ''}`}>
                 <div className="absolute top-0 right-10 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none"></div>
-                <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-                    Good {new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                        {(() => {
-                            if (userData?.uid === 'mock-cust') return 'Guest';
-                            const baseName = userData?.name || 'User';
-                            // If name accidentally contains "Services" (from a provider profile), strip it for the greeting
-                            return baseName.split(' ')[0].replace(/Services/gi, '').trim() || 'User';
-                        })()}
-                    </span> 👋
-                </h1>
-                <p className="text-xl font-medium text-slate-500 mt-4 max-w-lg">What service do you need today in Ahmedabad?</p>
+
+                {!userData?.uid && (
+                    <div className="absolute inset-0 z-0">
+                        {serviceImages.map((img, idx) => (
+                            <img
+                                key={idx}
+                                src={img}
+                                alt="Service"
+                                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-30' : 'opacity-0'}`}
+                            />
+                        ))}
+                        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent"></div>
+                    </div>
+                )}
+
+                <div className="relative z-10 max-w-2xl">
+                    <h1 className="text-4xl md:text-6xl font-black text-white md:text-slate-900 tracking-tight leading-tight">
+                        {!userData?.uid ? (
+                            <>
+                                Premium Home <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 md:from-blue-600 md:to-indigo-600">
+                                    Services in Ahmedabad
+                                </span>
+                            </>
+                        ) : (
+                            <>
+                                Good {new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                                    {userData.name?.split(' ')[0] || 'Prime User'}
+                                </span> 👋
+                            </>
+                        )}
+                    </h1>
+
+                    {!userData?.uid ? (
+                        <div className="mt-8 space-y-6">
+                            <p className="text-lg md:text-xl font-medium text-slate-300 md:text-slate-500 leading-relaxed">
+                                Book verified professionals for plumbing, electrical, cleaning and more. Experience quality and reliability at your doorstep.
+                            </p>
+                            <div className="flex flex-wrap gap-4">
+                                <button onClick={() => navigate('/login')} className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-600/30 transition-all transform hover:-translate-y-1">
+                                    Book Now
+                                </button>
+                                <button onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })} className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-black rounded-2xl border border-white/20 transition-all">
+                                    Explore Services
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-xl font-medium text-slate-500 mt-4">What service do you need today in Ahmedabad?</p>
+                    )}
+                </div>
             </div>
 
             {bookingStep === 1 ? (
@@ -576,122 +632,175 @@ const CustomerHome = () => {
 
                     {/* Sidebar / Active Bookings */}
                     <div className="space-y-8">
-                        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-1 rounded-3xl shadow-xl shadow-blue-600/20 relative overflow-hidden">
+                        {/* Current Activity Box */}
+                        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-1 rounded-[2.5rem] shadow-xl shadow-blue-600/20 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                            <div className="bg-white/10 backdrop-blur-md p-6 rounded-[22px] min-h-[300px]">
-                                <h2 className="text-xl font-black text-white mb-6 flex items-center gap-3">
-                                    <MapPin className="text-blue-200" /> Current Activity
-                                </h2>
-                                <div className="space-y-4 relative z-10">
-                                    {mockBookings.map(b => (
-                                        <div key={b.id} onClick={() => handleActivityClick(b)} className="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-pointer">
-                                            <div className={`absolute top-0 left-0 w-1.5 h-full ${b.status === 'negotiating' ? 'bg-purple-500' : 'bg-blue-500'}`}></div>
-                                            <div className="flex justify-between items-start mb-3">
-                                                <span className="font-black text-slate-900">{b.service}</span>
-                                                <span className={`px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest ${b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
-                                                    }`}>{b.status}</span>
-                                            </div>
-                                            <p className="text-sm font-medium text-slate-500 mb-4">{b.date} at {b.time}</p>
-                                            <div className="flex justify-between items-end">
-                                                <p className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                                                    <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs text-slate-600">{b.provider.charAt(0)}</div>
-                                                    {b.provider}
-                                                </p>
-                                                <p className="font-black text-slate-900 text-lg">₹{b.proposedPrice || b.price}</p>
-                                            </div>
+                            <div className="bg-white/10 backdrop-blur-md p-8 rounded-[2.3rem] min-h-[400px] flex flex-col">
+                                {userData?.uid ? (
+                                    <>
+                                        <h2 className="text-xl font-black text-white mb-6 flex items-center gap-3">
+                                            <MapPin className="text-blue-200" /> Current Activity
+                                        </h2>
+                                        <div className="space-y-4 relative z-10 flex-1">
+                                            {mockBookings.length > 0 ? (
+                                                mockBookings.map(b => (
+                                                    <div key={b.id} onClick={() => handleActivityClick(b)} className="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-pointer">
+                                                        <div className={`absolute top-0 left-0 w-1.5 h-full ${b.status === 'negotiating' ? 'bg-purple-500' : 'bg-blue-500'}`}></div>
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <span className="font-black text-slate-900">{b.service}</span>
+                                                            <span className={`px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest ${b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>{b.status}</span>
+                                                        </div>
+                                                        <p className="text-sm font-medium text-slate-500 mb-4">{b.date} at {b.time}</p>
+                                                        <div className="flex justify-between items-end">
+                                                            <p className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                                                <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs text-slate-600">{b.provider.charAt(0)}</div>
+                                                                {b.provider}
+                                                            </p>
+                                                            <p className="font-black text-slate-900 text-lg">₹{b.proposedPrice || b.price}</p>
+                                                        </div>
 
-                                            {b.status === 'accepted' && (
-                                                <div className="mt-5 pt-4 border-t border-slate-100">
-                                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Live Status</p>
-                                                    <div className="relative flex justify-between px-2">
-                                                        <div className="absolute top-2.5 left-2 right-2 h-1 bg-slate-100 rounded"></div>
-                                                        <div className={`absolute top-2.5 left-2 h-1 rounded transition-all duration-500 ${b.trackingStatus === 'inprogress' ? 'w-[calc(100%-1rem)] bg-emerald-500' :
-                                                            b.trackingStatus === 'arrived' ? 'w-[66%] bg-blue-500' :
-                                                                b.trackingStatus === 'enroute' ? 'w-[33%] bg-blue-500' :
-                                                                    'w-0 bg-blue-500'
-                                                            }`}></div>
-
-                                                        {[{ step: 'assigned', label: 'Assigned' }, { step: 'enroute', label: 'On Way' }, { step: 'arrived', label: 'Arrived' }, { step: 'inprogress', label: 'Working' }].map((s, i) => {
-                                                            const isPast =
-                                                                b.trackingStatus === 'inprogress' ? true :
-                                                                    b.trackingStatus === 'arrived' ? i <= 2 :
-                                                                        b.trackingStatus === 'enroute' ? i <= 1 :
-                                                                            i === 0;
-                                                            return (
-                                                                <div key={s.step} className="relative z-10 flex flex-col items-center gap-1.5 min-w-[3rem]">
-                                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors duration-500 bg-white ${isPast ? (b.trackingStatus === 'inprogress' ? 'border-emerald-500' : 'border-blue-500') : 'border-slate-200'}`}>
-                                                                        {isPast && <div className={`w-2 h-2 rounded-full ${b.trackingStatus === 'inprogress' ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>}
-                                                                    </div>
-                                                                    <span className={`text-[10px] font-bold text-center leading-tight ${isPast ? 'text-slate-800' : 'text-slate-400'}`}>{s.label}</span>
+                                                        {b.status === 'accepted' && (
+                                                            <div className="mt-5 pt-4 border-t border-slate-100">
+                                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Live Status</p>
+                                                                <div className="relative flex justify-between px-2">
+                                                                    <div className="absolute top-2.5 left-2 right-2 h-1 bg-slate-100 rounded"></div>
+                                                                    <div className={`absolute top-2.5 left-2 h-1 rounded transition-all duration-500 ${b.trackingStatus === 'inprogress' ? 'w-[calc(100%-1rem)] bg-emerald-500' : b.trackingStatus === 'arrived' ? 'w-[66%] bg-blue-500' : b.trackingStatus === 'enroute' ? 'w-[33%] bg-blue-500' : 'w-0 bg-blue-500'}`}></div>
+                                                                    {[{ step: 'assigned', label: 'Assigned' }, { step: 'enroute', label: 'On Way' }, { step: 'arrived', label: 'Arrived' }, { step: 'inprogress', label: 'Working' }].map((s, i) => {
+                                                                        const isPast = b.trackingStatus === 'inprogress' ? true : b.trackingStatus === 'arrived' ? i <= 2 : b.trackingStatus === 'enroute' ? i <= 1 : i === 0;
+                                                                        return (
+                                                                            <div key={s.step} className="relative z-10 flex flex-col items-center gap-1.5 min-w-[3rem]">
+                                                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors duration-500 bg-white ${isPast ? (b.trackingStatus === 'inprogress' ? 'border-emerald-500' : 'border-blue-500') : 'border-slate-200'}`}>
+                                                                                    {isPast && <div className={`w-2 h-2 rounded-full ${b.trackingStatus === 'inprogress' ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>}
+                                                                                </div>
+                                                                                <span className={`text-[10px] font-bold text-center leading-tight ${isPast ? 'text-slate-800' : 'text-slate-400'}`}>{s.label}</span>
+                                                                            </div>
+                                                                        )
+                                                                    })}
                                                                 </div>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                </div>
-                                            )}
+                                                            </div>
+                                                        )}
 
-                                            {b.status === 'negotiating' && (
-                                                <div className="mt-5 pt-4 border-t border-slate-100 flex gap-3">
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleNegotiation(b.id, false, b.proposedPrice); }}
-                                                        className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-colors"
-                                                    >
-                                                        Decline
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleNegotiation(b.id, true, b.proposedPrice); }}
-                                                        className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm shadow-md transition-colors"
-                                                    >
-                                                        Accept ₹{b.proposedPrice}
-                                                    </button>
-                                                </div>
-                                            )}
-                                            {/* EC-008: Cancel button for accepted / pending bookings */}
-                                            {(b.status === 'accepted' || b.status === 'pending') && (
-                                                <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2">
-                                                    {b.status === 'accepted' && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                if (!userData?.uid) {
-                                                                    navigate('/login');
-                                                                    return;
-                                                                }
-                                                                if (!b.providerPhone && !b.phone) {
-                                                                    alert("Provider phone number is not available.");
-                                                                    return;
-                                                                }
-                                                                window.location.href = `tel:${b.providerPhone || b.phone}`;
-                                                            }}
-                                                            className="flex-1 py-1.5 flex items-center justify-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 font-bold rounded-xl text-xs transition-colors border border-green-100"
-                                                        >
-                                                            <Phone className="w-3.5 h-3.5" /> Call Provider
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleCancelBooking(b.id); }}
-                                                        className="flex-1 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs transition-colors border border-red-100"
-                                                    >
-                                                        Cancel Booking
-                                                    </button>
+                                                        {/* Negotiate buttons — only shown for negotiating status */}
+                                                        {b.status === 'negotiating' && b.proposedPrice && (
+                                                            <div className="mt-4 pt-4 border-t border-slate-100 flex gap-2" onClick={e => e.stopPropagation()}>
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleNegotiation(b.id, false, b.proposedPrice); }}
+                                                                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-colors"
+                                                                >
+                                                                    Decline
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleNegotiation(b.id, true, b.proposedPrice); }}
+                                                                    className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm shadow-md transition-colors"
+                                                                >
+                                                                    Accept ₹{b.proposedPrice}
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Cancel / Call buttons for active bookings */}
+                                                        {(b.status === 'accepted' || b.status === 'pending') && (
+                                                            <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2" onClick={e => e.stopPropagation()}>
+                                                                {b.status === 'accepted' && (
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            if (!userData?.uid) { navigate('/login'); return; }
+                                                                            if (!b.providerPhone && !b.phone) { alert('Provider phone number is not available.'); return; }
+                                                                            window.location.href = `tel:${b.providerPhone || b.phone}`;
+                                                                        }}
+                                                                        className="flex-1 py-1.5 flex items-center justify-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 font-bold rounded-xl text-xs transition-colors border border-green-100"
+                                                                    >
+                                                                        <Phone className="w-3.5 h-3.5" /> Call Provider
+                                                                    </button>
+                                                                )}
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleCancelBooking(b.id); }}
+                                                                    className="flex-1 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs transition-colors border border-red-100"
+                                                                >
+                                                                    Cancel Booking
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="h-full flex flex-col items-center justify-center text-center text-white/60">
+                                                    <ClockIcon className="w-12 h-12 mb-4 opacity-20" />
+                                                    <p className="font-bold">No active requests.</p>
                                                 </div>
                                             )}
                                         </div>
-                                    ))}
-                                    {mockBookings.length === 0 && (
-                                        <div className="text-center py-10">
-                                            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <MapPin className="text-blue-200/50 w-8 h-8" />
+                                    </>
+                                ) : (
+                                    <div className="h-full flex flex-col items-center justify-center text-center">
+                                        <div className="relative w-48 h-48 mb-8 group">
+                                            <div className="absolute inset-0 bg-white/20 rounded-[3rem] rotate-6 group-hover:rotate-0 transition-transform duration-500"></div>
+                                            <div className="relative h-full w-full rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/30">
+                                                {serviceImages.map((img, idx) => (
+                                                    <img key={idx} src={img} alt="Service Pro" className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentImageIndex ? 'opacity-100' : 'opacity-0'}`} />
+                                                ))}
                                             </div>
-                                            <p className="text-blue-100 font-medium">No active requests.</p>
                                         </div>
-                                    )}
-                                </div>
+                                        <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Prime Quality</h3>
+                                        <p className="text-white/70 text-sm font-medium leading-relaxed mb-8">Ahmedabad's most trusted professionals. Secure, fast, and reliable home services.</p>
+                                        <button onClick={() => navigate('/login')} className="w-full py-4 bg-white text-blue-600 font-black rounded-2xl shadow-xl hover:scale-105 transition-all text-sm uppercase tracking-widest">
+                                            Sign In to Start
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        {/* Service Breakdown Chart */}
-                        {chartData.length > 0 && (
+                        {/* History / Testimonials Box */}
+                        <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden relative">
+                            {userData?.uid ? (
+                                <>
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-xl font-black text-slate-900">Recent Jobs</h2>
+                                        <span className="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-lg font-black">{pastBookings.length}</span>
+                                    </div>
+                                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {pastBookings.length > 0 ? (
+                                            pastBookings.map(b => (
+                                                <div key={b.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-all flex justify-between items-center group">
+                                                    <div>
+                                                        <p className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider">{b.service}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
+                                                    </div>
+                                                    <p className="font-black text-slate-900">₹{b.proposedPrice || b.price}</p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="py-12 text-center text-slate-300">
+                                                <Zap className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                                                <p className="text-sm font-bold">No history available</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-center py-4">
+                                    <div className="flex justify-center -space-x-3 mb-8">
+                                        <div className="w-14 h-14 rounded-full border-4 border-white bg-blue-100 flex items-center justify-center text-2xl shadow-lg transform -rotate-12">🧹</div>
+                                        <div className="w-14 h-14 rounded-full border-4 border-white bg-indigo-100 flex items-center justify-center text-2xl shadow-lg z-10 scale-110">⚡</div>
+                                        <div className="w-14 h-14 rounded-full border-4 border-white bg-emerald-100 flex items-center justify-center text-2xl shadow-lg transform rotate-12">🚰</div>
+                                    </div>
+                                    <p className="text-sm font-bold text-slate-800 leading-relaxed italic px-4">
+                                        "Found an amazing electrician in 5 minutes! Highly recommend PrimeSewa for anyone in Ahmedabad."
+                                    </p>
+                                    <div className="mt-6 flex flex-col items-center">
+                                        <div className="flex gap-1 text-amber-400">
+                                            {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
+                                        </div>
+                                        <span className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-widest">— Sneha P., Vastrapur</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Breakdown Chart — Only for logged in users */}
+                        {userData?.uid && chartData.length > 0 && (
                             <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                                 <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3">
                                     Service Breakdown
@@ -699,96 +808,22 @@ const CustomerHome = () => {
                                 <div className="h-48">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
-                                            <Pie
-                                                data={chartData}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={45}
-                                                outerRadius={75}
-                                                paddingAngle={5}
-                                                dataKey="value"
-                                                stroke="none"
-                                            >
+                                            <Pie data={chartData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={5} dataKey="value" stroke="none">
                                                 {chartData.map((entry, index) => {
                                                     const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
                                                     return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />;
                                                 })}
                                             </Pie>
-                                            <Tooltip
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                            />
+                                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
                             </div>
                         )}
-
-                        {/* Past Bookings & Ratings — always shown with empty state */}
-                        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                            <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100 bg-slate-50/50">
-                                <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center">
-                                    <CheckCircle2 className="w-4.5 h-4.5 text-white w-4 h-4" />
-                                </div>
-                                <h2 className="text-lg font-black text-slate-900">Booking History</h2>
-                                {pastBookings.length > 0 && (
-                                    <span className="ml-auto px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-black">{pastBookings.length}</span>
-                                )}
-                            </div>
-                            <div className="p-4 space-y-3 max-h-[500px] overflow-y-auto">
-                                {pastBookings.length > 0 ? pastBookings.map(b => (
-                                    <div key={b.id} className="p-4 rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white hover:shadow-sm transition-all">
-                                        <div className="flex justify-between items-start mb-1.5">
-                                            <span className="font-bold text-slate-900 text-sm">{b.service}</span>
-                                            <span className="text-sm font-black text-emerald-600">₹{b.proposedPrice || b.price}</span>
-                                        </div>
-                                        <p className="text-xs font-medium text-slate-500 mb-3">{b.provider} · {b.date || 'N/A'}</p>
-                                        {!b.rated ? (
-                                            <div className="pt-3 border-t border-slate-100">
-                                                <p className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider">Rate this service</p>
-                                                <div className="flex items-center gap-1.5 mb-3 cursor-pointer">
-                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                        <Star
-                                                            key={star}
-                                                            onClick={() => setRatingState({ bookingId: b.id, rating: star })}
-                                                            className={`w-6 h-6 transition-all hover:scale-110 ${ratingState.bookingId === b.id && ratingState.rating >= star ? 'fill-amber-400 text-amber-400' : 'text-slate-200 hover:text-amber-200'}`}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                {ratingState.bookingId === b.id && ratingState.rating > 0 && (
-                                                    <button
-                                                        onClick={() => submitRating(b)}
-                                                        className="w-full py-2.5 bg-slate-900 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all shadow-sm text-xs"
-                                                    >
-                                                        Submit Rating
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Your rating</span>
-                                                <div className="flex gap-0.5">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <Star key={i} className={`w-3.5 h-3.5 ${i < b.ratingGiven ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )) : (
-                                    <div className="text-center py-10">
-                                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                            <CheckCircle2 className="w-6 h-6 text-slate-400" />
-                                        </div>
-                                        <p className="text-slate-500 font-medium text-sm">No completed bookings yet.</p>
-                                        <p className="text-slate-400 text-xs mt-1">Book a service to get started!</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
                     </div>
                 </div>
-            )
-            }
+            )}
+
 
             {/* Provider Detail Modal — All fields null-safe */}
             {
@@ -930,7 +965,7 @@ const CustomerHome = () => {
                     );
                 })()
             }
-        </div >
+        </div>
     );
 };
 
