@@ -56,8 +56,10 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 | **Discovery** | Categories | Browse 4 core services: Plumbing, Electrical, Cleaning, Carpentry |
 | **Discovery** | Filtering | Real-time search by name and star rating (4.0+ / 4.5+) |
 | **Discovery** | Profiles | Detailed provider cards with ratings, job history, and rates |
+| **Booking** | Guest Flow | Detail preservation via `sessionStorage` allowing guest checkout → Login → Auto-fill |
 | **Booking** | Flow | One-click "Book Now" with date, time, and issue description |
-| **Booking** | Location | HTML5 Geolocation + free OpenStreetMap reverse-geocoding to fetch address |
+| **Booking** | Location | Precise Doorstep tracking with manual 'House No' + OSM Address Autocomplete |
+| **Booking** | GPS | One-tap current location capture via HTML5 Geolocation & OSM reverse-geocoding |
 | **Booking** | Controls | Duplicate request prevention (button locking) |
 | **Tracking** | Sidebar | "Current Activity" view for live status updates |
 | **Tracking** | Pipeline | Status states: Pending → Accepted → Arrived → Completed |
@@ -79,6 +81,7 @@ PrimeSewa is a digital marketplace connecting customers who need home services (
 | **Operations** | Actions | Accept or Reject leads with one click |
 | **Negotiation** | Quotes | Propose custom pricing; status changes to "negotiating" |
 | **Active Jobs** | Tracking | View job details, call customers, and mark jobs as complete |
+| **Active Jobs** | Doorstep | High-visibility 'House No' badges to identify exact flat/floor without calling |
 | **Active Jobs** | Navigation | One-click map link redirecting to external Google Maps using customer coordinates |
 | **Earnings** | Dashboard | Automated aggregation: Daily, Weekly, and Monthly income |
 | **Earnings** | Payout | Net earnings calculation (85% of total job value) |
@@ -221,7 +224,7 @@ Roles are enforced by `ProtectedRoute.jsx` in React using the `userData.role` fi
 
 | Collection | Key Fields |
 |---|---|
-| `bookings` | `status`, `customer`, `provider`, `service`, `price`, `proposedPrice`, `date`, `time`, `address` |
+| `bookings` | `status`, `customer`, `provider`, `service`, `price`, `proposedPrice`, `date`, `time`, `address`, `houseNo`, `location` |
 | `providers` | `name`, `phone`, `uid`, `category`, `price`, `rating`, `jobs`, `status`, `isOnline` |
 | `users` | `name`, `phone`, `uid`, `role`, `status` |
 | `commissions` | `bookingId`, `provider`, `amount`, `commission`, `date` |

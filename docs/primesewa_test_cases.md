@@ -22,6 +22,11 @@ Source BRD: AntiGravity Hyperlocal Service Booking MVP
 | FT-013 | Functional | Routing | Auth Guard | Access /admin without login | Redirect to Admin Login | High | Passed |
 | FT-014 | Functional | Customer | Rate Service | Complete job → select stars | Rating saved & visible in history | Low | Passed |
 | FT-015 | Functional | Admin | Export CSV | Select range → export | commissions_export.csv generated | Medium | Passed |
+| FT-016 | Functional | Customer | Guest Booking Flow | Guest user books → Login → Form auto-fill | Detail rehydrated from sessionStorage | High | Passed |
+| FT-017 | Functional | Customer | GPS Geolocation | Click "Use Current Location" | Coordinates & address fetched via OSM | Medium | Passed |
+| FT-018 | Functional | Customer | Address Autocomplete | Type street name in booking | Live suggestions appear from OSM API | Medium | Passed |
+| FT-019 | Functional | Provider| Doorstep Details | View incoming lead with House No | House No shown in bold badge style | High | Passed |
+| FT-020 | Functional | Customer | Mandatory House No | Submit booking without House No | Form blocks submission (HTML5 valid) | Medium | Passed |
 
 ## 2. Negative Test Cases
 

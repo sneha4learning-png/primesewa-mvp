@@ -91,9 +91,9 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 4.  **Category Listing:** Interactive cards to filter top providers by service.
 5.  **Provider Listing (Search Results):** Filtered view of active and approved providers matching a selected category.
 6.  **Provider Detail:** Provider initial avatar, ratings, total jobs completed, price estimations.
-7.  **Booking Form:** Captures exact service address and optional issue description via modal overlay.
-8.  **Booking Confirmation:** Success card and status entry placed into "Current Activity".
-9.  **Booking Status / History:** Live timeline (`pending` > `negotiating` > `accepted` > `completed`). Support for Accepting/Declining custom price proposals. Post-acceptance, a live tracker lets customers monitor provider arrival status.
+7.  **Booking Form:** Captures exact service address, specific **House/Flat/Floor No**, and optional issue description via modal overlay. Integrated with **OpenStreetMap Nominatim** for live address autocomplete and coordinate capture.
+8.  **Booking Confirmation:** Success card and status entry placed into "Current Activity". Supports **Guest Booking Persistence**: guest users can fill the form, login, and have their details automatically restored from `sessionStorage`.
+9.  **Booking Status / History:** Live timeline (`pending` > `negotiating` > `accepted` > `completed`). Support for Accepting/Declining custom price proposals. Post-acceptance, a live tracker lets customers monitor provider arrival status. Providers can see precise doorstep details (House No) alongside map links.
 10. **Rating:** Interactive 5-star rating component appears in the "Past Bookings" list once the job is marked `completed`.
 
 ---
@@ -205,4 +205,7 @@ This section highlights the actual technical and feature decisions made during t
     *   Provider Portal: `/provider` and `/provider/login`
 *   **Authentication Resiliency:** Implemented Firebase Phone Auth (reCAPTCHA invisible) with a built-in **Dev Mode Fallback** (OTP: 1234, Admin Password: 'admin') to bypass billing restrictions during testing.
 *   **Automated CI/CD:** Defined a `.github/workflows/deploy.yml` pipeline that dynamically injects environment secrets and deploys to Firebase Hosting on every push to the `main` branch.
+*   **Service Location & Precise Address Tracking:** Integrated **HTML5 Geolocation** and **OpenStreetMap Nominatim API** for free, key-less location services. Captures accurate GPS coordinates for both "Use Current Location" and manual address searches (Forward Geocoding).
+*   **Doorstep Detail (House No):** Implemented a mandatory "House / Flat / Floor No" field to supplement general map addresses, displayed prominently to providers in high-contrast badges for zero-confusion navigation.
+*   **Guest Booking Persistence (Session Recovery):** Implemented `sessionStorage` logic to allow guest users to start a booking, redirect to login, and return with all form data (date, time, address, coordinates) pre-filled.
 *   **Mock State Management:** Utilized persistent local storage via `utils/mockDb.js` alongside Firebase to ensure a seamless end-to-end testing experience for booking logic, provider status toggling, and assignment flows without fully provisioning cloud backends initially.

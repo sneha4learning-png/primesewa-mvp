@@ -60,7 +60,9 @@ primesewa-mvp/
 
 - **Cross-Portal Navigation**: Seamlessly switch between the customer storefront, provider dashboard, and admin panel with integrated quick links.
 - **Provider Verification Flow**: Enhanced registration requiring identity proofs and work history, creating a trusted marketplace.
-- **Service Location Integration**: Free coordinate capture using HTML5 Geolocation and reverse-geocoding via OpenStreetMap Nominatim API, allowing providers to navigate directly via Google Maps.
+- **Service Location Integration**: Free coordinate capture using HTML5 Geolocation and **Live Address Autocomplete** via OpenStreetMap Nominatim API.
+- **Precise Doorstep Tracking**: Implementation of a mandatory House/Flat No field with high-visibility provider badges for exact navigation.
+- **Guest Booking Persistence**: Intelligent `sessionStorage` logic that preserves booking details if a guest user is redirected to login mid-flow.
 - **Live Provider Tracking**: Customers can track the real-time arrival status of providers for accepted jobs.
 - **Refined Admin Suite**: Comprehensive operational management featuring consolidated booking histories, icon-driven action tables, and dummy data seeding for demonstrations.
 
