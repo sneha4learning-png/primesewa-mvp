@@ -496,7 +496,7 @@ const ProviderDashboard = () => {
                                             {job.ratingGiven && (
                                                 <div className="flex items-center gap-1 text-amber-500 mt-1">
                                                     <Star className="w-3.5 h-3.5 fill-current" />
-                                                    <span className="text-xs font-bold w-full truncate">{job.ratingGiven}.0 Rating</span>
+                                                    <span className="text-xs font-bold w-full truncate">{Number(job.ratingGiven).toFixed(1)} Rating</span>
                                                 </div>
                                             )}
                                         </div>

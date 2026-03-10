@@ -142,7 +142,7 @@ const ProviderProfile = () => {
                                         <p className="text-sm text-gray-500 font-medium">Customer Rating</p>
                                         {profile.jobs > 0 ? (
                                             <div className="flex items-center gap-2">
-                                                <p className="font-bold text-gray-900">{profile.rating} / 5.0</p>
+                                                <p className="font-bold text-gray-900">{Number(profile.rating || 0).toFixed(1)} / 5.0</p>
                                                 <div className="flex">
                                                     {[...Array(5)].map((_, i) => (
                                                         <Star key={i} className={`w-4 h-4 ${i < Math.floor(profile.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} />
