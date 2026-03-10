@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { UserCircle, Star, Briefcase, Phone, Tag, MapPin } from 'lucide-react';
+import { UserCircle, Star, StarHalf, Briefcase, Phone, Tag, MapPin } from 'lucide-react';
 
 const ProviderProfile = () => {
     const { currentUser, userData, handleLogout } = useAuth();
@@ -114,7 +114,7 @@ const ProviderProfile = () => {
                                                     <span key={i} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200">{area.trim()}</span>
                                                 ))
                                             ) : (
-                                                <span className="text-gray-400 text-sm">Not Specifed</span>
+                                                <span className="text-gray-400 text-sm italic">Not Specified</span>
                                             )}
                                         </div>
                                     </div>
@@ -144,9 +144,17 @@ const ProviderProfile = () => {
                                             <div className="flex items-center gap-2">
                                                 <p className="font-bold text-gray-900">{Number(profile.rating || 0).toFixed(1)} / 5.0</p>
                                                 <div className="flex">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <Star key={i} className={`w-4 h-4 ${i < Math.floor(profile.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} />
-                                                    ))}
+                                                    {[...Array(5)].map((_, i) => {
+                                                        const starValue = i + 1;
+                                                        const rating = profile.rating || 0;
+                                                        if (rating >= starValue) {
+                                                            return <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />;
+                                                        } else if (rating >= starValue - 0.5) {
+                                                            return <StarHalf key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />;
+                                                        } else {
+                                                            return <Star key={i} className="w-4 h-4 text-gray-300" />;
+                                                        }
+                                                    })}
                                                 </div>
                                             </div>
                                         ) : (

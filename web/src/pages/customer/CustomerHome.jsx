@@ -762,6 +762,10 @@ const CustomerHome = () => {
                                                     <h3 className="font-black text-lg text-slate-900 truncate">{provider.name || 'Service Partner'}</h3>
                                                 </div>
                                                 <p className="text-xs font-bold text-indigo-600 mt-0.5">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Professional Service')}</p>
+                                                <div className="flex items-center gap-1 text-[10px] text-slate-500 mt-1 uppercase tracking-tight font-black">
+                                                    <MapPin className="w-2.5 h-2.5 text-slate-400" />
+                                                    {provider.serviceAreas || 'Across Ahmedabad'}
+                                                </div>
                                                 <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-2">
                                                     <span className="flex items-center gap-1 text-amber-500 text-xs font-bold bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
                                                         <Star className="w-3 h-3 fill-current" /> {provider.rating ? Number(provider.rating).toFixed(1) : '—'}
