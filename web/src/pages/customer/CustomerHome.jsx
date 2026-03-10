@@ -1,4 +1,5 @@
 import { useState, useEffect, Component } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
@@ -41,6 +42,7 @@ const categories = [
 ];
 
 const CustomerHome = () => {
+    const navigate = useNavigate();
     const { userData } = useAuth();
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [bookingStep, setBookingStep] = useState(0); // 0: lists, 1: form, 2: success
@@ -166,6 +168,7 @@ const CustomerHome = () => {
             status: 'pending',
             provider: provider.name || 'Provider',
             providerPhone: provider.phone || '',
+            previousWorkSample: provider.previousWorkSample,
             customer: userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer'),
             price: parsedPrice
         };
@@ -183,6 +186,12 @@ const CustomerHome = () => {
 
     const confirmBooking = async (e) => {
         e.preventDefault();
+
+        if (!userData || !userData.uid || userData.uid === 'mock-cust') {
+            navigate('/login');
+            return;
+        }
+
         if (isSubmitting) return; // NT-015: prevent duplicate submissions
 
         // Validate: if today is selected, the chosen time must be in the future
@@ -335,6 +344,16 @@ const CustomerHome = () => {
                 <div className="max-w-2xl bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 mx-auto relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
                     <h2 className="text-3xl font-black mb-8 text-slate-900">Confirm Booking {pendingBookingData?.service ? <span className="text-blue-600 block text-xl mt-2">({pendingBookingData.service})</span> : ''}</h2>
+
+                    {pendingBookingData?.previousWorkSample && (
+                        <div className="mb-8">
+                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Provider's Previous Work</label>
+                            <div className="rounded-2xl overflow-hidden h-48 border border-slate-200 shadow-inner">
+                                <img src={pendingBookingData.previousWorkSample} alt="Previous Work Sample" className="w-full h-full object-cover" />
+                            </div>
+                        </div>
+                    )}
+
                     <form onSubmit={confirmBooking} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>

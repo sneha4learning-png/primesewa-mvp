@@ -38,7 +38,7 @@ function App() {
           <Route path="/" element={<CustomerLayout />}>
             <Route index element={<LandingPage />} />
             <Route path="login" element={<LoginPage />} />
-            <Route path="dashboard" element={<CustomerRoute><CustomerHome /></CustomerRoute>} />
+            <Route path="dashboard" element={<CustomerHome />} />
             <Route path="profile" element={<CustomerRoute><CustomerProfile /></CustomerRoute>} />
             <Route path="privacy" element={<LegalPage type="privacy" />} />
             <Route path="terms" element={<LegalPage type="terms" />} />
