@@ -60,6 +60,7 @@ const CustomerHome = () => {
     const [bookingTime, setBookingTime] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
     const [bookingAddress, setBookingAddress] = useState('');
+    const [bookingHouseNo, setBookingHouseNo] = useState('');
     const [timeError, setTimeError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(5);
@@ -186,6 +187,7 @@ const CustomerHome = () => {
                     setBookingTime(data.bookingTime || '');
                     setBookingDesc(data.bookingDesc || '');
                     setBookingAddress(data.bookingAddress || '');
+                    setBookingHouseNo(data.bookingHouseNo || '');
                     setLocationCoords(data.locationCoords || null);
                     setBookingStep(1); // Jump straight to the form
                 } catch (e) {
@@ -294,7 +296,11 @@ const CustomerHome = () => {
         setBookingDate('');
         setBookingTime('');
         setBookingDesc('');
+        setBookingDate('');
+        setBookingTime('');
+        setBookingDesc('');
         setBookingAddress('');
+        setBookingHouseNo('');
         setTimeError('');
         setSelectedProviderProfile(null);
         setBookingStep(1);
@@ -311,6 +317,7 @@ const CustomerHome = () => {
                 bookingTime,
                 bookingDesc,
                 bookingAddress,
+                bookingHouseNo,
                 locationCoords
             }));
             navigate('/login');
@@ -343,7 +350,11 @@ const CustomerHome = () => {
             date: bookingDate,
             time: bookingTime,
             description: bookingDesc,
+            date: bookingDate,
+            time: bookingTime,
+            description: bookingDesc,
             address: bookingAddress,
+            houseNo: bookingHouseNo,
             location: locationCoords ? { lat: locationCoords.lat, lng: locationCoords.lng } : null,
             createdAt: serverTimestamp()
         };
@@ -598,7 +609,7 @@ const CustomerHome = () => {
                                 </button>
                             </div>
                             <div className="relative">
-                                <input required type="text" value={bookingAddress} onChange={handleAddressTyping} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., 404 Safal Profitaire, Corporate Road, Prahladnagar, Ahmedabad" />
+                                <input required type="text" value={bookingAddress} onChange={handleAddressTyping} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="Street / Area Name" />
                                 {isSearchingAddress && (
                                     <div className="absolute right-4 top-1/2 -translate-y-1/2">
                                         <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
@@ -623,6 +634,11 @@ const CustomerHome = () => {
                                     </ul>
                                 )}
                             </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">House / Flat / Floor No *</label>
+                            <input required type="text" value={bookingHouseNo} onChange={(e) => setBookingHouseNo(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="e.g. Flat 404, Building A" />
                         </div>
 
                         <div>

@@ -276,7 +276,8 @@ const ProviderDashboard = () => {
                                     <div className="flex items-start gap-3">
                                         <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
                                         <div className="flex flex-col">
-                                            <span>{job.address}</span>
+                                            {job.houseNo && <span className="font-black text-slate-900 border-b border-slate-100 pb-1 mb-1">{job.houseNo}</span>}
+                                            <span className="text-slate-600">{job.address}</span>
                                             {job.location && (
                                                 <a href={`https://www.google.com/maps?q=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-1 flex items-center gap-1">
                                                     <Navigation className="w-3 h-3" /> Get Directions
@@ -380,7 +381,8 @@ const ProviderDashboard = () => {
                                         <div className="flex items-start gap-3">
                                             <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
                                             <div className="flex flex-col">
-                                                <span>{req.address}</span>
+                                                {req.houseNo && <span className="font-black text-slate-900 border-b border-indigo-50 pb-1 mb-1">{req.houseNo}</span>}
+                                                <span className="text-slate-600">{req.address}</span>
                                                 {req.location && (
                                                     <a href={`https://www.google.com/maps?q=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-1 flex items-center gap-1">
                                                         <Navigation className="w-3 h-3" /> View on Map
