@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
@@ -86,7 +86,6 @@ const CustomerHome = () => {
         // the real online provider record. Querying at source eliminates this entirely.
         const activeOnlineQuery = query(
             collection(db, 'providers'),
-            where('status', '==', 'active'),
             where('isOnline', '==', true)
         );
 
@@ -788,148 +787,157 @@ const CustomerHome = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Provider Detail Modal — All fields null-safe */}
-            {selectedProviderProfile && (() => {
-                const p = selectedProviderProfile;
-                const name = p.name || 'Provider';
-                const initial = name.charAt(0).toUpperCase();
-                const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Professional Service');
-                const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating) || 0;
-                const jobs = p.jobs || p.jobCount || 0;
-                const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0
-                    ? p.serviceAreas.join(', ')
-                    : 'Ahmedabad';
-                const priceDisplay = p.price
-                    ? (typeof p.price === 'string'
-                        ? p.price.replace('₹', '').replace('/hr', '')
-                        : p.price)
-                    : '500';
+            {
+                selectedProviderProfile && (() => {
+                    const p = selectedProviderProfile;
+                    const name = p.name || 'Provider';
+                    const initial = name.charAt(0).toUpperCase();
+                    const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Professional Service');
+                    const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating) || 0;
+                    const jobs = p.jobs || p.jobCount || 0;
+                    const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0
+                        ? p.serviceAreas.join(', ')
+                        : 'Ahmedabad';
+                    const priceDisplay = p.price
+                        ? (typeof p.price === 'string'
+                            ? p.price.replace('₹', '').replace('/hr', '')
+                            : p.price)
+                        : '500';
 
-                return (
-                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setSelectedProviderProfile(null)}>
-                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                            <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0">
-                                <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full p-2">
-                                    <XCircle className="w-6 h-6" />
-                                </button>
-                            </div>
-                            <div className="px-8 pb-8 -mt-12 relative">
-                                <div className="flex justify-between items-end mb-6">
-                                    <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center text-4xl font-black text-indigo-600 border-4 border-white shadow-lg">
-                                        {initial}
-                                    </div>
-                                    <div className="flex flex-col gap-2 mb-2 items-end">
-                                        <button
-                                            onClick={(e) => {
-                                                if (!userData?.uid) {
-                                                    navigate('/login');
-                                                    return;
-                                                }
-                                                if (!p.phone) {
-                                                    alert('Phone number not available');
-                                                    return;
-                                                }
-                                                window.location.href = `tel:${p.phone}`;
-                                            }}
-                                            className="px-8 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl border border-green-200 hover:bg-green-100 transition-all shadow-sm flex items-center justify-center gap-2"
-                                        >
-                                            <Phone className="w-4 h-4" /> Call Pro
-                                        </button>
-                                        <button onClick={() => handleBook(p)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-all">
-                                            Book This Pro
-                                        </button>
-                                    </div>
+                    return (
+                        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setSelectedProviderProfile(null)}>
+                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                                <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0">
+                                    <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full p-2">
+                                        <XCircle className="w-6 h-6" />
+                                    </button>
                                 </div>
-
-                                <h2 className="text-2xl font-black text-slate-900">{name}</h2>
-                                <p className="text-slate-500 font-medium">{category} Specialist • {areas}</p>
-
-                                <div className="grid grid-cols-3 gap-4 mt-8">
-                                    <div className="bg-amber-50 rounded-2xl p-4 text-center border border-amber-100">
-                                        <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
-                                            <Star className="w-5 h-5 fill-current" />
+                                <div className="px-8 pb-8 -mt-12 relative">
+                                    <div className="flex justify-between items-end mb-6">
+                                        <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center text-4xl font-black text-indigo-600 border-4 border-white shadow-lg">
+                                            {initial}
                                         </div>
-                                        <div className="text-xl font-black text-slate-900">{jobs > 0 ? rating.toFixed(1) : 'N/A'}</div>
-                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rating</div>
-                                    </div>
-                                    <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
-                                        <div className="flex items-center justify-center gap-1 text-emerald-600 mb-1">
-                                            <CheckCircle2 className="w-5 h-5" />
-                                        </div>
-                                        <div className="text-xl font-black text-slate-900">{jobs}</div>
-                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Jobs Done</div>
-                                    </div>
-                                    <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
-                                        <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
-                                            <IndianRupee className="w-5 h-5" />
-                                        </div>
-                                        <div className="text-xl font-black text-slate-900">{priceDisplay}</div>
-                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rate / Hr</div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8">
-                                    <h3 className="font-bold text-slate-900 text-lg mb-4">Previous Work Portfolio</h3>
-                                    <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
-                                        <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80" alt="Work sample 1" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&q=80" alt="Work sample 2" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                        <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400&q=80" alt="Work sample 3" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                    </div>
-                                </div>
-
-                                <div className="mt-8">
-                                    <h3 className="font-bold text-slate-900 text-lg mb-4">Identity Verification</h3>
-                                    <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                        <div className="w-24 h-24 rounded-xl overflow-hidden shadow-sm border border-white">
-                                            <img
-                                                src={p.proofDocument && p.proofDocument.startsWith('http') ? p.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
-                                                alt="ID Proof"
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{p.idProofType || 'Identity Document'}</p>
-                                            <p className="text-slate-800 font-bold">{p.idProofNumber || 'XXXX-XXXX-XXXX'}</p>
-                                            <p className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded inline-block mt-2">✓ VERIFIED PARTNER</p>
+                                        <div className="flex flex-col gap-2 mb-2 items-end">
+                                            <button
+                                                onClick={(e) => {
+                                                    if (!userData?.uid) {
+                                                        navigate('/login');
+                                                        return;
+                                                    }
+                                                    if (!p.phone) {
+                                                        alert('Phone number not available');
+                                                        return;
+                                                    }
+                                                    window.location.href = `tel:${p.phone}`;
+                                                }}
+                                                className="px-8 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl border border-green-200 hover:bg-green-100 transition-all shadow-sm flex items-center justify-center gap-2"
+                                            >
+                                                <Phone className="w-4 h-4" /> Call Pro
+                                            </button>
+                                            <button onClick={() => handleBook(p)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-all">
+                                                Book This Pro
+                                            </button>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="mt-8 border-t border-slate-100 pt-8">
-                                    <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
-                                    {jobs > 0 ? (
-                                        <div className="space-y-4">
-                                            <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                                <div className="flex gap-2 text-amber-400 mb-2">
-                                                    {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-current' : 'text-slate-300'}`} />)}
-                                                </div>
-                                                <p className="text-slate-600 text-sm font-medium">"Very professional and quick service. Highly recommended!"</p>
-                                                <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                    <h2 className="text-2xl font-black text-slate-900">{name}</h2>
+                                    <p className="text-slate-500 font-medium">{category} Specialist • {areas}</p>
+
+                                    <div className="grid grid-cols-3 gap-4 mt-8">
+                                        <div className="bg-amber-50 rounded-2xl p-4 text-center border border-amber-100">
+                                            <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
+                                                <Star className="w-5 h-5 fill-current" />
                                             </div>
-                                            <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                                <div className="flex gap-2 text-amber-400 mb-2">
-                                                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
-                                                </div>
-                                                <p className="text-slate-600 text-sm font-medium">"Arrived on time and solved the issue perfectly."</p>
-                                                <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                            <div className="text-xl font-black text-slate-900">{jobs > 0 ? rating.toFixed(1) : 'N/A'}</div>
+                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rating</div>
+                                        </div>
+                                        <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
+                                            <div className="flex items-center justify-center gap-1 text-emerald-600 mb-1">
+                                                <CheckCircle2 className="w-5 h-5" />
+                                            </div>
+                                            <div className="text-xl font-black text-slate-900">{jobs}</div>
+                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Jobs Done</div>
+                                        </div>
+                                        <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
+                                            <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                                                <IndianRupee className="w-5 h-5" />
+                                            </div>
+                                            <div className="text-xl font-black text-slate-900">{priceDisplay}</div>
+                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rate / Hr</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8">
+                                        <h3 className="font-bold text-slate-900 text-lg mb-4">Previous Work Portfolio</h3>
+                                        <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                                            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80" alt="Work sample 1" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&q=80" alt="Work sample 2" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                            <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400&q=80" alt="Work sample 3" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8">
+                                        <h3 className="font-bold text-slate-900 text-lg mb-4">Identity Verification</h3>
+                                        <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                            <div className="w-24 h-24 rounded-xl overflow-hidden shadow-sm border border-white">
+                                                <img
+                                                    src={p.proofDocument && p.proofDocument.startsWith('http') ? p.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
+                                                    alt="ID Proof"
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{p.idProofType || 'Identity Document'}</p>
+                                                <p className="text-slate-800 font-bold">{p.idProofNumber || 'XXXX-XXXX-XXXX'}</p>
+                                                <p className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded inline-block mt-2">✓ VERIFIED PARTNER</p>
                                             </div>
                                         </div>
-                                    ) : (
-                                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl text-center">
-                                            <p className="text-slate-400 font-medium text-sm">No reviews yet — be the first to book!</p>
-                                        </div>
-                                    )}
+                                    </div>
+
+                                    <div className="mt-8 border-t border-slate-100 pt-8">
+                                        <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
+                                        {jobs > 0 ? (
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                                    <div className="flex gap-2 text-amber-400 mb-2">
+                                                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-current' : 'text-slate-300'}`} />)}
+                                                    </div>
+                                                    <p className="text-slate-600 text-sm font-medium">"Very professional and quick service. Highly recommended!"</p>
+                                                    <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                                </div>
+                                                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                                    <div className="flex gap-2 text-amber-400 mb-2">
+                                                        {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                                    </div>
+                                                    <p className="text-slate-600 text-sm font-medium">"Arrived on time and solved the issue perfectly."</p>
+                                                    <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl text-center">
+                                                <p className="text-slate-400 font-medium text-sm">No reviews yet — be the first to book!</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                );
-            })()}
-        </div>
+                    );
+                })()
+            }
+        </div >
     );
 };
 
-export default CustomerHome;
+export default function CustomerHomeWithErrorBoundary() {
+    return (
+        <ErrorBoundary>
+            <CustomerHome />
+        </ErrorBoundary>
+    );
+}

@@ -25,7 +25,7 @@ const CustomerLayout = () => {
             <header className="h-16 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-2 group" onClick={closeMobileMenu}>
-                        <img src="/logo.png" alt="PrimeSewa" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
+                        <img src="/logo-v2.png" alt="PrimeSewa" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
                         <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
                     </Link>
 
