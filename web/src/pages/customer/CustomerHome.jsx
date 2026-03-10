@@ -276,7 +276,7 @@ const CustomerHome = () => {
                 bookingAddress,
                 locationCoords
             }));
-            navigate('/customer/login');
+            navigate('/login');
             return;
         }
 

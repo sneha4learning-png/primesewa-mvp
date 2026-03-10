@@ -116,11 +116,8 @@ const LoginPage = () => {
             setCurrentUser(user);
             setUserData(userDataObj);
 
-            if (sessionStorage.getItem('pendingCustomerBooking')) {
-                navigate('/customer');
-            } else {
-                navigate('/dashboard');
-            }
+            // The useEffect on /dashboard (CustomerHome) will pick up the session and reopen the form
+            navigate('/dashboard');
         } catch (err) {
             console.error("OTP Verify Error", err);
             setError('Invalid OTP. Please try again.');
