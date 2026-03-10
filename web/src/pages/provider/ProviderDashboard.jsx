@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Naviga
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
-import { collection, getDocs, doc, updateDoc, addDoc, query, where, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, updateDoc, addDoc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
 
 const ProviderDashboard = () => {
     const { currentUser, userData } = useAuth();
@@ -25,96 +25,83 @@ const ProviderDashboard = () => {
     const itemsPerPage = 3;
 
     useEffect(() => {
-        // Use userData.name instead of currentUser.displayName
         const providerName = userData?.name || currentUser?.displayName;
         if (!providerName) return;
 
-        const loadDb = async () => {
-            if (userData?.uid) {
-                try {
-                    const qSnap = await getDocs(query(collection(db, 'providers'), where('uid', '==', userData.uid)));
-                    if (!qSnap.empty) {
-                        setProviderStatus(qSnap.docs[0].data().status);
-                    }
-                } catch (e) { console.error(e); }
-            } else {
-                setProviderStatus(userData?.status || 'pending');
-            }
+        // 1. Real-time listener for this provider's approval status
+        let unsubscribeProvider = () => { };
+        if (userData?.uid) {
+            const providerQuery = query(collection(db, 'providers'), where('uid', '==', userData.uid));
+            unsubscribeProvider = onSnapshot(providerQuery, (snap) => {
+                if (!snap.empty) setProviderStatus(snap.docs[0].data().status);
+            }, e => console.error(e));
+        } else {
+            setProviderStatus(userData?.status || 'pending');
+        }
 
-            try {
-                const bookSnap = await getDocs(collection(db, 'bookings'));
-                const allBookings = [];
-                bookSnap.forEach(d => allBookings.push({ id: d.id, ...d.data() }));
+        // 2. Real-time listener for ALL bookings assigned to this provider
+        const unsubscribeBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
+            const allBookings = [];
+            snapshot.forEach(d => allBookings.push({ id: d.id, ...d.data() }));
 
-                // Filter bookings meant for THIS provider and sort them newest first
-                const myBookings = allBookings.filter(b => b.provider === providerName).sort((a, b) => {
-                    const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.date || 0).getTime();
-                    const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.date || 0).getTime();
-                    return timeB - timeA;
+            // Filter to only THIS provider's bookings, newest first
+            const myBookings = allBookings
+                .filter(b => b.provider === providerName)
+                .sort((a, b) => {
+                    const tA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || new Date(a.date || 0).getTime();
+                    const tB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || new Date(b.date || 0).getTime();
+                    return tB - tA;
                 });
 
-                setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
-                setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
+            setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
+            setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
+            setHistoricalBookings(myBookings);
 
-                // Track all historical bookings for filtered views
-                setHistoricalBookings(myBookings);
+            const completedJobs = myBookings.filter(b => b.status === 'completed');
 
-                // Sort ascending strictly for the earnings period calculations if necessary, but here we can just pass the sorted array
-                const completedJobs = myBookings.filter(b => b.status === 'completed');
+            const calcEarnings = (fromDate) => completedJobs
+                .filter(job => new Date(job.date || job.completedAt?.toDate?.() || 0) >= fromDate)
+                .reduce((sum, job) => {
+                    const rawPrice = job.proposedPrice || job.price || job.amount || 0;
+                    const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
+                    return sum + (amt * 0.85);
+                }, 0);
 
-                const now = new Date();
-                const todayStr = now.toISOString().split('T')[0];
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(now.getDate() - 7);
-                const oneMonthAgo = new Date();
-                oneMonthAgo.setMonth(now.getMonth() - 1);
+            const now = new Date();
+            const oneWeekAgo = new Date(); oneWeekAgo.setDate(now.getDate() - 7);
+            const oneMonthAgo = new Date(); oneMonthAgo.setMonth(now.getMonth() - 1);
+            setEarnings({
+                today: calcEarnings(new Date(new Date().setHours(0, 0, 0, 0))),
+                week: calcEarnings(oneWeekAgo),
+                month: calcEarnings(oneMonthAgo)
+            });
 
-                const getEarningsForPeriod = (startDate) => {
-                    return completedJobs.filter(job => {
-                        const jobDate = new Date(job.date || job.completedAt?.toDate?.() || 0);
-                        return jobDate >= startDate;
-                    }).reduce((sum, job) => {
+            // Chart: last 7 days earnings
+            const last7Days = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+                return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), earnings: 0 };
+            });
+            completedJobs.forEach(job => {
+                const jDateStr = job.date || (job.completedAt?.toDate ? job.completedAt.toDate().toISOString().split('T')[0] : null);
+                if (jDateStr) {
+                    const dayObj = last7Days.find(d => d.date === jDateStr);
+                    if (dayObj) {
                         const rawPrice = job.proposedPrice || job.price || job.amount || 0;
-                        const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
-                        return sum + (amt * 0.85);
-                    }, 0);
-                };
-
-                setEarnings({
-                    today: getEarningsForPeriod(new Date(new Date().setHours(0, 0, 0, 0))),
-                    week: getEarningsForPeriod(oneWeekAgo),
-                    month: getEarningsForPeriod(oneMonthAgo)
-                });
-
-                // Generate chart data (last 7 days)
-                const last7Days = Array.from({ length: 7 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() - (6 - i));
-                    return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), earnings: 0 };
-                });
-
-                completedJobs.forEach(job => {
-                    const jDateStr = job.date || (job.completedAt?.toDate ? job.completedAt.toDate().toISOString().split('T')[0] : null);
-                    if (jDateStr) {
-                        const dayObj = last7Days.find(d => d.date === jDateStr);
-                        if (dayObj) {
-                            const rawPrice = job.proposedPrice || job.price || job.amount || 0;
-                            const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                            dayObj.earnings += amt * 0.85;
-                        }
+                        const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                        dayObj.earnings += amt * 0.85;
                     }
-                });
-                setChartData(last7Days);
+                }
+            });
+            setChartData(last7Days);
+            setDbError(false);
+        }, e => { console.error('Bookings listener error:', e); setDbError(true); });
 
-                setDbError(false);
-            } catch (e) { console.error('Firebase error:', e); setDbError(true); }
+        return () => {
+            unsubscribeProvider();
+            unsubscribeBookings();
         };
-
-        loadDb();
-        const interval = setInterval(loadDb, 5000); // 5s polling
-        return () => clearInterval(interval);
-
-    }, [currentUser]);
+    }, [userData, currentUser]);
 
     // Pagination logic
     const paginatedActive = activeJobs.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);

@@ -93,13 +93,19 @@ const CustomerHome = () => {
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
     useEffect(() => {
-        const myName = userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer');
-        setLoadingData(true);
+        if (!userData?.uid) {
+            // Not logged in: clear bookings and show guest view
+            setMockBookings([]);
+            setPastBookings([]);
+            setChartData([]);
+            setLoadingData(false);
+            return;
+        }
 
-        // 1. PERMANENT FIX: Query ONLY active + online providers directly from Firestore.
-        // Previously we fetched ALL providers and filtered client-side, which caused
-        // deduplication race conditions where a stale/offline mock record would shadow
-        // the real online provider record. Querying at source eliminates this entirely.
+        setLoadingData(true);
+        const myUid = userData.uid;
+
+        // 1. Listen to online providers (real Firestore data)
         const activeOnlineQuery = query(
             collection(db, 'providers'),
             where('isOnline', '==', true)
@@ -109,17 +115,14 @@ const CustomerHome = () => {
             const allProviders = [];
             snapshot.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
 
-            // Deduplicate by normalized name — keep the one with a real UID (real account)
-            // This handles the edge case where old mock + real account both have isOnline=true
+            // Deduplicate by name — keep real UID records over old mock records
             const uniqueProvidersMap = new Map();
             allProviders.forEach(p => {
                 const nameKey = (p.name || '').toLowerCase().trim();
                 if (!nameKey) return;
-
                 const existing = uniqueProvidersMap.get(nameKey);
                 const pIsReal = !!p.uid && !p.uid.startsWith('mock-');
                 const eIsReal = existing && !!existing.uid && !existing.uid.startsWith('mock-');
-
                 if (!existing || (pIsReal && !eIsReal)) {
                     uniqueProvidersMap.set(nameKey, p);
                 }
@@ -134,20 +137,19 @@ const CustomerHome = () => {
             setLoadingData(false);
         });
 
-        // 2. Listen to User Bookings in real-time
+        // 2. Listen to THIS user's bookings only — filter strictly by customerUid
+        // Falls back to name-match for old bookings that predate the customerUid field
         const unsubscribeBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
             const allMyBookings = [];
             snapshot.forEach(d => {
                 const b = { id: d.id, ...d.data() };
-                // Match by full name OR first name to handle variations (e.g. "Sneha" vs "Sneha Services")
-                const firstName = myName.split(' ')[0].toLowerCase();
-                const bookingCustRaw = (b.customer || '').toLowerCase();
-                const isMyBooking =
-                    bookingCustRaw === myName.toLowerCase() ||
-                    bookingCustRaw === firstName ||
-                    b.customer === 'Guest User' ||
-                    !b.customer;
-                if (isMyBooking) allMyBookings.push(b);
+                // Primary: match by UID (new bookings)
+                const matchByUid = b.customerUid === myUid;
+                // Fallback: name match ONLY for old bookings (no customerUid stored)
+                const matchByName = !b.customerUid && (
+                    (b.customer || '').toLowerCase() === (userData.name || '').toLowerCase()
+                );
+                if (matchByUid || matchByName) allMyBookings.push(b);
             });
 
             setMockBookings(allMyBookings.filter(b => b.status !== 'completed' && b.status !== 'rejected' && b.status !== 'cancelled'));
@@ -159,8 +161,7 @@ const CustomerHome = () => {
                 const cat = b.service || 'Other';
                 categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
             });
-            const cData = Object.keys(categoryCounts).map(k => ({ name: k, value: categoryCounts[k] }));
-            setChartData(cData);
+            setChartData(Object.keys(categoryCounts).map(k => ({ name: k, value: categoryCounts[k] })));
         }, (err) => {
             console.error('Bookings Listener Error:', err);
         });
@@ -228,8 +229,9 @@ const CustomerHome = () => {
             status: 'pending',
             provider: pendingBookingData.provider,
             providerPhone: pendingBookingData.providerPhone || '',
-            customer: userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer'),
-            customerPhone: pendingBookingData.customerPhone || '',
+            customer: userData?.name || 'Customer',
+            customerUid: userData?.uid || '',
+            customerPhone: pendingBookingData.customerPhone || userData?.phone || '',
             price: parseInt(pendingBookingData.price) || 500,
             date: bookingDate,
             time: bookingTime,
@@ -252,7 +254,6 @@ const CustomerHome = () => {
 
     const handleCancelBooking = async (bookingId) => {
         try {
-            const { updateDoc, doc } = await import('firebase/firestore');
             await updateDoc(doc(db, 'bookings', bookingId), { status: 'cancelled' });
             setMockBookings(prev => prev.filter(b => b.id !== bookingId));
         } catch (err) {
