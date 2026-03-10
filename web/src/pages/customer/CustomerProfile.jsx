@@ -42,6 +42,8 @@ const CustomerProfile = () => {
         { icon: Clock, label: 'Member Since', value: memberSince, color: 'text-blue-500', bg: 'bg-blue-50' },
     ];
 
+    const hasChanges = name.trim() !== initialName.trim();
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 px-4 py-10">
             <div className="max-w-4xl mx-auto space-y-8">
@@ -146,10 +148,10 @@ const CustomerProfile = () => {
                         <div className="pt-4 border-t border-slate-100 flex justify-end">
                             <button
                                 type="submit"
-                                disabled={isSaving}
+                                disabled={isSaving || !hasChanges}
                                 className={`px-8 py-4 font-bold rounded-2xl shadow-lg transition-all flex items-center gap-3 text-white
-                                    ${isSaving
-                                        ? 'bg-blue-400 cursor-not-allowed'
+                                        ${isSaving || !hasChanges
+                                        ? 'bg-slate-300 cursor-not-allowed shadow-none'
                                         : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/30 hover:shadow-xl hover:-translate-y-0.5 active:scale-95'
                                     }`}
                             >
