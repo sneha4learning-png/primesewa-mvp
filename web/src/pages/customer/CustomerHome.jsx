@@ -155,12 +155,18 @@ const CustomerHome = () => {
                 if (matchByUid || matchByName) allMyBookings.push(b);
             });
 
-            setMockBookings(allMyBookings.filter(b => b.status !== 'completed' && b.status !== 'rejected' && b.status !== 'cancelled'));
-            const pBookings = allMyBookings.filter(b => b.status === 'completed');
+            const sortedAll = allMyBookings.sort((a, b) => {
+                const tA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || new Date(a.date || 0).getTime();
+                const tB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || new Date(b.date || 0).getTime();
+                return tB - tA;
+            });
+
+            setMockBookings(sortedAll.filter(b => !['completed', 'rejected', 'cancelled'].includes(b.status)));
+            const pBookings = sortedAll.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status));
             setPastBookings(pBookings);
 
             const categoryCounts = {};
-            pBookings.forEach(b => {
+            pBookings.filter(b => b.status === 'completed').forEach(b => {
                 const cat = b.service || 'Other';
                 categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
             });
@@ -809,7 +815,13 @@ const CustomerHome = () => {
                                                             <span className="font-black text-slate-900">{b.service}</span>
                                                             <span className={`px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest ${b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>{b.status}</span>
                                                         </div>
-                                                        <p className="text-sm font-medium text-slate-500 mb-4">{b.date} at {b.time}</p>
+                                                        <p className="text-sm font-medium text-slate-500 mb-2">{b.date} at {b.time}</p>
+                                                        {b.description && (
+                                                            <div className="bg-slate-50/80 p-2.5 rounded-xl mb-4 border border-slate-100/50">
+                                                                <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-1">Stated Issue</p>
+                                                                <p className="text-xs font-medium text-slate-600 italic line-clamp-2">"{b.description}"</p>
+                                                            </div>
+                                                        )}
                                                         <div className="flex justify-between items-end">
                                                             <p className="text-sm font-bold text-slate-700 flex items-center gap-2">
                                                                 <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs text-slate-600">{b.provider.charAt(0)}</div>
@@ -923,11 +935,19 @@ const CustomerHome = () => {
                                         {pastBookings.length > 0 ? (
                                             pastBookings.map(b => (
                                                 <div key={b.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-all flex justify-between items-center group">
-                                                    <div>
-                                                        <p className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider">{b.service}</p>
-                                                        <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
+                                                    <div className="flex-1 min-w-0 pr-4">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider truncate">{b.service}</p>
+                                                            <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-green-100 text-green-700' : b.status === 'rejected' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'}`}>
+                                                                {b.status}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
+                                                        {b.description && (
+                                                            <p className="text-[10px] text-slate-400 italic mt-1.5 line-clamp-1 border-l-2 border-slate-200 pl-2">"{b.description}"</p>
+                                                        )}
                                                     </div>
-                                                    <p className="font-black text-slate-900">₹{b.proposedPrice || b.price}</p>
+                                                    <p className="font-black text-slate-900 shrink-0">₹{b.proposedPrice || b.price}</p>
                                                 </div>
                                             ))
                                         ) : (
