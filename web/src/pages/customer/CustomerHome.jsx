@@ -93,19 +93,9 @@ const CustomerHome = () => {
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
     useEffect(() => {
-        if (!userData?.uid) {
-            // Not logged in: clear bookings and show guest view
-            setMockBookings([]);
-            setPastBookings([]);
-            setChartData([]);
-            setLoadingData(false);
-            return;
-        }
-
         setLoadingData(true);
-        const myUid = userData.uid;
 
-        // 1. Listen to online providers (real Firestore data)
+        // 1. Listen to online providers — runs for ALL users (guests AND logged-in)
         const activeOnlineQuery = query(
             collection(db, 'providers'),
             where('isOnline', '==', true)
@@ -137,8 +127,15 @@ const CustomerHome = () => {
             setLoadingData(false);
         });
 
-        // 2. Listen to THIS user's bookings only — filter strictly by customerUid
-        // Falls back to name-match for old bookings that predate the customerUid field
+        // 2. Bookings listener — only for logged-in users
+        if (!userData?.uid) {
+            setMockBookings([]);
+            setPastBookings([]);
+            setChartData([]);
+            return () => unsubscribeProviders();
+        }
+
+        const myUid = userData.uid;
         const unsubscribeBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
             const allMyBookings = [];
             snapshot.forEach(d => {
@@ -263,8 +260,9 @@ const CustomerHome = () => {
 
     // Unified Filtering Logic
     const displayedProviders = mockProviders.filter(p => {
-        // 1. Status Check
-        if ((p.status || '').toLowerCase().trim() !== 'active') return false;
+        // 1. Status Check — accept 'active' OR 'approved' (admin sets 'approved')
+        const providerStatus = (p.status || '').toLowerCase().trim();
+        if (providerStatus !== 'active' && providerStatus !== 'approved') return false;
 
         // 2. Category Filter (Robust & Fuzzy)
         const matchesCategory = !selectedCategory || selectedCategory === 'All' || (() => {
