@@ -153,10 +153,25 @@ const LandingPage = () => {
                                     </div>
                                 </div>
                                 <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                                    <div className={`w-full h-full bg-gradient-to-r ${activeBooking?.status === 'accepted' || activeBooking?.status === 'arrived' || activeBooking?.status === 'started' ? 'from-emerald-400 to-emerald-500 animate-pulse' : 'from-blue-400 to-blue-500'}`}></div>
+                                    <div
+                                        className={`h-full bg-gradient-to-r transition-all duration-700 ${activeBooking?.status === 'accepted' ? 'from-emerald-400 to-emerald-500 animate-pulse' : 'from-blue-400 to-blue-500'}`}
+                                        style={{
+                                            width: activeBooking
+                                                ? (activeBooking.trackingStatus === 'inprogress' ? '100%' :
+                                                    activeBooking.trackingStatus === 'arrived' ? '66%' :
+                                                        activeBooking.trackingStatus === 'enroute' ? '33%' : '10%')
+                                                : '100%'
+                                        }}
+                                    ></div>
                                 </div>
                                 <p className={`text-[10px] text-center mt-2 font-bold tracking-widest uppercase ${activeBooking?.status === 'accepted' || activeBooking?.status === 'arrived' || activeBooking?.status === 'started' ? 'text-emerald-400' : 'text-blue-300'}`}>
-                                    {activeBooking ? (activeBooking.status === 'accepted' ? 'Partner is on the way' : activeBooking.status === 'arrived' ? 'Partner has arrived' : activeBooking.status === 'started' ? 'Job in progress' : 'Finding Provider...') : 'Top Rated Partner'}
+                                    {activeBooking ? (
+                                        activeBooking.trackingStatus === 'enroute' ? 'Partner is on the way' :
+                                            activeBooking.trackingStatus === 'arrived' ? 'Partner has arrived' :
+                                                activeBooking.trackingStatus === 'inprogress' ? 'Job in progress' :
+                                                    activeBooking.status === 'accepted' ? 'Partner Assigned' :
+                                                        'Finding Provider...'
+                                    ) : 'Top Rated Partner'}
                                 </p>
                             </div>
                         </div>
