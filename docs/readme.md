@@ -60,6 +60,7 @@ primesewa-mvp/
 
 - **Cross-Portal Navigation**: Seamlessly switch between the customer storefront, provider dashboard, and admin panel with integrated quick links.
 - **Provider Verification Flow**: Enhanced registration requiring identity proofs and work history, creating a trusted marketplace.
+- **Service Location Integration**: Free coordinate capture using HTML5 Geolocation and reverse-geocoding via OpenStreetMap Nominatim API, allowing providers to navigate directly via Google Maps.
 - **Live Provider Tracking**: Customers can track the real-time arrival status of providers for accepted jobs.
 - **Refined Admin Suite**: Comprehensive operational management featuring consolidated booking histories, icon-driven action tables, and dummy data seeding for demonstrations.
 
@@ -88,6 +89,7 @@ primesewa-mvp/
 | Auth | Firebase Phone OTP |
 | Hosting | Firebase Hosting (Global CDN) |
 | CI/CD | GitHub Actions |
+| Location | HTML5 Geolocation & OpenStreetMap Nominatim |
 
 ---
 
