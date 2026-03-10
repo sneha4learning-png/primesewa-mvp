@@ -115,7 +115,12 @@ const LoginPage = () => {
             }
             setCurrentUser(user);
             setUserData(userDataObj);
-            navigate('/dashboard');
+
+            if (sessionStorage.getItem('pendingCustomerBooking')) {
+                navigate('/customer');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             console.error("OTP Verify Error", err);
             setError('Invalid OTP. Please try again.');

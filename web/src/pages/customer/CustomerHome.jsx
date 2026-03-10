@@ -171,6 +171,28 @@ const CustomerHome = () => {
         };
     }, [userData]);
 
+    // Restore pending booking form if returned from login
+    useEffect(() => {
+        if (userData?.uid && !userData.uid.startsWith('mock-')) {
+            const saved = sessionStorage.getItem('pendingCustomerBooking');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    setPendingBookingData(data.pendingBookingData);
+                    setBookingDate(data.bookingDate || '');
+                    setBookingTime(data.bookingTime || '');
+                    setBookingDesc(data.bookingDesc || '');
+                    setBookingAddress(data.bookingAddress || '');
+                    setLocationCoords(data.locationCoords || null);
+                    setBookingStep(1); // Jump straight to the form
+                } catch (e) {
+                    console.error('Failed to parse pending booking', e);
+                }
+                sessionStorage.removeItem('pendingCustomerBooking');
+            }
+        }
+    }, [userData]);
+
     const handleGetLocation = () => {
         if (!navigator.geolocation) {
             alert("Geolocation is not supported by your browser");
@@ -244,8 +266,17 @@ const CustomerHome = () => {
     const confirmBooking = async (e) => {
         e.preventDefault();
 
-        if (!userData || !userData.uid || userData.uid === 'mock-cust') {
-            navigate('/login');
+        // If guest user clicks "Confirm Request", save their details and send them to login
+        if (!userData || !userData.uid || userData.uid === 'mock-cust' || userData.uid.startsWith('dev-')) {
+            sessionStorage.setItem('pendingCustomerBooking', JSON.stringify({
+                pendingBookingData,
+                bookingDate,
+                bookingTime,
+                bookingDesc,
+                bookingAddress,
+                locationCoords
+            }));
+            navigate('/customer/login');
             return;
         }
 
