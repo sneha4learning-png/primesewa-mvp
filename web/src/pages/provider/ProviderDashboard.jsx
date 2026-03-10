@@ -274,7 +274,15 @@ const ProviderDashboard = () => {
                                 </div>
                                 <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50 p-4 rounded-2xl">
                                     <div className="flex items-start gap-3">
-                                        <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" /> <span>{job.address}</span>
+                                        <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
+                                        <div className="flex flex-col">
+                                            <span>{job.address}</span>
+                                            {job.location && (
+                                                <a href={`https://www.google.com/maps?q=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-1 flex items-center gap-1">
+                                                    <Navigation className="w-3 h-3" /> Get Directions
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Phone className="w-4 h-4 text-slate-400 shrink-0" />
@@ -370,7 +378,15 @@ const ProviderDashboard = () => {
                                     </div>
                                     <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50/80 p-4 rounded-2xl border border-slate-100/50">
                                         <div className="flex items-start gap-3">
-                                            <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" /> <span>{req.address}</span>
+                                            <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
+                                            <div className="flex flex-col">
+                                                <span>{req.address}</span>
+                                                {req.location && (
+                                                    <a href={`https://www.google.com/maps?q=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-1 flex items-center gap-1">
+                                                        <Navigation className="w-3 h-3" /> View on Map
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{req.time}</span>

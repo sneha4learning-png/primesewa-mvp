@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
@@ -67,6 +67,8 @@ const CustomerHome = () => {
     const [networkError, setNetworkError] = useState(false);
     const [dbError, setDbError] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
+    const [isLocating, setIsLocating] = useState(false);
+    const [locationCoords, setLocationCoords] = useState(null);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const serviceImages = [
@@ -169,6 +171,46 @@ const CustomerHome = () => {
         };
     }, [userData]);
 
+    const handleGetLocation = () => {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser");
+            return;
+        }
+
+        setIsLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                setLocationCoords({ lat, lng });
+
+                try {
+                    // Free reverse geocoding via OpenStreetMap Nominatim API
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                    const data = await response.json();
+
+                    if (data && data.display_name) {
+                        setBookingAddress(data.display_name);
+                    } else {
+                        setBookingAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                    }
+                } catch (error) {
+                    console.error("Geocoding error:", error);
+                    setBookingAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                } finally {
+                    setIsLocating(false);
+                }
+            },
+            (error) => {
+                console.error("Location error:", error);
+                setIsLocating(false);
+                if (error.code === 1) alert("Location access denied. Please allow location permissions.");
+                else alert("Unable to retrieve your location.");
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    };
+
     const handleBook = (provider) => {
         // Safely parse price whether it's a string (e.g. '₹500/hr') or a number
         const rawPrice = provider.price;
@@ -234,6 +276,7 @@ const CustomerHome = () => {
             time: bookingTime,
             description: bookingDesc,
             address: bookingAddress,
+            location: locationCoords ? { lat: locationCoords.lat, lng: locationCoords.lng } : null,
             createdAt: serverTimestamp()
         };
 
@@ -474,7 +517,18 @@ const CustomerHome = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Service Address *</label>
+                            <div className="flex items-center justify-between mb-3">
+                                <label className="block text-sm font-bold text-slate-700 uppercase tracking-wider">Service Address *</label>
+                                <button
+                                    type="button"
+                                    onClick={handleGetLocation}
+                                    disabled={isLocating}
+                                    className="flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                                >
+                                    {isLocating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
+                                    {isLocating ? 'Locating...' : 'Use Current Location'}
+                                </button>
+                            </div>
                             <input required type="text" value={bookingAddress} onChange={(e) => setBookingAddress(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., 404 Safal Profitaire, Corporate Road, Prahladnagar, Ahmedabad" />
                         </div>
 
