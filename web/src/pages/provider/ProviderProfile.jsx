@@ -5,7 +5,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { UserCircle, Star, StarHalf, Briefcase, Phone, Tag, MapPin } from 'lucide-react';
 
 const ProviderProfile = () => {
-    const { currentUser, userData, handleLogout } = useAuth();
+    const { currentUser, userData } = useAuth();
     const [profile, setProfile] = useState(null);
 
     useEffect(() => {

@@ -343,7 +343,7 @@ const ProviderDashboard = () => {
                                             { key: 'enroute', label: '🚗 En Route', color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
                                             { key: 'arrived', label: '📍 Arrived', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
                                             { key: 'inprogress', label: '🔧 In Progress', color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' },
-                                        ].map((s, index) => {
+                                        ].map((s) => {
                                             const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
                                             const currentStatusLevel = job.trackingStatus ? statusOrder[job.trackingStatus] || 0 : 0;
                                             const thisStatusLevel = statusOrder[s.key];

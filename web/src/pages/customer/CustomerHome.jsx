@@ -157,11 +157,13 @@ const CustomerHome = () => {
                 const b = { id: d.id, ...d.data() };
                 // Primary: match by UID (new bookings)
                 const matchByUid = b.customerUid === myUid;
+                // Secondary: match by phone (robust fallback)
+                const matchByPhone = b.customerPhone && (b.customerPhone === userData.phone);
                 // Fallback: name match ONLY for old bookings (no customerUid stored)
-                const matchByName = !b.customerUid && (
+                const matchByName = !b.customerUid && !b.customerPhone && (
                     (b.customer || '').toLowerCase() === (userData.name || '').toLowerCase()
                 );
-                if (matchByUid || matchByName) allMyBookings.push(b);
+                if (matchByUid || matchByPhone || matchByName) allMyBookings.push(b);
             });
 
             const sortedAll = allMyBookings.sort((a, b) => {

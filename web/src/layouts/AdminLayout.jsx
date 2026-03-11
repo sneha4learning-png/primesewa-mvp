@@ -3,6 +3,40 @@ import { useState } from 'react';
 import { LayoutDashboard, Users, UserCog, CalendarDays, DollarSign, LogOut, Bell, Menu, X, Wrench } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
 
+const navLinkClass = ({ isActive }) =>
+    `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive
+        ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20'
+        : 'text-slate-400 hover:bg-white/5 hover:text-white'}`;
+
+const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
+    <>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
+            <span className="flex items-center gap-3">
+                <img src="/logo-v2.png" alt="PrimeSewa" className="w-10 h-10 object-contain shadow-2xl" />
+                <span className="text-2xl font-black text-white tracking-tighter">PrimeSewa</span>
+            </span>
+            <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
+                <X className="w-5 h-5" />
+            </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto py-8">
+            <ul className="space-y-2 px-4 relative z-10">
+                <li><NavLink to="/admin" end className={navLinkClass} onClick={() => setSidebarOpen(false)}><LayoutDashboard className="w-5 h-5" /> Dashboard</NavLink></li>
+                <li><NavLink to="/admin/providers" className={navLinkClass} onClick={() => setSidebarOpen(false)}><UserCog className="w-5 h-5" /> Provider Fleet</NavLink></li>
+                <li><NavLink to="/admin/bookings" className={navLinkClass} onClick={() => setSidebarOpen(false)}><CalendarDays className="w-5 h-5" /> Live Bookings</NavLink></li>
+                <li><NavLink to="/admin/commissions" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Commissions</NavLink></li>
+                <li><NavLink to="/admin/users" className={navLinkClass} onClick={() => setSidebarOpen(false)}><Users className="w-5 h-5" /> Consumers</NavLink></li>
+            </ul>
+        </nav>
+        <div className="p-4 border-t border-white/10 relative z-10">
+            <button onClick={handleLogout} className="flex items-center justify-center gap-3 px-4 py-3 w-full text-slate-300 font-medium rounded-xl hover:bg-rose-500/20 hover:text-rose-400 border border-transparent hover:border-rose-500/30 transition-all duration-300">
+                <LogOut className="w-5 h-5" /> Terminate Session
+            </button>
+        </div>
+    </>
+);
+
 const AdminLayout = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
@@ -20,45 +54,11 @@ const AdminLayout = () => {
         navigate('/admin/login');
     };
 
-    const navLinkClass = ({ isActive }) =>
-        `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive
-            ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-blue-400 shadow-inner border border-blue-500/20'
-            : 'text-slate-400 hover:bg-white/5 hover:text-white'}`;
-
-    const SidebarInner = () => (
-        <>
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
-                <span className="flex items-center gap-3">
-                    <img src="/logo-v2.png" alt="PrimeSewa" className="w-10 h-10 object-contain shadow-2xl" />
-                    <span className="text-2xl font-black text-white tracking-tighter">PrimeSewa</span>
-                </span>
-                <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
-                    <X className="w-5 h-5" />
-                </button>
-            </div>
-            <nav className="flex-1 overflow-y-auto py-8">
-                <ul className="space-y-2 px-4 relative z-10">
-                    <li><NavLink to="/admin" end className={navLinkClass} onClick={() => setSidebarOpen(false)}><LayoutDashboard className="w-5 h-5" /> Dashboard</NavLink></li>
-                    <li><NavLink to="/admin/providers" className={navLinkClass} onClick={() => setSidebarOpen(false)}><UserCog className="w-5 h-5" /> Provider Fleet</NavLink></li>
-                    <li><NavLink to="/admin/bookings" className={navLinkClass} onClick={() => setSidebarOpen(false)}><CalendarDays className="w-5 h-5" /> Live Bookings</NavLink></li>
-                    <li><NavLink to="/admin/commissions" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Commissions</NavLink></li>
-                    <li><NavLink to="/admin/users" className={navLinkClass} onClick={() => setSidebarOpen(false)}><Users className="w-5 h-5" /> Consumers</NavLink></li>
-                </ul>
-            </nav>
-            <div className="p-4 border-t border-white/10 relative z-10">
-                <button onClick={handleLogout} className="flex items-center justify-center gap-3 px-4 py-3 w-full text-slate-300 font-medium rounded-xl hover:bg-rose-500/20 hover:text-rose-400 border border-transparent hover:border-rose-500/30 transition-all duration-300">
-                    <LogOut className="w-5 h-5" /> Terminate Session
-                </button>
-            </div>
-        </>
-    );
-
     return (
         <div className="flex h-screen bg-[#F8FAFC]">
             {/* Desktop Sidebar */}
             <aside className="hidden lg:flex w-72 bg-[#0B0F19] border-r border-[#1E293B] flex-col relative overflow-hidden">
-                <SidebarInner />
+                <SidebarInner setSidebarOpen={setSidebarOpen} handleLogout={handleLogout} />
             </aside>
 
             {/* Mobile Sidebar Overlay */}
@@ -66,7 +66,7 @@ const AdminLayout = () => {
                 <div className="lg:hidden fixed inset-0 z-50 flex">
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
                     <aside className="relative w-72 bg-[#0B0F19] flex flex-col overflow-hidden z-10">
-                        <SidebarInner />
+                        <SidebarInner setSidebarOpen={setSidebarOpen} handleLogout={handleLogout} />
                     </aside>
                 </div>
             )}

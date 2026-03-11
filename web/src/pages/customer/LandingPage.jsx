@@ -8,6 +8,7 @@ import { collection, query, where, getDocs, orderBy, limit, onSnapshot } from 'f
 const LandingPage = () => {
     const { userData } = useAuth();
     const [providerDetails, setProviderDetails] = useState(null);
+    const [activeBooking, setActiveBooking] = useState(null);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const serviceImages = [
@@ -40,10 +41,31 @@ const LandingPage = () => {
             const topOnline = providers.find(p => p.isOnline === true || String(p.isOnline) === 'true');
             if (topOnline) setProviderDetails(topOnline);
         });
+
+        // 2. Listen to User's Active Booking for Tracking (if logged in)
+        let unsubscribeBooking = () => { };
+        if (userData?.phone) {
+            const bookingQuery = query(
+                collection(db, 'bookings'),
+                where('customerPhone', '==', userData.phone),
+                where('status', 'in', ['pending', 'accepted', 'enroute', 'arrived', 'inprogress', 'negotiating']),
+                orderBy('createdAt', 'desc'),
+                limit(1)
+            );
+            unsubscribeBooking = onSnapshot(bookingQuery, (snapshot) => {
+                if (!snapshot.empty) {
+                    setActiveBooking({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
+                } else {
+                    setActiveBooking(null);
+                }
+            });
+        }
+
         return () => {
             unsubscribeTop();
+            unsubscribeBooking();
         };
-    }, []);
+    }, [userData]);
     return (
         <div className="flex flex-col min-h-screen">
             {/* Hero Section */}
@@ -114,27 +136,60 @@ const LandingPage = () => {
                                 ))}
                             </div>
                             <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-white text-indigo-600 shadow-md">
-                                            {(providerDetails?.name || 'A').charAt(0).toUpperCase()}
+                                {activeBooking ? (
+                                    <>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-blue-500 text-white shadow-lg animate-pulse">
+                                                    <Clock className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-white">Live Status: {activeBooking.status}</h4>
+                                                    <p className="text-blue-200 text-sm">{activeBooking.service}</p>
+                                                </div>
+                                            </div>
+                                            <Link to="/dashboard" className="text-white bg-white/20 hover:bg-white/30 p-2 rounded-xl transition-all">
+                                                <ArrowRight className="w-5 h-5" />
+                                            </Link>
                                         </div>
-                                        <div>
-                                            <h4 className="font-bold text-white">{providerDetails?.name || 'Finding Partner...'}</h4>
-                                            <p className="text-indigo-200 text-sm">{providerDetails?.category || 'Expert Service'}</p>
+                                        <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full bg-gradient-to-r from-blue-400 to-indigo-400 transition-all duration-1000 ${activeBooking.trackingStatus === 'inprogress' ? 'w-full' :
+                                                    activeBooking.trackingStatus === 'arrived' ? 'w-[75%]' :
+                                                        activeBooking.trackingStatus === 'enroute' ? 'w-[50%]' :
+                                                            activeBooking.status === 'accepted' ? 'w-[25%]' : 'w-[10%]'
+                                                    }`}
+                                            ></div>
                                         </div>
-                                    </div>
-                                    <div className="flex items-center gap-1 text-amber-400">
-                                        <Star className="w-5 h-5 fill-current" />
-                                        <span className="font-bold text-white">{providerDetails ? Number(providerDetails.rating || 0).toFixed(1) : '5.0'}</span>
-                                    </div>
-                                </div>
-                                <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r transition-all duration-700 from-blue-400 to-blue-500 w-full animate-pulse"></div>
-                                </div>
-                                <p className="text-[10px] text-center mt-2 font-bold tracking-widest uppercase text-blue-300">
-                                    Top Rated Partner
-                                </p>
+                                        <p className="text-[10px] text-center mt-2 font-bold tracking-widest uppercase text-blue-300">
+                                            Track your service in real-time
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-white text-indigo-600 shadow-md">
+                                                    {(providerDetails?.name || 'A').charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-white">{providerDetails?.name || 'Finding Partner...'}</h4>
+                                                    <p className="text-indigo-200 text-sm">{providerDetails?.category || 'Expert Service'}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-1 text-amber-400">
+                                                <Star className="w-5 h-5 fill-current" />
+                                                <span className="font-bold text-white">{providerDetails ? Number(providerDetails.rating || 0).toFixed(1) : '5.0'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+                                            <div className="h-full bg-gradient-to-r transition-all duration-700 from-blue-400 to-blue-500 w-full animate-pulse"></div>
+                                        </div>
+                                        <p className="text-[10px] text-center mt-2 font-bold tracking-widest uppercase text-blue-300">
+                                            Top Rated Partner
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
