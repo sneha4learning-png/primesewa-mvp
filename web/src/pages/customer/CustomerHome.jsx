@@ -305,6 +305,7 @@ const CustomerHome = () => {
             provider: provider.name || 'Provider',
             providerPhone: provider.phone || '',
             previousWorkSample: provider.previousWorkSample,
+            portfolio: provider.portfolio || [],
             customer: userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer'),
             price: parsedPrice
         };
@@ -540,26 +541,40 @@ const CustomerHome = () => {
                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
                     <h2 className="text-3xl font-black mb-8 text-slate-900">Confirm Booking {pendingBookingData?.service ? <span className="text-blue-600 block text-xl mt-2">({pendingBookingData.service})</span> : ''}</h2>
 
-                    {pendingBookingData?.previousWorkSample && (
+                    {pendingBookingData && (pendingBookingData.previousWorkSample || (pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0)) && (
                         <div className="mb-8">
                             <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider flex items-center gap-2">
                                 <ShieldCheck className="w-4 h-4 text-blue-500" />
                                 Provider's Previous Work
                             </label>
-                            <div className="rounded-2xl overflow-hidden h-40 border border-slate-200 shadow-sm relative group">
-                                <img
-                                    src={pendingBookingData.previousWorkSample}
-                                    alt="Previous Work Sample"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                    onError={(e) => {
-                                        // Fallback to a clean placeholder if the provider's link (like imgur) is broken
-                                        e.target.onerror = null;
-                                        e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
-                                    }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                    <span className="text-white font-medium text-sm drop-shadow-md">Verified Work Sample</span>
-                                </div>
+                            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar snap-x">
+                                {pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0 ? (
+                                    pendingBookingData.portfolio.map((img, idx) => (
+                                        <div key={idx} className="rounded-2xl overflow-hidden h-32 w-48 border border-slate-200 shadow-sm relative group shrink-0 snap-center">
+                                            <img
+                                                src={img}
+                                                alt={`Work sample ${idx + 1}`}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                onError={(e) => {
+                                                    e.target.onerror = null;
+                                                    e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
+                                                }}
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="rounded-2xl overflow-hidden h-40 w-full border border-slate-200 shadow-sm relative group">
+                                        <img
+                                            src={pendingBookingData.previousWorkSample || 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80'}
+                                            alt="Previous Work Sample"
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
+                                            }}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
