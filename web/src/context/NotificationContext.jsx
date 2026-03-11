@@ -10,7 +10,7 @@ export const useNotifications = () => useContext(NotificationContext);
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
-    const { currentUser } = useAuth();
+    const { currentUser, userData } = useAuth();
 
     useEffect(() => {
         if (!currentUser) {
@@ -19,9 +19,14 @@ export const NotificationProvider = ({ children }) => {
             return;
         }
 
+        const userIdentifiers = [currentUser.uid];
+        if (userData?.role) {
+            userIdentifiers.push(userData.role);
+        }
+
         const q = query(
             collection(db, 'notifications'),
-            where('userId', '==', currentUser.uid),
+            where('userId', 'in', userIdentifiers),
             orderBy('createdAt', 'desc'),
             limit(20)
         );
@@ -36,7 +41,7 @@ export const NotificationProvider = ({ children }) => {
         });
 
         return () => unsubscribe();
-    }, [currentUser]);
+    }, [currentUser, userData?.role]);
 
     const sendNotification = async (userId, title, message, type = 'info') => {
         try {
