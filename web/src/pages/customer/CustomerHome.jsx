@@ -775,8 +775,12 @@ const CustomerHome = () => {
                                                         : 'Across Ahmedabad'}
                                                 </div>
                                                 <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-2">
-                                                    <span className="flex items-center gap-1 text-amber-500 text-xs font-bold bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
-                                                        <Star className="w-3 h-3 fill-current" /> {provider.rating ? Number(provider.rating).toFixed(1) : '—'}
+                                                    <span className={`flex items-center gap-1 ${provider.jobs > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} text-xs font-bold px-2 py-0.5 rounded-lg border`}>
+                                                        {provider.jobs > 0 ? (
+                                                            <><Star className="w-3 h-3 fill-current" /> {Number(provider.rating || 0).toFixed(1)}</>
+                                                        ) : (
+                                                            'New'
+                                                        )}
                                                     </span>
                                                     <span className="text-xs text-slate-400 font-medium">{provider.jobs || 0} jobs</span>
                                                     <span className="flex items-center gap-0.5 text-emerald-700 text-xs font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
@@ -1087,8 +1091,8 @@ const CustomerHome = () => {
                                             <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
                                                 <Star className="w-5 h-5 fill-current" />
                                             </div>
-                                            <div className="text-xl font-black text-slate-900">{jobs > 0 ? rating.toFixed(1) : 'N/A'}</div>
-                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rating</div>
+                                            <div className="text-xl font-black text-slate-900">{jobs > 0 ? rating.toFixed(1) : 'New'}</div>
+                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{jobs > 0 ? 'Rating' : 'Status'}</div>
                                         </div>
                                         <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
                                             <div className="flex items-center justify-center gap-1 text-emerald-600 mb-1">

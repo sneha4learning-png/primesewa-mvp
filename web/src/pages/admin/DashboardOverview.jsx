@@ -94,10 +94,17 @@ const DashboardOverview = () => {
                     jobs: completedCounts.get(p.name) || 0
                 }));
                 activeProvs.sort((a, b) => {
+                    const jobsA = a.jobs || 0;
+                    const jobsB = b.jobs || 0;
+                    
+                    // Prioritize those with jobs
+                    if (jobsA > 0 && jobsB === 0) return -1;
+                    if (jobsA === 0 && jobsB > 0) return 1;
+
                     const ratingA = parseFloat(a.rating) || 0;
                     const ratingB = parseFloat(b.rating) || 0;
                     if (ratingB !== ratingA) return ratingB - ratingA;
-                    return (b.jobs || 0) - (a.jobs || 0);
+                    return jobsB - jobsA;
                 });
                 setTopProviders(activeProvs.slice(0, 5));
 
@@ -192,8 +199,14 @@ const DashboardOverview = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="flex items-center justify-end gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded text-sm font-bold border border-amber-100 mb-1">
-                                            <Star className="w-3.5 h-3.5 fill-current" /> {Number(p.rating || 0).toFixed(1)}
+                                        <div className={`flex items-center justify-end gap-1 ${p.jobs > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} px-2 py-0.5 rounded text-sm font-bold border mb-1`}>
+                                            {p.jobs > 0 ? (
+                                                <>
+                                                    <Star className="w-3.5 h-3.5 fill-current" /> {Number(p.rating || 0).toFixed(1)}
+                                                </>
+                                            ) : (
+                                                <span className="text-[10px] uppercase tracking-widest px-1">New</span>
+                                            )}
                                         </div>
                                         <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{p.jobs || 0} Jobs</div>
                                     </div>
