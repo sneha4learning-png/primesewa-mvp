@@ -302,7 +302,13 @@ const DashboardOverview = () => {
                                         {b.status}
                                     </span>
                                 </div>
-                                <p className="text-xs text-slate-500 font-medium mb-2">{b.customer} • {b.provider}</p>
+                                <p className="text-xs text-slate-700 font-semibold mb-1">👤 {b.customer}</p>
+                                <p className="text-xs text-slate-500 font-medium mb-1">🔧 {b.provider}</p>
+                                {(b.date || b.time) && (
+                                    <p className="text-xs text-slate-400 font-medium mt-1 flex items-center gap-1">
+                                        📅 {b.date || '—'}{b.time ? ` • 🕐 ${b.time}` : ''}
+                                    </p>
+                                )}
                             </div>
                         ))}
                     </div>
