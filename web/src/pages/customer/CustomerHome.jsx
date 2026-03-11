@@ -229,7 +229,6 @@ const CustomerHome = () => {
 
     const handleAddressTyping = (e) => {
         const val = e.target.value;
-        setBookingAddress(val);
 
         if (addressSearchTimeout) clearTimeout(addressSearchTimeout);
 
@@ -241,28 +240,40 @@ const CustomerHome = () => {
         const timeoutId = setTimeout(async () => {
             setIsSearchingAddress(true);
             try {
-                // Ahmedabad bounding box: SW(72.43,22.87) → NE(72.71,23.13)
-                // bounded=1 forces results inside the box only
-                // Include amenities/landmarks via addressdetails & extratags
+                // Nominatim STRUCTURED query — locks city=Ahmedabad & state=Gujarat
+                // Much more reliable than free-text + bounded viewbox
                 const url = [
                     'https://nominatim.openstreetmap.org/search',
                     `?format=json`,
-                    `&q=${encodeURIComponent(val + ', Ahmedabad')}`,
+                    `&street=${encodeURIComponent(val)}`,
+                    `&city=Ahmedabad`,
+                    `&state=Gujarat`,
+                    `&country=India`,
                     `&addressdetails=1`,
                     `&extratags=1`,
                     `&namedetails=1`,
-                    `&limit=8`,
-                    `&countrycodes=in`,
-                    `&viewbox=72.43,23.13,72.71,22.87`,
-                    `&bounded=1`
+                    `&limit=8`
                 ].join('');
 
-                const res = await fetch(url, {
-                    headers: { 'Accept-Language': 'en' }
-                });
-                const data = await res.json();
+                const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+                let data = await res.json();
 
-                // Secondary filter — only keep results that mention Ahmedabad or Gujarat
+                // Fallback: if structured query returns nothing, try free-text with city appended
+                if (!data || data.length === 0) {
+                    const fallbackUrl = [
+                        'https://nominatim.openstreetmap.org/search',
+                        `?format=json`,
+                        `&q=${encodeURIComponent(val + ' Ahmedabad Gujarat')}`,
+                        `&addressdetails=1`,
+                        `&namedetails=1`,
+                        `&countrycodes=in`,
+                        `&limit=8`
+                    ].join('');
+                    const fallbackRes = await fetch(fallbackUrl, { headers: { 'Accept-Language': 'en' } });
+                    data = await fallbackRes.json();
+                }
+
+                // Keep only Ahmedabad/Gujarat results
                 const filtered = (data || []).filter(p => {
                     const addr = JSON.stringify(p.address || {}).toLowerCase();
                     return addr.includes('ahmedabad') || addr.includes('gujarat');

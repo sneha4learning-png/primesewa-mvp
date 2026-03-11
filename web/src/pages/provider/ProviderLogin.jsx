@@ -385,11 +385,15 @@ const ProviderLogin = () => {
                                 >
                                     <option value="" disabled className="text-slate-500">Choose your account</option>
                                     {providers.map(p => {
-                                        const phoneStr = (p.phone || '').replace('+91', '');
-                                        const phoneTail = phoneStr.slice(-4) || p._docId?.slice(-4) || '????';
+                                        const phoneStr = (p.phone || '').replace(/^\+91/, '');
+                                        // Avoid showing 0000 or blank — use doc ID suffix as fallback
+                                        const rawTail = phoneStr.slice(-4);
+                                        const tail = (rawTail && rawTail !== '0000' && /\d{4}/.test(rawTail))
+                                            ? rawTail
+                                            : (p._docId || '').replace(/[^a-z0-9]/gi, '').slice(-4).toUpperCase() || '????';
                                         const status = (p.status || 'pending').toLowerCase();
                                         const isActive = status === 'active' || status === 'approved';
-                                        const label = `${isActive ? '✅' : '⏳'} ${p.name || 'Provider'} (${p.category || 'Service'}) — ****${phoneTail}`;
+                                        const label = `${isActive ? '✅' : '⏳'} ${p.name || 'Provider'} (${p.category || 'Service'}) — ****${tail}`;
                                         return <option key={p._docId || phoneStr} value={phoneStr}>{label}</option>;
                                     })}
                                 </select>
