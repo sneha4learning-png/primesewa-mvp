@@ -47,22 +47,29 @@ const ProviderLogin = () => {
     useEffect(() => {
         const fetchProviders = async () => {
             try {
-                // Fetch all providers so we can check status during login
                 const querySnapshot = await getDocs(collection(db, 'providers'));
                 const fetchedMap = new Map();
 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const phone = data.phone?.replace('+91', '') || doc.id;
-                    // Only keep the most recent if there are duplicates (or any)
-                    if (!fetchedMap.has(phone)) {
-                        fetchedMap.set(phone, data);
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    // Deduplicate by doc ID (uid) — ensures newly-signed-up providers are never skipped
+                    const key = docSnap.id;
+                    if (!fetchedMap.has(key)) {
+                        fetchedMap.set(key, { ...data, _docId: docSnap.id });
                     }
                 });
 
-                setProviders(Array.from(fetchedMap.values()));
+                // Sort: approved/active first, then pending, then by name
+                const sorted = Array.from(fetchedMap.values()).sort((a, b) => {
+                    const aActive = ['active', 'approved'].includes((a.status || '').toLowerCase());
+                    const bActive = ['active', 'approved'].includes((b.status || '').toLowerCase());
+                    if (aActive !== bActive) return aActive ? -1 : 1;
+                    return (a.name || '').localeCompare(b.name || '');
+                });
+
+                setProviders(sorted);
             } catch (err) {
-                console.error("Error fetching providers:", err);
+                console.error('Error fetching providers:', err);
             }
         };
         fetchProviders();
@@ -377,11 +384,14 @@ const ProviderLogin = () => {
                                     onChange={(e) => setPhoneNumber(e.target.value)}
                                 >
                                     <option value="" disabled className="text-slate-500">Choose your account</option>
-                                    {/* Show all providers in the login dropdown so they can log in and see their status */
-                                        providers.map(p => {
-                                            const phoneStr = (p.phone || '').replace('+91', '');
-                                            return <option key={p.phone} value={phoneStr}>{p.name} ({phoneStr})</option>;
-                                        })}
+                                    {providers.map(p => {
+                                        const phoneStr = (p.phone || '').replace('+91', '');
+                                        const phoneTail = phoneStr.slice(-4) || p._docId?.slice(-4) || '????';
+                                        const status = (p.status || 'pending').toLowerCase();
+                                        const isActive = status === 'active' || status === 'approved';
+                                        const label = `${isActive ? '✅' : '⏳'} ${p.name || 'Provider'} (${p.category || 'Service'}) — ****${phoneTail}`;
+                                        return <option key={p._docId || phoneStr} value={phoneStr}>{label}</option>;
+                                    })}
                                 </select>
                             ) : (
                                 <p className="text-sm text-slate-400 bg-slate-900 border border-slate-700 p-3 rounded-xl">No active providers available.</p>
