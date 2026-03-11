@@ -17,6 +17,16 @@ const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     </div>
 );
 
+// Converts 24-hour time string (e.g. "16:00") → AM/PM (e.g. "4:00 PM") — consistent with all panels
+const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':').map(Number);
+    if (isNaN(h)) return timeStr;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const hour = h % 12 || 12;
+    return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+};
+
 const DashboardOverview = () => {
     const [stats, setStats] = useState({
         totalBookings: 0,
@@ -306,7 +316,7 @@ const DashboardOverview = () => {
                                 <p className="text-xs text-slate-500 font-medium mb-1">🔧 {b.provider}</p>
                                 {(b.date || b.time) && (
                                     <p className="text-xs text-slate-400 font-medium mt-1 flex items-center gap-1">
-                                        📅 {b.date || '—'}{b.time ? ` • 🕐 ${b.time}` : ''}
+                                        📅 {b.date || '—'}{b.time ? ` • 🕐 ${formatTime(b.time)}` : ''}
                                     </p>
                                 )}
                             </div>
