@@ -131,14 +131,23 @@ const CustomerHome = () => {
             const allProviders = [];
             snapshot.forEach(d => allProviders.push({ id: d.id, ...d.data() }));
 
-            // Deduplicate by name — keep real UID records over old mock records
+            // Deduplicate by name — prioritize real Auth UID records over mock/pre-filled records
             const uniqueProvidersMap = new Map();
             allProviders.forEach(p => {
                 const nameKey = (p.name || '').toLowerCase().trim();
                 if (!nameKey) return;
                 const existing = uniqueProvidersMap.get(nameKey);
-                const pIsReal = !!p.uid && !p.uid.startsWith('mock-');
-                const eIsReal = existing && !!existing.uid && !existing.uid.startsWith('mock-');
+                
+                // Identify if this is a "real" Firebase Auth UID (usually 28 chars, no 'dev-' or 'mock-' prefix)
+                const isRealId = p.id && p.id.length >= 20 && !p.id.includes('-');
+                const isRealUid = p.uid && p.uid.length >= 20 && !p.uid.startsWith('mock-') && !p.uid.includes('-');
+                const pIsReal = isRealId || isRealUid;
+
+                const eIsReal = existing && (
+                    (existing.id && existing.id.length >= 20 && !existing.id.includes('-')) ||
+                    (existing.uid && existing.uid.length >= 20 && !existing.uid.startsWith('mock-') && !existing.uid.includes('-'))
+                );
+
                 if (!existing || (pIsReal && !eIsReal)) {
                     uniqueProvidersMap.set(nameKey, p);
                 }
@@ -370,7 +379,10 @@ const CustomerHome = () => {
             service: (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Plumbing',
             status: 'pending',
             provider: provider.name || 'Provider',
-            providerUid: provider.uid || provider.id || '',
+            // Prioritize the ID if it looks like a real Auth UID, otherwise use .uid field
+            providerUid: (provider.id && provider.id.length >= 20 && !provider.id.includes('-')) 
+                ? provider.id 
+                : (provider.uid && !provider.uid.startsWith('mock-') ? provider.uid : provider.id),
             providerPhone: provider.phone || '',
             previousWorkSample: provider.previousWorkSample,
             portfolio: provider.portfolio || [],
@@ -449,6 +461,7 @@ const CustomerHome = () => {
             service: pendingBookingData ? pendingBookingData.service : (selectedCategory || 'Plumbing'),
             status: 'pending',
             provider: pendingBookingData.provider,
+            providerUid: pendingBookingData.providerUid || '',
             providerPhone: pendingBookingData.providerPhone || '',
             customer: userData?.name || 'Customer',
             customerUid: userData?.uid || '',
@@ -504,12 +517,22 @@ const CustomerHome = () => {
         const providerStatus = (p.status || '').toLowerCase().trim();
         if (providerStatus !== 'active' && providerStatus !== 'approved') return false;
 
-        // 2. Category Filter (Robust & Fuzzy)
-        const matchesCategory = !selectedCategory || selectedCategory === 'All' || (() => {
-            const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
-            const target = selectedCategory.toLowerCase().trim();
+        const pName = (p.name || '').toLowerCase();
+        const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
+        const queryTerm = (searchQuery || '').toLowerCase().trim();
 
-            return pCats.some(c => {
+        // 2. Global Search Override
+        // If searching, we prioritize showing anything that matches name or category across ALL types
+        if (queryTerm !== '') {
+            const matchesSearch = pName.includes(queryTerm) || pCats.some(c => c.includes(queryTerm));
+            if (!matchesSearch) return false;
+            // When searching, we don't strictly enforce category filter unless it also matches
+        }
+
+        // 3. Category Filter (Active only if not searching or if it matches)
+        if (selectedCategory && selectedCategory !== 'All' && queryTerm === '') {
+            const target = selectedCategory.toLowerCase().trim();
+            const matchesCategory = pCats.some(c => {
                 if (c === target) return true;
                 if (target === 'carpentry' && (c.includes('carpent') || c.includes('wood'))) return true;
                 if (target === 'electrical' && (c.includes('electri') || c.includes('light'))) return true;
@@ -517,19 +540,11 @@ const CustomerHome = () => {
                 if (target === 'cleaning' && (c.includes('clean') || c.includes('housekeep'))) return true;
                 return c.includes(target) || target.includes(c);
             });
-        })();
-        if (!matchesCategory) return false;
-
-        // 3. Search Query
-        if (searchQuery.trim() !== '') {
-            const query = searchQuery.toLowerCase();
-            const matchesSearch = (p.name || '').toLowerCase().includes(query) ||
-                (Array.isArray(p.category) ? p.category.join(' ') : (p.category || '')).toLowerCase().includes(query);
-            if (!matchesSearch) return false;
+            if (!matchesCategory) return false;
         }
 
         // 4. Rating Filter
-        if (ratingFilter !== 'All Ratings') {
+        if (ratingFilter !== '0') {
             const minRating = parseFloat(ratingFilter);
             if ((p.rating || 0) < minRating) return false;
         }
@@ -904,17 +919,29 @@ const CustomerHome = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Main Content Area */}
                     <div className="lg:col-span-2 space-y-12">
-                        {/* Search */}
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-blue-500/5 rounded-3xl blur-xl group-hover:bg-blue-500/10 transition-colors pointer-events-none"></div>
-                            <Search className="w-7 h-7 absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search for 'Electrician', 'Cleaning'..."
-                                className="w-full pl-16 pr-6 py-6 bg-white border border-slate-200 rounded-3xl shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-lg font-medium text-slate-800 transition-all placeholder:text-slate-400"
-                            />
+                        {/* Improved Premium Search */}
+                        <div className="relative group max-w-3xl mx-auto">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-40 transition duration-1000 group-focus-within:duration-200"></div>
+                            <div className="relative flex items-center bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-indigo-500/5 overflow-hidden focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all duration-300">
+                                <div className="pl-6 flex items-center">
+                                    <Search className="w-6 h-6 text-slate-400 group-focus-within:text-blue-600 transition-colors duration-300" />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Need help with something? Search 'Plumbing', 'Electrical'..."
+                                    className="w-full px-5 py-5 bg-transparent border-none focus:ring-0 text-lg font-medium text-slate-800 placeholder:text-slate-400"
+                                />
+                                {searchQuery && (
+                                    <button 
+                                        onClick={() => setSearchQuery('')}
+                                        className="pr-6 text-slate-300 hover:text-slate-500 transition-colors"
+                                    >
+                                        <XCircle className="w-6 h-6" />
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Categories */}

@@ -64,15 +64,18 @@ const CustomerProfile = () => {
                     </div>
 
                     {/* Avatar + Name */}
-                    <div className="bg-white px-8 pb-8">
-                        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 relative z-10">
-                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-4xl font-black text-white border-4 border-white shadow-xl shadow-indigo-600/30 shrink-0">
+                    <div className="bg-white px-8 pb-10">
+                        <div className="flex flex-col sm:flex-row sm:items-end gap-6 -mt-10 relative z-10">
+                            <div className="w-28 h-28 rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-5xl font-black text-white border-[6px] border-white shadow-2xl shadow-indigo-600/40 shrink-0 transform transition-transform hover:scale-105 duration-300">
                                 {initial}
                             </div>
-                            <div className="pb-1 sm:ml-4">
-                                <h2 className="text-2xl font-black text-slate-900">{name || 'Your Name'}</h2>
-                                <p className="text-slate-500 text-sm font-medium mt-0.5">
-                                    PrimeSewa Customer
+                            <div className="pb-2 pt-4 sm:ml-4 flex-1">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 border border-blue-100">
+                                    Active Account
+                                </div>
+                                <h2 className="text-3xl font-black text-slate-900 tracking-tight">{name || 'Your Name'}</h2>
+                                <p className="text-slate-500 text-sm font-semibold flex items-center gap-2 mt-1">
+                                    <Shield className="w-4 h-4 text-emerald-500" /> Verified PrimeSewa Customer
                                 </p>
                             </div>
                         </div>

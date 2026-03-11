@@ -28,21 +28,22 @@ const CleanupPage = () => {
                 const rawName = p.name || 'Unknown';
                 const nameKey = rawName.toLowerCase().replace(/servicies/g, 'services').replace(/\s+/g, ' ').trim();
                 const isSneha = nameKey.includes('sneha');
+                const isNewProv = nameKey.includes('new provider');
+                const hasConflictingNumber = p.phone === '+911111111111' || p.phone === '1111111111';
                 
-                // CRITICAL: Ensure Provider number doesn't conflict with Customer number
-                // Sneha Customer = 1111111111, so Sneha Provider = 9999999999
-                let normalizedPhone = p.phone || '+910000000000';
-                if (isSneha || nameKey.includes('provider')) {
+                // CRITICAL: Ensure Provider number is NEVER 1111111111
+                let normalizedPhone = p.phone || '+919999999999';
+                if (isSneha || isNewProv || nameKey.includes('provider') || hasConflictingNumber) {
                     normalizedPhone = '+919999999999';
                 }
 
                 const updates = {
-                    name: isSneha ? 'Sneha Services' : rawName.trim(),
+                    name: isSneha ? 'Sneha Services' : (isNewProv ? 'New Provider' : rawName.trim()),
                     phone: normalizedPhone,
-                    status: isSneha ? 'active' : (p.status || 'active').toLowerCase().trim(),
+                    status: (isSneha || isNewProv) ? 'active' : (p.status || 'active').toLowerCase().trim(),
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
                     category: isSneha ? 'Carpentry' : (p.category || 'Professional Service'),
-                    price: isSneha ? '₹200/hr' : (p.price || '₹500/hr')
+                    price: (isSneha || isNewProv) ? '₹200/hr' : (p.price || '₹500/hr')
                 };
 
                 if (seen.has(nameKey)) {
