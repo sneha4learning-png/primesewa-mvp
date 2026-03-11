@@ -4,6 +4,7 @@ import { db } from '../firebase/config';
 import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
 import { LayoutDashboard, Users, UserCog, CalendarDays, DollarSign, LogOut, Bell, Menu, X, Wrench, Clock } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
+import NotificationBell from '../components/NotificationBell';
 
 const navLinkClass = ({ isActive }) =>
     `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive
@@ -42,74 +43,7 @@ const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
 const AdminLayout = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
-    const [showNotifications, setShowNotifications] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-
-    const [notifications, setNotifications] = useState([]);
-
-    useEffect(() => {
-        // Query for 5 most recent pending providers
-        const qProviders = query(
-            collection(db, 'providers'),
-            where('status', '==', 'pending'),
-            orderBy('createdAt', 'desc'),
-            limit(5)
-        );
-
-        // Query for 5 most recent pending bookings
-        const qBookings = query(
-            collection(db, 'bookings'),
-            where('status', '==', 'pending'),
-            orderBy('createdAt', 'desc'),
-            limit(5)
-        );
-
-        const unsubProviders = onSnapshot(qProviders, (snapshot) => {
-            const providerNotifs = snapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    id: `p-${doc.id}`,
-                    text: `New provider ${data.name || 'Partner'} applied.`,
-                    time: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
-                    unread: true,
-                    timestamp: data.createdAt?.toDate ? data.createdAt.toDate().getTime() : Date.now(),
-                    type: 'provider'
-                };
-            });
-            updateNotifications(providerNotifs, 'provider');
-        });
-
-        const unsubBookings = onSnapshot(qBookings, (snapshot) => {
-            const bookingNotifs = snapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    id: `b-${doc.id}`,
-                    text: `New ${data.service} booking request pending.`,
-                    time: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
-                    unread: true,
-                    timestamp: data.createdAt?.toDate ? data.createdAt.toDate().getTime() : Date.now(),
-                    type: 'booking'
-                };
-            });
-            updateNotifications(bookingNotifs, 'booking');
-        });
-
-        // Helper to merge and sort notifications
-        const currentNotifs = { provider: [], booking: [] };
-        const updateNotifications = (newItems, type) => {
-            currentNotifs[type] = newItems;
-            const combined = [...currentNotifs.provider, ...currentNotifs.booking]
-                .sort((a, b) => b.timestamp - a.timestamp)
-                .slice(0, 8);
-            setNotifications(combined);
-        };
-
-        return () => {
-            unsubProviders();
-            unsubBookings();
-        };
-    }, []);
-
     const handleLogout = async () => {
         await logout();
         navigate('/admin/login');
@@ -142,39 +76,7 @@ const AdminLayout = () => {
                         <h1 className="text-base lg:text-xl font-bold text-slate-800 tracking-tight">Command Center</h1>
                     </div>
                     <div className="flex items-center gap-3 lg:gap-5">
-                        <div className="relative">
-                            <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
-                                <Bell className="w-5 h-5 lg:w-6 lg:h-6" />
-                                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
-                            </button>
-                            {showNotifications && (
-                                <div className="absolute right-0 mt-2 w-72 lg:w-80 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50">
-                                    <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                                        <h3 className="font-bold text-slate-800">Notifications</h3>
-                                        <span className="text-xs font-semibold text-blue-600 cursor-pointer">Mark all read</span>
-                                    </div>
-                                    <div className="max-h-80 overflow-y-auto">
-                                        {notifications.map(n => (
-                                            <div key={n.id} className={`p-4 border-b border-slate-50 hover:bg-slate-50 cursor-pointer ${n.unread ? 'bg-blue-50/30' : ''}`}>
-                                                <p className={`text-sm ${n.unread ? 'font-semibold text-slate-800' : 'text-slate-600'}`}>{n.text}</p>
-                                                <p className="text-xs text-slate-400 mt-1">{n.time}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="p-3 text-center border-t border-slate-100">
-                                        <button 
-                                            onClick={() => {
-                                                navigate('/admin');
-                                                setShowNotifications(false);
-                                            }}
-                                            className="text-sm font-medium text-blue-600 cursor-pointer hover:underline w-full"
-                                        >
-                                            View All Notifications
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <NotificationBell />
                         <div className="hidden sm:flex flex-col text-right">
                             <span className="text-sm font-bold text-slate-900">System Admin</span>
                             <span className="text-xs font-medium text-emerald-600 flex items-center gap-1 justify-end">

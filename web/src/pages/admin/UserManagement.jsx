@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, UserX, Activity } from 'lucide-react';
+import { Search, MapPin, UserX, Activity, ShieldAlert, UserCheck, ChevronDown, Filter } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+import { useNotifications } from '../../context/NotificationContext';
 
 const UserManagement = () => {
+    const { sendNotification } = useNotifications();
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +63,9 @@ const UserManagement = () => {
         try {
             await updateDoc(doc(db, 'users', id), { status: newStatus });
             setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
+            
+            // Notify User
+            sendNotification(id, 'Account Update', `Your account has been marked as ${newStatus} by the administrator.`, newStatus === 'active' ? 'success' : 'error');
         } catch (err) {
             console.error("Error updating status:", err);
         }
@@ -95,20 +100,60 @@ const UserManagement = () => {
     }, [searchTerm]);
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h2 className="text-xl font-semibold text-gray-800">Consumer Accounts</h2>
-                <div className="relative w-full sm:w-72">
-                    <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search users by name or phone..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+        <div className="space-y-6">
+            {/* Quick Account Control */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6">
+                    <div className="flex items-center gap-3 text-white mb-2">
+                        <ShieldAlert className="w-6 h-6 text-amber-500" />
+                        <h2 className="text-xl font-black tracking-tight">Quick Account Control</h2>
+                    </div>
+                    <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">Select an account to instantly block or restore access</p>
+                </div>
+                <div className="p-6 bg-slate-50/50">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex-1 relative">
+                            <select 
+                                className="w-full h-[52px] pl-4 pr-10 appearance-none bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-800 font-bold text-sm shadow-sm cursor-pointer outline-none transition-all"
+                                onChange={(e) => {
+                                    const user = users.find(u => u.id === e.target.value);
+                                    if (user) handleToggleStatus(user.id, user.status);
+                                }}
+                                defaultValue=""
+                            >
+                                <option value="" disabled>Select user to toggle status...</option>
+                                {users.map(u => (
+                                    <option key={u.id} value={u.id}>
+                                        {u.name} ({u.status === 'active' ? 'ACTIVE' : 'BLOCKED'})
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
+                        <div className="flex-1 relative group">
+                            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="Universal name or phone search..."
+                                className="w-full h-[52px] pl-12 pr-4 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-800 font-medium text-sm shadow-sm outline-none transition-all"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-blue-500" />
+                        <h2 className="text-lg font-black text-slate-800">Consumer Directory</h2>
+                    </div>
+                    <span className="text-[10px] font-black uppercase bg-blue-50 text-blue-600 px-3 py-1 rounded-full tracking-tighter shadow-sm border border-blue-100">
+                        {users.length} Database Records
+                    </span>
+                </div>
 
             <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
                 {/* Desktop view (table) */}
@@ -200,6 +245,7 @@ const UserManagement = () => {
                     {paginatedUsers.length === 0 && (
                         <div className="p-8 text-center text-gray-400 text-sm">No users found.</div>
                     )}
+                </div>
                 </div>
             </div>
 

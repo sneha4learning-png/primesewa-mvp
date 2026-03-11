@@ -1,3 +1,4 @@
+
 import { useState, useEffect, Component } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
@@ -41,9 +42,14 @@ const categories = [
     { id: '11', name: 'Packers & Movers', icon: Wrench, color: 'bg-indigo-100 text-indigo-600' },
 ];
 
+import { useNotifications } from '../../context/NotificationContext';
+
 const CustomerHome = () => {
     const navigate = useNavigate();
     const { userData } = useAuth();
+    const { sendNotification } = useNotifications();
+
+    const [allProviders, setAllProviders] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [bookingStep, setBookingStep] = useState(0); // 0: lists, 1: form, 2: success
     const [onlineProviders, setOnlineProviders] = useState([]);
@@ -69,6 +75,7 @@ const CustomerHome = () => {
     const [timeError, setTimeError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(5);
+    const [visibleHistoryCount, setVisibleHistoryCount] = useState(5);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [networkError, setNetworkError] = useState(false);
     const [dbError, setDbError] = useState(false);
@@ -462,6 +469,10 @@ const CustomerHome = () => {
 
         try {
             await addDoc(collection(db, 'bookings'), finalBookingData);
+            
+            // Notify Admin
+            sendNotification('admin', 'New Booking Received', `${userData.name} booked ${finalBookingData.service} for ${finalBookingData.date}.`, 'booking');
+
             setBookingStep(2);
             setTimeout(() => setBookingStep(0), 3000);
         } catch (err) {
@@ -623,7 +634,19 @@ const CustomerHome = () => {
             {bookingStep === 1 ? (
                 <div className="max-w-2xl bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 mx-auto relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                    <h2 className="text-3xl font-black mb-8 text-slate-900">Confirm Booking {pendingBookingData?.service ? <span className="text-blue-600 block text-xl mt-2">({pendingBookingData.service})</span> : ''}</h2>
+                    <div className="flex justify-between items-start mb-8">
+                        <div>
+                            <h2 className="text-3xl font-black text-slate-900">Confirm Booking</h2>
+                            {pendingBookingData?.service && <span className="text-blue-600 block text-xl mt-1 font-bold">({pendingBookingData.service})</span>}
+                        </div>
+                        <button 
+                            type="button" 
+                            onClick={() => setBookingStep(0)}
+                            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-all"
+                        >
+                            <XCircle className="w-8 h-8" />
+                        </button>
+                    </div>
 
                     {pendingBookingData && (pendingBookingData.previousWorkSample || (pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0)) && (
                         <div className="mb-8">
@@ -838,8 +861,14 @@ const CustomerHome = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Issue Description (Optional)</label>
-                            <input type="text" value={bookingDesc} onChange={(e) => setBookingDesc(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="E.g., Fan regulator is not working" />
+                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Issue Description *</label>
+                            <textarea 
+                                required
+                                value={bookingDesc} 
+                                onChange={(e) => setBookingDesc(e.target.value)} 
+                                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 min-h-[100px]" 
+                                placeholder="Please describe the issue in detail (e.g., Fan regulator is not working, sparking in switch)" 
+                            />
                         </div>
                         {networkError && (
                             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-medium flex items-center gap-2">
@@ -1136,25 +1165,37 @@ const CustomerHome = () => {
                                         <h2 className="text-xl font-black text-slate-900">Recent Jobs</h2>
                                         <span className="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-lg font-black">{pastBookings.length}</span>
                                     </div>
-                                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                    <div className="space-y-4">
                                         {pastBookings.length > 0 ? (
-                                            pastBookings.map(b => (
-                                                <div key={b.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-all flex justify-between items-center group">
-                                                    <div className="flex-1 min-w-0 pr-4">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider truncate">{b.service}</p>
-                                                            <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-green-100 text-green-700' : b.status === 'rejected' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'}`}>
-                                                                {b.status}
-                                                            </span>
+                                            <>
+                                                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                                    {pastBookings.slice(0, visibleHistoryCount).map(b => (
+                                                        <div key={b.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-all flex justify-between items-center group">
+                                                            <div className="flex-1 min-w-0 pr-4">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider truncate">{b.service}</p>
+                                                                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-green-100 text-green-700' : b.status === 'rejected' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'}`}>
+                                                                        {b.status}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
+                                                                {b.description && (
+                                                                    <p className="text-[10px] text-slate-400 italic mt-1.5 line-clamp-1 border-l-2 border-slate-200 pl-2">"{b.description}"</p>
+                                                                )}
+                                                            </div>
+                                                            <p className="font-black text-slate-900 shrink-0">₹{b.proposedPrice || b.price}</p>
                                                         </div>
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
-                                                        {b.description && (
-                                                            <p className="text-[10px] text-slate-400 italic mt-1.5 line-clamp-1 border-l-2 border-slate-200 pl-2">"{b.description}"</p>
-                                                        )}
-                                                    </div>
-                                                    <p className="font-black text-slate-900 shrink-0">₹{b.proposedPrice || b.price}</p>
+                                                    ))}
                                                 </div>
-                                            ))
+                                                {visibleHistoryCount < pastBookings.length && (
+                                                    <button 
+                                                        onClick={() => setVisibleHistoryCount(prev => prev + 5)}
+                                                        className="w-full py-3 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-bold hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/50 transition-all text-sm"
+                                                    >
+                                                        Load More History ({pastBookings.length - visibleHistoryCount} remaining)
+                                                    </button>
+                                                )}
+                                            </>
                                         ) : (
                                             <div className="py-12 text-center text-slate-300">
                                                 <Zap className="w-10 h-10 mx-auto mb-2 opacity-20" />
@@ -1295,11 +1336,11 @@ const CustomerHome = () => {
                                         <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
                                             {p.portfolio && p.portfolio.length > 0 ? (
                                                 p.portfolio.map((img, idx) => (
-                                                    <img 
-                                                        key={idx} 
-                                                        src={img} 
-                                                        alt={`Work sample ${idx + 1}`} 
-                                                        className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" 
+                                                    <img
+                                                        key={idx}
+                                                        src={img}
+                                                        alt={`Work sample ${idx + 1}`}
+                                                        className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0"
                                                         onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80"; }}
                                                     />
                                                 ))

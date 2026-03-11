@@ -2,6 +2,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../firebase/AuthContext';
 import { User, LogOut, Menu, X, Bell, ShoppingBag, ShieldCheck, Wrench } from 'lucide-react';
 import { useState } from 'react';
+import NotificationBell from '../components/NotificationBell';
 
 const CustomerLayout = () => {
     const { currentUser, userData, logout } = useAuth();
@@ -39,6 +40,7 @@ const CustomerLayout = () => {
                                 <Link to={isProvider ? "/provider" : "/provider/login"} className="text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
                                 <Link to="/dashboard" className={`text-sm font-bold transition-colors ${location.pathname === '/dashboard' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Dashboard</Link>
                                 <Link to="/profile" className={`text-sm font-bold transition-colors ${location.pathname === '/profile' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Profile</Link>
+                                <NotificationBell />
                                 <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2 text-sm font-bold border border-rose-200 text-rose-600 bg-rose-50 rounded-full hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-600/20 transition-all">
                                     <LogOut className="w-4 h-4" /> Logout
                                 </button>
@@ -54,13 +56,16 @@ const CustomerLayout = () => {
                     </nav>
 
                     {/* Mobile Hamburger Button */}
-                    <button
-                        className="md:hidden p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        aria-label="Toggle navigation menu"
-                    >
-                        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                    </button>
+                    <div className="flex items-center gap-2 md:hidden">
+                        {currentUser && <NotificationBell />}
+                        <button
+                            className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            aria-label="Toggle navigation menu"
+                        >
+                            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        </button>
+                    </div>
                 </div>
             </header>
 

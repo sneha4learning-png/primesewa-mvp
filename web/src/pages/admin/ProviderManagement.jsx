@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc, query, where, orderBy } from 'firebase/firestore';
+import { useNotifications } from '../../context/NotificationContext';
 import { useLocation } from 'react-router-dom';
 import TimelineModal from '../../components/TimelineModal';
 
 const ProviderManagement = () => {
     const location = useLocation();
+    const { sendNotification } = useNotifications();
     const [providers, setProviders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
@@ -60,6 +62,9 @@ const ProviderManagement = () => {
         try {
             await updateDoc(doc(db, 'providers', id), { status: newStatus });
             setProviders(providers.map(p => p.id === id ? { ...p, status: newStatus } : p));
+            
+            // Notify Provider
+            sendNotification(id, 'Partner Status Update', `Your partner account status has been updated to ${newStatus}.`, newStatus === 'active' ? 'success' : 'info');
         } catch (err) {
             console.error("Error updating status:", err);
         }

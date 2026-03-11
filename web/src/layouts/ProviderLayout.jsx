@@ -4,6 +4,7 @@ import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X, Wrench, AlertTriang
 import { useAuth } from '../firebase/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import NotificationBell from '../components/NotificationBell';
 const ProviderLayout = () => {
     const { userData, logout } = useAuth();
     const navigate = useNavigate();

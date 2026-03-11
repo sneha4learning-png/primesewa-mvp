@@ -29,10 +29,13 @@ import ProviderLogin from './pages/provider/ProviderLogin';
 import ProviderEarnings from './pages/provider/ProviderEarnings';
 import ProviderProfile from './pages/provider/ProviderProfile';
 
+import { NotificationProvider } from './context/NotificationContext';
+
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <NotificationProvider>
+        <Router>
         <Routes>
           {/* Public / Customer Routes */}
           <Route path="/" element={<CustomerLayout />}>
@@ -72,7 +75,8 @@ function App() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </Router>
+        </Router>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

@@ -99,12 +99,9 @@ const ProviderLogin = () => {
 
         // For signup: validate manual phone input length
         // For login: phone comes from dropdown (already formatted), just check it's not empty
-        if (isSignup && targetPhone.length !== 10) {
+        if (!targetPhone || targetPhone.length !== 10) {
             setError('Please enter a valid 10-digit phone number');
-            return;
-        }
-        if (!isSignup && !targetPhone) {
-            setError('Please select a provider account from the list');
+            setIsLoading(false);
             return;
         }
 
@@ -159,11 +156,15 @@ const ProviderLogin = () => {
             if (isSignup) {
                 providerName = signupData.name;
             } else {
-                const cleanPhoneTarget = phoneNumber.replace('+91', '');
-                const selectedProv = providers.find(p => p.phone && p.phone.includes(cleanPhoneTarget));
+                // For login, find the provider in the list fetched during mount
+                const selectedProv = providers.find(p => {
+                    const cleanP = (p.phone || '').replace(/\D/g, '').slice(-10);
+                    const cleanI = phoneNumber.replace(/\D/g, '').slice(-10);
+                    return cleanP === cleanI;
+                });
 
                 if (!selectedProv) {
-                    setError('Provider account not found. Please contact support.');
+                    setError('Provider account not found. Please register first.');
                     setIsLoading(false);
                     return;
                 }
@@ -375,31 +376,20 @@ const ProviderLogin = () => {
                 ) : step === 1 ? (
                     <form onSubmit={handleSendOtp} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Select Provider Account</label>
-                            {providers.length > 0 ? (
-                                <select
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Service Mobile Number</label>
+                            <div className="relative group">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold border-r border-slate-700 pr-3">+91</span>
+                                <input
                                     required
-                                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-white text-sm"
+                                    type="tel"
+                                    maxLength={10}
+                                    className="w-full pl-16 pr-4 py-3.5 bg-slate-900 border border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-bold text-white tracking-widest outline-none"
+                                    placeholder="Enter 10 digit number"
                                     value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                >
-                                    <option value="" disabled className="text-slate-500">Choose your account</option>
-                                    {providers.map(p => {
-                                        const phoneStr = (p.phone || '').replace(/^\+91/, '');
-                                        // Avoid showing 0000 or blank — use doc ID suffix as fallback
-                                        const rawTail = phoneStr.slice(-4);
-                                        const tail = (rawTail && rawTail !== '0000' && /\d{4}/.test(rawTail))
-                                            ? rawTail
-                                            : (p._docId || '').replace(/[^a-z0-9]/gi, '').slice(-4).toUpperCase() || '????';
-                                        const status = (p.status || 'pending').toLowerCase();
-                                        const isActive = status === 'active' || status === 'approved';
-                                        const label = `${isActive ? '✅' : '⏳'} ${p.name || 'Provider'} (${p.category || 'Service'}) — ****${tail}`;
-                                        return <option key={p._docId || phoneStr} value={phoneStr}>{label}</option>;
-                                    })}
-                                </select>
-                            ) : (
-                                <p className="text-sm text-slate-400 bg-slate-900 border border-slate-700 p-3 rounded-xl">No active providers available.</p>
-                            )}
+                                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                                />
+                            </div>
+                            <p className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest font-bold">Verification code will be sent via SMS</p>
                         </div>
                         <button
                             type="submit"

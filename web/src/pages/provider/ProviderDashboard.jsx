@@ -4,9 +4,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, doc, updateDoc, addDoc, query, where, serverTimestamp, onSnapshot, increment, getDocs } from 'firebase/firestore';
+import { useNotifications } from '../../context/NotificationContext';
 
 const ProviderDashboard = () => {
     const { currentUser, userData } = useAuth();
+    const { sendNotification } = useNotifications();
     const [requests, setRequests] = useState([]);
     const [activeJobs, setActiveJobs] = useState([]);
     const [historicalBookings, setHistoricalBookings] = useState([]); // All bookings for history
@@ -136,6 +138,11 @@ const ProviderDashboard = () => {
             setRequests(prev => prev.filter(r => r.id !== req.id));
             setActiveJobs(prev => [{ ...req, status: 'accepted' }, ...prev]);
             setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'accepted' } : r));
+            
+            // Notify Customer
+            if (req.customerUid) {
+                sendNotification(req.customerUid, 'Request Accepted', `${userData.name} has accepted your ${req.service} request and is starting soon.`, 'success');
+            }
         } catch (e) { console.error(e); }
     };
 
@@ -147,6 +154,11 @@ const ProviderDashboard = () => {
             setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) } : r));
             setNegotiatingId(null);
             setNegotiatedPrice('');
+
+            // Notify Customer
+            if (req.customerUid) {
+                sendNotification(req.customerUid, 'New Quote Proposed', `${userData.name} proposed ₹${negotiatedPrice} for your ${req.service} request.`, 'info');
+            }
         } catch (e) { console.error(e); }
     };
 
@@ -168,6 +180,12 @@ const ProviderDashboard = () => {
             await updateDoc(doc(db, 'bookings', job.id), { trackingStatus: status });
             setActiveJobs(prev => prev.map(j => j.id === job.id ? { ...j, trackingStatus: status } : j));
             setHistoricalBookings(prev => prev.map(j => j.id === job.id ? { ...j, trackingStatus: status } : j));
+
+            // Notify Customer
+            if (job.customerUid) {
+                const statusLabels = { 'enroute': 'on the way', 'arrived': 'at your doorstep', 'inprogress': 'starting the work' };
+                sendNotification(job.customerUid, 'Status Update', `${userData.name} is ${statusLabels[status] || status}.`, 'info');
+            }
         } catch (e) { console.error('Tracking update error:', e); }
     };
 
@@ -220,6 +238,11 @@ const ProviderDashboard = () => {
 
             setActiveJobs(prev => prev.filter(j => j.id !== job.id));
             setHistoricalBookings(prev => prev.map(j => j.id === job.id ? { ...j, status: 'completed' } : j));
+
+            // Notify Customer
+            if (job.customerUid) {
+                sendNotification(job.customerUid, 'Job Completed', `${userData.name} has marked your ${job.service} as completed. Please rate the service!`, 'success');
+            }
 
             // Optimistically update earnings display
             setEarnings(prev => ({
@@ -314,10 +337,21 @@ const ProviderDashboard = () => {
                                                 <div className="text-[10px] font-bold text-amber-600 mb-1">⚠️ No house number</div>
                                             )}
                                             <span className="text-slate-600 text-sm leading-relaxed">{job.address}</span>
+                                            {job.description && (
+                                                <div className="mt-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/50">
+                                                    <span className="text-[10px] uppercase font-black text-indigo-400 block tracking-widest mb-1">Issue Description</span>
+                                                    <p className="text-xs font-medium text-slate-700 italic">"{job.description}"</p>
+                                                </div>
+                                            )}
                                             {job.location && (
-                                                <a href={`https://www.google.com/maps?q=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-2 flex items-center gap-1">
-                                                    <Navigation className="w-3 h-3" /> Get Directions
-                                                </a>
+                                                <div className="flex gap-2 mt-4">
+                                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/20">
+                                                        <Navigation className="w-3.5 h-3.5" /> G-Maps
+                                                    </a>
+                                                    <a href={`https://www.openstreetmap.org/directions?from=&to=${job.location.lat}%2C${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-200">
+                                                        <MapPin className="w-3.5 h-3.5" /> OSM
+                                                    </a>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -427,10 +461,21 @@ const ProviderDashboard = () => {
                                                     <div className="text-[10px] font-bold text-amber-600 mb-1">⚠️ No house number provided</div>
                                                 )}
                                                 <span className="text-slate-600 text-sm leading-relaxed">{req.address}</span>
+                                                {req.description && (
+                                                    <div className="mt-3 bg-rose-50/30 p-3 rounded-xl border border-rose-100/30">
+                                                        <span className="text-[10px] uppercase font-black text-rose-400 block tracking-widest mb-1">Issue Description</span>
+                                                        <p className="text-xs font-medium text-slate-700 italic">"{req.description}"</p>
+                                                    </div>
+                                                )}
                                                 {req.location && (
-                                                    <a href={`https://www.google.com/maps?q=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-xs text-blue-600 font-bold hover:underline mt-2 flex items-center gap-1">
-                                                        <Navigation className="w-3 h-3" /> View on Map
-                                                    </a>
+                                                    <div className="flex gap-2 mt-3">
+                                                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 font-black hover:underline flex items-center gap-1 bg-blue-50 px-2 py-1 rounded">
+                                                            <Navigation className="w-2.5 h-2.5" /> Google Directions
+                                                        </a>
+                                                        <a href={`https://www.openstreetmap.org/directions?from=&to=${req.location.lat}%2C${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-slate-600 font-black hover:underline flex items-center gap-1 bg-slate-100 px-2 py-1 rounded">
+                                                            <MapPin className="w-2.5 h-2.5" /> OSM View
+                                                        </a>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>

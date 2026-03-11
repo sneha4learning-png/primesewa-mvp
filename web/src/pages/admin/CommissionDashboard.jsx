@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import { DollarSign, Download, Filter } from 'lucide-react';
+import { DollarSign, Download, Filter, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 
 const CommissionDashboard = () => {
     const [commissions, setCommissions] = useState([]);
     const [totalCommission, setTotalCommission] = useState(0);
+    const [monthlyData, setMonthlyData] = useState([]);
     const [timeRange, setTimeRange] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
@@ -62,6 +63,26 @@ const CommissionDashboard = () => {
                 const sorted = [...filtered].sort((a, b) => b._ts - a._ts);
                 setCommissions(sorted);
                 setTotalCommission(sorted.reduce((acc, curr) => acc + (curr.commission || 0), 0));
+
+                // Process Monthly Data for Analytics
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const monthlyMap = {};
+                
+                allRecords.forEach(rec => {
+                    const d = new Date(rec.date);
+                    const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+                    if (!monthlyMap[key]) {
+                        monthlyMap[key] = { month: key, commission: 0, jobs: 0, sortKey: d.getFullYear() * 100 + d.getMonth() };
+                    }
+                    monthlyMap[key].commission += rec.commission;
+                    monthlyMap[key].jobs += 1;
+                });
+
+                const analytics = Object.values(monthlyMap)
+                    .sort((a, b) => a.sortKey - b.sortKey)
+                    .slice(-6); // Last 6 months
+                
+                setMonthlyData(analytics);
             } catch (err) {
                 console.error('Error processing commissions:', err);
             }
@@ -141,6 +162,83 @@ const CommissionDashboard = () => {
                     <p className="text-3xl font-bold text-gray-900">
                         ₹{commissions.reduce((a, c) => a + (c.amount || 0), 0).toFixed(2)}
                     </p>
+                </div>
+            </div>
+
+            {/* Analytics Chart */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <TrendingUp className="w-5 h-5 text-emerald-500" /> Commission Growth
+                            </h3>
+                            <p className="text-xs text-slate-400 font-medium">Monthly revenue performance breakdown</p>
+                        </div>
+                        <div className="flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-lg">
+                            <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="text-[10px] font-black text-emerald-700 uppercase">Live Data</span>
+                        </div>
+                    </div>
+                    <div className="h-[280px] w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={monthlyData}>
+                                <defs>
+                                    <linearGradient id="colorComm" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis 
+                                    dataKey="month" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{fontSize: 10, fontWeight: 700, fill: '#64748b'}}
+                                    dy={10}
+                                />
+                                <YAxis 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{fontSize: 10, fontWeight: 700, fill: '#64748b'}}
+                                    tickFormatter={(value) => `₹${value}`}
+                                />
+                                <Tooltip 
+                                    contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}}
+                                    cursor={{stroke: '#10b981', strokeWidth: 2}}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="commission" 
+                                    stroke="#10b981" 
+                                    strokeWidth={4}
+                                    fillOpacity={1} 
+                                    fill="url(#colorComm)" 
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+                   <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-blue-500" /> Monthly Summary
+                        </h3>
+                        <div className="space-y-4">
+                            {monthlyData.slice().reverse().map((data, idx) => (
+                                <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <span className="text-xs font-bold text-slate-600">{data.month}</span>
+                                    <div className="text-right">
+                                        <p className="text-sm font-black text-slate-900">₹{data.commission.toFixed(0)}</p>
+                                        <p className="text-[10px] font-bold text-emerald-600">{data.jobs} Jobs</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                   </div>
+                   <button className="w-full mt-6 py-3 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all">
+                        View Detailed Audit
+                   </button>
                 </div>
             </div>
 

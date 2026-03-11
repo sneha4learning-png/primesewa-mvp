@@ -1,0 +1,81 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { db } from '../firebase/config';
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, limit, doc, updateDoc } from 'firebase/firestore';
+import { useAuth } from '../firebase/AuthContext';
+
+const NotificationContext = createContext();
+
+export const useNotifications = () => useContext(NotificationContext);
+
+export const NotificationProvider = ({ children }) => {
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const { currentUser } = useAuth();
+
+    useEffect(() => {
+        if (!currentUser) {
+            setNotifications([]);
+            setUnreadCount(0);
+            return;
+        }
+
+        const q = query(
+            collection(db, 'notifications'),
+            where('userId', '==', currentUser.uid),
+            orderBy('createdAt', 'desc'),
+            limit(20)
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const fetched = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setNotifications(fetched);
+            setUnreadCount(fetched.filter(n => !n.read).length);
+        });
+
+        return () => unsubscribe();
+    }, [currentUser]);
+
+    const sendNotification = async (userId, title, message, type = 'info') => {
+        try {
+            await addDoc(collection(db, 'notifications'), {
+                userId,
+                title,
+                message,
+                type,
+                read: false,
+                createdAt: serverTimestamp()
+            });
+        } catch (err) {
+            console.error("Error sending notification:", err);
+        }
+    };
+
+    const markAsRead = async (notificationId) => {
+        try {
+            await updateDoc(doc(db, 'notifications', notificationId), {
+                read: true
+            });
+        } catch (err) {
+            console.error("Error marking notification as read:", err);
+        }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            const unread = notifications.filter(n => !n.read);
+            const promises = unread.map(n => updateDoc(doc(db, 'notifications', n.id), { read: true }));
+            await Promise.all(promises);
+        } catch (err) {
+            console.error("Error marking all as read:", err);
+        }
+    };
+
+    return (
+        <NotificationContext.Provider value={{ notifications, unreadCount, sendNotification, markAsRead, markAllAsRead }}>
+            {children}
+        </NotificationContext.Provider>
+    );
+};
