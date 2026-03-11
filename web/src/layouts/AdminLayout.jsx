@@ -1,6 +1,8 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { LayoutDashboard, Users, UserCog, CalendarDays, DollarSign, LogOut, Bell, Menu, X, Wrench } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { db } from '../firebase/config';
+import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
+import { LayoutDashboard, Users, UserCog, CalendarDays, DollarSign, LogOut, Bell, Menu, X, Wrench, Clock } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
 
 const navLinkClass = ({ isActive }) =>
@@ -43,11 +45,70 @@ const AdminLayout = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const notifications = [
-        { id: 1, text: 'New provider Rahul Sharma applied.', time: '10 mins ago', unread: true },
-        { id: 2, text: 'Booking B1003 is pending assignment.', time: '1 hour ago', unread: true },
-        { id: 3, text: 'Weekly commission report generated.', time: '2 days ago', unread: false }
-    ];
+    const [notifications, setNotifications] = useState([]);
+
+    useEffect(() => {
+        // Query for 5 most recent pending providers
+        const qProviders = query(
+            collection(db, 'providers'),
+            where('status', '==', 'pending'),
+            orderBy('createdAt', 'desc'),
+            limit(5)
+        );
+
+        // Query for 5 most recent pending bookings
+        const qBookings = query(
+            collection(db, 'bookings'),
+            where('status', '==', 'pending'),
+            orderBy('createdAt', 'desc'),
+            limit(5)
+        );
+
+        const unsubProviders = onSnapshot(qProviders, (snapshot) => {
+            const providerNotifs = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: `p-${doc.id}`,
+                    text: `New provider ${data.name || 'Partner'} applied.`,
+                    time: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
+                    unread: true,
+                    timestamp: data.createdAt?.toDate ? data.createdAt.toDate().getTime() : Date.now(),
+                    type: 'provider'
+                };
+            });
+            updateNotifications(providerNotifs, 'provider');
+        });
+
+        const unsubBookings = onSnapshot(qBookings, (snapshot) => {
+            const bookingNotifs = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: `b-${doc.id}`,
+                    text: `New ${data.service} booking request pending.`,
+                    time: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
+                    unread: true,
+                    timestamp: data.createdAt?.toDate ? data.createdAt.toDate().getTime() : Date.now(),
+                    type: 'booking'
+                };
+            });
+            updateNotifications(bookingNotifs, 'booking');
+        });
+
+        // Helper to merge and sort notifications
+        const currentNotifs = { provider: [], booking: [] };
+        const updateNotifications = (newItems, type) => {
+            currentNotifs[type] = newItems;
+            const combined = [...currentNotifs.provider, ...currentNotifs.booking]
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .slice(0, 8);
+            setNotifications(combined);
+        };
+
+        return () => {
+            unsubProviders();
+            unsubBookings();
+        };
+    }, []);
 
     const handleLogout = async () => {
         await logout();
@@ -101,7 +162,15 @@ const AdminLayout = () => {
                                         ))}
                                     </div>
                                     <div className="p-3 text-center border-t border-slate-100">
-                                        <span className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">View All Notifications</span>
+                                        <button 
+                                            onClick={() => {
+                                                navigate('/admin');
+                                                setShowNotifications(false);
+                                            }}
+                                            className="text-sm font-medium text-blue-600 cursor-pointer hover:underline w-full"
+                                        >
+                                            View All Notifications
+                                        </button>
                                     </div>
                                 </div>
                             )}

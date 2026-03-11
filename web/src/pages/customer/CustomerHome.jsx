@@ -132,7 +132,8 @@ const CustomerHome = () => {
                 }
             });
 
-            const finalOnlineProviders = Array.from(uniqueProvidersMap.values()).filter(p => p.isOnline === true);
+            const finalOnlineProviders = Array.from(uniqueProvidersMap.values())
+                .filter(p => (p.isOnline === true || String(p.isOnline) === 'true') && p.status === 'active');
             setMockProviders(finalOnlineProviders);
             setLoadingData(false);
             setDbError(false);
