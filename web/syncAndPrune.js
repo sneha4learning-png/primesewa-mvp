@@ -43,10 +43,21 @@ const syncAndPrune = async () => {
 
     // 3. Delete old bookings
     if (toDelete.length > 0) {
-        console.log(`🗑️ Deleting ${toDelete.length} old records...`);
+        console.log(`🗑️ Deleting ${toDelete.length} old records in batches...`);
+        let batch = writeBatch(db);
+        let count = 0;
+        
         for (const b of toDelete) {
-            await deleteDoc(doc(db, 'bookings', b.id));
+            batch.delete(doc(db, 'bookings', b.id));
+            count++;
+            
+            if (count % 400 === 0) {
+                await batch.commit();
+                batch = writeBatch(db);
+            }
         }
+        await batch.commit();
+        console.log(`✅ Successfully deleted ${toDelete.length} records.`);
     }
 
     // 4. Recalculate Provider Metrics based on the KEPT bookings

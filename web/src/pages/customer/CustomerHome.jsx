@@ -1113,9 +1113,23 @@ const CustomerHome = () => {
                                     <div className="mt-8">
                                         <h3 className="font-bold text-slate-900 text-lg mb-4">Previous Work Portfolio</h3>
                                         <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
-                                            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80" alt="Work sample 1" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&q=80" alt="Work sample 2" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                            <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400&q=80" alt="Work sample 3" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                            {p.portfolio && p.portfolio.length > 0 ? (
+                                                p.portfolio.map((img, idx) => (
+                                                    <img 
+                                                        key={idx} 
+                                                        src={img} 
+                                                        alt={`Work sample ${idx + 1}`} 
+                                                        className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" 
+                                                        onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80"; }}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <>
+                                                    <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80" alt="Work sample 1" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                                    <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&q=80" alt="Work sample 2" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                                    <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400&q=80" alt="Work sample 3" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
