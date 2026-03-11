@@ -181,6 +181,7 @@ const DashboardOverview = () => {
                                 <Tooltip
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
                                     cursor={{ fill: '#f8fafc' }}
+                                    formatter={(value, name) => name === 'Revenue (₹)' ? [`₹${Math.round(value)}`, name] : [value, name]}
                                 />
                                 <Bar yAxisId="left" dataKey="revenue" name="Revenue (₹)" fill="#10b981" radius={[4, 4, 0, 0]} barSize={24} />
                                 <Bar yAxisId="right" dataKey="bookings" name="Bookings" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={24} />
