@@ -133,7 +133,12 @@ const CustomerHome = () => {
             });
 
             const finalOnlineProviders = Array.from(uniqueProvidersMap.values())
-                .filter(p => (p.isOnline === true || String(p.isOnline) === 'true') && p.status === 'active');
+                .filter(p => {
+                    const st = (p.status || '').toLowerCase().trim();
+                    const isApproved = st === 'active' || st === 'approved';
+                    const isOnline = p.isOnline === true || String(p.isOnline) === 'true';
+                    return isApproved && isOnline;
+                });
             setOnlineProviders(finalOnlineProviders);
             setLoadingData(false);
             setDbError(false);
