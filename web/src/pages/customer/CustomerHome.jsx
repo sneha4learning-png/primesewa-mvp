@@ -61,6 +61,11 @@ const CustomerHome = () => {
     const [bookingDesc, setBookingDesc] = useState('');
     const [bookingAddress, setBookingAddress] = useState('');
     const [bookingHouseNo, setBookingHouseNo] = useState('');
+    const [bookingArea, setBookingArea] = useState('');
+    const [bookingLandmark, setBookingLandmark] = useState('');
+    const [bookingPincode, setBookingPincode] = useState('');
+    const [bookingCity, setBookingCity] = useState('Ahmedabad');
+    const [bookingState, setBookingState] = useState('Gujarat');
     const [timeError, setTimeError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [visibleCount, setVisibleCount] = useState(5);
@@ -274,55 +279,62 @@ const CustomerHome = () => {
     };
 
     const handleSelectSuggestion = (place) => {
-        // Build a clean, short address: name + road/suburb + city
         const a = place.address || {};
-        const parts = [
-            place.namedetails?.name || place.name || '',
+        const name = place.namedetails?.name || place.name || '';
+        const area = [
+            name,
             a.road || a.pedestrian || '',
-            a.suburb || a.neighbourhood || a.quarter || '',
-            'Ahmedabad'
-        ].filter(Boolean);
-        const cleanAddress = [...new Set(parts)].join(', ');
-        setBookingAddress(cleanAddress);
+            a.suburb || a.neighbourhood || a.quarter || ''
+        ].filter(Boolean).join(', ');
+        setBookingArea(area || '');
+        setBookingPincode(a.postcode || '');
+        setBookingCity(a.city || a.town || 'Ahmedabad');
+        setBookingState(a.state || 'Gujarat');
+        setBookingAddress(area);
         setLocationCoords({ lat: parseFloat(place.lat), lng: parseFloat(place.lon) });
         setAddressSuggestions([]);
     };
 
     const handleGetLocation = () => {
         if (!navigator.geolocation) {
-            alert("Geolocation is not supported by your browser");
+            alert('Geolocation is not supported by your browser');
             return;
         }
-
         setIsLocating(true);
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 setLocationCoords({ lat, lng });
-
                 try {
-                    // Free reverse geocoding via OpenStreetMap Nominatim API
-                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`,
+                        { headers: { 'Accept-Language': 'en' } }
+                    );
                     const data = await response.json();
-
-                    if (data && data.display_name) {
-                        setBookingAddress(data.display_name);
-                    } else {
-                        setBookingAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                    if (data && data.address) {
+                        const a = data.address;
+                        const area = [
+                            a.road || a.pedestrian || a.footway || '',
+                            a.suburb || a.neighbourhood || a.quarter || a.village || ''
+                        ].filter(Boolean).join(', ');
+                        setBookingArea(area || a.county || '');
+                        setBookingPincode(a.postcode || '');
+                        setBookingCity(a.city || a.town || a.municipality || 'Ahmedabad');
+                        setBookingState(a.state || 'Gujarat');
+                        setBookingAddress(area || data.display_name);
                     }
                 } catch (error) {
-                    console.error("Geocoding error:", error);
-                    setBookingAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                    console.error('Geocoding error:', error);
                 } finally {
                     setIsLocating(false);
                 }
             },
             (error) => {
-                console.error("Location error:", error);
+                console.error('Location error:', error);
                 setIsLocating(false);
-                if (error.code === 1) alert("Location access denied. Please allow location permissions.");
-                else alert("Unable to retrieve your location.");
+                if (error.code === 1) alert('Location access denied. Please allow location permissions.');
+                else alert('Unable to retrieve your location.');
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
@@ -358,6 +370,11 @@ const CustomerHome = () => {
         setBookingDesc('');
         setBookingAddress('');
         setBookingHouseNo('');
+        setBookingArea('');
+        setBookingLandmark('');
+        setBookingPincode('');
+        setBookingCity('Ahmedabad');
+        setBookingState('Gujarat');
         setTimeError('');
         setSelectedProviderProfile(null);
         setBookingStep(1);
@@ -375,6 +392,11 @@ const CustomerHome = () => {
                 bookingDesc,
                 bookingAddress,
                 bookingHouseNo,
+                bookingArea,
+                bookingLandmark,
+                bookingPincode,
+                bookingCity,
+                bookingState,
                 locationCoords
             }));
             navigate('/login');
@@ -395,6 +417,15 @@ const CustomerHome = () => {
         setIsSubmitting(true);
         setNetworkError(false);
 
+        const fullAddress = [
+            bookingHouseNo,
+            bookingArea || bookingAddress,
+            bookingLandmark ? `Near ${bookingLandmark}` : '',
+            bookingPincode,
+            bookingCity || 'Ahmedabad',
+            bookingState || 'Gujarat'
+        ].filter(Boolean).join(', ');
+
         const finalBookingData = {
             service: pendingBookingData ? pendingBookingData.service : (selectedCategory || 'Plumbing'),
             status: 'pending',
@@ -407,8 +438,13 @@ const CustomerHome = () => {
             date: bookingDate,
             time: bookingTime,
             description: bookingDesc,
-            address: bookingAddress,
+            address: fullAddress,
             houseNo: bookingHouseNo,
+            area: bookingArea,
+            landmark: bookingLandmark,
+            pincode: bookingPincode,
+            city: bookingCity || 'Ahmedabad',
+            state: bookingState || 'Gujarat',
             location: locationCoords ? { lat: locationCoords.lat, lng: locationCoords.lng } : null,
             createdAt: serverTimestamp()
         };
@@ -663,13 +699,9 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">House / Flat / Floor No *</label>
-                            <input required type="text" value={bookingHouseNo} onChange={(e) => setBookingHouseNo(e.target.value)} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="e.g. Flat 404, Building A" />
-                        </div>
-
-                        <div>
-                            <div className="flex items-center justify-between mb-3">
+                        {/* Amazon-style structured address form */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
                                 <label className="block text-sm font-bold text-slate-700 uppercase tracking-wider">Service Address *</label>
                                 <button
                                     type="button"
@@ -678,30 +710,53 @@ const CustomerHome = () => {
                                     className="flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     {isLocating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
-                                    {isLocating ? 'Locating...' : 'Use Current Location'}
+                                    {isLocating ? 'Detecting...' : 'Use My Location'}
                                 </button>
                             </div>
+
+                            {/* Row 1: Flat / House No */}
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Flat, House No., Building, Company, Apartment *</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={bookingHouseNo}
+                                    onChange={(e) => setBookingHouseNo(e.target.value)}
+                                    placeholder="e.g. 110, Amaltas Apartment"
+                                    className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                                />
+                            </div>
+
+                            {/* Row 2: Area / Street with autocomplete */}
                             <div className="relative">
-                                <input required type="text" value={bookingAddress} onChange={handleAddressTyping} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800" placeholder="Street / Area Name" />
+                                <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Area, Street, Sector, Village *</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={bookingArea}
+                                    onChange={(e) => { setBookingArea(e.target.value); handleAddressTyping(e); }}
+                                    placeholder="e.g. ISKCON Flyover, Vastrapur"
+                                    className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                                />
                                 {isSearchingAddress && (
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                                        <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                                    <div className="absolute right-4 top-11">
+                                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
                                     </div>
                                 )}
                                 {addressSuggestions.length > 0 && (
-                                    <ul className="absolute z-50 w-full bg-white border border-slate-200 rounded-2xl mt-2 shadow-xl overflow-hidden max-h-72 overflow-y-auto">
+                                    <ul className="absolute z-50 w-full bg-white border border-slate-200 rounded-2xl mt-1 shadow-xl overflow-hidden max-h-72 overflow-y-auto">
                                         {addressSuggestions.map((place, i) => {
                                             const a = place.address || {};
                                             const name = place.namedetails?.name || place.name || '';
                                             const locality = a.suburb || a.neighbourhood || a.quarter || a.road || '';
                                             const placeType = (place.type || place.class || '').replace(/_/g, ' ');
-                                            const isLandmark = !['residential','yes','house'].includes(place.type);
+                                            const isLandmark = !['residential', 'yes', 'house'].includes(place.type);
                                             return (
                                                 <li key={i}>
                                                     <button
                                                         type="button"
                                                         onClick={() => handleSelectSuggestion(place)}
-                                                        className="w-full text-left px-5 py-3.5 hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-0"
+                                                        className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-0"
                                                     >
                                                         <div className="flex items-start gap-3">
                                                             <MapPin className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
@@ -712,9 +767,7 @@ const CustomerHome = () => {
                                                                         <span className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded uppercase tracking-wide shrink-0">{placeType}</span>
                                                                     )}
                                                                 </div>
-                                                                {locality && name && (
-                                                                    <p className="text-xs text-slate-400 mt-0.5 truncate">{locality}, Ahmedabad</p>
-                                                                )}
+                                                                {locality && name && <p className="text-xs text-slate-400 mt-0.5 truncate">{locality}, Ahmedabad</p>}
                                                             </div>
                                                         </div>
                                                     </button>
@@ -723,6 +776,53 @@ const CustomerHome = () => {
                                         })}
                                     </ul>
                                 )}
+                            </div>
+
+                            {/* Row 3: Landmark */}
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Landmark (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={bookingLandmark}
+                                    onChange={(e) => setBookingLandmark(e.target.value)}
+                                    placeholder="E.g. Near Apollo Hospital"
+                                    className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                                />
+                            </div>
+
+                            {/* Row 4: Pincode + City */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Pincode</label>
+                                    <input
+                                        type="text"
+                                        value={bookingPincode}
+                                        onChange={(e) => setBookingPincode(e.target.value)}
+                                        placeholder="380015"
+                                        maxLength={6}
+                                        className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Town / City</label>
+                                    <input
+                                        type="text"
+                                        value={bookingCity}
+                                        readOnly
+                                        className="w-full p-3.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-700 cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Row 5: State */}
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">State</label>
+                                <input
+                                    type="text"
+                                    value={bookingState}
+                                    readOnly
+                                    className="w-full p-3.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-700 cursor-not-allowed"
+                                />
                             </div>
                         </div>
 
