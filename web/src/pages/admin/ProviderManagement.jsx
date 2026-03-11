@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock } from 'lucide-react';
 import { db } from '../../firebase/config';
-import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, query, where, orderBy } from 'firebase/firestore';
 import { useLocation } from 'react-router-dom';
 import TimelineModal from '../../components/TimelineModal';
 
@@ -19,21 +19,18 @@ const ProviderManagement = () => {
     const itemsPerPage = 5;
 
     useEffect(() => {
-        const fetchProviders = async () => {
-            try {
-                const [pSnap, bSnap] = await Promise.all([
-                    getDocs(collection(db, 'providers')),
-                    getDocs(collection(db, 'bookings'))
-                ]);
+        // 1. Live bookings for job counts
+        const unsubBookings = onSnapshot(collection(db, 'bookings'), (bSnap) => {
+            const allBookings = bSnap.docs.map(d => d.data());
+            const completedCounts = new Map();
+            allBookings.forEach(b => {
+                if (b.status === 'completed') {
+                    completedCounts.set(b.provider, (completedCounts.get(b.provider) || 0) + 1);
+                }
+            });
 
-                const allBookings = bSnap.docs.map(d => d.data());
-                const completedCounts = new Map();
-                allBookings.forEach(b => {
-                    if (b.status === 'completed') {
-                        completedCounts.set(b.provider, (completedCounts.get(b.provider) || 0) + 1);
-                    }
-                });
-
+            // 2. Live providers
+            const unsubProviders = onSnapshot(collection(db, 'providers'), (pSnap) => {
                 const fetched = [];
                 pSnap.forEach((doc) => {
                     const data = doc.data();
@@ -45,14 +42,18 @@ const ProviderManagement = () => {
                     });
                 });
                 setProviders(fetched);
-            } catch (err) {
-                console.error("Error fetching providers:", err);
-            } finally {
                 setIsLoading(false);
-            }
-        };
+            }, (err) => {
+                console.error("Error fetching providers:", err);
+                setIsLoading(false);
+            });
 
-        fetchProviders();
+            return () => unsubProviders();
+        }, (err) => {
+            console.error("Error fetching bookings:", err);
+        });
+
+        return () => unsubBookings();
     }, []);
 
     const handleStatusChange = async (id, newStatus) => {
@@ -92,7 +93,8 @@ const ProviderManagement = () => {
     const filteredProviders = providers.filter(p => {
         const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
             (p.category || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'All' || p.status === statusFilter;
+        const matchesStatus = statusFilter === 'All' || 
+            (statusFilter === 'pending' ? (p.status === 'pending' || !p.status) : p.status === statusFilter);
         return matchesSearch && matchesStatus;
     });
 

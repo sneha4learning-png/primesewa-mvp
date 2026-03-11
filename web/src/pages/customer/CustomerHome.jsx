@@ -46,8 +46,8 @@ const CustomerHome = () => {
     const { userData } = useAuth();
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [bookingStep, setBookingStep] = useState(0); // 0: lists, 1: form, 2: success
-    const [mockProviders, setMockProviders] = useState([]);
-    const [mockBookings, setMockBookings] = useState([]);
+    const [onlineProviders, setOnlineProviders] = useState([]);
+    const [activeBookings, setActiveBookings] = useState([]);
     const [pastBookings, setPastBookings] = useState([]);
     const [pendingBookingData, setPendingBookingData] = useState(null);
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
@@ -134,7 +134,7 @@ const CustomerHome = () => {
 
             const finalOnlineProviders = Array.from(uniqueProvidersMap.values())
                 .filter(p => (p.isOnline === true || String(p.isOnline) === 'true') && p.status === 'active');
-            setMockProviders(finalOnlineProviders);
+            setOnlineProviders(finalOnlineProviders);
             setLoadingData(false);
             setDbError(false);
         }, (err) => {
@@ -145,7 +145,8 @@ const CustomerHome = () => {
 
         // 2. Bookings listener — only for logged-in users
         if (!userData?.uid) {
-            setMockBookings([]);
+            setOnlineProviders([]);
+            setActiveBookings([]);
             setPastBookings([]);
             setChartData([]);
             return () => unsubscribeProviders();
@@ -173,7 +174,7 @@ const CustomerHome = () => {
                 return tB - tA;
             });
 
-            setMockBookings(sortedAll.filter(b => !['completed', 'rejected', 'cancelled'].includes(b.status)));
+            setActiveBookings(sortedAll.filter(b => !['completed', 'rejected', 'cancelled'].includes(b.status)));
             const pBookings = sortedAll.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status));
             setPastBookings(pBookings);
 
@@ -389,14 +390,14 @@ const CustomerHome = () => {
     const handleCancelBooking = async (bookingId) => {
         try {
             await updateDoc(doc(db, 'bookings', bookingId), { status: 'cancelled' });
-            setMockBookings(prev => prev.filter(b => b.id !== bookingId));
+            setActiveBookings(prev => prev.filter(b => b.id !== bookingId));
         } catch (err) {
             console.error('Cancel error:', err);
         }
     };
 
     // Unified Filtering Logic
-    const displayedProviders = mockProviders.filter(p => {
+    const displayedProviders = onlineProviders.filter(p => {
         // 1. Status Check — accept 'active' OR 'approved' (admin sets 'approved')
         const providerStatus = (p.status || '').toLowerCase().trim();
         if (providerStatus !== 'active' && providerStatus !== 'approved') return false;
@@ -442,10 +443,10 @@ const CustomerHome = () => {
         try {
             if (accept) {
                 await updateDoc(doc(db, 'bookings', id), { status: 'accepted', price: proposedPrice });
-                setMockBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'accepted', price: proposedPrice } : b));
+                setActiveBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'accepted', price: proposedPrice } : b));
             } else {
                 await updateDoc(doc(db, 'bookings', id), { status: 'rejected' });
-                setMockBookings(prev => prev.filter(b => b.id !== id));
+                setActiveBookings(prev => prev.filter(b => b.id !== id));
             }
         } catch (err) {
             console.error(err);
@@ -827,8 +828,8 @@ const CustomerHome = () => {
                                             <MapPin className="text-blue-200" /> Current Activity
                                         </h2>
                                         <div className="space-y-4 relative z-10 flex-1">
-                                            {mockBookings.length > 0 ? (
-                                                mockBookings.map(b => (
+                                            {activeBookings.length > 0 ? (
+                                                activeBookings.map(b => (
                                                     <div key={b.id} onClick={() => handleActivityClick(b)} className="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-pointer">
                                                         <div className={`absolute top-0 left-0 w-1.5 h-full ${b.status === 'negotiating' ? 'bg-purple-500' : 'bg-blue-500'}`}></div>
                                                         <div className="flex justify-between items-start mb-3">

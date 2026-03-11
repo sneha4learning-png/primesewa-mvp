@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { db } from '../../firebase/config';
-import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, query, orderBy, limit } from 'firebase/firestore';
 
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex items-center gap-4">
@@ -34,23 +34,16 @@ const DashboardOverview = () => {
 
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const [bSnap, pSnap, cSnap] = await Promise.all([
-                    getDocs(collection(db, 'bookings')),
-                    getDocs(collection(db, 'providers')),
-                    getDocs(collection(db, 'commissions'))
-                ]);
-
-                const allBookings = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // 1. Real-time stats and data
+        const unsubBookings = onSnapshot(collection(db, 'bookings'), (bSnap) => {
+            const allBookings = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            // 2. Real-time providers
+            const unsubProviders = onSnapshot(collection(db, 'providers'), (pSnap) => {
                 const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                const dbCommissions = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-
-
+                
                 // Count completed requests per provider
                 const completedCounts = new Map();
-
                 allBookings.forEach(b => {
                     if (b.status === 'completed') {
                         const count = completedCounts.get(b.provider) || 0;
@@ -62,11 +55,9 @@ const DashboardOverview = () => {
                 const pendingBookingsCount = bookings.filter(b => b.status === 'pending').length;
                 const activeProvidersCount = providers.filter(p => p.status === 'active').length;
 
-                const trackedBookingIds = new Set(dbCommissions.map(c => c.bookingId));
                 let totalCommission = 0;
                 let totalRevenue = 0;
 
-                // Only count commissions and revenue for the filtered bookings
                 const completedBookings = bookings.filter(b => b.status === 'completed');
                 completedBookings.forEach(b => {
                     const rawPrice = b.proposedPrice || b.price || b.amount || 0;
@@ -83,7 +74,6 @@ const DashboardOverview = () => {
                 });
 
                 bookings.forEach(b => {
-                    // Approximate date from createdAt if missing
                     const bDateStr = b.date || (b.createdAt?.toDate ? b.createdAt.toDate().toISOString().split('T')[0] : null);
                     if (bDateStr) {
                         const dayObj = last7Days.find(d => d.date === bDateStr);
@@ -98,7 +88,7 @@ const DashboardOverview = () => {
                 });
                 setChartData(last7Days);
 
-                // Top 5 Providers based on filtered jobs
+                // Top 5 Providers
                 const activeProvs = providers.filter(p => p.status === 'active').map(p => ({
                     ...p,
                     jobs: completedCounts.get(p.name) || 0
@@ -119,7 +109,6 @@ const DashboardOverview = () => {
                     activeProviders: activeProvidersCount
                 });
 
-                // Get top 3 recent bookings by sorting chronologically descending
                 const sortedRecent = [...bookings].sort((a, b) => {
                     const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.date || 0).getTime();
                     const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.date || 0).getTime();
@@ -129,15 +118,20 @@ const DashboardOverview = () => {
                 setRecentBookings(sortedRecent.filter(b => b.status !== 'rejected' && b.status !== 'cancelled').slice(0, 3));
                 setRecentDeclined(sortedRecent.filter(b => b.status === 'rejected' || b.status === 'cancelled').slice(0, 3));
 
-                // Get pending providers
-                setPendingProviders(providers.filter(p => p.status === 'pending'));
-            } catch (err) {
-                console.error('Firebase Firestore error:', err);
+                // Get pending providers (robust check for missing status field)
+                setPendingProviders(providers.filter(p => (p.status === 'pending' || !p.status)));
+            }, (err) => {
+                console.error('Providers Listener Error:', err);
                 setDbError(true);
-            }
-        };
+            });
 
-        fetchStats();
+            return () => unsubProviders();
+        }, (err) => {
+            console.error('Bookings Listener Error:', err);
+            setDbError(true);
+        });
+
+        return () => unsubBookings();
     }, []);
 
     return (
