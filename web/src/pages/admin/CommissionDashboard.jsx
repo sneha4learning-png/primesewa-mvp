@@ -139,7 +139,7 @@ const CommissionDashboard = () => {
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                     <p className="text-sm font-semibold text-gray-500 mb-2">Total Job Value</p>
                     <p className="text-3xl font-bold text-gray-900">
-                        ₹{commissions.reduce((a, c) => a + (c.amount || 0), 0).toFixed(0)}
+                        ₹{commissions.reduce((a, c) => a + (c.amount || 0), 0).toFixed(2)}
                     </p>
                 </div>
             </div>
