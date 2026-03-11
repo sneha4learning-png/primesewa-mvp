@@ -15,65 +15,86 @@ const UserManagement = () => {
     const itemsPerPage = 5;
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchAllAccounts = async () => {
             try {
-                // 1. Fetch User Accounts
-                const q = query(collection(db, 'users'), where('role', '==', 'customer'));
-                const querySnapshot = await getDocs(q);
-
-                // 2. Fetch all Bookings to calculate authentic Lifetime Bookings
+                // 1. Fetch Customers
+                const qUsers = query(collection(db, 'users'), where('role', '==', 'customer'));
+                const usersSnap = await getDocs(qUsers);
+                
+                // 2. Fetch Providers
+                const providersSnap = await getDocs(collection(db, 'providers'));
+                
+                // 3. Fetch Bookings for count
                 const bookingsSnap = await getDocs(collection(db, 'bookings'));
                 const bookingCounts = {};
                 bookingsSnap.forEach((doc) => {
                     const b = doc.data();
-                    if (b.customer) {
-                        bookingCounts[b.customer] = (bookingCounts[b.customer] || 0) + 1;
-                    }
+                    if (b.customer) bookingCounts[b.customer] = (bookingCounts[b.customer] || 0) + 1;
                 });
 
-                const fetchedUsers = [];
-                querySnapshot.forEach((doc) => {
+                const allAccounts = [];
+                
+                // Process Customers
+                usersSnap.forEach((doc) => {
                     const data = doc.data();
-                    const userName = data.name || 'Unknown User';
-
-                    fetchedUsers.push({
+                    allAccounts.push({
                         id: doc.id,
-                        name: userName,
+                        name: data.name || 'Unknown User',
                         phone: data.phone || data.phoneNumber || 'No phone',
-                        joined: data.createdAt
-                            ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString() : new Date(data.createdAt).toLocaleDateString())
-                            : 'Recent',
-                        totalBookings: bookingCounts[userName] || 0, // Dynamic calculation
-                        status: data.status || 'active'
+                        joined: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Recent',
+                        totalBookings: bookingCounts[data.name] || 0,
+                        status: data.status || 'active',
+                        type: 'customer',
+                        collection: 'users'
                     });
                 });
-                setUsers(fetchedUsers);
+
+                // Process Providers for the dropdown
+                providersSnap.forEach((doc) => {
+                    const data = doc.data();
+                    allAccounts.push({
+                        id: doc.id,
+                        name: data.name || 'Unknown Partner',
+                        phone: data.phone || 'No phone',
+                        joined: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Recent',
+                        totalBookings: 0, // We can hide this for providers in user list
+                        status: data.status || 'active',
+                        type: 'provider',
+                        collection: 'providers'
+                    });
+                });
+
+                setUsers(allAccounts);
             } catch (err) {
-                console.error("Error fetching users:", err);
+                console.error("Error fetching accounts:", err);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchUsers();
+        fetchAllAccounts();
     }, []);
 
     const handleToggleStatus = async (id, currentStatus) => {
-        const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
+        const user = users.find(u => u.id === id);
+        if (!user) return;
+
+        const newStatus = (currentStatus === 'active' || currentStatus === 'approved') ? 'blocked' : 'active';
         const actionLabel = newStatus === 'active' ? 'RESTORE and UNBLOCK' : 'INSTANTLY BLOCK';
         
-        if (!window.confirm(`Are you sure you want to ${actionLabel} access for this user account?`)) {
+        if (!window.confirm(`Are you sure you want to ${actionLabel} access for this ${user.type} account?`)) {
             return;
         }
 
         try {
-            await updateDoc(doc(db, 'users', id), { status: newStatus });
+            await updateDoc(doc(db, user.collection || 'users', id), { status: newStatus });
             setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
             
             // Notify User
             sendNotification(id, 'Account Update', `Your account has been marked as ${newStatus} by the administrator.`, newStatus === 'active' ? 'success' : 'error');
         } catch (err) {
             console.error("Error updating status:", err);
+            alert("Failed to update status. Please try again.");
         }
     };
 
@@ -92,7 +113,16 @@ const UserManagement = () => {
         }
     };
 
-    const filteredUsers = users.filter(u =>
+    // Table should ONLY show customers, but dropdown uses full mixed list
+    const customerList = users.filter(u => u.type === 'customer');
+    
+    const filteredUsers = customerList.filter(u =>
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.phone.includes(searchTerm)
+    );
+
+    // Universal list for the dropdown
+    const universalList = users.filter(u => 
         u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.phone.includes(searchTerm)
     );
@@ -131,9 +161,9 @@ const UserManagement = () => {
                                 value=""
                             >
                                 <option value="" disabled>Select user to toggle status...</option>
-                                {users.map(u => (
-                                    <option key={u.id} value={u.id}>
-                                        {u.name} ({u.status === 'active' ? 'ACTIVE' : 'BLOCKED'})
+                                {universalList.map(u => (
+                                    <option key={u.id} value={u.id} className="py-2">
+                                        [{u.type.toUpperCase()}] {u.name} ({u.status === 'active' || u.status === 'approved' ? 'ACTIVE' : 'BLOCKED'})
                                     </option>
                                 ))}
                             </select>
