@@ -573,16 +573,32 @@ const CustomerHome = () => {
     const submitRating = async (booking) => {
         if (ratingState.rating > 0) {
             try {
-                // Find Provider doc
-                const q = query(collection(db, 'providers'), where('name', '==', booking.provider));
-                const snap = await getDocs(q);
-                if (!snap.empty) {
-                    const pDoc = snap.docs[0];
-                    const p = pDoc.data();
-                    const currentRating = parseFloat(p.rating) || 5.0;
-                    const jobs = parseInt(p.jobs) || 1;
-                    const newRating = ((currentRating * jobs) + ratingState.rating) / (jobs + 1);
-                    await updateDoc(doc(db, 'providers', pDoc.id), { rating: parseFloat(newRating.toFixed(1)) });
+                // Find Provider doc — Prioritize providerUid if stored in booking, fallback to name
+                let providerId = null;
+                if (booking.providerUid) {
+                    providerId = booking.providerUid;
+                } else {
+                    const q = query(collection(db, 'providers'), where('name', '==', booking.provider));
+                    const snap = await getDocs(q);
+                    if (!snap.empty) providerId = snap.docs[0].id;
+                }
+
+                if (providerId) {
+                    // Try to get by ID directly
+                    try {
+                        const pRef = doc(db, 'providers', providerId);
+                        const pDoc = await getDocs(query(collection(db, 'providers'), where('__name__', '==', providerId)));
+                        if (!pDoc.empty) {
+                            const p = pDoc.docs[0].data();
+                            const currentRating = parseFloat(p.rating) || 5.0;
+                            const jobs = parseInt(p.jobs) || 1;
+                            const newRating = ((currentRating * jobs) + ratingState.rating) / (jobs + 1);
+                            await updateDoc(doc(db, 'providers', pDoc.docs[0].id), { 
+                                rating: parseFloat(newRating.toFixed(1)),
+                                jobs: jobs + 1 // Also increment job count as it was just completed/rated
+                            });
+                        }
+                    } catch (e) { console.error('Rating update failed:', e); }
                 }
 
                 await updateDoc(doc(db, 'bookings', booking.id), { rated: true, ratingGiven: ratingState.rating });
@@ -1094,7 +1110,7 @@ const CustomerHome = () => {
                                                                 <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs text-slate-600">{b.provider.charAt(0)}</div>
                                                                 {b.provider}
                                                             </p>
-                                                            <p className="font-black text-slate-900 text-lg">₹{b.proposedPrice || b.price}</p>
+                                                            <p className="font-black text-slate-900 text-lg">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
                                                         </div>
 
                                                         {b.status === 'accepted' && (
@@ -1203,20 +1219,74 @@ const CustomerHome = () => {
                                             <>
                                                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                                     {pastBookings.slice(0, visibleHistoryCount).map(b => (
-                                                        <div key={b.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-all flex justify-between items-center group">
-                                                            <div className="flex-1 min-w-0 pr-4">
-                                                                <div className="flex items-center gap-2 mb-1">
-                                                                    <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider truncate">{b.service}</p>
-                                                                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-green-100 text-green-700' : b.status === 'rejected' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'}`}>
-                                                                        {b.status}
-                                                                    </span>
+                                                        <div key={b.id} className="p-5 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 transition-all flex flex-col gap-4 group shadow-sm">
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex-1 min-w-0 pr-4">
+                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                        <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider truncate">{b.service}</p>
+                                                                        <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-green-100 text-green-700' : b.status === 'rejected' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'}`}>
+                                                                            {b.status}
+                                                                        </span>
+                                                                    </div>
+                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
                                                                 </div>
-                                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
-                                                                {b.description && (
-                                                                    <p className="text-[10px] text-slate-400 italic mt-1.5 line-clamp-1 border-l-2 border-slate-200 pl-2">"{b.description}"</p>
-                                                                )}
+                                                                <p className="font-black text-slate-900 shrink-0 text-sm">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
                                                             </div>
-                                                            <p className="font-black text-slate-900 shrink-0">₹{b.proposedPrice || b.price}</p>
+
+                                                            {/* Rating UI for Completed Bookings */}
+                                                            {b.status === 'completed' && (
+                                                                <div className="pt-3 border-t border-slate-50 flex items-center justify-between">
+                                                                    {b.rated ? (
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <div className="flex gap-0.5">
+                                                                                {[...Array(5)].map((_, i) => (
+                                                                                    <Star key={i} className={`w-3 h-3 ${i < (b.ratingGiven || 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
+                                                                                ))}
+                                                                            </div>
+                                                                            <span className="text-[10px] font-black text-amber-600 uppercase tracking-tighter">Your Review</span>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="flex items-center gap-3 w-full animate-in fade-in slide-in-from-bottom-1">
+                                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rate Pro:</p>
+                                                                            <div className="flex gap-1">
+                                                                                {[1, 2, 3, 4, 5].map((num) => (
+                                                                                    <button
+                                                                                        key={num}
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            setRatingState({ bookingId: b.id, rating: num });
+                                                                                        }}
+                                                                                        className="transition-transform active:scale-125"
+                                                                                    >
+                                                                                        <Star 
+                                                                                            className={`w-4 h-4 transition-colors ${
+                                                                                                (ratingState.bookingId === b.id && ratingState.rating >= num)
+                                                                                                ? 'fill-amber-400 text-amber-400'
+                                                                                                : 'text-slate-300 hover:text-amber-300'
+                                                                                            }`} 
+                                                                                        />
+                                                                                    </button>
+                                                                                ))}
+                                                                            </div>
+                                                                            {ratingState.bookingId === b.id && ratingState.rating > 0 && (
+                                                                                <button
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        submitRating(b);
+                                                                                    }}
+                                                                                    className="ml-auto px-4 py-1.5 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest hover:bg-black transition-all shadow-md"
+                                                                                >
+                                                                                    Submit
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+
+                                                            {b.description && (
+                                                                <p className="text-[10px] text-slate-400 italic line-clamp-1 border-l-2 border-slate-200 pl-2">"{b.description}"</p>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>

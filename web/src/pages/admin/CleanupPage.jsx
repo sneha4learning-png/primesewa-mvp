@@ -24,37 +24,32 @@ const CleanupPage = () => {
             const toDelete = [];
 
             // 1. Normalize Providers and Resolve Conflicts
-            providers.forEach(p => {
+            providers.forEach((p, idx) => {
                 const rawName = p.name || 'Unknown';
                 const nameKey = rawName.toLowerCase().replace(/servicies/g, 'services').replace(/\s+/g, ' ').trim();
                 const isSneha = nameKey.includes('sneha');
-                const isNewProv = nameKey.includes('new provider');
+                const isNewProv = nameKey.includes('new provider') || nameKey.includes('test provider');
                 const hasConflictingNumber = p.phone === '+911111111111' || p.phone === '1111111111';
                 
-                let normalizedPhone = p.phone || '+919999999999';
-                if (isSneha || isNewProv || nameKey.includes('provider') || hasConflictingNumber) {
-                    normalizedPhone = '+919999999999';
+                // CRITICAL: Providers must NOT have 1111111111 (Reserved for Sneha Customer)
+                let normalizedPhone = p.phone || `+9199999${10000 + idx}`;
+                if (hasConflictingNumber || isNewProv || isSneha) {
+                    // Assign a unique dummy number for test providers that doesn't conflict with customer
+                    normalizedPhone = `+9198765${20000 + idx}`;
                 }
 
                 const updates = {
-                    name: isSneha ? 'Sneha Services' : (isNewProv ? 'New Provider' : rawName.trim()),
+                    name: isSneha ? 'Sneha Services' : (isNewProv ? (nameKey.includes('test') ? 'Test Provider' : 'New Provider') : rawName.trim()),
                     phone: normalizedPhone,
-                    status: (isSneha || isNewProv) ? 'active' : (p.status || 'active').toLowerCase().trim(),
+                    status: 'active', // Force active for sanitized records
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
                     category: isSneha ? 'Carpentry' : (p.category || 'Professional Service'),
-                    price: (isSneha || isNewProv) ? '₹200/hr' : (p.price || '₹500/hr')
+                    price: (isSneha || isNewProv) ? (isSneha ? '₹200/hr' : '₹500/hr') : (p.price || '₹500/hr')
                 };
 
                 if (seen.has(nameKey)) {
                     const existing = seen.get(nameKey);
-                    const shouldKeepP = (!!p.uid && !existing.uid) || (p.isOnline && !existing.isOnline) || (p.jobs || 0) > (existing.jobs || 0);
-                    if (shouldKeepP) {
-                        toDelete.push(existing.id);
-                        seen.set(nameKey, { ...p, ...updates });
-                        batch.update(doc(db, 'providers', p.id), updates);
-                    } else {
-                        toDelete.push(p.id);
-                    }
+                    toDelete.push(p.id);
                 } else {
                     seen.set(nameKey, { ...p, ...updates });
                     batch.update(doc(db, 'providers', p.id), updates);
@@ -138,9 +133,9 @@ const CleanupPage = () => {
                 <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-900/40">
                     <span className="text-3xl">🛡️</span>
                 </div>
-                <h1 className="text-3xl font-black text-white mb-2 tracking-tighter">DB Sanitizer v5</h1>
+                <h1 className="text-3xl font-black text-white mb-2 tracking-tighter">DB Sanitizer v6</h1>
                 <p className="text-slate-400 mb-10 text-sm font-medium leading-relaxed">
-                    Resolves naming inconsistencies and merges duplicates. Ensures all users can access the platform.
+                    Resolves phone number conflicts (1111111111), merges duplicates, and restores global account access.
                 </p>
 
                 <div className="space-y-4">

@@ -247,7 +247,7 @@ const DashboardOverview = () => {
                                         <p className="text-xs text-gray-500">{b.customer || 'Unknown'} • {b.provider || 'Unassigned'}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-bold text-gray-900">₹{b.proposedPrice || b.price}</p>
+                                        <p className="font-bold text-gray-900">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
                                         <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${b.status === 'completed' ? 'bg-green-100 text-green-700' :
                                             b.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
                                                 b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' :
