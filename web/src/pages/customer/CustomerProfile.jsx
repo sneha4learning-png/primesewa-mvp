@@ -69,13 +69,10 @@ const CustomerProfile = () => {
                             <div className="w-28 h-28 rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-5xl font-black text-white border-[6px] border-white shadow-2xl shadow-indigo-600/40 shrink-0 transform transition-transform hover:scale-105 duration-300">
                                 {initial}
                             </div>
-                            <div className="pb-2 pt-4 sm:ml-4 flex-1">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 border border-blue-100">
-                                    Active Account
-                                </div>
+                            <div className="pb-2 pt-6 sm:ml-4 flex-1">
                                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">{name || 'Your Name'}</h2>
-                                <p className="text-slate-500 text-sm font-semibold flex items-center gap-2 mt-1">
-                                    <Shield className="w-4 h-4 text-emerald-500" /> Verified PrimeSewa Customer
+                                <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mt-1 opacity-60">
+                                    PrimeSewa Customer
                                 </p>
                             </div>
                         </div>
