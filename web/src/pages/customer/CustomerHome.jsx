@@ -228,7 +228,7 @@ const CustomerHome = () => {
 
         if (addressSearchTimeout) clearTimeout(addressSearchTimeout);
 
-        if (val.trim().length < 4) {
+        if (val.trim().length < 3) {
             setAddressSuggestions([]);
             return;
         }
@@ -236,22 +236,54 @@ const CustomerHome = () => {
         const timeoutId = setTimeout(async () => {
             setIsSearchingAddress(true);
             try {
-                // Free OpenStreetMap Nominatim request
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&addressdetails=1&limit=5&countrycodes=in`;
-                const res = await fetch(url);
+                // Ahmedabad bounding box: SW(72.43,22.87) → NE(72.71,23.13)
+                // bounded=1 forces results inside the box only
+                // Include amenities/landmarks via addressdetails & extratags
+                const url = [
+                    'https://nominatim.openstreetmap.org/search',
+                    `?format=json`,
+                    `&q=${encodeURIComponent(val + ', Ahmedabad')}`,
+                    `&addressdetails=1`,
+                    `&extratags=1`,
+                    `&namedetails=1`,
+                    `&limit=8`,
+                    `&countrycodes=in`,
+                    `&viewbox=72.43,23.13,72.71,22.87`,
+                    `&bounded=1`
+                ].join('');
+
+                const res = await fetch(url, {
+                    headers: { 'Accept-Language': 'en' }
+                });
                 const data = await res.json();
-                setAddressSuggestions(data || []);
+
+                // Secondary filter — only keep results that mention Ahmedabad or Gujarat
+                const filtered = (data || []).filter(p => {
+                    const addr = JSON.stringify(p.address || {}).toLowerCase();
+                    return addr.includes('ahmedabad') || addr.includes('gujarat');
+                });
+
+                setAddressSuggestions(filtered);
             } catch (err) {
-                console.error("Nominatim search failed", err);
+                console.error('Nominatim search failed', err);
             } finally {
                 setIsSearchingAddress(false);
             }
-        }, 600);
+        }, 500);
         setAddressSearchTimeout(timeoutId);
     };
 
     const handleSelectSuggestion = (place) => {
-        setBookingAddress(place.display_name);
+        // Build a clean, short address: name + road/suburb + city
+        const a = place.address || {};
+        const parts = [
+            place.namedetails?.name || place.name || '',
+            a.road || a.pedestrian || '',
+            a.suburb || a.neighbourhood || a.quarter || '',
+            'Ahmedabad'
+        ].filter(Boolean);
+        const cleanAddress = [...new Set(parts)].join(', ');
+        setBookingAddress(cleanAddress);
         setLocationCoords({ lat: parseFloat(place.lat), lng: parseFloat(place.lon) });
         setAddressSuggestions([]);
     };
@@ -657,21 +689,38 @@ const CustomerHome = () => {
                                     </div>
                                 )}
                                 {addressSuggestions.length > 0 && (
-                                    <ul className="absolute z-50 w-full bg-white border border-slate-200 rounded-2xl mt-2 shadow-xl overflow-hidden max-h-60 overflow-y-auto">
-                                        {addressSuggestions.map((place, i) => (
-                                            <li key={i}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleSelectSuggestion(place)}
-                                                    className="w-full text-left px-5 py-4 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
-                                                >
-                                                    <div className="flex items-start gap-3">
-                                                        <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                                                        <span className="text-sm font-medium text-slate-700 line-clamp-2">{place.display_name}</span>
-                                                    </div>
-                                                </button>
-                                            </li>
-                                        ))}
+                                    <ul className="absolute z-50 w-full bg-white border border-slate-200 rounded-2xl mt-2 shadow-xl overflow-hidden max-h-72 overflow-y-auto">
+                                        {addressSuggestions.map((place, i) => {
+                                            const a = place.address || {};
+                                            const name = place.namedetails?.name || place.name || '';
+                                            const locality = a.suburb || a.neighbourhood || a.quarter || a.road || '';
+                                            const placeType = (place.type || place.class || '').replace(/_/g, ' ');
+                                            const isLandmark = !['residential','yes','house'].includes(place.type);
+                                            return (
+                                                <li key={i}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSelectSuggestion(place)}
+                                                        className="w-full text-left px-5 py-3.5 hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-0"
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <MapPin className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2 flex-wrap">
+                                                                    <span className="text-sm font-bold text-slate-800 truncate">{name || locality || 'Ahmedabad'}</span>
+                                                                    {isLandmark && placeType && (
+                                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded uppercase tracking-wide shrink-0">{placeType}</span>
+                                                                    )}
+                                                                </div>
+                                                                {locality && name && (
+                                                                    <p className="text-xs text-slate-400 mt-0.5 truncate">{locality}, Ahmedabad</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 )}
                             </div>
