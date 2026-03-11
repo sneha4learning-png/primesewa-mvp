@@ -59,6 +59,17 @@ const ProviderManagement = () => {
     }, []);
 
     const handleStatusChange = async (id, newStatus) => {
+        const actionLabels = {
+            'active': 'APPROVE/REACTIVATE',
+            'rejected': 'REJECT',
+            'suspended': 'SUSPEND',
+            'pending': 'MOVE BACK TO REVIEW'
+        };
+
+        if (!window.confirm(`Are you sure you want to ${actionLabels[newStatus] || newStatus.toUpperCase()} this partner account?`)) {
+            return;
+        }
+
         try {
             await updateDoc(doc(db, 'providers', id), { status: newStatus });
             setProviders(providers.map(p => p.id === id ? { ...p, status: newStatus } : p));

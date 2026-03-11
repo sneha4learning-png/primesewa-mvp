@@ -60,6 +60,12 @@ const UserManagement = () => {
 
     const handleToggleStatus = async (id, currentStatus) => {
         const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
+        const actionLabel = newStatus === 'active' ? 'RESTORE and UNBLOCK' : 'INSTANTLY BLOCK';
+        
+        if (!window.confirm(`Are you sure you want to ${actionLabel} access for this user account?`)) {
+            return;
+        }
+
         try {
             await updateDoc(doc(db, 'users', id), { status: newStatus });
             setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
@@ -117,9 +123,12 @@ const UserManagement = () => {
                                 className="w-full h-[52px] pl-4 pr-10 appearance-none bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-800 font-bold text-sm shadow-sm cursor-pointer outline-none transition-all"
                                 onChange={(e) => {
                                     const user = users.find(u => u.id === e.target.value);
-                                    if (user) handleToggleStatus(user.id, user.status);
+                                    if (user) {
+                                        handleToggleStatus(user.id, user.status);
+                                        e.target.value = ""; // Reset to default "Select user..." option
+                                    }
                                 }}
-                                defaultValue=""
+                                value=""
                             >
                                 <option value="" disabled>Select user to toggle status...</option>
                                 {users.map(u => (
