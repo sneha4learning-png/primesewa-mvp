@@ -135,6 +135,7 @@ const ProviderLayout = () => {
                         )}
                     </div>
                     <div className="flex items-center gap-3 lg:gap-5">
+                        <NotificationBell />
                         {providerStatus === 'active' && (
                             <button
                                 onClick={toggleOnlineStatus}
