@@ -8,52 +8,46 @@ const CleanupPage = () => {
 
     const runCleanup = async () => {
         setLoading(true);
-        setStatus('🔍 Analyzing Database...');
+            setStatus('🔍 Analyzing Database...');
         try {
-            const snapshot = await getDocs(collection(db, 'providers'));
+            const providerSnapshot = await getDocs(collection(db, 'providers'));
+            const userSnapshot = await getDocs(collection(db, 'users'));
             const batch = writeBatch(db);
-            const providers = [];
 
-            snapshot.forEach(d => providers.push({ id: d.id, ...d.data() }));
+            const providers = [];
+            const users = [];
+
+            providerSnapshot.forEach(d => providers.push({ id: d.id, ...d.data() }));
+            userSnapshot.forEach(d => users.push({ id: d.id, ...d.data() }));
 
             const seen = new Map();
             const toDelete = [];
 
+            // 1. Normalize Providers and Resolve Conflicts
             providers.forEach(p => {
                 const rawName = p.name || 'Unknown';
-                // Normalize name to catch typos like 'servicies' or double spaces
-                const nameKey = rawName.toLowerCase()
-                    .replace(/servicies/g, 'services')
-                    .replace(/\s+/g, ' ')
-                    .trim();
-
+                const nameKey = rawName.toLowerCase().replace(/servicies/g, 'services').replace(/\s+/g, ' ').trim();
                 const isSneha = nameKey.includes('sneha');
+                
+                // CRITICAL: Ensure Provider number doesn't conflict with Customer number
+                // Sneha Customer = 1111111111, so Sneha Provider = 9999999999
+                let normalizedPhone = p.phone || '+910000000000';
+                if (isSneha || nameKey.includes('provider')) {
+                    normalizedPhone = '+919999999999';
+                }
 
                 const updates = {
                     name: isSneha ? 'Sneha Services' : rawName.trim(),
+                    phone: normalizedPhone,
                     status: isSneha ? 'active' : (p.status || 'active').toLowerCase().trim(),
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
                     category: isSneha ? 'Carpentry' : (p.category || 'Professional Service'),
-                    // Ensure price is standardized
                     price: isSneha ? '₹200/hr' : (p.price || '₹500/hr')
                 };
 
                 if (seen.has(nameKey)) {
                     const existing = seen.get(nameKey);
-
-                    const pIsReal = !!p.uid;
-                    const eIsReal = !!existing.uid;
-                    const pIsOnline = updates.isOnline;
-                    const eIsOnline = existing.isOnline === true || String(existing.isOnline) === 'true';
-
-                    // DECISION CRITERIA:
-                    // 1. Keep Real Account over Mock
-                    // 2. Keep Online over Offline
-                    // 3. Keep record with more jobs
-                    const shouldKeepP = (!eIsReal && pIsReal) ||
-                        (pIsReal === eIsReal && pIsOnline && !eIsOnline) ||
-                        (pIsReal === eIsReal && pIsOnline === eIsOnline && (p.jobs || 0) > (existing.jobs || 0));
-
+                    const shouldKeepP = (!!p.uid && !existing.uid) || (p.isOnline && !existing.isOnline) || (p.jobs || 0) > (existing.jobs || 0);
                     if (shouldKeepP) {
                         toDelete.push(existing.id);
                         seen.set(nameKey, { ...p, ...updates });
@@ -67,13 +61,23 @@ const CleanupPage = () => {
                 }
             });
 
-            // Delete orphans/duplicates
-            toDelete.forEach(id => {
-                batch.delete(doc(db, 'providers', id));
+            // 2. Normalize Users (Customers)
+            users.forEach(u => {
+                const isSneha = (u.name || '').toLowerCase().includes('sneha');
+                if (isSneha) {
+                    batch.update(doc(db, 'users', u.id), {
+                        name: 'Sneha Customer',
+                        phone: '+911111111111', // Fixed for Customer
+                        role: 'customer'
+                    });
+                }
             });
 
+            // Delete orphans/duplicates
+            toDelete.forEach(id => batch.delete(doc(db, 'providers', id)));
+
             await batch.commit();
-            setStatus(`✅ SUCCESS! Cleaned up ${toDelete.length} duplicates. Normalized "Sneha Services" to Carpentry category. Ready for testing.`);
+            setStatus(`✅ SUCCESS! Enforced unique numbers: Sneha Customer (1111111111) vs Sneha Services Provider (9999999999). Cleaned ${toDelete.length} duplicates. Ready for testing.`);
         } catch (err) {
             console.error(err);
             setStatus(`❌ FAILED: ${err.message}`);

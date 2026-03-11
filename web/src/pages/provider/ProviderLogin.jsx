@@ -4,6 +4,7 @@ import { useAuth } from '../../firebase/AuthContext';
 import { auth, db } from '../../firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useNotifications } from '../../context/NotificationContext';
 import { Phone, ArrowRight, ShieldCheck, Mail, Lock, User, CheckCircle2, AlertCircle, Eye, EyeOff, Wrench, UploadCloud } from 'lucide-react';
 
 const ProviderLogin = () => {
@@ -33,6 +34,7 @@ const ProviderLogin = () => {
 
     const [providers, setProviders] = useState([]);
     const { setCurrentUser, setUserData } = useAuth();
+    const { sendNotification } = useNotifications();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -203,6 +205,11 @@ const ProviderLogin = () => {
             }
 
             await setDoc(userDocRef, providerData, { merge: true });
+
+            // Notify Admin of new partner signup
+            if (isSignup) {
+                sendNotification('admin', 'New Partner Registration', `${providerName} has registered as a ${signupData.category} provider and is awaiting approval.`, 'info');
+            }
 
             setCurrentUser(user);
             setUserData({

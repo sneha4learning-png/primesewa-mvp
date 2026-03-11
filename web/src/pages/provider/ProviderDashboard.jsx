@@ -172,6 +172,11 @@ const ProviderDashboard = () => {
                 setRequests(prev => prev.filter(r => r.id !== id));
             }
             setHistoricalBookings(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
+
+            // Notify Customer
+            if (req && req.customerUid) {
+                sendNotification(req.customerUid, 'Request Declined', `${userData.name} is unavailable for the ${req.service} request.`, 'error');
+            }
         } catch (e) { console.error(e); }
     };
 

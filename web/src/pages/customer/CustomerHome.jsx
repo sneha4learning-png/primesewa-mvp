@@ -370,6 +370,7 @@ const CustomerHome = () => {
             service: (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Plumbing',
             status: 'pending',
             provider: provider.name || 'Provider',
+            providerUid: provider.uid || provider.id || '',
             providerPhone: provider.phone || '',
             previousWorkSample: provider.previousWorkSample,
             portfolio: provider.portfolio || [],
@@ -472,6 +473,11 @@ const CustomerHome = () => {
             
             // Notify Admin
             sendNotification('admin', 'New Booking Received', `${userData.name} booked ${finalBookingData.service} for ${finalBookingData.date}.`, 'booking');
+
+            // Notify Provider
+            if (finalBookingData.providerUid) {
+                sendNotification(finalBookingData.providerUid, 'New Job Request', `${userData.name} has requested your ${finalBookingData.service} service for ${finalBookingData.date}.`, 'info');
+            }
 
             setBookingStep(2);
             setTimeout(() => setBookingStep(0), 3000);
