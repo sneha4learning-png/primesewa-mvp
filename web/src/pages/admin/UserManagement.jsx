@@ -33,10 +33,13 @@ const UserManagement = () => {
                 });
 
                 const allAccounts = [];
+                const seenIds = new Set();
                 
                 // Process Customers
                 usersSnap.forEach((doc) => {
                     const data = doc.data();
+                    if (seenIds.has(doc.id)) return;
+                    seenIds.add(doc.id);
                     allAccounts.push({
                         id: doc.id,
                         name: data.name || 'Unknown User',
@@ -52,14 +55,16 @@ const UserManagement = () => {
                 // Process Providers for the dropdown
                 providersSnap.forEach((doc) => {
                     const data = doc.data();
+                    if (seenIds.has(doc.id)) return; // Avoid adding same physical record twice if for some reason it's in both
+                    seenIds.add(doc.id);
                     allAccounts.push({
                         id: doc.id,
                         name: data.name || 'Unknown Partner',
                         phone: data.phone || 'No phone',
                         joined: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Recent',
-                        totalBookings: 0, // We can hide this for providers in user list
-                        status: data.status || 'active',
-                        type: 'provider',
+                        totalBookings: 0,
+                        status: (data.status || 'pending').includes('active') ? 'active' : 'blocked', // Normalize status for simple toggle
+                        type: 'partner',
                         collection: 'providers'
                     });
                 });
@@ -162,8 +167,8 @@ const UserManagement = () => {
                             >
                                 <option value="" disabled>Select user to toggle status...</option>
                                 {universalList.map(u => (
-                                    <option key={u.id} value={u.id} className="py-2">
-                                        [{u.type.toUpperCase()}] {u.name} ({u.status === 'active' || u.status === 'approved' ? 'ACTIVE' : 'BLOCKED'})
+                                    <option key={`${u.type}-${u.id}`} value={u.id} className="py-2">
+                                        {u.type === 'customer' ? '[CONSUMER]' : '[PARTNER]'} {u.name} — {u.status === 'active' ? '✅ ACTIVE' : '🚫 BLOCKED'}
                                     </option>
                                 ))}
                             </select>

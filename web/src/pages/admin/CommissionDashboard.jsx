@@ -81,6 +81,10 @@ const CommissionDashboard = () => {
 
                 const analytics = Object.values(monthlyMap)
                     .sort((a, b) => a.sortKey - b.sortKey)
+                    .map(item => ({
+                        ...item,
+                        commission: Math.round(item.commission) // Enforce clean integers for analytics
+                    }))
                     .slice(-6); // Last 6 months
                 
                 setMonthlyData(analytics);
@@ -207,6 +211,7 @@ const CommissionDashboard = () => {
                                 <Tooltip 
                                     contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}}
                                     cursor={{stroke: '#10b981', strokeWidth: 2}}
+                                    formatter={(value) => [`₹${Math.round(value)}`, 'Commission']}
                                 />
                                 <Area 
                                     type="natural" 
