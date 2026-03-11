@@ -6,7 +6,7 @@ export const AdminRoute = ({ children }) => {
 
     if (loading) return <div>Loading...</div>;
     if (!currentUser) return <Navigate to="/admin/login" />;
-    if (userData?.role !== 'admin') return <Navigate to="/" />; // Or unauthorized
+    if (userData?.role !== 'admin') return <Navigate to="/admin/login" />;
 
     return children;
 };
@@ -16,7 +16,7 @@ export const ProviderRoute = ({ children }) => {
 
     if (loading) return <div>Loading...</div>;
     if (!currentUser) return <Navigate to="/provider/login" />;
-    if (userData?.role !== 'provider') return <Navigate to="/" />;
+    if (userData?.role !== 'provider') return <Navigate to="/provider/login" />;
 
     return children;
 };
