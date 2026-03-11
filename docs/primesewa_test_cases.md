@@ -1,4 +1,3 @@
-
 # Test Case Document – PrimeSewa Hyperlocal Service Platform - [STATUS: UPDATED]
 
 Source BRD: AntiGravity Hyperlocal Service Booking MVP
@@ -27,6 +26,13 @@ Source BRD: AntiGravity Hyperlocal Service Booking MVP
 | FT-018 | Functional | Customer | Address Autocomplete | Type street name in booking | Live suggestions appear from OSM API | Medium | Passed |
 | FT-019 | Functional | Provider| Doorstep Details | View incoming lead with House No | House No shown in bold badge style | High | Passed |
 | FT-020 | Functional | Customer | Mandatory House No | Submit booking without House No | Form blocks submission (HTML5 valid) | Medium | Passed |
+| FT-021 | Functional | Platform | Rating Consistency | View ratings on Dashboard/Profile | Displays systematically up to 1 decimal place (e.g., 4.5) | Medium | Passed |
+| FT-022 | Functional | Booking | Booking Date Sync | View job in Live Booking then Commission | Dates/times match identically across both views | High | Passed |
+| FT-023 | Functional | Booking | Default Service Selection | Click "Book Now" without prior category selection | Prompts for category or defaults to Provider's category | High | Passed |
+| FT-024 | Functional | Provider | Multi-category Selection | Provider signs up / edits profile | Can select and save multiple service categories successfully | High | Passed |
+| FT-025 | Functional | Provider | State Action Updates | Accept job, then click "On Way" | Booking status progresses immediately without popup glitches | High | Passed |
+| FT-026 | Functional | Customer | Past Bookings Empty State | View profile without history | Past bookings section visible showing empty state UI | Low | Passed |
+| FT-027 | Functional | System | CI/CD Lighthouse Audit | Push code to main branch | Github Actions trigger Automated Lighthouse responsive audit correctly | High | Passed |
 
 ## 2. Negative Test Cases
 
@@ -49,4 +55,3 @@ Source BRD: AntiGravity Hyperlocal Service Booking MVP
 | EC-003 | Edge | UI | Responsive Dashboard | Open Admin panel on 768px | Sidebar collapses or adapts | Medium | Passed |
 | EC-004 | Edge | Auth | Session Persistence | Refresh page while logged in | User remains logged in (localStorage) | High | Passed |
 | EC-005 | Edge | Admin | Empty Fleet Data | View Provider table with zero data | "No active providers available" message | Low | Passed |
-

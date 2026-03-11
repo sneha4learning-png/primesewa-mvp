@@ -7,7 +7,6 @@ import { collection, query, where, getDocs, orderBy, limit, onSnapshot } from 'f
 
 const LandingPage = () => {
     const { userData } = useAuth();
-    const [activeBooking, setActiveBooking] = useState(null);
     const [providerDetails, setProviderDetails] = useState(null);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -41,32 +40,10 @@ const LandingPage = () => {
             const topOnline = providers.find(p => p.isOnline === true || String(p.isOnline) === 'true');
             if (topOnline) setProviderDetails(topOnline);
         });
-
-        // 2. Listen to Active Bookings if user is logged in
-        let unsubscribeBooking = () => { };
-        if (userData?.uid || userData?.name) {
-            const identifier = userData.name || userData.displayName;
-            const bookingsQuery = query(
-                collection(db, 'bookings'),
-                where('customer', '==', identifier),
-                where('status', 'in', ['accepted', 'pending', 'negotiating', 'arrived', 'started'])
-            );
-
-            unsubscribeBooking = onSnapshot(bookingsQuery, (snapshot) => {
-                if (!snapshot.empty) {
-                    const active = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-                    setActiveBooking(active);
-                } else {
-                    setActiveBooking(null);
-                }
-            });
-        }
-
         return () => {
             unsubscribeTop();
-            unsubscribeBooking();
         };
-    }, [userData]);
+    }, []);
     return (
         <div className="flex flex-col min-h-screen">
             {/* Hero Section */}
@@ -139,12 +116,12 @@ const LandingPage = () => {
                             <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${activeBooking ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-600'} shadow-md`}>
-                                            {(activeBooking?.provider || providerDetails?.name || 'A').charAt(0).toUpperCase()}
+                                        <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-white text-indigo-600 shadow-md">
+                                            {(providerDetails?.name || 'A').charAt(0).toUpperCase()}
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-white">{activeBooking?.provider || providerDetails?.name || 'Finding Partner...'}</h4>
-                                            <p className="text-indigo-200 text-sm">{activeBooking?.service || providerDetails?.category || 'Expert Service'}</p>
+                                            <h4 className="font-bold text-white">{providerDetails?.name || 'Finding Partner...'}</h4>
+                                            <p className="text-indigo-200 text-sm">{providerDetails?.category || 'Expert Service'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1 text-amber-400">
@@ -153,25 +130,10 @@ const LandingPage = () => {
                                     </div>
                                 </div>
                                 <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full bg-gradient-to-r transition-all duration-700 ${activeBooking?.status === 'accepted' ? 'from-emerald-400 to-emerald-500 animate-pulse' : 'from-blue-400 to-blue-500'}`}
-                                        style={{
-                                            width: activeBooking
-                                                ? (activeBooking.trackingStatus === 'inprogress' ? '100%' :
-                                                    activeBooking.trackingStatus === 'arrived' ? '66%' :
-                                                        activeBooking.trackingStatus === 'enroute' ? '33%' : '10%')
-                                                : '100%'
-                                        }}
-                                    ></div>
+                                    <div className="h-full bg-gradient-to-r transition-all duration-700 from-blue-400 to-blue-500 w-full animate-pulse"></div>
                                 </div>
-                                <p className={`text-[10px] text-center mt-2 font-bold tracking-widest uppercase ${activeBooking?.status === 'accepted' || activeBooking?.status === 'arrived' || activeBooking?.status === 'started' ? 'text-emerald-400' : 'text-blue-300'}`}>
-                                    {activeBooking ? (
-                                        activeBooking.trackingStatus === 'enroute' ? 'Partner is on the way' :
-                                            activeBooking.trackingStatus === 'arrived' ? 'Partner has arrived' :
-                                                activeBooking.trackingStatus === 'inprogress' ? 'Job in progress' :
-                                                    activeBooking.status === 'accepted' ? 'Partner Assigned' :
-                                                        'Finding Provider...'
-                                    ) : 'Top Rated Partner'}
+                                <p className="text-[10px] text-center mt-2 font-bold tracking-widest uppercase text-blue-300">
+                                    Top Rated Partner
                                 </p>
                             </div>
                         </div>
@@ -359,6 +321,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </footer>
+
         </div>
     );
 };
