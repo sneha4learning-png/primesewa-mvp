@@ -151,7 +151,7 @@ const CommissionDashboard = () => {
                         </div>
                         <h3 className="text-lg font-medium text-emerald-50">Total Revenue (15%)</h3>
                     </div>
-                    <p className="text-4xl font-bold tracking-tight">₹{totalCommission.toFixed(2)}</p>
+                    <p className="text-4xl font-bold tracking-tight">₹{totalCommission.toFixed(0)}</p>
                     <p className="text-emerald-100 mt-2 text-sm">For the selected period</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
@@ -161,7 +161,7 @@ const CommissionDashboard = () => {
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                     <p className="text-sm font-semibold text-gray-500 mb-2">Total Job Value</p>
                     <p className="text-3xl font-bold text-gray-900">
-                        ₹{commissions.reduce((a, c) => a + (c.amount || 0), 0).toFixed(2)}
+                        ₹{commissions.reduce((a, c) => a + (c.amount || 0), 0).toFixed(0)}
                     </p>
                 </div>
             </div>
@@ -183,7 +183,7 @@ const CommissionDashboard = () => {
                     </div>
                     <div className="h-[280px] w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={monthlyData}>
+                            <AreaChart data={monthlyData} margin={{ top: 10, right: 35, left: 10, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorComm" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
@@ -209,12 +209,14 @@ const CommissionDashboard = () => {
                                     cursor={{stroke: '#10b981', strokeWidth: 2}}
                                 />
                                 <Area 
-                                    type="monotone" 
+                                    type="natural" 
                                     dataKey="commission" 
-                                    stroke="#10b981" 
+                                    stroke="#059669" 
                                     strokeWidth={4}
                                     fillOpacity={1} 
                                     fill="url(#colorComm)" 
+                                    dot={{ r: 4, fill: '#059669', strokeWidth: 2, stroke: '#fff' }}
+                                    activeDot={{ r: 6, strokeWidth: 0 }}
                                 />
                             </AreaChart>
                         </ResponsiveContainer>
@@ -269,8 +271,8 @@ const CommissionDashboard = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{c.date}</td>
                                     <td className="px-6 py-4 text-sm text-gray-700 font-medium">{c.service || '—'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{c.provider}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 text-right">₹{c.amount}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 text-right">+ ₹{c.commission}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 text-right">₹{c.amount.toFixed(0)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 text-right">+ ₹{c.commission.toFixed(0)}</td>
                                 </tr>
                             ))}
                             {paginatedRecords.length === 0 && (
