@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock } from 'lucide-react';
+import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock, Star } from 'lucide-react';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { useNotifications } from '../../context/NotificationContext';
 import { useLocation } from 'react-router-dom';
 import TimelineModal from '../../components/TimelineModal';
