@@ -161,6 +161,7 @@ const ProviderManagement = () => {
                             <th className="px-6 py-4 font-medium">Category</th>
                             <th className="px-6 py-4 font-medium">Contact</th>
                             <th className="px-6 py-4 font-medium">Jobs Done</th>
+                            <th className="px-6 py-4 font-medium">Rating</th>
                             <th className="px-6 py-4 font-medium">Rate</th>
                             <th className="px-6 py-4 font-medium relative">Status</th>
                             <th className="px-6 py-4 font-medium text-right">Actions</th>
@@ -178,6 +179,18 @@ const ProviderManagement = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.phone}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.jobs || 0}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <div className="flex items-center gap-1.5 font-bold text-amber-500">
+                                        {provider.rating > 0 ? (
+                                            <>
+                                                <Star className="w-4 h-4 fill-current" />
+                                                {Number(provider.rating).toFixed(1)}
+                                            </>
+                                        ) : (
+                                            <span className="text-slate-400 font-medium">New</span>
+                                        )}
+                                    </div>
+                                </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{provider.price || '₹500/hr'}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
@@ -253,6 +266,10 @@ const ProviderManagement = () => {
                             <div className="flex items-center gap-3 text-xs text-gray-600 flex-wrap">
                                 <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">{provider.category || 'No Category'}</span>
                                 <span>{provider.jobs || 0} jobs</span>
+                                <span className={`font-bold flex items-center gap-1 ${provider.rating > 0 ? 'text-amber-500' : 'text-slate-400'}`}>
+                                    <Star className={`w-3 h-3 ${provider.rating > 0 ? 'fill-current' : ''}`} />
+                                    {provider.rating > 0 ? Number(provider.rating).toFixed(1) : 'New'}
+                                </span>
                                 <span className="text-emerald-600 font-semibold">{provider.price || '₹500/hr'}</span>
                                 <span>{provider.phone}</span>
                             </div>

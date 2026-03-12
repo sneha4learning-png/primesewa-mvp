@@ -218,6 +218,7 @@ const ProviderLogin = () => {
                     proofOfWorkImageNames: signupData.proofOfWorkImages?.map(f => f.name) || [],
                     proofDocumentName: signupData.proofDocument?.name || '',
                     rating: 0,
+                    ratingCount: 0,
                     jobs: 0,
                     isOnline: true
                 };

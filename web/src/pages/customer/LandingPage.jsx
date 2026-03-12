@@ -179,7 +179,7 @@ const LandingPage = () => {
                                             </div>
                                             <div className="flex items-center gap-1 text-amber-400">
                                                 <Star className="w-5 h-5 fill-current" />
-                                                <span className="font-bold text-white">{providerDetails ? Number(providerDetails.rating || 0).toFixed(1) : '5.0'}</span>
+                                                <span className="font-bold text-white">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
                                             </div>
                                         </div>
                                         <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">

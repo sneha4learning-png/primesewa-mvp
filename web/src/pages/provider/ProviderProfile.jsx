@@ -141,9 +141,9 @@ const ProviderProfile = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500 font-medium">Customer Rating</p>
-                                        {profile.jobs > 0 ? (
+                                        {profile.rating > 0 ? (
                                             <div className="flex items-center gap-2">
-                                                <p className="font-bold text-gray-900">{Number(profile.rating || 0).toFixed(1)} / 5.0</p>
+                                                <p className="font-bold text-gray-900">{Number(profile.rating).toFixed(1)} / 5.0</p>
                                                 <div className="flex">
                                                     {[...Array(5)].map((_, i) => {
                                                         const starValue = i + 1;
@@ -159,7 +159,7 @@ const ProviderProfile = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <p className="text-sm font-bold text-slate-400 mt-1">No ratings yet</p>
+                                            <p className="text-sm font-bold text-slate-400 mt-1">New Partner (No ratings)</p>
                                         )}
                                     </div>
                                 </div>

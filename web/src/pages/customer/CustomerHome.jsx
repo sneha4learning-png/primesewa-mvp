@@ -590,12 +590,20 @@ const CustomerHome = () => {
                         const pDoc = await getDocs(query(collection(db, 'providers'), where('__name__', '==', providerId)));
                         if (!pDoc.empty) {
                             const p = pDoc.docs[0].data();
-                            const currentRating = parseFloat(p.rating) || 5.0;
-                            const jobs = parseInt(p.jobs) || 1;
-                            const newRating = ((currentRating * jobs) + ratingState.rating) / (jobs + 1);
+                            // Correct Rating Math: Use ratingCount specifically for average calculation
+                            const currentRating = parseFloat(p.rating) || 0;
+                            const ratingCount = parseInt(p.ratingCount) || 0;
+                            
+                            let newRating;
+                            if (ratingCount === 0) {
+                                newRating = ratingState.rating;
+                            } else {
+                                newRating = ((currentRating * ratingCount) + ratingState.rating) / (ratingCount + 1);
+                            }
+
                             await updateDoc(doc(db, 'providers', pDoc.docs[0].id), { 
                                 rating: parseFloat(newRating.toFixed(1)),
-                                jobs: jobs + 1 // Also increment job count as it was just completed/rated
+                                ratingCount: ratingCount + 1
                             });
                         }
                     } catch (e) { console.error('Rating update failed:', e); }
@@ -1033,9 +1041,9 @@ const CustomerHome = () => {
                                                         : 'Across Ahmedabad'}
                                                 </div>
                                                 <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-2">
-                                                    <span className={`flex items-center gap-1 ${provider.jobs > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} text-xs font-bold px-2 py-0.5 rounded-lg border`}>
-                                                        {provider.jobs > 0 ? (
-                                                            <><Star className="w-3 h-3 fill-current" /> {Number(provider.rating || 0).toFixed(1)}</>
+                                                    <span className={`flex items-center gap-1 ${provider.rating > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} text-xs font-bold px-2 py-0.5 rounded-lg border`}>
+                                                        {provider.rating > 0 ? (
+                                                            <><Star className="w-3 h-3 fill-current" /> {Number(provider.rating).toFixed(1)}</>
                                                         ) : (
                                                             'New'
                                                         )}
@@ -1415,8 +1423,8 @@ const CustomerHome = () => {
                                             <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
                                                 <Star className="w-5 h-5 fill-current" />
                                             </div>
-                                            <div className="text-xl font-black text-slate-900">{jobs > 0 ? rating.toFixed(1) : 'New'}</div>
-                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{jobs > 0 ? 'Rating' : 'Status'}</div>
+                                            <div className="text-xl font-black text-slate-900">{rating > 0 ? rating.toFixed(1) : 'New'}</div>
+                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{rating > 0 ? 'Rating' : 'Status'}</div>
                                         </div>
                                         <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
                                             <div className="flex items-center justify-center gap-1 text-emerald-600 mb-1">
