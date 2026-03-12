@@ -148,8 +148,22 @@ const CustomerHome = () => {
                     (existing.uid && existing.uid.length >= 20 && !existing.uid.startsWith('mock-') && !existing.uid.includes('-'))
                 );
 
-                if (!existing || (pIsReal && !eIsReal)) {
+                const pRating = parseFloat(p.rating) || 0;
+                const eRating = existing ? (parseFloat(existing.rating) || 0) : 0;
+                const pJobs = parseInt(p.jobs) || 0;
+                const eJobs = existing ? (parseInt(existing.jobs) || 0) : 0;
+
+                // Priority: 1. Real vs Mock, 2. Rating, 3. Jobs
+                if (!existing) {
                     uniqueProvidersMap.set(nameKey, p);
+                } else if (pIsReal && !eIsReal) {
+                    uniqueProvidersMap.set(nameKey, p);
+                } else if (pIsReal === eIsReal) {
+                    if (pRating > eRating) {
+                        uniqueProvidersMap.set(nameKey, p);
+                    } else if (pRating === eRating && pJobs > eJobs) {
+                        uniqueProvidersMap.set(nameKey, p);
+                    }
                 }
             });
 
@@ -1041,14 +1055,22 @@ const CustomerHome = () => {
                                                         : 'Across Ahmedabad'}
                                                 </div>
                                                 <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-2">
-                                                    <span className={`flex items-center gap-1 ${provider.rating > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} text-xs font-bold px-2 py-0.5 rounded-lg border`}>
-                                                        {provider.rating > 0 ? (
-                                                            <><Star className="w-3 h-3 fill-current" /> {Number(provider.rating).toFixed(1)}</>
-                                                        ) : (
-                                                            'New'
-                                                        )}
-                                                    </span>
-                                                    <span className="text-xs text-slate-400 font-medium">{provider.jobs || 0} jobs</span>
+                                                    {(() => {
+                                                        const r = typeof provider.rating === 'number' ? provider.rating : parseFloat(provider.rating || 0);
+                                                        const j = parseInt(provider.jobs) || parseInt(provider.jobCount) || 0;
+                                                        return (
+                                                            <>
+                                                                <span className={`flex items-center gap-1 ${r > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} text-xs font-bold px-2 py-0.5 rounded-lg border`}>
+                                                                    {r > 0 ? (
+                                                                        <><Star className="w-3 h-3 fill-current" /> {r.toFixed(1)}</>
+                                                                    ) : (
+                                                                        'New'
+                                                                    )}
+                                                                </span>
+                                                                <span className="text-xs text-slate-400 font-medium">{j} jobs</span>
+                                                            </>
+                                                        );
+                                                    })()}
                                                     <span className="flex items-center gap-0.5 text-emerald-700 text-xs font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
                                                         ₹{(provider.price || '').toString().replace(/[₹,/a-zA-Z\s]/g, '') || '—'}/hr
                                                     </span>
@@ -1368,8 +1390,8 @@ const CustomerHome = () => {
                     const name = p.name || 'Provider';
                     const initial = name.charAt(0).toUpperCase();
                     const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Professional Service');
-                    const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating) || 0;
-                    const jobs = p.jobs || p.jobCount || 0;
+                    const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating || 0);
+                    const jobs = parseInt(p.jobs) || parseInt(p.jobCount) || 0;
                     const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0
                         ? p.serviceAreas.join(', ')
                         : 'Ahmedabad';

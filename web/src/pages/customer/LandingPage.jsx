@@ -36,9 +36,24 @@ const LandingPage = () => {
         );
 
         const unsubscribeTop = onSnapshot(topProviderQuery, (snapshot) => {
-            const providers = snapshot.docs.map(d => d.data());
+            const providers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            // Deduplicate by name if multiple exist
+            const uniqueProvidersMap = new Map();
+            providers.forEach(p => {
+                const nameKey = (p.name || '').toLowerCase().trim();
+                const existing = uniqueProvidersMap.get(nameKey);
+                const pRating = parseFloat(p.rating) || 0;
+                const eRating = existing ? (parseFloat(existing.rating) || 0) : 0;
+                
+                if (!existing || pRating > eRating) {
+                    uniqueProvidersMap.set(nameKey, p);
+                }
+            });
+
+            const uniqueProviders = Array.from(uniqueProvidersMap.values());
             // Filter online manually to handle type mismatches (string "true" vs boolean)
-            const topOnline = providers.find(p => p.isOnline === true || String(p.isOnline) === 'true');
+            const topOnline = uniqueProviders.find(p => p.isOnline === true || String(p.isOnline) === 'true');
             if (topOnline) setProviderDetails(topOnline);
         });
 

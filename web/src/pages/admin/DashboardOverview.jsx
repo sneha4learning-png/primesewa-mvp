@@ -98,10 +98,29 @@ const DashboardOverview = () => {
                 });
                 setChartData(last7Days);
 
+                // Deduplicate providers by name, prioritizing those with higher ratings/jobs
+                const uniqueProvidersMap = new Map();
+                providers.forEach(p => {
+                    const nameKey = (p.name || '').toLowerCase().trim();
+                    if (!nameKey) return;
+                    const existing = uniqueProvidersMap.get(nameKey);
+                    
+                    const pRating = parseFloat(p.rating) || 0;
+                    const eRating = existing ? (parseFloat(existing.rating) || 0) : 0;
+                    const pJobs = parseInt(p.jobs) || completedCounts.get(p.name) || 0;
+                    const eJobs = existing ? (parseInt(existing.jobs) || completedCounts.get(existing.name) || 0) : 0;
+
+                    if (!existing || pRating > eRating || (pRating === eRating && pJobs > eJobs)) {
+                        uniqueProvidersMap.set(nameKey, p);
+                    }
+                });
+
+                const uniqueProviders = Array.from(uniqueProvidersMap.values());
+
                 // Top 5 Providers
-                const activeProvs = providers.filter(p => p.status === 'active').map(p => ({
+                const activeProvs = uniqueProviders.filter(p => p.status === 'active').map(p => ({
                     ...p,
-                    jobs: completedCounts.get(p.name) || 0
+                    jobs: parseInt(p.jobs) || completedCounts.get(p.name) || 0
                 }));
                 activeProvs.sort((a, b) => {
                     const jobsA = a.jobs || 0;
