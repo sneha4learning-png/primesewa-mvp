@@ -27,8 +27,7 @@ export const NotificationProvider = ({ children }) => {
         const q = query(
             collection(db, 'notifications'),
             where('userId', 'in', userIdentifiers),
-            orderBy('createdAt', 'desc'),
-            limit(20)
+            limit(50) // Fetch more to allow for in-memory sorting
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -36,7 +35,15 @@ export const NotificationProvider = ({ children }) => {
                 id: doc.id,
                 ...doc.data()
             }));
-            setNotifications(fetched);
+            
+            // Sort in-memory: handle missing createdAt or non-timestamp values
+            const sorted = fetched.sort((a, b) => {
+                const timeA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || 0;
+                const timeB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || 0;
+                return timeB - timeA;
+            });
+            
+            setNotifications(sorted.slice(0, 20)); // Keep only latest 20
         });
 
         // Separate listener for accurate unread count across ALL notifications
