@@ -1323,13 +1323,13 @@ const CustomerHome = () => {
                                         <div className="w-14 h-14 rounded-full border-4 border-white bg-emerald-100 flex items-center justify-center text-2xl shadow-lg transform rotate-12">🚰</div>
                                     </div>
                                     <p className="text-sm font-bold text-slate-800 leading-relaxed italic px-4">
-                                        "Found an amazing electrician in 5 minutes! Highly recommend PrimeSewa for anyone in Ahmedabad."
+                                        Empowering Ahmedabad with the most trusted professionals. Secure, fast, and reliable home services at your doorstep.
                                     </p>
                                     <div className="mt-6 flex flex-col items-center">
-                                        <div className="flex gap-1 text-amber-400">
+                                        <div className="flex gap-1 text-blue-500/20">
                                             {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
                                         </div>
-                                        <span className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-widest">— Sneha P., Vastrapur</span>
+                                        <span className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-widest">Ahmedabad's #1 Service Platform</span>
                                     </div>
                                 </div>
                             )}
@@ -1456,11 +1456,10 @@ const CustomerHome = () => {
                                                     />
                                                 ))
                                             ) : (
-                                                <>
-                                                    <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80" alt="Work sample 1" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                                    <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&q=80" alt="Work sample 2" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                                    <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400&q=80" alt="Work sample 3" className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0" />
-                                                </>
+                                                <div className="w-full py-12 flex flex-col items-center justify-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 gap-2 min-w-[300px]">
+                                                    <Briefcase className="w-8 h-8 opacity-20" />
+                                                    <p className="text-[10px] font-bold uppercase tracking-widest">No portfolio items yet</p>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -1486,28 +1485,9 @@ const CustomerHome = () => {
 
                                     <div className="mt-8 border-t border-slate-100 pt-8">
                                         <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
-                                        {jobs > 0 ? (
-                                            <div className="space-y-4">
-                                                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                                    <div className="flex gap-2 text-amber-400 mb-2">
-                                                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(rating) ? 'fill-current' : 'text-slate-300'}`} />)}
-                                                    </div>
-                                                    <p className="text-slate-600 text-sm font-medium">"Very professional and quick service. Highly recommended!"</p>
-                                                    <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
-                                                </div>
-                                                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                                                    <div className="flex gap-2 text-amber-400 mb-2">
-                                                        {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
-                                                    </div>
-                                                    <p className="text-slate-600 text-sm font-medium">"Arrived on time and solved the issue perfectly."</p>
-                                                    <p className="text-slate-400 text-xs font-bold mt-2 uppercase tracking-wide">- Verified Customer</p>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl text-center">
-                                                <p className="text-slate-400 font-medium text-sm">No reviews yet — be the first to book!</p>
-                                            </div>
-                                        )}
+                                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl text-center">
+                                            <p className="text-slate-400 font-medium text-sm">Real-time ratings from verified customers will appear here.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

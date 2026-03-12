@@ -365,16 +365,21 @@ const ProviderManagement = () => {
                                     {/* Work Description explicitly removed below */}
                                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 col-span-2">
                                         <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Identity Document</p>
-                                        <a href={(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http')) ? selectedProvider.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=800&q=80"} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] min-h-[140px] bg-slate-100 rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm relative">
-                                            <img
-                                                src={(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http')) ? selectedProvider.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
-                                                alt="ID Proof"
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
-                                            />
-                                        </a>
-                                        {(!(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http'))) && (
-                                            <p className="text-[10px] text-amber-600 mt-2 font-bold italic bg-amber-50 px-2 py-1 rounded inline-block">Showing sample ID (Verification pending)</p>
+                                        {(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http')) ? (
+                                            <a href={selectedProvider.proofDocument} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] min-h-[140px] bg-white rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm">
+                                                <img
+                                                    src={selectedProvider.proofDocument}
+                                                    alt="ID Proof"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </a>
+                                        ) : (
+                                            <div className="w-full max-w-[200px] h-[140px] bg-slate-100 rounded-lg flex flex-col items-center justify-center border border-dashed border-slate-300 gap-2">
+                                                <div className="p-3 bg-white rounded-full text-slate-400 shadow-sm">
+                                                    <FileText className="w-6 h-6" />
+                                                </div>
+                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">No document uploaded</p>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -382,23 +387,17 @@ const ProviderManagement = () => {
                                 <div className="mt-4">
                                     <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Work Portfolio / Sample</p>
                                     <div className="flex gap-3 overflow-x-auto pb-2">
-                                        <a href={selectedProvider.previousWorkSample || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&q=80"} target="_blank" rel="noreferrer" className="block w-32 h-24 rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity flex-shrink-0">
-                                            <img src={selectedProvider.previousWorkSample || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=300&q=80"} alt="Work 1" className="w-full h-full object-cover" />
-                                        </a>
-                                        <div className="w-32 h-24 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
-                                            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=300&q=80" alt="Work 2" className="w-full h-full object-cover" />
-                                        </div>
-                                        <div className="w-32 h-24 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
-                                            <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=300&q=80" alt="Work 3" className="w-full h-full object-cover" />
-                                        </div>
-                                    </div>
-                                    {selectedProvider.previousWorkSample && (
-                                        <div className="mt-2 text-right">
-                                            <a href={selectedProvider.previousWorkSample} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline font-semibold">
-                                                <ExternalLink className="w-3 h-3" /> External Link
+                                        {selectedProvider.previousWorkSample ? (
+                                            <a href={selectedProvider.previousWorkSample} target="_blank" rel="noreferrer" className="block w-32 h-24 rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity flex-shrink-0">
+                                                <img src={selectedProvider.previousWorkSample} alt="Work 1" className="w-full h-full object-cover" />
                                             </a>
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <div className="w-full py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 gap-1.5 min-h-[96px]">
+                                                <Briefcase className="w-6 h-6 opacity-20" />
+                                                <p className="text-[10px] font-bold uppercase tracking-widest">No work samples uploaded</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 {selectedProvider.status === 'pending' && (
                                     <div className="mt-4 flex gap-3">

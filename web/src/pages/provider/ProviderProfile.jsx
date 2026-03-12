@@ -170,13 +170,21 @@ const ProviderProfile = () => {
                     <div className="mt-8 pt-6 border-t border-gray-100">
                         <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 pb-2">Identity Verification</h3>
                         <div className="flex flex-col items-center sm:items-start gap-4">
-                            <div className="w-full max-w-[240px] min-h-[160px] bg-slate-50 rounded-xl overflow-hidden border border-gray-200 shadow-sm transition-transform hover:scale-[1.02] relative">
-                                <img
-                                    src={(typeof profile.proofDocument === 'string' && profile.proofDocument.startsWith('http')) ? profile.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
-                                    alt="ID Proof"
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
-                                />
+                            <div className="w-full max-w-[240px] min-h-[160px] bg-slate-100 rounded-xl flex flex-col items-center justify-center border border-dashed border-gray-300 gap-3 transition-transform hover:scale-[1.02]">
+                                {(typeof profile.proofDocument === 'string' && profile.proofDocument.startsWith('http')) ? (
+                                    <img
+                                        src={profile.proofDocument}
+                                        alt="ID Proof"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <>
+                                        <div className="p-4 bg-white rounded-full text-indigo-300 shadow-sm">
+                                            <Briefcase className="w-8 h-8" />
+                                        </div>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center px-4">Identity Verification<br />Pending Upload</p>
+                                    </>
+                                )}
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-gray-800">{profile.idProofType || 'Aadhaar'} Number</p>
