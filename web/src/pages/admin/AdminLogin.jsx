@@ -109,6 +109,22 @@ const AdminLogin = () => {
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
+                            <label className="block text-xs font-bold text-white/50 mb-2 uppercase tracking-wider">System Username</label>
+                            <div className="relative group opacity-80">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    value="admin"
+                                    readOnly
+                                    disabled
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl outline-none text-white/60 cursor-not-allowed transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
                             <label className="block text-xs font-bold text-white/50 mb-2 uppercase tracking-wider">Access Key</label>
                             <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
