@@ -196,6 +196,13 @@ const ProviderLogin = () => {
                 createdAt: serverTimestamp()
             };
 
+            // Handle existing provider data migration if ID mismatch
+            const existingProv = providers.find(p => {
+                const cleanP = (p.phone || '').replace(/\D/g, '').slice(-10);
+                const targetP = (isSignup ? signupData.phone : phoneNumber).replace(/\D/g, '').slice(-10);
+                return cleanP === targetP;
+            });
+
             // If it's a new signup, include the extra details
             if (isSignup) {
                 providerData = {
@@ -214,6 +221,27 @@ const ProviderLogin = () => {
                     jobs: 0,
                     isOnline: true
                 };
+            } else if (existingProv) {
+                // MIGRATE DATA: Ensure new UID-based doc has the status/stats of the existing record
+                providerData = {
+                    ...existingProv,
+                    ...providerData,
+                    uid: user.uid // Ensure it uses the new auth UID
+                };
+                delete providerData._docId; // Remove temp field from mount fetch
+
+                // If IDs are different, we should cleanup the old one to avoid duplicates in Admin Panel
+                if (existingProv._docId !== user.uid) {
+                    console.log(`Migrating provider data from ${existingProv._docId} to ${user.uid}`);
+                    // We can delete the old doc after successfully setting the new one
+                    // Use a small delay to ensure the setDoc completes first
+                    setTimeout(async () => {
+                        try {
+                            const { deleteDoc, doc: fsDoc } = await import('firebase/firestore');
+                            await deleteDoc(fsDoc(db, 'providers', existingProv._docId));
+                        } catch (e) { console.error("Migration cleanup failed", e); }
+                    }, 2000);
+                }
             }
 
             await setDoc(userDocRef, providerData, { merge: true });

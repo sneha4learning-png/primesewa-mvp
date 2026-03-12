@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase/config';
-import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, limit, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, limit, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { useAuth } from '../firebase/AuthContext';
 
 const NotificationContext = createContext();
@@ -98,8 +98,28 @@ export const NotificationProvider = ({ children }) => {
         }
     };
 
+    const clearNotifications = async () => {
+        try {
+            const userIdentifiers = [currentUser.uid];
+            if (userData?.role) userIdentifiers.push(userData.role);
+            
+            const q = query(
+                collection(db, 'notifications'),
+                where('userId', 'in', userIdentifiers)
+            );
+            
+            const snapshot = await getDocs(q);
+            const promises = snapshot.docs.map(d => deleteDoc(doc(db, 'notifications', d.id)));
+            await Promise.all(promises);
+            setNotifications([]);
+            setUnreadCount(0);
+        } catch (err) {
+            console.error("Error clearing notifications:", err);
+        }
+    };
+
     return (
-        <NotificationContext.Provider value={{ notifications, unreadCount, sendNotification, markAsRead, markAllAsRead }}>
+        <NotificationContext.Provider value={{ notifications, unreadCount, sendNotification, markAsRead, markAllAsRead, clearNotifications }}>
             {children}
         </NotificationContext.Provider>
     );

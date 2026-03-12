@@ -3,7 +3,7 @@ import { Bell, X, Check } from 'lucide-react';
 import { useNotifications } from '../context/NotificationContext';
 
 const NotificationBell = () => {
-    const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+    const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -66,7 +66,13 @@ const NotificationBell = () => {
                     </div>
                     
                     <div className="p-3 bg-slate-50 text-center border-t border-slate-100">
-                        <button className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors">
+                        <button 
+                            onClick={async () => {
+                                await clearNotifications();
+                                setIsOpen(false);
+                            }}
+                            className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+                        >
                             Clear History
                         </button>
                     </div>
