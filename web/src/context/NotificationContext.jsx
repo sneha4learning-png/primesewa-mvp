@@ -37,10 +37,23 @@ export const NotificationProvider = ({ children }) => {
                 ...doc.data()
             }));
             setNotifications(fetched);
-            setUnreadCount(fetched.filter(n => !n.read).length);
         });
 
-        return () => unsubscribe();
+        // Separate listener for accurate unread count across ALL notifications
+        const unreadQ = query(
+            collection(db, 'notifications'),
+            where('userId', 'in', userIdentifiers),
+            where('read', '==', false)
+        );
+
+        const unsubscribeUnread = onSnapshot(unreadQ, (snapshot) => {
+            setUnreadCount(snapshot.size);
+        });
+
+        return () => {
+            unsubscribe();
+            unsubscribeUnread();
+        };
     }, [currentUser, userData?.role]);
 
     const sendNotification = async (userId, title, message, type = 'info') => {

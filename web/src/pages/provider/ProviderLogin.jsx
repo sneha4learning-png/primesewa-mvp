@@ -107,6 +107,18 @@ const ProviderLogin = () => {
             return;
         }
 
+        // Uniqueness check for new providers
+        if (isSignup) {
+            const alreadyExists = providers.some(p => {
+                const cleanP = (p.phone || '').replace(/\D/g, '').slice(-10);
+                return cleanP === targetPhone;
+            });
+            if (alreadyExists) {
+                setError('This phone number is already registered as a provider.');
+                return;
+            }
+        }
+
         if (isSignup && !signupData.proofDocument) {
             setError('Please upload an identity/proof document to proceed.');
             return;

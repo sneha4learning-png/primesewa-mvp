@@ -148,6 +148,42 @@ const CleanupPage = () => {
                     </button>
 
                     <button
+                        onClick={async () => {
+                            setLoading(true);
+                            setStatus('📱 Fixing Provider Numbers...');
+                            try {
+                                const snapshot = await getDocs(collection(db, 'providers'));
+                                const batch = writeBatch(db);
+                                let count = 0;
+                                let index = 0;
+                                snapshot.forEach(d => {
+                                    const data = d.data();
+                                    // Identify the "wrong" numbers from the screenshot (+91 91000 00000 or variations)
+                                    const raw = (data.phone || '').replace(/\D/g, '');
+                                    if (raw === '919100000000' || raw === '9100000000' || raw.includes('91000')) {
+                                        // Base number provided by user: 7777777777
+                                        // To make it unique, we'll use 77777777 & then a 2-digit index
+                                        const newPhone = `+91 77777777${String(index).padStart(2, '0')}`;
+                                        batch.update(doc(db, 'providers', d.id), { phone: newPhone });
+                                        count++;
+                                        index++;
+                                    }
+                                });
+                                await batch.commit();
+                                setStatus(`✅ SUCCESS! Corrected ${count} provider numbers to the 777- series.`);
+                            } catch (err) {
+                                setStatus(`❌ ERROR: ${err.message}`);
+                            } finally {
+                                setLoading(false);
+                            }
+                        }}
+                        disabled={loading}
+                        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 active:scale-95'}`}
+                    >
+                        Correct Provider Numbers (7777777777)
+                    </button>
+
+                    <button
                         onClick={unblockAll}
                         disabled={loading}
                         className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 active:scale-95'}`}
