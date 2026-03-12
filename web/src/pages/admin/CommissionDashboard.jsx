@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react';
 import { DollarSign, Download, Filter, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const CommissionDashboard = () => {
     const [commissions, setCommissions] = useState([]);
     const [totalCommission, setTotalCommission] = useState(0);
-    const [monthlyData, setMonthlyData] = useState([]);
     const [timeRange, setTimeRange] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
@@ -65,29 +64,7 @@ const CommissionDashboard = () => {
                 setCommissions(sorted);
                 setTotalCommission(sorted.reduce((acc, curr) => acc + (curr.commission || 0), 0));
 
-                // Process Monthly Data for Analytics
-                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                const monthlyMap = {};
-                
-                allRecords.forEach(rec => {
-                    const d = new Date(rec.date);
-                    const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-                    if (!monthlyMap[key]) {
-                        monthlyMap[key] = { month: key, commission: 0, jobs: 0, sortKey: d.getFullYear() * 100 + d.getMonth() };
-                    }
-                    monthlyMap[key].commission += rec.commission;
-                    monthlyMap[key].jobs += 1;
-                });
-
-                const analytics = Object.values(monthlyMap)
-                    .sort((a, b) => a.sortKey - b.sortKey)
-                    .map(item => ({
-                        ...item,
-                        commission: Math.round(item.commission) // Enforce clean integers for analytics
-                    }))
-                    .slice(-6); // Last 6 months
-                
-                setMonthlyData(analytics);
+                // Analytics data processing removed as chart is hidden
             } catch (err) {
                 console.error('Error processing commissions:', err);
             }
@@ -170,102 +147,7 @@ const CommissionDashboard = () => {
                 </div>
             </div>
 
-            {/* Analytics Chart */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-                    <div>
-                        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-emerald-500" /> Platform Analytics
-                        </h3>
-                        <p className="text-xs text-slate-400 font-medium">Performance breakdown of revenue and jobs</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-lg">
-                            <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
-                            <span className="text-[10px] font-black text-emerald-700 uppercase">Live Data</span>
-                        </div>
-                        <button 
-                            onClick={() => document.getElementById('commission-table')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold transition-all shadow-lg shadow-slate-200"
-                        >
-                            View Detailed Audit
-                        </button>
-                    </div>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
-                    {/* Main Chart */}
-                    <div className="lg:col-span-2 p-6">
-                        <div className="h-[300px] w-full mt-4">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={monthlyData} margin={{ top: 10, right: 35, left: 10, bottom: 30 }}>
-                                    <defs>
-                                        <linearGradient id="colorComm" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis 
-                                        dataKey="month" 
-                                        axisLine={false} 
-                                        tickLine={false} 
-                                        tick={{fontSize: 10, fontWeight: 700, fill: '#64748b'}}
-                                        dy={10}
-                                    />
-                                    <YAxis 
-                                        axisLine={false} 
-                                        tickLine={false} 
-                                        tick={{fontSize: 10, fontWeight: 700, fill: '#64748b'}}
-                                        tickFormatter={(value) => `₹${value}`}
-                                    />
-                                    <Tooltip 
-                                        contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}}
-                                        cursor={{stroke: '#10b981', strokeWidth: 2}}
-                                        formatter={(value) => [`₹${Math.round(value)}`, 'Commission']}
-                                    />
-                                    <Area 
-                                        type="natural" 
-                                        dataKey="commission" 
-                                        stroke="#059669" 
-                                        strokeWidth={4}
-                                        fillOpacity={1} 
-                                        fill="url(#colorComm)" 
-                                        dot={{ r: 4, fill: '#059669', strokeWidth: 2, stroke: '#fff' }}
-                                        activeDot={{ r: 6, strokeWidth: 0 }}
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
 
-                    {/* Monthly Summary Sidebar */}
-                    <div className="p-6 bg-slate-50/30">
-                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                            <Calendar className="w-3.5 h-3.5 text-blue-500" /> Monthly Summary
-                        </h4>
-                        <div className="space-y-3">
-                            {monthlyData.slice().reverse().map((data, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 shadow-sm hover:border-emerald-200 transition-colors group">
-                                    <div>
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter block">{data.month.split(' ')[1]}</span>
-                                        <span className="text-sm font-black text-slate-700">{data.month.split(' ')[0]}</span>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm font-black text-emerald-600">₹{data.commission.toFixed(0)}</p>
-                                        <p className="text-[10px] font-bold text-slate-400 group-hover:text-blue-500">{data.jobs} Jobs</p>
-                                    </div>
-                                </div>
-                            ))}
-                            {monthlyData.length === 0 && (
-                                <div className="text-center py-10">
-                                    <p className="text-xs font-bold text-slate-300">No data available for the period</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Table */}
             <div id="commission-table" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-6">
