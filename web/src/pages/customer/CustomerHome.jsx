@@ -668,12 +668,12 @@ const CustomerHome = () => {
                 )}
 
                 <div className="relative z-10 max-w-3xl">
-                    <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full mb-8 shadow-xl">
-                        <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(37,99,235,0.8)]"></div>
-                        <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Verified Professionals in Ahmedabad</span>
+                    <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full mb-8 shadow-sm backdrop-blur-md border ${!userData?.uid ? 'bg-white/5 border-white/10' : 'bg-surface-100 border-surface-200'}`}>
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
+                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${!userData?.uid ? 'text-white' : 'text-surface-500'}`}>Verified Professionals in Ahmedabad</span>
                     </div>
 
-                    <h1 className={`text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] mb-8 ${!userData?.uid ? 'text-white' : 'text-slate-900'}`}>
+                    <h1 className={`text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] mb-8 ${!userData?.uid ? 'text-white' : 'text-surface-900'}`}>
                         {!userData?.uid ? (
                             <>
                                 Premium <br />
@@ -683,7 +683,7 @@ const CustomerHome = () => {
                             </>
                         ) : (
                             <>
-                                Welcome Back, <br />
+                                <span className="block text-surface-900 opacity-90 mb-2">Welcome Back,</span>
                                 <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-indigo-600 to-indigo-800">
                                     {userData.name || 'Prime User'}
                                 </span>
@@ -706,7 +706,7 @@ const CustomerHome = () => {
                             </div>
                         </div>
                     ) : (
-                        <p className="text-xl md:text-3xl font-bold text-slate-500 mt-4 tracking-tight">What can we help you with today?</p>
+                        <p className="text-lg md:text-xl font-bold text-slate-400 mt-4 tracking-tight">What can we help you with today?</p>
                     )}
                 </div>
             </div>
@@ -1089,56 +1089,56 @@ const CustomerHome = () => {
                                         const category = (Array.isArray(p.category) ? p.category[0] : p.category) || 'General';
 
                                         return (
-                                            <div key={p.id} className="group relative bg-white rounded-[3rem] border border-surface-100 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.06)] overflow-hidden">
-                                                <div className="p-10">
+                                            <div key={p.id} className="group relative bg-white rounded-[2.5rem] border border-surface-100 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.06)] overflow-hidden">
+                                                <div className="p-8">
                                                     <div className="flex items-center justify-between mb-10">
                                                         <div className="flex items-center gap-6">
                                                             <div className="relative">
-                                                                <div className="w-20 h-20 bg-surface-50 rounded-[2rem] flex items-center justify-center text-3xl font-black text-primary border border-surface-100 group-hover:scale-105 transition-transform duration-500">
+                                                                <div className="w-16 h-16 bg-surface-50 rounded-3xl flex items-center justify-center text-2xl font-black text-primary border border-surface-100 group-hover:scale-105 transition-transform duration-500">
                                                                     {nameInitial}
                                                                 </div>
                                                                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-4 border-white shadow-lg"></div>
                                                             </div>
-                                                            <div className="space-y-1">
-                                                                <h3 className="text-2xl font-black text-surface-900 tracking-tight">{p.name || 'Professional'}</h3>
-                                                                <div className="flex items-center gap-3">
-                                                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{category}</span>
+                                                            <div className="space-y-0.5">
+                                                                <h3 className="text-xl font-black text-surface-900 tracking-tight leading-tight">{p.name || 'Professional'}</h3>
+                                                                <div className="flex items-center gap-2.5">
+                                                                    <span className="text-[9px] font-black text-primary uppercase tracking-[0.15em]">{category}</span>
                                                                     <div className="w-1 h-1 rounded-full bg-surface-200"></div>
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
-                                                                        <span className="text-xs font-black text-surface-900">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <Star className="w-3 h-3 text-amber-500 fill-current" />
+                                                                        <span className="text-[10px] font-black text-surface-900">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="text-3xl font-black text-surface-900 tracking-tighter">₹{p.price || 499}</div>
-                                                            <p className="text-[10px] font-bold text-surface-400 uppercase tracking-widest mt-1">Starting Rate</p>
+                                                            <div className="text-2xl font-black text-surface-900 tracking-tighter">₹{p.price || 499}</div>
+                                                            <p className="text-[8px] font-black text-surface-400 uppercase tracking-widest mt-0.5">Starting Rate</p>
                                                         </div>
                                                     </div>
 
                                                     <div className="flex items-center gap-12 mb-10 border-t border-surface-50 pt-8">
                                                         <div>
-                                                            <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Total Jobs</p>
-                                                            <div className="flex items-center gap-2">
-                                                                <Briefcase className="w-4 h-4 text-primary" />
-                                                                <span className="text-sm font-black text-surface-900">{jobCount}+</span>
+                                                            <p className="text-[8px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Total Jobs</p>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Briefcase className="w-3.5 h-3.5 text-primary" />
+                                                                <span className="text-xs font-black text-surface-900">{jobCount}+</span>
                                                             </div>
                                                         </div>
-                                                        <div className="h-8 w-px bg-surface-100"></div>
+                                                        <div className="h-6 w-px bg-surface-100"></div>
                                                         <div>
-                                                            <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Identity</p>
-                                                            <div className="flex items-center gap-2">
-                                                                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                                                                <span className="text-sm font-black text-surface-900">Verified</span>
+                                                            <p className="text-[8px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Identity</p>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                                                <span className="text-xs font-black text-surface-900">Verified</span>
                                                             </div>
                                                         </div>
-                                                        <div className="h-8 w-px bg-surface-100"></div>
+                                                        <div className="h-6 w-px bg-surface-100"></div>
                                                         <div className="flex-1">
-                                                            <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Location</p>
-                                                            <div className="flex items-center gap-2">
-                                                                <MapPin className="w-4 h-4 text-surface-400" />
-                                                                <span className="text-sm font-bold text-surface-600 truncate">Ahmedabad</span>
+                                                            <p className="text-[8px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Location</p>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <MapPin className="w-3.5 h-3.5 text-surface-400" />
+                                                                <span className="text-xs font-bold text-surface-600 truncate">Ahmedabad</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1146,15 +1146,15 @@ const CustomerHome = () => {
                                                     <div className="flex gap-4">
                                                         <button 
                                                             onClick={() => setSelectedProviderProfile(p)}
-                                                            className="px-8 py-4 bg-surface-50 hover:bg-surface-100 text-surface-900 font-black rounded-2xl transition-all text-[10px] uppercase tracking-widest"
+                                                            className="flex-1 py-4 bg-surface-50 hover:bg-surface-100 text-surface-900 font-black rounded-2xl transition-all text-[9px] uppercase tracking-widest"
                                                         >
                                                             Profile
                                                         </button>
                                                         <button 
                                                             onClick={() => handleBook(p)}
-                                                            className="flex-1 py-4 bg-primary hover:bg-primary-dark text-white font-black rounded-2xl transition-all shadow-xl shadow-primary/20 text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3"
+                                                            className="flex-[1.8] py-4 bg-primary hover:bg-primary-dark text-white font-black rounded-2xl transition-all shadow-xl shadow-primary/20 text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-2"
                                                         >
-                                                            Instant Booking <Wrench className="w-4 h-4" />
+                                                            Instant Booking <Wrench className="w-3.5 h-3.5" />
                                                         </button>
                                                     </div>
                                                 </div>
