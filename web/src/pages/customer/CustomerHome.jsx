@@ -1204,7 +1204,7 @@ const CustomerHome = () => {
                                                         <div className="flex flex-col gap-4">
                                                             <div className="flex flex-col gap-1">
                                                                 <div className="flex items-center justify-between mb-1">
-                                                                    <div className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 ${
+                                                                    <div className={`px-3 py-1.5 rounded-xl flex items-center gap-2 shrink-0 ${
                                                                         ['negotiating', 'negotiation'].includes(b.status) ? 'bg-amber-400/20' : 
                                                                         b.trackingStatus === 'inprogress' ? 'bg-emerald-400/20' : 
                                                                         b.trackingStatus ? 'bg-blue-400/20' : 'bg-primary/20'
@@ -1214,7 +1214,7 @@ const CustomerHome = () => {
                                                                             b.trackingStatus === 'inprogress' ? 'bg-emerald-400' : 
                                                                             b.trackingStatus ? 'bg-blue-400' : 'bg-primary'
                                                                         }`}></div>
-                                                                        <span className={`text-[10px] font-black uppercase tracking-wider ${
+                                                                        <span className={`text-[10px] font-black uppercase tracking-wider whitespace-nowrap ${
                                                                             ['negotiating', 'negotiation'].includes(b.status) ? 'text-amber-400' : 
                                                                             b.trackingStatus === 'inprogress' ? 'text-emerald-400' : 
                                                                             b.trackingStatus ? 'text-blue-400' : 'text-primary'
