@@ -1089,12 +1089,12 @@ const CustomerHome = () => {
                                         const category = (Array.isArray(p.category) ? p.category[0] : p.category) || 'General';
 
                                         return (
-                                            <div key={p.id} className="group relative bg-white rounded-[2.5rem] border border-surface-100 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.06)] overflow-hidden">
+                                            <div key={p.id} className="group relative bg-white rounded-[2.5rem] border border-slate-200 hover:border-primary/40 shadow-sm transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] overflow-hidden">
                                                 <div className="p-6">
                                                     <div className="flex items-center justify-between mb-6">
                                                         <div className="flex items-center gap-6">
                                                             <div className="relative">
-                                                                <div className="w-14 h-14 bg-surface-50 rounded-2xl flex items-center justify-center text-xl font-black text-primary border border-surface-100 group-hover:scale-105 transition-transform duration-500">
+                                                                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-xl font-black text-primary border border-slate-200 transition-all duration-500 group-hover:scale-105 group-hover:border-primary/20">
                                                                     {nameInitial}
                                                                 </div>
                                                                 <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-emerald-500 rounded-full border-[3px] border-white shadow-lg"></div>
