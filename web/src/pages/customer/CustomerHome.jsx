@@ -220,11 +220,18 @@ const CustomerHome = () => {
             setPastBookings(pBookings);
 
             const categoryCounts = {};
-            pBookings.filter(b => b.status === 'completed').forEach(b => {
+            const totalPast = pBookings.length;
+            
+            pBookings.forEach(b => {
                 const cat = b.service || 'Other';
                 categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
             });
-            setChartData(Object.keys(categoryCounts).map(k => ({ name: k, value: categoryCounts[k] })));
+            
+            setChartData(Object.keys(categoryCounts).map(k => ({ 
+                name: k, 
+                value: categoryCounts[k],
+                percentage: totalPast > 0 ? Math.round((categoryCounts[k] / totalPast) * 100) : 0
+            })));
         }, (err) => {
             console.error('Bookings Listener Error:', err);
         });
@@ -666,7 +673,7 @@ const CustomerHome = () => {
                         <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Verified Professionals in Ahmedabad</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-[0.9] mb-8">
+                    <h1 className={`text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] mb-8 ${!userData?.uid ? 'text-white' : 'text-slate-900'}`}>
                         {!userData?.uid ? (
                             <>
                                 Premium <br />
@@ -677,8 +684,8 @@ const CustomerHome = () => {
                         ) : (
                             <>
                                 Welcome Back, <br />
-                                <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-primary-light">
-                                    {userData.name?.split(' ')[0] || 'Prime User'}
+                                <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-indigo-600 to-indigo-800">
+                                    {userData.name || 'Prime User'}
                                 </span>
                             </>
                         )}
@@ -1188,18 +1195,49 @@ const CustomerHome = () => {
                                         <div className="space-y-6 relative z-10 flex-1 overflow-y-auto pr-2 hide-scrollbar">
                                             {activeBookings.length > 0 ? (
                                                 activeBookings.map(b => (
-                                                    <div key={b.id} onClick={() => handleActivityClick(b)} className="bg-white/5 hover:bg-white/10 border border-white/5 p-6 rounded-3xl transition-all cursor-pointer group/item relative overflow-hidden">
-                                                        <div className={`absolute top-0 left-0 w-1.5 h-full ${b.status === 'negotiating' ? 'bg-amber-400' : 'bg-primary'}`}></div>
-                                                        <div className="flex justify-between items-start mb-3">
-                                                            <span className="font-black text-white tracking-tight text-lg">{b.service}</span>
-                                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded-lg">
-                                                                <div className={`w-1 h-1 rounded-full animate-pulse ${b.status === 'negotiating' ? 'bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.8)]' : 'bg-primary'}`}></div>
-                                                                <span className="text-[9px] font-black text-white/80 uppercase tracking-widest">{b.status}</span>
+                                                    <div key={b.id} className="bg-white/5 border border-white/5 p-6 rounded-3xl transition-all relative overflow-hidden">
+                                                        <div className={`absolute top-0 left-0 w-1.5 h-full ${['negotiating', 'negotiation'].includes(b.status) ? 'bg-amber-400' : 'bg-primary'}`}></div>
+                                                        <div className="flex flex-col gap-3">
+                                                            <div className="flex justify-between items-start">
+                                                                <div className="flex-1">
+                                                                    <span className="font-black text-white tracking-tight text-lg block">{b.service}</span>
+                                                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{b.provider || 'Professional'}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded-lg shrink-0">
+                                                                    <div className={`w-1 h-1 rounded-full animate-pulse ${['negotiating', 'negotiation'].includes(b.status) ? 'bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.8)]' : 'bg-primary'}`}></div>
+                                                                    <span className="text-[9px] font-black text-white/80 uppercase tracking-widest">{b.status}</span>
+                                                                </div>
                                                             </div>
+
+                                                            <div className="flex items-center justify-between text-white/40 text-[10px] font-bold">
+                                                                <span className="flex items-center gap-2"><ClockIcon className="w-3 h-3" /> {b.date} • {formatTime(b.time)}</span>
+                                                                {b.price && <span className="font-black text-white/80">₹{b.price}</span>}
+                                                            </div>
+
+                                                            {/* Negotiation Controls */}
+                                                            {['negotiating', 'negotiation'].includes(b.status) && b.proposedPrice && (
+                                                                <div className="mt-4 pt-4 border-t border-white/5 bg-white/5 -mx-6 -mb-6 p-6">
+                                                                    <div className="flex items-center justify-between mb-4">
+                                                                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest leading-none">New Quote Given</span>
+                                                                        <span className="text-xl font-black text-white tracking-tighter">₹{b.proposedPrice}</span>
+                                                                    </div>
+                                                                    <div className="flex gap-2">
+                                                                        <button 
+                                                                            onClick={() => handleNegotiation(b.id, true, b.proposedPrice)}
+                                                                            className="flex-1 py-3 bg-primary hover:bg-primary-dark text-white font-black rounded-xl text-[10px] uppercase tracking-widest transition-all"
+                                                                        >
+                                                                            Accept
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={() => handleNegotiation(b.id, false)}
+                                                                            className="flex-1 py-3 bg-white/5 hover:bg-rose-500/20 hover:text-rose-400 text-white/60 font-black rounded-xl text-[10px] uppercase tracking-widest border border-white/5 transition-all"
+                                                                        >
+                                                                            Reject
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                        <p className="text-white/40 text-xs font-bold flex items-center gap-2">
-                                                            <ClockIcon className="w-3 h-3" /> {b.date} • {formatTime(b.time)}
-                                                        </p>
                                                     </div>
                                                 ))
                                             ) : (
@@ -1242,21 +1280,61 @@ const CustomerHome = () => {
                             <div className="space-y-6">
                                 {pastBookings.length > 0 ? (
                                     <>
-                                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
+                                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 hide-scrollbar">
                                             {pastBookings.slice(0, visibleHistoryCount).map(b => (
-                                                <div key={b.id} className="p-6 rounded-3xl bg-surface-50/50 border border-surface-100 hover:border-primary/20 transition-all flex flex-col gap-4 group">
-                                                    <div className="flex justify-between items-center">
+                                                <div key={b.id} className="p-6 rounded-3xl bg-surface-50/50 border border-surface-100 hover:border-primary/20 transition-all flex flex-col gap-5 group">
+                                                    <div className="flex justify-between items-start">
                                                         <div className="flex-1 min-w-0 pr-4">
-                                                            <div className="flex items-center gap-2 mb-1">
+                                                            <div className="flex items-center gap-2 mb-2">
                                                                 <p className="font-black text-surface-900 uppercase text-[10px] tracking-widest truncate">{b.service}</p>
                                                                 <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-surface-200 text-surface-500'}`}>
                                                                     {b.status}
                                                                 </span>
                                                             </div>
-                                                            <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest">{b.date || 'N/A'}</p>
+                                                            <h4 className="text-xs font-black text-surface-900">{b.provider || 'Professional'}</h4>
+                                                            <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest mt-1">{b.date || 'N/A'}</p>
                                                         </div>
-                                                        <p className="font-black text-surface-900 shrink-0">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
+                                                        <p className="font-black text-surface-900 shrink-0 text-sm">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
                                                     </div>
+
+                                                    {/* Interactive Rating for Completed Jobs */}
+                                                    {b.status === 'completed' && !b.rated && (
+                                                        <div className="pt-4 border-t border-surface-100">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex gap-1.5">
+                                                                    {[1, 2, 3, 4, 5].map(star => (
+                                                                        <button
+                                                                            key={star}
+                                                                            onClick={() => setRatingState({ bookingId: b.id, rating: star })}
+                                                                            className="transition-transform active:scale-95"
+                                                                        >
+                                                                            <Star className={`w-5 h-5 ${star <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-surface-200'}`} />
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                                {ratingState.bookingId === b.id && ratingState.rating > 0 && (
+                                                                    <button
+                                                                        onClick={() => submitRating(b)}
+                                                                        className="px-4 py-2 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20"
+                                                                    >
+                                                                        Submit
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Show Rating if already rated */}
+                                                    {b.rated && b.ratingGiven && (
+                                                        <div className="pt-4 border-t border-surface-100 flex items-center gap-1.5">
+                                                            <span className="text-[9px] font-black text-surface-400 uppercase tracking-widest">You Rated:</span>
+                                                            <div className="flex gap-0.5">
+                                                                {[...Array(5)].map((_, i) => (
+                                                                    <Star key={i} className={`w-3 h-3 ${i < b.ratingGiven ? 'text-amber-500 fill-current' : 'text-surface-100'}`} />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -1292,10 +1370,10 @@ const CustomerHome = () => {
                                 <div className="h-56">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
-                                            <Pie data={chartData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={8} dataKey="value" stroke="none">
+                                            <Pie data={chartData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={4} dataKey="value" stroke="none">
                                                 {chartData.map((entry, index) => {
                                                     const COLORS = ['#2563eb', '#3b82f6', '#1d4ed8', '#1e40af', '#60a5fa'];
-                                                    return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="hover:opacity-80 transition-opacity cursor-pointer" />;
+                                                    return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="hover:opacity-80 transition-opacity cursor-pointer focus:outline-none" />;
                                                 })}
                                             </Pie>
                                             <Tooltip 
@@ -1303,20 +1381,25 @@ const CustomerHome = () => {
                                                     borderRadius: '24px', 
                                                     border: 'none', 
                                                     boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                                                    background: 'rgba(15, 23, 42, 0.9)',
+                                                    background: 'rgba(15, 23, 42, 0.95)',
+                                                    backdropFilter: 'blur(10px)',
                                                     color: 'white',
                                                     padding: '12px 16px'
                                                 }} 
                                                 itemStyle={{ color: 'white', fontWeight: 'bold' }}
+                                                formatter={(value, name, props) => [`${value} Jobs (${props.payload.percentage}%)`, name]}
                                             />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
-                                <div className="mt-6 flex flex-wrap gap-3">
+                                <div className="mt-8 flex flex-col gap-3">
                                     {chartData.map((entry, index) => (
-                                        <div key={index} className="flex items-center gap-2 px-3 py-1 bg-surface-50 rounded-full border border-surface-100">
-                                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#2563eb', '#3b82f6', '#1d4ed8', '#1e40af', '#60a5fa'][index % 5] }}></div>
-                                            <span className="text-[9px] font-black text-surface-500 uppercase tracking-widest">{entry.name}</span>
+                                        <div key={index} className="flex items-center justify-between px-4 py-2 bg-surface-50 rounded-2xl border border-surface-100">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: ['#2563eb', '#3b82f6', '#1d4ed8', '#1e40af', '#60a5fa'][index % 5] }}></div>
+                                                <span className="text-[10px] font-black text-surface-600 uppercase tracking-widest">{entry.name}</span>
+                                            </div>
+                                            <span className="text-[10px] font-black text-slate-400">{entry.value} ({entry.percentage}%)</span>
                                         </div>
                                     ))}
                                 </div>
