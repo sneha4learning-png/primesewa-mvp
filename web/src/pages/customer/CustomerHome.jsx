@@ -1090,75 +1090,75 @@ const CustomerHome = () => {
 
                                         return (
                                             <div key={p.id} className="group relative bg-white rounded-[2.5rem] border border-surface-100 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.06)] overflow-hidden">
-                                                <div className="p-8">
-                                                    <div className="flex items-center justify-between mb-10">
+                                                <div className="p-6">
+                                                    <div className="flex items-center justify-between mb-6">
                                                         <div className="flex items-center gap-6">
                                                             <div className="relative">
-                                                                <div className="w-16 h-16 bg-surface-50 rounded-3xl flex items-center justify-center text-2xl font-black text-primary border border-surface-100 group-hover:scale-105 transition-transform duration-500">
+                                                                <div className="w-14 h-14 bg-surface-50 rounded-2xl flex items-center justify-center text-xl font-black text-primary border border-surface-100 group-hover:scale-105 transition-transform duration-500">
                                                                     {nameInitial}
                                                                 </div>
-                                                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-4 border-white shadow-lg"></div>
+                                                                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-emerald-500 rounded-full border-[3px] border-white shadow-lg"></div>
                                                             </div>
-                                                            <div className="space-y-1">
-                                                                <h3 className="text-lg font-black text-slate-900 tracking-tight leading-tight">{p.name || 'Professional'}</h3>
-                                                                <div className="flex items-center gap-2.5">
-                                                                    <span className="text-[9px] font-black text-primary uppercase tracking-widest">{category}</span>
+                                                            <div className="space-y-0.5">
+                                                                <h3 className="text-base font-black text-slate-900 tracking-tight leading-tight group-hover:text-primary transition-colors">{p.name || 'Professional'}</h3>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-[8px] font-black text-primary/80 uppercase tracking-widest">{category}</span>
                                                                     <div className="w-1 h-1 rounded-full bg-slate-200"></div>
                                                                     <div className="flex items-center gap-1">
-                                                                        <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
-                                                                        <span className="text-[11px] font-black text-slate-900">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
+                                                                        <Star className="w-3 h-3 text-amber-500 fill-current" />
+                                                                        <span className="text-[10px] font-black text-slate-900">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="flex flex-col items-end">
+                                                        <div className="flex flex-col items-end whitespace-nowrap">
                                                             <div className="flex items-baseline gap-0.5">
-                                                                <span className="text-sm font-black text-slate-900">₹</span>
-                                                                <span className="text-xl font-black text-slate-900 tracking-tighter">{p.price || 499}</span>
-                                                                <span className="text-slate-400 text-[10px] font-bold">/hr</span>
+                                                                <span className="text-xs font-black text-slate-950">₹</span>
+                                                                <span className="text-xl font-black text-slate-950 tracking-tighter">{p.price || 499}</span>
+                                                                <span className="text-slate-400 text-[9px] font-bold">/hr</span>
                                                             </div>
-                                                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Starting Rate</p>
+                                                            <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest leading-none">Starting Rate</p>
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-8 mb-8 border-t border-slate-50 pt-8">
+                                                    <div className="flex items-center gap-6 mb-6 border-t border-slate-50 pt-6">
                                                         <div className="flex-1">
-                                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Total Jobs</p>
+                                                            <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 leading-none">Total Jobs</p>
                                                             <div className="flex items-center gap-1.5">
-                                                                <Briefcase className="w-3.5 h-3.5 text-primary/60" />
-                                                                <span className="text-xs font-black text-slate-900">{jobCount}+</span>
+                                                                <Briefcase className="w-3 h-3 text-primary/50" />
+                                                                <span className="text-[11px] font-black text-slate-900 leading-none">{jobCount}+</span>
                                                             </div>
                                                         </div>
                                                         <div className="h-6 w-px bg-slate-100"></div>
                                                         <div className="flex-1">
-                                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Identity</p>
+                                                            <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 leading-none">Identity</p>
                                                             <div className="flex items-center gap-1.5">
-                                                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500/60" />
-                                                                <span className="text-xs font-black text-slate-900">Verified</span>
+                                                                <ShieldCheck className="w-3 h-3 text-emerald-500/50" />
+                                                                <span className="text-[11px] font-black text-slate-900 leading-none">Verified</span>
                                                             </div>
                                                         </div>
                                                         <div className="h-6 w-px bg-slate-100"></div>
-                                                        <div className="flex-[1.5] min-w-0">
-                                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-2">Location</p>
-                                                            <div className="flex items-center gap-1.5">
-                                                                <MapPin className="w-3.5 h-3.5 text-slate-300" />
-                                                                <span className="text-xs font-bold text-slate-500 truncate">Ahmedabad</span>
+                                                        <div className="flex-[1.2] min-w-0">
+                                                            <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 leading-none">Location</p>
+                                                            <div className="flex items-center gap-1">
+                                                                <MapPin className="w-2.5 h-2.5 text-slate-200" />
+                                                                <span className="text-[10px] font-bold text-slate-500 truncate leading-none">Ahmedabad</span>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex gap-3">
+                                                    <div className="flex gap-2.5">
                                                         <button 
                                                             onClick={() => setSelectedProviderProfile(p)}
-                                                            className="flex-1 py-4 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold rounded-2xl transition-all text-xs uppercase tracking-widest border border-slate-100"
+                                                            className="flex-1 py-3.5 bg-slate-50 hover:bg-slate-100 text-slate-900 font-bold rounded-xl transition-all text-[10px] uppercase tracking-widest border border-slate-100"
                                                         >
                                                             Profile
                                                         </button>
                                                         <button 
                                                             onClick={() => handleBook(p)}
-                                                            className="flex-[2] py-4 bg-primary hover:bg-primary-dark text-white font-black rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                                                            className="flex-[2] py-3.5 bg-primary hover:bg-primary-dark text-white font-black rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.98] text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
                                                         >
-                                                            Instant Booking <Wrench className="w-3.5 h-3.5" />
+                                                            Instant Booking <Wrench className="w-3 h-3" />
                                                         </button>
                                                     </div>
                                                 </div>
