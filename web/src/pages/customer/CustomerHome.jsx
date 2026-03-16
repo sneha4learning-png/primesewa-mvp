@@ -1300,7 +1300,7 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Recent History Box */}
-                        <div className="glass-card p-10 rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
+                        <div className="glass-card p-6 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-xl font-black text-surface-900 tracking-tighter">Recent Jobs</h2>
                                 <span className="bg-surface-50 text-surface-400 text-[10px] px-3 py-1 rounded-full font-black border border-surface-100">{pastBookings.length}</span>
@@ -1308,9 +1308,9 @@ const CustomerHome = () => {
                             <div className="space-y-6">
                                 {pastBookings.length > 0 ? (
                                     <>
-                                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 hide-scrollbar">
+                                        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1 md:pr-2 hide-scrollbar">
                                             {pastBookings.slice(0, visibleHistoryCount).map(b => (
-                                                <div key={b.id} className="p-6 rounded-3xl bg-surface-50/50 border border-surface-100 hover:border-primary/20 transition-all flex flex-col gap-5 group">
+                                                <div key={b.id} className="p-4 md:p-6 rounded-2xl md:rounded-3xl bg-surface-50/50 border border-surface-100 hover:border-primary/20 transition-all flex flex-col gap-4 md:gap-5 group">
                                                     <div className="flex justify-between items-start">
                                                         <div className="flex-1 min-w-0 pr-4">
                                                             <div className="flex items-center gap-2 mb-2">
@@ -1328,24 +1328,24 @@ const CustomerHome = () => {
                                                     {/* Interactive Rating for Completed Jobs */}
                                                     {b.status === 'completed' && !b.rated && (
                                                         <div className="pt-4 border-t border-surface-100">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex gap-1.5">
+                                                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                                                <div className="flex gap-1">
                                                                     {[1, 2, 3, 4, 5].map(star => (
                                                                         <button
                                                                             key={star}
                                                                             onClick={() => setRatingState({ bookingId: b.id, rating: star })}
-                                                                            className="transition-transform active:scale-95"
+                                                                            className="transition-transform active:scale-95 p-0.5"
                                                                         >
-                                                                            <Star className={`w-5 h-5 ${star <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-surface-200'}`} />
+                                                                            <Star className={`w-5 h-5 md:w-6 md:h-6 ${star <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200'}`} />
                                                                         </button>
                                                                     ))}
                                                                 </div>
                                                                 {ratingState.bookingId === b.id && ratingState.rating > 0 && (
                                                                     <button
                                                                         onClick={() => submitRating(b)}
-                                                                        className="px-4 py-2 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20"
+                                                                        className="flex-1 sm:flex-none px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95"
                                                                     >
-                                                                        Submit
+                                                                        Submit Rating
                                                                     </button>
                                                                 )}
                                                             </div>
