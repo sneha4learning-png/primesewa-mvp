@@ -1328,27 +1328,27 @@ const CustomerHome = () => {
                                                     {/* Interactive Rating for Completed Jobs */}
                                                     {b.status === 'completed' && !b.rated && (
                                                         <div className="pt-4 border-t border-surface-100">
-                                                            <div className="flex flex-wrap items-center justify-between gap-4">
-                                                                <div className="flex gap-1">
-                                                                    {[1, 2, 3, 4, 5].map(star => (
+                                                                    <div className="flex flex-col md:flex-row items-center justify-between w-full gap-5">
+                                                                        <div className="flex gap-1 justify-center">
+                                                                            {[1, 2, 3, 4, 5].map(star => (
+                                                                                <button
+                                                                                    key={star}
+                                                                                    onClick={() => setRatingState({ bookingId: b.id, rating: star })}
+                                                                                    className="transition-transform active:scale-95 p-1"
+                                                                                >
+                                                                                    <Star className={`w-[19px] h-[19px] md:w-6 md:h-6 ${star <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200'}`} />
+                                                                                </button>
+                                                                            ))}
+                                                                        </div>
+                                                                    {ratingState.bookingId === b.id && ratingState.rating > 0 && (
                                                                         <button
-                                                                            key={star}
-                                                                            onClick={() => setRatingState({ bookingId: b.id, rating: star })}
-                                                                            className="transition-transform active:scale-95 p-0.5"
+                                                                            onClick={() => submitRating(b)}
+                                                                            className="w-full md:w-auto px-7 py-3.5 bg-primary hover:bg-primary-dark text-white text-[11px] font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
                                                                         >
-                                                                            <Star className={`w-5 h-5 md:w-6 md:h-6 ${star <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200'}`} />
+                                                                            Submit Rating
                                                                         </button>
-                                                                    ))}
+                                                                    )}
                                                                 </div>
-                                                                {ratingState.bookingId === b.id && ratingState.rating > 0 && (
-                                                                    <button
-                                                                        onClick={() => submitRating(b)}
-                                                                        className="flex-1 sm:flex-none px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95"
-                                                                    >
-                                                                        Submit Rating
-                                                                    </button>
-                                                                )}
-                                                            </div>
                                                         </div>
                                                     )}
 
