@@ -1,5 +1,5 @@
 
-import { useState, useEffect, Component } from 'react';
+import { useState, useEffect, useMemo, Component } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
@@ -533,52 +533,61 @@ const CustomerHome = () => {
         }
     };
 
-    // Unified Filtering Logic
-    const displayedProviders = onlineProviders.filter(p => {
-        // 1. Status Check — accept 'active' OR 'approved' (admin sets 'approved')
-        const providerStatus = (p.status || '').toLowerCase().trim();
-        if (providerStatus !== 'active' && providerStatus !== 'approved') return false;
+    // Unified Filtering & Sorting Logic — Memoized for performance
+    const displayedProviders = useMemo(() => {
+        return onlineProviders.filter(p => {
+            // 1. Status Check — accept 'active' OR 'approved'
+            const providerStatus = (p.status || '').toLowerCase().trim();
+            if (providerStatus !== 'active' && providerStatus !== 'approved') return false;
 
-        const pName = (p.name || '').toLowerCase();
-        const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
-        const queryTerm = (searchQuery || '').toLowerCase().trim();
+            const pName = (p.name || '').toLowerCase();
+            const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
+            const queryTerm = (searchQuery || '').toLowerCase().trim();
 
-        // 2. Global Search Override
-        // If searching, we prioritize showing anything that matches name or category across ALL types
-        if (queryTerm !== '') {
-            const matchesSearch = pName.includes(queryTerm) || pCats.some(c => c.includes(queryTerm));
-            if (!matchesSearch) return false;
-            // When searching, we don't strictly enforce category filter unless it also matches
-        }
+            // 2. Global Search Override
+            if (queryTerm !== '') {
+                const matchesSearch = pName.includes(queryTerm) || pCats.some(c => c.includes(queryTerm));
+                if (!matchesSearch) return false;
+            }
 
-        // 3. Category Filter (Active only if not searching or if it matches)
-        if (selectedCategory && selectedCategory !== 'All' && queryTerm === '') {
-            const target = selectedCategory.toLowerCase().trim();
-            const matchesCategory = pCats.some(c => {
-                if (c === target) return true;
-                if (target === 'carpentry' && (c.includes('carpent') || c.includes('wood'))) return true;
-                if (target === 'electrical' && (c.includes('electri') || c.includes('light'))) return true;
-                if (target === 'plumbing' && (c.includes('plumb') || c.includes('pipe'))) return true;
-                if (target === 'cleaning' && (c.includes('clean') || c.includes('housekeep'))) return true;
-                return c.includes(target) || target.includes(c);
-            });
-            if (!matchesCategory) return false;
-        }
+            // 3. Category Filter (Now works alongside search)
+            if (selectedCategory && selectedCategory !== 'All') {
+                const target = selectedCategory.toLowerCase().trim();
+                const matchesCategory = pCats.some(c => {
+                    if (c === target) return true;
+                    if (target === 'carpentry' && (c.includes('carpent') || c.includes('wood'))) return true;
+                    if (target === 'electrical' && (c.includes('electri') || c.includes('light'))) return true;
+                    if (target === 'plumbing' && (c.includes('plumb') || c.includes('pipe'))) return true;
+                    if (target === 'cleaning' && (c.includes('clean') || c.includes('housekeep'))) return true;
+                    return c.includes(target) || target.includes(c);
+                });
+                if (!matchesCategory) return false;
+            }
 
-        // 4. Rating Filter
-        if (ratingFilter !== '0') {
-            const minRating = parseFloat(ratingFilter);
-            if ((p.rating || 0) < minRating) return false;
-        }
+            // 4. Rating Filter
+            if (ratingFilter !== '0') {
+                const minRating = parseFloat(ratingFilter);
+                if ((parseFloat(p.rating) || 0) < minRating) return false;
+            }
 
-        return true;
-    }).sort((a, b) => {
-        if (sortBy === 'rating') return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
-        if (sortBy === 'jobs') return (parseInt(b.jobs || b.jobCount) || 0) - (parseInt(a.jobs || a.jobCount) || 0);
-        if (sortBy === 'priceLow') return (parseFloat(a.price) || 500) - (parseFloat(b.price) || 500);
-        if (sortBy === 'priceHigh') return (parseFloat(b.price) || 500) - (parseFloat(a.price) || 500);
-        return 0;
-    });
+            return true;
+        }).sort((a, b) => {
+            const parsePrice = (val) => {
+                if (typeof val === 'number') return val;
+                return parseInt((val || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
+            };
+            const parseJobs = (val) => {
+                if (typeof val === 'number') return val;
+                return parseInt((val || '').toString().replace(/[^0-9]/g, '')) || 0;
+            };
+
+            if (sortBy === 'rating') return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+            if (sortBy === 'jobs') return parseJobs(b.jobs || b.jobCount) - parseJobs(a.jobs || a.jobCount);
+            if (sortBy === 'priceLow') return parsePrice(a.price) - parsePrice(b.price);
+            if (sortBy === 'priceHigh') return parsePrice(b.price) - parsePrice(a.price);
+            return 0;
+        });
+    }, [onlineProviders, searchQuery, selectedCategory, ratingFilter, sortBy]);
 
     const handleActivityClick = (booking) => {
         // Removed intrusive alert popup that caused confusion about changing status
@@ -1065,18 +1074,36 @@ const CustomerHome = () => {
                                     <p className="text-sm font-bold text-surface-400 mt-2">{displayedProviders.length} Professionals available in your area</p>
                                 </div>
                                 
-                                <div className="flex items-center gap-4 bg-surface-50 p-2 rounded-2xl border border-surface-200">
-                                    <Filter className="w-4 h-4 text-surface-400 ml-2" />
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                        className="bg-transparent border-none focus:ring-0 text-xs font-black uppercase tracking-widest text-surface-600 outline-none pr-8 cursor-pointer"
-                                    >
-                                        <option value="rating">Top Rated</option>
-                                        <option value="jobs">Most Experienced</option>
-                                        <option value="priceLow">Price: Low to High</option>
-                                        <option value="priceHigh">Price: High to Low</option>
-                                    </select>
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {/* Rating Filter UI */}
+                                    <div className="flex items-center gap-2 bg-surface-50 pl-3.5 pr-1 py-2 rounded-2xl border border-surface-200">
+                                        <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                                        <select
+                                            value={ratingFilter}
+                                            onChange={(e) => setRatingFilter(e.target.value)}
+                                            className="bg-transparent border-none focus:ring-0 text-[10px] font-black uppercase tracking-[0.15em] text-surface-600 outline-none pr-7 cursor-pointer"
+                                        >
+                                            <option value="0">All Ratings</option>
+                                            <option value="4">4.0+ Stars</option>
+                                            <option value="4.5">4.5+ Stars</option>
+                                            <option value="4.8">4.8+ Stars</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Sort Dropdown */}
+                                    <div className="flex items-center gap-2 bg-surface-50 pl-3.5 pr-1 py-2 rounded-2xl border border-surface-200">
+                                        <Filter className="w-3.5 h-3.5 text-surface-400" />
+                                        <select
+                                            value={sortBy}
+                                            onChange={(e) => setSortBy(e.target.value)}
+                                            className="bg-transparent border-none focus:ring-0 text-[10px] font-black uppercase tracking-[0.15em] text-surface-600 outline-none pr-7 cursor-pointer"
+                                        >
+                                            <option value="rating">Top Rated</option>
+                                            <option value="jobs">Most Experienced</option>
+                                            <option value="priceLow">Price: Low to High</option>
+                                            <option value="priceHigh">Price: High to Low</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
