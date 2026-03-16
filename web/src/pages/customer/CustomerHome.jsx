@@ -58,6 +58,7 @@ const CustomerHome = () => {
     const [pendingBookingData, setPendingBookingData] = useState(null);
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
     const [chartData, setChartData] = useState([]);
+    const [sortBy, setSortBy] = useState('rating');
 
     // New Feature States
     const [ratingFilter, setRatingFilter] = useState('0');
@@ -564,7 +565,13 @@ const CustomerHome = () => {
         }
 
         return true;
-    }).sort((a, b) => b.rating - a.rating);
+    }).sort((a, b) => {
+        if (sortBy === 'rating') return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+        if (sortBy === 'jobs') return (parseInt(b.jobs || b.jobCount) || 0) - (parseInt(a.jobs || a.jobCount) || 0);
+        if (sortBy === 'priceLow') return (parseFloat(a.price) || 500) - (parseFloat(b.price) || 500);
+        if (sortBy === 'priceHigh') return (parseFloat(b.price) || 500) - (parseFloat(a.price) || 500);
+        return 0;
+    });
 
     const handleActivityClick = (booking) => {
         // Removed intrusive alert popup that caused confusion about changing status
