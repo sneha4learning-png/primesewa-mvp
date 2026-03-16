@@ -29,17 +29,17 @@ class ErrorBoundary extends Component {
 }
 
 const categories = [
-    { id: '1', name: 'Plumbing', icon: Droplets, color: 'bg-blue-100 text-blue-600' },
-    { id: '2', name: 'Electrical', icon: Zap, color: 'bg-yellow-100 text-yellow-600' },
-    { id: '3', name: 'Cleaning', icon: Sparkles, color: 'bg-emerald-100 text-emerald-600' },
-    { id: '4', name: 'Carpentry', icon: Wrench, color: 'bg-orange-100 text-orange-600' },
-    { id: '5', name: 'Painting', icon: Sparkles, color: 'bg-purple-100 text-purple-600' },
-    { id: '6', name: 'AC Repair', icon: Wrench, color: 'bg-cyan-100 text-cyan-600' },
-    { id: '7', name: 'Appliance Repair', icon: Zap, color: 'bg-rose-100 text-rose-600' },
-    { id: '8', name: 'Repair', icon: Wrench, color: 'bg-slate-100 text-slate-600' },
-    { id: '9', name: 'Pest Control', icon: Sparkles, color: 'bg-red-100 text-red-600' },
-    { id: '10', name: 'Salon & Beauty', icon: Sparkles, color: 'bg-pink-100 text-pink-600' },
-    { id: '11', name: 'Packers & Movers', icon: Wrench, color: 'bg-indigo-100 text-indigo-600' },
+    { id: '1', name: 'Plumbing', icon: Droplets, color: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-500' },
+    { id: '2', name: 'Electrical', icon: Zap, color: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-500' },
+    { id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500' },
+    { id: '4', name: 'Carpentry', icon: Wrench, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500' },
+    { id: '5', name: 'Painting', icon: Sparkles, color: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-500' },
+    { id: '6', name: 'AC Repair', icon: Wrench, color: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-500' },
+    { id: '7', name: 'Appliance Repair', icon: Zap, color: 'from-rose-500/10 to-rose-600/5', iconColor: 'text-rose-500' },
+    { id: '8', name: 'Repair', icon: Wrench, color: 'from-slate-500/10 to-slate-600/5', iconColor: 'text-slate-500' },
+    { id: '9', name: 'Pest Control', icon: Sparkles, color: 'from-red-500/10 to-red-600/5', iconColor: 'text-red-500' },
+    { id: '10', name: 'Salon & Beauty', icon: Sparkles, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500' },
+    { id: '11', name: 'Packers & Movers', icon: Wrench, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500' },
 ];
 
 import { useNotifications } from '../../context/NotificationContext';
@@ -632,10 +632,11 @@ const CustomerHome = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-in">
             {/* Hero Section / Welcome Header */}
-            <div className={`mb-12 relative overflow-hidden rounded-[3rem] ${!userData?.uid ? 'bg-slate-900 border border-slate-800 p-8 md:p-16' : ''}`}>
-                <div className="absolute top-0 right-10 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className={`mb-16 relative overflow-hidden rounded-[3.5rem] ${!userData?.uid ? 'bg-surface-900 border border-white/5 p-10 md:p-24 shadow-2xl' : 'bg-linear-to-br from-primary/5 via-transparent to-transparent p-12'}`}>
+                <div className="absolute top-0 right-10 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none animate-pulse"></div>
+                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-light/10 rounded-full blur-[100px] pointer-events-none animate-float"></div>
 
                 {!userData?.uid && (
                     <div className="absolute inset-0 z-0">
@@ -644,153 +645,167 @@ const CustomerHome = () => {
                                 key={idx}
                                 src={img}
                                 alt="Service"
-                                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-60' : 'opacity-0'}`}
+                                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 ease-in-out ${idx === currentImageIndex ? 'opacity-40' : 'opacity-0'}`}
                             />
                         ))}
-                        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-slate-900/20"></div>
+                        <div className="absolute inset-0 mesh-gradient opacity-60 mix-blend-multiply"></div>
+                        <div className="absolute inset-0 bg-linear-to-r from-surface-900 via-surface-900/60 to-transparent"></div>
                     </div>
                 )}
 
-                <div className="relative z-10 max-w-2xl">
-                    <h1 className="text-4xl md:text-6xl font-black text-white md:text-slate-900 tracking-tight leading-tight">
+                <div className="relative z-10 max-w-3xl">
+                    <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full mb-8 shadow-xl">
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(37,99,235,0.8)]"></div>
+                        <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Verified Professionals in Ahmedabad</span>
+                    </div>
+
+                    <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-[0.9] mb-8">
                         {!userData?.uid ? (
                             <>
-                                Premium Home <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 md:from-blue-600 md:to-indigo-600">
-                                    Services in Ahmedabad
+                                Premium <br />
+                                <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-light to-blue-400">
+                                    Home Services
                                 </span>
                             </>
                         ) : (
                             <>
-                                Good {new Date().getHours() < 12 ? 'Morning' : 'Afternoon'}, <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                                Welcome Back, <br />
+                                <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-primary-light">
                                     {userData.name?.split(' ')[0] || 'Prime User'}
-                                </span> 👋
+                                </span>
                             </>
                         )}
                     </h1>
 
                     {!userData?.uid ? (
-                        <div className="mt-8 space-y-6">
-                            <p className="text-lg md:text-xl font-medium text-slate-300 md:text-slate-500 leading-relaxed">
-                                Book verified professionals for plumbing, electrical, cleaning and more. Experience quality and reliability at your doorstep.
+                        <div className="space-y-8">
+                            <p className="text-lg md:text-2xl font-medium text-white/50 leading-relaxed max-w-xl">
+                                Book world-class professionals for your home essentials. Experience reliability at your doorstep.
                             </p>
-                            <div className="flex flex-wrap gap-4">
-                                <button onClick={() => navigate('/login')} className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-600/30 transition-all transform hover:-translate-y-1">
-                                    Book Now
+                            <div className="flex flex-wrap gap-6 pt-4">
+                                <button onClick={() => navigate('/login')} className="px-10 py-5 bg-primary hover:bg-primary-dark text-white font-black rounded-3xl shadow-2xl shadow-primary/30 transition-all hover-lift active:scale-95">
+                                    Get Started
                                 </button>
-                                <button onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })} className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-black rounded-2xl border border-white/20 transition-all">
-                                    Explore Services
+                                <button onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })} className="px-10 py-5 bg-white/5 hover:bg-white/10 backdrop-blur-2xl text-white font-black rounded-3xl border border-white/10 transition-all hover-lift">
+                                    Browse Catalog
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <p className="text-xl font-medium text-slate-500 mt-4">What service do you need today in Ahmedabad?</p>
+                        <p className="text-xl md:text-3xl font-bold text-slate-500 mt-4 tracking-tight">What can we help you with today?</p>
                     )}
                 </div>
             </div>
 
             {bookingStep === 1 ? (
-                <div className="max-w-2xl bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 mx-auto relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                    <div className="flex justify-between items-start mb-8">
-                        <div>
-                            <h2 className="text-3xl font-black text-slate-900">Confirm Booking</h2>
-                            {pendingBookingData?.service && <span className="text-blue-600 block text-xl mt-1 font-bold">({pendingBookingData.service})</span>}
+                <div className="max-w-3xl glass-card rounded-[3rem] shadow-2xl border-white/10 mx-auto relative overflow-hidden animate-fade-in">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-linear-to-r from-primary to-primary-light"></div>
+                    <div className="p-10 md:p-14">
+                        <div className="flex justify-between items-start mb-12">
+                            <div>
+                                <h2 className="text-4xl font-black text-surface-900 tracking-tighter">Confirm Booking</h2>
+                                {pendingBookingData?.service && (
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full mt-3">
+                                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                                        <span className="text-primary font-black text-[10px] uppercase tracking-widest">{pendingBookingData.service}</span>
+                                    </div>
+                                )}
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => setBookingStep(0)}
+                                className="p-3 bg-surface-100 hover:bg-surface-200 text-surface-400 rounded-2xl transition-all hover:rotate-90 duration-300"
+                            >
+                                <XCircle className="w-6 h-6" />
+                            </button>
                         </div>
-                        <button 
-                            type="button" 
-                            onClick={() => setBookingStep(0)}
-                            className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-all"
-                        >
-                            <XCircle className="w-8 h-8" />
-                        </button>
-                    </div>
 
-                    {pendingBookingData && (pendingBookingData.previousWorkSample || (pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0)) && (
-                        <div className="mb-8">
-                            <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider flex items-center gap-2">
-                                <ShieldCheck className="w-4 h-4 text-blue-500" />
-                                Provider's Previous Work
-                            </label>
-                            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar snap-x">
-                                {pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0 ? (
-                                    pendingBookingData.portfolio.map((img, idx) => (
-                                        <div key={idx} className="rounded-2xl overflow-hidden h-32 w-48 border border-slate-200 shadow-sm relative group shrink-0 snap-center">
+                        {pendingBookingData && (pendingBookingData.previousWorkSample || (pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0)) && (
+                            <div className="mb-12">
+                                <label className="block text-[10px] font-black text-surface-400 mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <ShieldCheck className="w-4 h-4 text-primary" />
+                                    Portfolio & Verification
+                                </label>
+                                <div className="flex gap-6 overflow-x-auto pb-6 hide-scrollbar snap-x">
+                                    {pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0 ? (
+                                        pendingBookingData.portfolio.map((img, idx) => (
+                                            <div key={idx} className="rounded-3xl overflow-hidden h-40 w-64 border border-surface-100 shadow-lg relative group shrink-0 snap-center">
+                                                <img
+                                                    src={img}
+                                                    alt={`Work sample ${idx + 1}`}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
+                                                    }}
+                                                />
+                                                <div className="absolute inset-0 bg-linear-to-t from-surface-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                                    <span className="text-white text-[10px] font-bold uppercase tracking-widest">View Project</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="rounded-3xl overflow-hidden h-48 w-full border border-surface-100 shadow-lg relative group">
                                             <img
-                                                src={img}
-                                                alt={`Work sample ${idx + 1}`}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                src={pendingBookingData.previousWorkSample || 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80'}
+                                                alt="Previous Work Sample"
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                 onError={(e) => {
                                                     e.target.onerror = null;
                                                     e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
                                                 }}
                                             />
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="rounded-2xl overflow-hidden h-40 w-full border border-slate-200 shadow-sm relative group">
-                                        <img
-                                            src={pendingBookingData.previousWorkSample || 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80'}
-                                            alt="Previous Work Sample"
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
-                                            }}
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        <form onSubmit={confirmBooking} className="space-y-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Service Date</label>
+                                    <div className="relative group">
+                                        <Calendar className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-surface-400 group-focus-within:text-primary transition-colors" />
+                                        <input
+                                            required
+                                            type="date"
+                                            value={bookingDate}
+                                            min={getTodayStr()}
+                                            onChange={(e) => { setBookingDate(e.target.value); setBookingTime(''); }}
+                                            className="w-full pl-14 pr-5 py-5 bg-surface-50 border border-surface-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-surface-900 outline-none"
                                         />
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    <form onSubmit={confirmBooking} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Service Date</label>
-                                <div className="relative">
-                                    <Calendar className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input
-                                        required
-                                        type="date"
-                                        value={bookingDate}
-                                        min={getTodayStr()}
-                                        onChange={(e) => { setBookingDate(e.target.value); setBookingTime(''); }}
-                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
-                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Preferred Time</label>
+                                    <div className="relative group">
+                                        <ClockIcon className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-surface-400 group-focus-within:text-primary transition-colors" />
+                                        <input
+                                            required
+                                            type="time"
+                                            value={bookingTime}
+                                            min={bookingDate === getTodayStr() ? getNowTimeStr() : undefined}
+                                            onChange={(e) => {
+                                                const selected = e.target.value;
+                                                if (bookingDate === getTodayStr() && selected && selected <= getNowTimeStr()) {
+                                                    setTimeError(`Please pick a time after ${getNowTimeStr()} for today.`);
+                                                    setBookingTime('');
+                                                } else {
+                                                    setTimeError('');
+                                                    setBookingTime(selected);
+                                                }
+                                            }}
+                                            className={`w-full pl-14 pr-5 py-5 bg-surface-50 border rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-surface-900 outline-none ${timeError ? 'border-red-400' : 'border-surface-200'}`}
+                                        />
+                                    </div>
+                                    {timeError && (
+                                        <p className="text-red-500 text-[10px] font-black mt-2 flex items-center gap-1 uppercase tracking-widest">
+                                            <AlertCircle className="w-3 h-3" /> {timeError}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Preferred Time</label>
-                                <div className="relative">
-                                    <ClockIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input
-                                        required
-                                        type="time"
-                                        value={bookingTime}
-                                        min={bookingDate === getTodayStr() ? getNowTimeStr() : undefined}
-                                        onChange={(e) => {
-                                            const selected = e.target.value;
-                                            // Guard: if today is selected, reject past times immediately
-                                            if (bookingDate === getTodayStr() && selected && selected <= getNowTimeStr()) {
-                                                setTimeError(`Please pick a time after ${getNowTimeStr()} for today.`);
-                                                setBookingTime('');
-                                            } else {
-                                                setTimeError('');
-                                                setBookingTime(selected);
-                                            }
-                                        }}
-                                        className={`w-full pl-12 pr-4 py-4 bg-slate-50 border rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 ${timeError ? 'border-red-400' : 'border-slate-200'}`}
-                                    />
-                                </div>
-                                {timeError && (
-                                    <p className="text-red-500 text-xs font-bold mt-2 flex items-center gap-1">
-                                        ⚠️ {timeError}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
 
                         {/* Amazon-style structured address form */}
                         <div className="space-y-4">
@@ -942,6 +957,7 @@ const CustomerHome = () => {
                         </div>
                     </form>
                 </div>
+            </div>
             ) : bookingStep === 2 ? (
                 <div className="max-w-lg bg-emerald-500 p-12 rounded-3xl mx-auto text-center flex flex-col items-center relative overflow-hidden shadow-2xl shadow-emerald-500/20">
                     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop')] mix-blend-overlay opacity-20 bg-cover"></div>
@@ -954,27 +970,27 @@ const CustomerHome = () => {
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
                     {/* Main Content Area */}
-                    <div className="lg:col-span-2 space-y-12">
+                    <div className="lg:col-span-3 space-y-16">
                         {/* Improved Premium Search */}
-                        <div className="relative group max-w-3xl mx-auto">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-40 transition duration-1000 group-focus-within:duration-200"></div>
-                            <div className="relative flex items-center bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-indigo-500/5 overflow-hidden focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all duration-300">
-                                <div className="pl-6 flex items-center">
-                                    <Search className="w-6 h-6 text-slate-400 group-focus-within:text-blue-600 transition-colors duration-300" />
+                        <div className="relative group max-w-4xl">
+                            <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-primary-light/10 rounded-[2.5rem] blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
+                            <div className="relative flex items-center bg-white border border-surface-100 rounded-[2rem] shadow-2xl shadow-primary/5 overflow-hidden transition-all duration-500 focus-within:ring-1 focus-within:ring-primary/20">
+                                <div className="pl-8 flex items-center">
+                                    <Search className="w-6 h-6 text-surface-300 group-focus-within:text-primary transition-colors duration-300" />
                                 </div>
                                 <input
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Need help with something? Search 'Plumbing', 'Electrical'..."
-                                    className="w-full px-5 py-5 bg-transparent border-none focus:ring-0 text-lg font-medium text-slate-800 placeholder:text-slate-400"
+                                    placeholder="Search for 'Plumbing', 'Electrician', etc."
+                                    className="w-full px-6 py-7 bg-transparent border-none focus:ring-0 text-xl font-semibold text-surface-900 placeholder:text-surface-300"
                                 />
                                 {searchQuery && (
                                     <button 
                                         onClick={() => setSearchQuery('')}
-                                        className="pr-6 text-slate-300 hover:text-slate-500 transition-colors"
+                                        className="pr-8 text-surface-300 hover:text-surface-500 transition-colors"
                                     >
                                         <XCircle className="w-6 h-6" />
                                     </button>
@@ -983,126 +999,144 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Categories */}
-                        <div>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Browse Services</h2>
+                        <div className="space-y-8">
+                            <div className="flex items-end justify-between">
+                                <div>
+                                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-2">Service Catalog</p>
+                                    <h2 className="text-4xl font-black text-surface-900 tracking-tighter">Featured Services</h2>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={() => setSelectedCategory(null)}
+                                        className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${!selectedCategory ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-surface-50 text-surface-400 hover:bg-surface-100'}`}
+                                    >
+                                        All
+                                    </button>
+                                </div>
                             </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-                                {categories.map(cat => (
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                                {categories.map((cat) => (
                                     <button
                                         key={cat.id}
                                         onClick={() => setSelectedCategory(cat.name === selectedCategory ? null : cat.name)}
-                                        className={`relative flex flex-col items-center p-4 md:p-5 rounded-2xl border-2 transition-all duration-300 overflow-hidden
-                                            ${selectedCategory === cat.name
-                                                ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg shadow-blue-500/10 scale-[1.03]'
-                                                : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-md hover:-translate-y-1'
-                                            }`}
+                                        className={`group relative flex flex-col items-center p-8 rounded-[2.5rem] transition-all duration-500 hover-lift ${selectedCategory === cat.name ? 'ring-2 ring-primary bg-white shadow-2xl scale-105' : 'bg-linear-to-br border border-white/40 shadow-sm'} ${cat.color}`}
                                     >
-                                        {selectedCategory === cat.name && (
-                                            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-500" />
-                                        )}
-                                        <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-2.5 transition-transform ${cat.color} ${selectedCategory === cat.name ? 'scale-110' : ''}`}>
-                                            <cat.icon className="w-6 h-6 md:w-7 md:h-7" />
+                                        <div className={`w-16 h-16 rounded-3xl bg-white shadow-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 ${cat.iconColor}`}>
+                                            <cat.icon className="w-8 h-8" />
                                         </div>
-                                        <span className={`text-xs md:text-sm font-bold text-center leading-tight ${selectedCategory === cat.name ? 'text-blue-700' : 'text-slate-700'}`}>{cat.name}</span>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest text-center ${selectedCategory === cat.name ? 'text-primary' : 'text-surface-600'}`}>{cat.name}</span>
+                                        
+                                        {selectedCategory === cat.name && (
+                                            <div className="absolute top-4 right-4">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></div>
+                                            </div>
+                                        )}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         {/* Top Providers with Filters */}
-                        <div>
-                            <div className="flex items-center justify-between mb-6">
+                        <div className="space-y-10">
+                            <div className="flex items-end justify-between">
                                 <div>
-                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                                        {selectedCategory ? `${selectedCategory} Pros` : 'Available Pros'}
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full mb-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                        <span className="text-emerald-600 font-black text-[9px] uppercase tracking-[0.2em]">Live Status</span>
+                                    </div>
+                                    <h2 className="text-4xl font-black text-surface-900 tracking-tighter">
+                                        {selectedCategory ? `${selectedCategory} Experts` : 'Available Experts'}
                                     </h2>
-                                    <p className="text-sm text-slate-500 mt-0.5">{displayedProviders.length} online now</p>
+                                    <p className="text-sm font-bold text-surface-400 mt-2">{displayedProviders.length} Professionals available in your area</p>
                                 </div>
-                                <select
-                                    className="px-4 py-2 border border-slate-200 rounded-xl bg-white font-medium text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                    value={ratingFilter}
-                                    onChange={(e) => setRatingFilter(e.target.value)}
-                                >
-                                    <option value="0">All Ratings</option>
-                                    <option value="4.5">4.5+ Stars</option>
-                                    <option value="4.0">4.0+ Stars</option>
-                                    <option value="3.0">3.0+ Stars</option>
-                                </select>
-                            </div>
-                            <div className="space-y-4">
-                                {displayedProviders.slice(0, visibleCount).map(provider => (
-                                    <div key={provider.id} className="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-xl hover:border-indigo-100 transition-all duration-300 hover:-translate-y-0.5">
-                                        <div className="flex items-center gap-4">
-                                            {/* Avatar with online indicator */}
-                                            <div className="relative shrink-0">
-                                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xl font-black text-white shadow-md shadow-indigo-500/20">
-                                                    {(provider.name || 'P').charAt(0)}
-                                                </div>
-                                                <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full" title="Online" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <div className="flex items-center gap-2 flex-wrap">
-                                                    <h3 className="font-black text-lg text-slate-900 truncate">{provider.name || 'Service Partner'}</h3>
-                                                </div>
-                                                <p className="text-xs font-bold text-indigo-600 mt-0.5">{Array.isArray(provider.category) ? provider.category.join(', ') : (provider.category || 'Professional Service')}</p>
-                                                <div className="flex items-center gap-1 text-[10px] text-slate-500 mt-1 uppercase tracking-tight font-black">
-                                                    <MapPin className="w-2.5 h-2.5 text-slate-400" />
-                                                    {provider.serviceAreas
-                                                        ? (typeof provider.serviceAreas === 'string'
-                                                            ? provider.serviceAreas.split(',').map(s => s.trim()).filter(Boolean).join(', ')
-                                                            : (Array.isArray(provider.serviceAreas) ? provider.serviceAreas.join(', ') : provider.serviceAreas))
-                                                        : 'Across Ahmedabad'}
-                                                </div>
-                                                <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-2">
-                                                    {(() => {
-                                                        const r = typeof provider.rating === 'number' ? provider.rating : parseFloat(provider.rating || 0);
-                                                        const j = parseInt(provider.jobs) || parseInt(provider.jobCount) || 0;
-                                                        return (
-                                                            <>
-                                                                <span className={`flex items-center gap-1 ${r > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} text-xs font-bold px-2 py-0.5 rounded-lg border`}>
-                                                                    {r > 0 ? (
-                                                                        <><Star className="w-3 h-3 fill-current" /> {r.toFixed(1)}</>
-                                                                    ) : (
-                                                                        'New'
-                                                                    )}
-                                                                </span>
-                                                                <span className="text-xs text-slate-400 font-medium">{j} jobs</span>
-                                                            </>
-                                                        );
-                                                    })()}
-                                                    <span className="flex items-center gap-0.5 text-emerald-700 text-xs font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
-                                                        ₹{(provider.price || '').toString().replace(/[₹,/a-zA-Z\s]/g, '') || '—'}/hr
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-row md:flex-col gap-2.5 shrink-0">
-                                            <button onClick={() => setSelectedProviderProfile(provider)} className="flex-1 md:flex-none px-5 py-2.5 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold rounded-xl transition-all border border-slate-200 hover:border-blue-200 text-sm">
-                                                View
-                                            </button>
-                                            <button onClick={() => handleBook(provider)} className="flex-1 md:flex-none px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all text-sm">
-                                                Book Now
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                                {displayedProviders.length === 0 && (
-                                    <div className="p-12 text-center bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-3xl border border-dashed border-slate-200">
-                                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Search className="w-7 h-7 text-blue-400" />
-                                        </div>
-                                        <p className="text-slate-600 font-bold">No online providers for this category.</p>
-                                        <p className="text-slate-400 text-sm mt-1">Check back soon or try another category.</p>
-                                    </div>
-                                )}
-                                {visibleCount < displayedProviders.length && (
-                                    <button
-                                        onClick={() => setVisibleCount(c => c + 5)}
-                                        className="w-full py-4 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-bold hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/50 transition-all"
+                                
+                                <div className="flex items-center gap-4 bg-surface-50 p-2 rounded-2xl border border-surface-200">
+                                    <Filter className="w-4 h-4 text-surface-400 ml-2" />
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
+                                        className="bg-transparent border-none focus:ring-0 text-xs font-black uppercase tracking-widest text-surface-600 outline-none pr-8 cursor-pointer"
                                     >
-                                        Load More ({displayedProviders.length - visibleCount} remaining)
-                                    </button>
+                                        <option value="rating">Top Rated</option>
+                                        <option value="jobs">Most Experienced</option>
+                                        <option value="priceLow">Price: Low to High</option>
+                                        <option value="priceHigh">Price: High to Low</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {displayedProviders.length > 0 ? (
+                                    displayedProviders.map((p) => {
+                                        const ratingValue = parseFloat(p.rating || 0).toFixed(1);
+                                        const jobCount = p.jobs || p.jobCount || 0;
+                                        const nameInitial = (p.name || 'P').charAt(0).toUpperCase();
+                                        const category = (Array.isArray(p.category) ? p.category[0] : p.category) || 'General';
+
+                                        return (
+                                            <div key={p.id} className="group glass-card rounded-[2.5rem] border border-surface-100 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 overflow-hidden">
+                                                <div className="p-8">
+                                                    <div className="flex items-start justify-between mb-8">
+                                                        <div className="flex items-center gap-5">
+                                                            <div className="w-20 h-20 bg-linear-to-br from-surface-50 to-surface-100 rounded-3xl flex items-center justify-center text-3xl font-black text-primary shadow-inner border border-white">
+                                                                {nameInitial}
+                                                            </div>
+                                                            <div>
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <h3 className="text-xl font-black text-surface-900 tracking-tight">{p.name || 'Professional'}</h3>
+                                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                                                </div>
+                                                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">{category} Specialist</p>
+                                                                <div className="flex items-center gap-4 mt-3">
+                                                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg border border-amber-100">
+                                                                        <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                                                                        <span className="text-xs font-black text-amber-700">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-surface-50 rounded-lg border border-surface-100">
+                                                                        <Briefcase className="w-3.5 h-3.5 text-surface-500" />
+                                                                        <span className="text-xs font-black text-surface-700">{jobCount} Jobs</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-[10px] font-black text-surface-400 uppercase tracking-widest mb-1">Starts From</div>
+                                                            <div className="text-2xl font-black text-surface-900">₹{p.price || 499}<span className="text-xs text-surface-400 font-bold">/hr</span></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3 py-6 border-y border-surface-50 mb-8">
+                                                        <MapPin className="w-4 h-4 text-primary" />
+                                                        <p className="text-xs font-bold text-surface-600 truncate">Serves Ahmedabad & surrounding areas</p>
+                                                    </div>
+
+                                                    <div className="flex gap-4">
+                                                        <button 
+                                                            onClick={() => setSelectedProviderProfile(p)}
+                                                            className="flex-1 py-4 bg-surface-50 hover:bg-surface-100 text-surface-900 font-black rounded-2xl transition-all text-[10px] uppercase tracking-widest border border-surface-200"
+                                                        >
+                                                            View Profile
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleBook(p)}
+                                                            className="flex-1 py-4 bg-primary hover:bg-primary-dark text-white font-black rounded-2xl transition-all shadow-xl shadow-primary/20 hover-lift text-[10px] uppercase tracking-widest"
+                                                        >
+                                                            Book Now
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="col-span-1 md:col-span-2 py-20 bg-surface-50 rounded-[3rem] border-2 border-dashed border-surface-200 text-center">
+                                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                                            <Search className="w-8 h-8 text-surface-200" />
+                                        </div>
+                                        <h3 className="text-xl font-black text-surface-900 mb-2">No professionals found</h3>
+                                        <p className="text-surface-400 font-medium">Try adjusting your search or filters to see more results.</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -1111,124 +1145,62 @@ const CustomerHome = () => {
                     {/* Sidebar / Active Bookings */}
                     <div className="space-y-8">
                         {/* Current Activity Box */}
-                        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-1 rounded-[2.5rem] shadow-xl shadow-blue-600/20 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                            <div className="bg-white/10 backdrop-blur-md p-8 rounded-[2.3rem] min-h-[400px] flex flex-col">
+                        <div className="bg-surface-900 p-1 rounded-[3.5rem] shadow-2xl shadow-primary/10 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-colors duration-700"></div>
+                            <div className="bg-white/5 backdrop-blur-3xl p-10 rounded-[3.3rem] min-h-[450px] flex flex-col border border-white/5">
                                 {userData?.uid ? (
                                     <>
-                                        <h2 className="text-xl font-black text-white mb-6 flex items-center gap-3">
-                                            <MapPin className="text-blue-200" /> Current Activity
-                                        </h2>
-                                        <div className="space-y-4 relative z-10 flex-1">
+                                        <div className="flex items-center justify-between mb-10">
+                                            <h2 className="text-2xl font-black text-white tracking-tighter flex items-center gap-3">
+                                                <div className="w-1.5 h-8 bg-primary rounded-full"></div>
+                                                Live Activity
+                                            </h2>
+                                            <div className="px-3 py-1 bg-white/10 rounded-full border border-white/10">
+                                                <span className="text-white/60 font-black text-[9px] uppercase tracking-widest">{activeBookings.length} Active</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-6 relative z-10 flex-1 overflow-y-auto pr-2 hide-scrollbar">
                                             {activeBookings.length > 0 ? (
                                                 activeBookings.map(b => (
-                                                    <div key={b.id} onClick={() => handleActivityClick(b)} className="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-pointer">
-                                                        <div className={`absolute top-0 left-0 w-1.5 h-full ${b.status === 'negotiating' ? 'bg-purple-500' : 'bg-blue-500'}`}></div>
+                                                    <div key={b.id} onClick={() => handleActivityClick(b)} className="bg-white/5 hover:bg-white/10 border border-white/5 p-6 rounded-3xl transition-all cursor-pointer group/item relative overflow-hidden">
+                                                        <div className={`absolute top-0 left-0 w-1.5 h-full ${b.status === 'negotiating' ? 'bg-amber-400' : 'bg-primary'}`}></div>
                                                         <div className="flex justify-between items-start mb-3">
-                                                            <span className="font-black text-slate-900">{b.service}</span>
-                                                            <span className={`px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest ${b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>{b.status}</span>
+                                                            <span className="font-black text-white tracking-tight text-lg">{b.service}</span>
+                                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded-lg">
+                                                                <div className={`w-1 h-1 rounded-full animate-pulse ${b.status === 'negotiating' ? 'bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.8)]' : 'bg-primary'}`}></div>
+                                                                <span className="text-[9px] font-black text-white/80 uppercase tracking-widest">{b.status}</span>
+                                                            </div>
                                                         </div>
-                                                        <p className="text-sm font-medium text-slate-500 mb-2">{b.date} at {formatTime(b.time)}</p>
-                                                        {b.description && (
-                                                            <div className="bg-slate-50/80 p-2.5 rounded-xl mb-4 border border-slate-100/50">
-                                                                <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-1">Stated Issue</p>
-                                                                <p className="text-xs font-medium text-slate-600 italic line-clamp-2">"{b.description}"</p>
-                                                            </div>
-                                                        )}
-                                                        <div className="flex justify-between items-end">
-                                                            <p className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                                                                <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-xs text-slate-600">{b.provider.charAt(0)}</div>
-                                                                {b.provider}
-                                                            </p>
-                                                            <p className="font-black text-slate-900 text-lg">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
-                                                        </div>
-
-                                                        {b.status === 'accepted' && (
-                                                            <div className="mt-5 pt-4 border-t border-slate-100">
-                                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Live Status</p>
-                                                                <div className="relative flex justify-between px-2">
-                                                                    <div className="absolute top-2.5 left-2 right-2 h-1 bg-slate-100 rounded"></div>
-                                                                    <div className={`absolute top-2.5 left-2 h-1 rounded transition-all duration-500 ${b.trackingStatus === 'inprogress' ? 'w-[calc(100%-1rem)] bg-emerald-500' : b.trackingStatus === 'arrived' ? 'w-[66%] bg-blue-500' : b.trackingStatus === 'enroute' ? 'w-[33%] bg-blue-500' : 'w-0 bg-blue-500'}`}></div>
-                                                                    {[{ step: 'assigned', label: 'Assigned' }, { step: 'enroute', label: 'On Way' }, { step: 'arrived', label: 'Arrived' }, { step: 'inprogress', label: 'Working' }].map((s, i) => {
-                                                                        const isPast = b.trackingStatus === 'inprogress' ? true : b.trackingStatus === 'arrived' ? i <= 2 : b.trackingStatus === 'enroute' ? i <= 1 : i === 0;
-                                                                        return (
-                                                                            <div key={s.step} className="relative z-10 flex flex-col items-center gap-1.5 min-w-[3rem]">
-                                                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors duration-500 bg-white ${isPast ? (b.trackingStatus === 'inprogress' ? 'border-emerald-500' : 'border-blue-500') : 'border-slate-200'}`}>
-                                                                                    {isPast && <div className={`w-2 h-2 rounded-full ${b.trackingStatus === 'inprogress' ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>}
-                                                                                </div>
-                                                                                <span className={`text-[10px] font-bold text-center leading-tight ${isPast ? 'text-slate-800' : 'text-slate-400'}`}>{s.label}</span>
-                                                                            </div>
-                                                                        )
-                                                                    })}
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        {/* Negotiate buttons — only shown for negotiating status */}
-                                                        {b.status === 'negotiating' && b.proposedPrice && (
-                                                            <div className="mt-4 pt-4 border-t border-slate-100 flex gap-2" onClick={e => e.stopPropagation()}>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleNegotiation(b.id, false, b.proposedPrice); }}
-                                                                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-colors"
-                                                                >
-                                                                    Decline
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleNegotiation(b.id, true, b.proposedPrice); }}
-                                                                    className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm shadow-md transition-colors"
-                                                                >
-                                                                    Accept ₹{b.proposedPrice}
-                                                                </button>
-                                                            </div>
-                                                        )}
-
-                                                        {/* Cancel / Call buttons for active bookings */}
-                                                        {(b.status === 'accepted' || b.status === 'pending') && (
-                                                            <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2" onClick={e => e.stopPropagation()}>
-                                                                {b.status === 'accepted' && (
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            if (!userData?.uid) { navigate('/login'); return; }
-                                                                            if (!b.providerPhone && !b.phone) { alert('Provider phone number is not available.'); return; }
-                                                                            window.location.href = `tel:${b.providerPhone || b.phone}`;
-                                                                        }}
-                                                                        className="flex-1 py-1.5 flex items-center justify-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 font-bold rounded-xl text-xs transition-colors border border-green-100"
-                                                                    >
-                                                                        <Phone className="w-3.5 h-3.5" /> Call Provider
-                                                                    </button>
-                                                                )}
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleCancelBooking(b.id); }}
-                                                                    className="flex-1 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs transition-colors border border-red-100"
-                                                                >
-                                                                    Cancel Booking
-                                                                </button>
-                                                            </div>
-                                                        )}
+                                                        <p className="text-white/40 text-xs font-bold flex items-center gap-2">
+                                                            <ClockIcon className="w-3 h-3" /> {b.date} • {formatTime(b.time)}
+                                                        </p>
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="h-full flex flex-col items-center justify-center text-center text-white/60">
-                                                    <ClockIcon className="w-12 h-12 mb-4 opacity-20" />
-                                                    <p className="font-bold">No active requests.</p>
+                                                <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                                                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
+                                                        <ClockIcon className="w-10 h-10 text-white/10" />
+                                                    </div>
+                                                    <p className="text-white/40 font-bold text-sm">No active requests found.</p>
                                                 </div>
                                             )}
                                         </div>
                                     </>
                                 ) : (
                                     <div className="h-full flex flex-col items-center justify-center text-center">
-                                        <div className="relative w-48 h-48 mb-8 group">
-                                            <div className="absolute inset-0 bg-white/20 rounded-[3rem] rotate-6 group-hover:rotate-0 transition-transform duration-500"></div>
-                                            <div className="relative h-full w-full rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/30">
+                                        <div className="relative w-56 h-56 mb-10 group">
+                                            <div className="absolute inset-0 bg-primary/20 rounded-[3.5rem] rotate-6 group-hover:rotate-0 transition-transform duration-700 blur shadow-2xl"></div>
+                                            <div className="relative h-full w-full rounded-[3.5rem] overflow-hidden border-4 border-white/10 shadow-2xl">
                                                 {serviceImages.map((img, idx) => (
-                                                    <img key={idx} src={img} alt="Service Pro" className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${idx === currentImageIndex ? 'opacity-100' : 'opacity-0'}`} />
+                                                    <img key={idx} src={img} alt="Service Pro" className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 ${idx === currentImageIndex ? 'opacity-100' : 'opacity-0'}`} />
                                                 ))}
+                                                <div className="absolute inset-0 bg-linear-to-t from-surface-900/80 to-transparent"></div>
                                             </div>
                                         </div>
-                                        <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Prime Quality</h3>
-                                        <p className="text-white/70 text-sm font-medium leading-relaxed mb-8">Ahmedabad's most trusted professionals. Secure, fast, and reliable home services.</p>
-                                        <button onClick={() => navigate('/login')} className="w-full py-4 bg-white text-blue-600 font-black rounded-2xl shadow-xl hover:scale-105 transition-all text-sm uppercase tracking-widest">
+                                        <h3 className="text-3xl font-black text-white mb-4 tracking-tighter">Prime Quality</h3>
+                                        <p className="text-white/50 text-sm font-medium leading-relaxed mb-10 px-4 italic">Experience the benchmark of home services. Reliable, professional, and at your doorstep.</p>
+                                        <button onClick={() => navigate('/login')} className="w-full py-5 bg-white text-surface-900 font-black rounded-[2rem] shadow-2xl hover:bg-primary hover:text-white transition-all text-[11px] uppercase tracking-[0.2em]">
                                             Sign In to Start
                                         </button>
                                     </div>
@@ -1236,145 +1208,92 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        {/* History / Testimonials Box */}
-                        <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden relative">
-                            {userData?.uid ? (
-                                <>
-                                    <div className="flex items-center justify-between mb-6">
-                                        <h2 className="text-xl font-black text-slate-900">Recent Jobs</h2>
-                                        <span className="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-lg font-black">{pastBookings.length}</span>
-                                    </div>
-                                    <div className="space-y-4">
-                                        {pastBookings.length > 0 ? (
-                                            <>
-                                                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                                                    {pastBookings.slice(0, visibleHistoryCount).map(b => (
-                                                        <div key={b.id} className="p-5 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 transition-all flex flex-col gap-4 group shadow-sm">
-                                                            <div className="flex justify-between items-center">
-                                                                <div className="flex-1 min-w-0 pr-4">
-                                                                    <div className="flex items-center gap-2 mb-1">
-                                                                        <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-xs tracking-wider truncate">{b.service}</p>
-                                                                        <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-green-100 text-green-700' : b.status === 'rejected' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500'}`}>
-                                                                            {b.status}
-                                                                        </span>
-                                                                    </div>
-                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{b.provider} • {b.date || 'N/A'}</p>
-                                                                </div>
-                                                                <p className="font-black text-slate-900 shrink-0 text-sm">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
+                        {/* Recent History Box */}
+                        <div className="glass-card p-10 rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-xl font-black text-surface-900 tracking-tighter">Recent Jobs</h2>
+                                <span className="bg-surface-50 text-surface-400 text-[10px] px-3 py-1 rounded-full font-black border border-surface-100">{pastBookings.length}</span>
+                            </div>
+                            <div className="space-y-6">
+                                {pastBookings.length > 0 ? (
+                                    <>
+                                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
+                                            {pastBookings.slice(0, visibleHistoryCount).map(b => (
+                                                <div key={b.id} className="p-6 rounded-3xl bg-surface-50/50 border border-surface-100 hover:border-primary/20 transition-all flex flex-col gap-4 group">
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex-1 min-w-0 pr-4">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <p className="font-black text-surface-900 uppercase text-[10px] tracking-widest truncate">{b.service}</p>
+                                                                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-surface-200 text-surface-500'}`}>
+                                                                    {b.status}
+                                                                </span>
                                                             </div>
-
-                                                            {/* Rating UI for Completed Bookings */}
-                                                            {b.status === 'completed' && (
-                                                                <div className="pt-3 border-t border-slate-50 flex items-center justify-between">
-                                                                    {b.rated ? (
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <div className="flex gap-0.5">
-                                                                                {[...Array(5)].map((_, i) => (
-                                                                                    <Star key={i} className={`w-3 h-3 ${i < (b.ratingGiven || 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
-                                                                                ))}
-                                                                            </div>
-                                                                            <span className="text-[10px] font-black text-amber-600 uppercase tracking-tighter">Your Review</span>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="flex items-center gap-3 w-full animate-in fade-in slide-in-from-bottom-1">
-                                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rate Pro:</p>
-                                                                            <div className="flex gap-1">
-                                                                                {[1, 2, 3, 4, 5].map((num) => (
-                                                                                    <button
-                                                                                        key={num}
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            setRatingState({ bookingId: b.id, rating: num });
-                                                                                        }}
-                                                                                        className="transition-transform active:scale-125"
-                                                                                    >
-                                                                                        <Star 
-                                                                                            className={`w-4 h-4 transition-colors ${
-                                                                                                (ratingState.bookingId === b.id && ratingState.rating >= num)
-                                                                                                ? 'fill-amber-400 text-amber-400'
-                                                                                                : 'text-slate-300 hover:text-amber-300'
-                                                                                            }`} 
-                                                                                        />
-                                                                                    </button>
-                                                                                ))}
-                                                                            </div>
-                                                                            {ratingState.bookingId === b.id && ratingState.rating > 0 && (
-                                                                                <button
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        submitRating(b);
-                                                                                    }}
-                                                                                    className="ml-auto px-4 py-1.5 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest hover:bg-black transition-all shadow-md"
-                                                                                >
-                                                                                    Submit
-                                                                                </button>
-                                                                            )}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            {b.description && (
-                                                                <p className="text-[10px] text-slate-400 italic line-clamp-1 border-l-2 border-slate-200 pl-2">"{b.description}"</p>
-                                                            )}
+                                                            <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest">{b.date || 'N/A'}</p>
                                                         </div>
-                                                    ))}
+                                                        <p className="font-black text-surface-900 shrink-0">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
+                                                    </div>
                                                 </div>
-                                                {visibleHistoryCount < pastBookings.length && (
-                                                    <button 
-                                                        onClick={() => setVisibleHistoryCount(prev => prev + 5)}
-                                                        className="w-full py-3 mt-2 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-bold hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/50 transition-all text-sm"
-                                                    >
-                                                        Load More History ({pastBookings.length - visibleHistoryCount} remaining)
-                                                    </button>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <div className="py-12 text-center text-slate-300">
-                                                <Zap className="w-10 h-10 mx-auto mb-2 opacity-20" />
-                                                <p className="text-sm font-bold">No history available</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="text-center py-4">
-                                    <div className="flex justify-center -space-x-3 mb-8">
-                                        <div className="w-14 h-14 rounded-full border-4 border-white bg-blue-100 flex items-center justify-center text-2xl shadow-lg transform -rotate-12">🧹</div>
-                                        <div className="w-14 h-14 rounded-full border-4 border-white bg-indigo-100 flex items-center justify-center text-2xl shadow-lg z-10 scale-110">⚡</div>
-                                        <div className="w-14 h-14 rounded-full border-4 border-white bg-emerald-100 flex items-center justify-center text-2xl shadow-lg transform rotate-12">🚰</div>
-                                    </div>
-                                    <p className="text-sm font-bold text-slate-800 leading-relaxed italic px-4">
-                                        Empowering Ahmedabad with the most trusted professionals. Secure, fast, and reliable home services at your doorstep.
-                                    </p>
-                                    <div className="mt-6 flex flex-col items-center">
-                                        <div className="flex gap-1 text-blue-500/20">
-                                            {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
+                                            ))}
                                         </div>
-                                        <span className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-widest">Ahmedabad's #1 Service Platform</span>
+                                        {visibleHistoryCount < pastBookings.length && (
+                                            <button 
+                                                onClick={() => setVisibleHistoryCount(prev => prev + 5)}
+                                                className="w-full py-4 border-2 border-dashed border-surface-200 rounded-3xl text-surface-400 font-black hover:border-primary hover:text-primary transition-all text-[10px] uppercase tracking-widest"
+                                            >
+                                                Load More
+                                            </button>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="py-12 text-center">
+                                        <ClockIcon className="w-10 h-10 mx-auto mb-4 text-surface-200 opacity-20" />
+                                        <p className="text-[11px] font-black text-surface-400 uppercase tracking-widest">No history yet</p>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
 
-                        {/* Breakdown Chart — Only for logged in users */}
+                        {/* Service Breakdown Chart */}
                         {userData?.uid && chartData.length > 0 && (
-                            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                                <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3">
-                                    Service Breakdown
-                                </h2>
-                                <div className="h-48">
+                            <div className="glass-card p-10 rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                        <PieChartIcon className="w-5 h-5 text-primary" />
+                                    </div>
+                                    <h2 className="text-xl font-black text-surface-900 tracking-tighter">
+                                        Service Mix
+                                    </h2>
+                                </div>
+                                <div className="h-56">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
-                                            <Pie data={chartData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={5} dataKey="value" stroke="none">
+                                            <Pie data={chartData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={8} dataKey="value" stroke="none">
                                                 {chartData.map((entry, index) => {
-                                                    const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-                                                    return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />;
+                                                    const COLORS = ['#2563eb', '#3b82f6', '#1d4ed8', '#1e40af', '#60a5fa'];
+                                                    return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="hover:opacity-80 transition-opacity cursor-pointer" />;
                                                 })}
                                             </Pie>
-                                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                            <Tooltip 
+                                                contentStyle={{ 
+                                                    borderRadius: '24px', 
+                                                    border: 'none', 
+                                                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+                                                    background: 'rgba(15, 23, 42, 0.9)',
+                                                    color: 'white',
+                                                    padding: '12px 16px'
+                                                }} 
+                                                itemStyle={{ color: 'white', fontWeight: 'bold' }}
+                                            />
                                         </PieChart>
                                     </ResponsiveContainer>
+                                </div>
+                                <div className="mt-6 flex flex-wrap gap-3">
+                                    {chartData.map((entry, index) => (
+                                        <div key={index} className="flex items-center gap-2 px-3 py-1 bg-surface-50 rounded-full border border-surface-100">
+                                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#2563eb', '#3b82f6', '#1d4ed8', '#1e40af', '#60a5fa'][index % 5] }}></div>
+                                            <span className="text-[9px] font-black text-surface-500 uppercase tracking-widest">{entry.name}</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
@@ -1383,132 +1302,115 @@ const CustomerHome = () => {
             )}
 
 
-            {/* Provider Detail Modal — All fields null-safe */}
+            {/* Provider Detail Modal — Premium Glassmorphism Design */}
             {
                 selectedProviderProfile && (() => {
                     const p = selectedProviderProfile;
-                    const name = p.name || 'Provider';
+                    const name = p.name || 'Service Specialist';
                     const initial = name.charAt(0).toUpperCase();
-                    const category = Array.isArray(p.category) ? p.category.join(', ') : (p.category || 'Professional Service');
+                    const category = Array.isArray(p.category) ? p.category[0] : (p.category || 'General specialist');
                     const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating || 0);
-                    const jobs = parseInt(p.jobs) || parseInt(p.jobCount) || 0;
-                    const areas = Array.isArray(p.serviceAreas) && p.serviceAreas.length > 0
-                        ? p.serviceAreas.join(', ')
-                        : 'Ahmedabad';
-                    const priceDisplay = p.price
-                        ? (typeof p.price === 'string'
-                            ? p.price.replace('₹', '').replace('/hr', '')
-                            : p.price)
-                        : '500';
+                    const jobs = p.jobs || p.jobCount || 0;
+                    const areas = (Array.isArray(p.serviceAreas) ? p.serviceAreas[0] : p.serviceAreas) || 'Ahmedabad';
+                    const price = p.price || 499;
 
                     return (
-                        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setSelectedProviderProfile(null)}>
-                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                                <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0">
-                                    <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-black/20 hover:bg-black/40 rounded-full p-2">
+                        <div className="fixed inset-0 bg-surface-900/40 backdrop-blur-xl z-[100] flex items-center justify-center p-6 sm:p-8 animate-fade-in" onClick={() => setSelectedProviderProfile(null)}>
+                            <div className="bg-white/80 backdrop-blur-3xl rounded-[3.5rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.3)] w-full max-w-2xl max-h-[90vh] overflow-hidden relative flex flex-col border border-white/20" onClick={e => e.stopPropagation()}>
+                                <div className="h-48 bg-linear-to-br from-primary via-indigo-600 to-indigo-700 relative shrink-0">
+                                    <div className="absolute inset-0 bg-mesh opacity-30"></div>
+                                    <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-6 right-6 text-white/50 hover:text-white transition-all bg-white/10 hover:bg-white/20 rounded-full p-3 backdrop-blur-lg border border-white/10">
                                         <XCircle className="w-6 h-6" />
                                     </button>
                                 </div>
-                                <div className="px-8 pb-8 -mt-12 relative">
-                                    <div className="flex justify-between items-end mb-6">
-                                        <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center text-4xl font-black text-indigo-600 border-4 border-white shadow-lg">
+                                
+                                <div className="px-10 pb-10 -mt-16 relative flex-1 overflow-y-auto hide-scrollbar">
+                                    <div className="flex justify-between items-end mb-8">
+                                        <div className="w-32 h-32 bg-white rounded-3xl flex items-center justify-center text-5xl font-black text-primary border-8 border-white shadow-2xl shadow-primary/20 rotate-1 group-hover:rotate-0 transition-transform">
                                             {initial}
                                         </div>
-                                        <div className="flex flex-col gap-2 mb-2 items-end">
+                                        <div className="flex flex-col gap-3 items-end mb-2">
                                             <button
                                                 onClick={(e) => {
-                                                    if (!userData?.uid) {
-                                                        navigate('/login');
-                                                        return;
-                                                    }
-                                                    if (!p.phone) {
-                                                        alert('Phone number not available');
-                                                        return;
-                                                    }
+                                                    if (!userData?.uid) { navigate('/login'); return; }
+                                                    if (!p.phone) { alert('Contact details unavailable.'); return; }
                                                     window.location.href = `tel:${p.phone}`;
                                                 }}
-                                                className="px-8 py-2.5 bg-green-50 text-green-700 font-bold rounded-xl border border-green-200 hover:bg-green-100 transition-all shadow-sm flex items-center justify-center gap-2"
+                                                className="px-8 py-3 bg-emerald-50 text-emerald-600 font-black rounded-2xl border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 text-[10px] uppercase tracking-widest"
                                             >
-                                                <Phone className="w-4 h-4" /> Call Pro
+                                                <Phone className="w-4 h-4" /> Direct Call
                                             </button>
-                                            <button onClick={() => handleBook(p)} className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-all">
-                                                Book This Pro
+                                            <button onClick={() => handleBook(p)} className="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-primary/30 hover:bg-primary-dark transition-all hover:scale-105 active:scale-95 text-[10px] uppercase tracking-widest">
+                                                Confirm Booking
                                             </button>
                                         </div>
                                     </div>
 
-                                    <h2 className="text-2xl font-black text-slate-900">{name}</h2>
-                                    <p className="text-slate-500 font-medium">{category} Specialist • {areas}</p>
+                                    <div className="space-y-1">
+                                        <h2 className="text-4xl font-black text-surface-900 tracking-tighter">{name}</h2>
+                                        <p className="text-sm font-bold text-surface-400 uppercase tracking-widest flex items-center gap-2">
+                                            {category} Specialist <span className="w-1 h-1 rounded-full bg-surface-200"></span> {areas}
+                                        </p>
+                                    </div>
 
-                                    <div className="grid grid-cols-3 gap-4 mt-8">
-                                        <div className="bg-amber-50 rounded-2xl p-4 text-center border border-amber-100">
-                                            <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
+                                    <div className="grid grid-cols-3 gap-6 mt-10">
+                                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
+                                            <div className="flex items-center justify-center gap-1.5 text-amber-500 mb-2">
                                                 <Star className="w-5 h-5 fill-current" />
                                             </div>
-                                            <div className="text-xl font-black text-slate-900">{rating > 0 ? rating.toFixed(1) : 'New'}</div>
-                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{rating > 0 ? 'Rating' : 'Status'}</div>
+                                            <div className="text-2xl font-black text-surface-900">{rating > 0 ? rating.toFixed(1) : 'New'}</div>
+                                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Provider Rating</div>
                                         </div>
-                                        <div className="bg-emerald-50 rounded-2xl p-4 text-center border border-emerald-100">
-                                            <div className="flex items-center justify-center gap-1 text-emerald-600 mb-1">
-                                                <CheckCircle2 className="w-5 h-5" />
+                                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
+                                            <div className="flex items-center justify-center gap-1.5 text-primary mb-2">
+                                                <Briefcase className="w-5 h-5" />
                                             </div>
-                                            <div className="text-xl font-black text-slate-900">{jobs}</div>
-                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Jobs Done</div>
+                                            <div className="text-2xl font-black text-surface-900">{jobs}</div>
+                                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Jobs Completed</div>
                                         </div>
-                                        <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
-                                            <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
+                                            <div className="flex items-center justify-center gap-1.5 text-emerald-500 mb-2">
                                                 <IndianRupee className="w-5 h-5" />
                                             </div>
-                                            <div className="text-xl font-black text-slate-900">{priceDisplay}</div>
-                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Rate / Hr</div>
+                                            <div className="text-2xl font-black text-surface-900">₹{price}</div>
+                                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Starting Rate</div>
                                         </div>
                                     </div>
 
-                                    <div className="mt-8">
-                                        <h3 className="font-bold text-slate-900 text-lg mb-4">Previous Work Portfolio</h3>
+                                    {/* Portfolio Section */}
+                                    <div className="mt-12">
+                                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">Work Showcase</p>
                                         <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
                                             {p.portfolio && p.portfolio.length > 0 ? (
                                                 p.portfolio.map((img, idx) => (
-                                                    <img
-                                                        key={idx}
-                                                        src={img}
-                                                        alt={`Work sample ${idx + 1}`}
-                                                        className="w-48 h-32 object-cover rounded-2xl shadow-sm border border-slate-200 snap-center shrink-0"
-                                                        onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80"; }}
-                                                    />
+                                                    <div key={idx} className="w-64 h-40 rounded-[2rem] overflow-hidden shrink-0 snap-center border-4 border-white shadow-xl">
+                                                        <img src={img} alt="Work Portfolio" className="w-full h-full object-cover" />
+                                                    </div>
                                                 ))
                                             ) : (
-                                                <div className="w-full py-12 flex flex-col items-center justify-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 gap-2 min-w-[300px]">
-                                                    <Briefcase className="w-8 h-8 opacity-20" />
-                                                    <p className="text-[10px] font-bold uppercase tracking-widest">No portfolio items yet</p>
+                                                <div className="w-full h-40 bg-surface-50 rounded-[2rem] flex flex-col items-center justify-center border-2 border-dashed border-surface-200">
+                                                    <Briefcase className="w-8 h-8 text-surface-200 mb-2" />
+                                                    <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">No portfolio items available</p>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="mt-8">
-                                        <h3 className="font-bold text-slate-900 text-lg mb-4">Identity Verification</h3>
-                                        <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                            <div className="w-24 h-24 rounded-xl overflow-hidden shadow-sm border border-white">
-                                                <img
-                                                    src={p.proofDocument && p.proofDocument.startsWith('http') ? p.proofDocument : "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"}
-                                                    alt="ID Proof"
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1633265486064-086b219458ce?w=500&q=80"; }}
-                                                />
+                                    {/* Trust & Verification */}
+                                    <div className="mt-12 bg-surface-900 rounded-[2.5rem] p-8 relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+                                        <div className="relative z-10 flex items-center gap-6">
+                                            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/20">
+                                                <img src={p.proofDocument || "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop"} alt="Verification" className="w-full h-full object-cover opacity-80" />
                                             </div>
                                             <div>
-                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{p.idProofType || 'Identity Document'}</p>
-                                                <p className="text-slate-800 font-bold">{p.idProofNumber || 'XXXX-XXXX-XXXX'}</p>
-                                                <p className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded inline-block mt-2">✓ VERIFIED PARTNER</p>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-primary font-black text-[10px] uppercase tracking-widest">Verified Identity</span>
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                                                </div>
+                                                <p className="text-white font-black text-lg tracking-tight">{p.idProofType || 'Government ID'} Linked</p>
+                                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">Secure & background checked</p>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-8 border-t border-slate-100 pt-8">
-                                        <h3 className="font-bold text-slate-900 text-lg mb-4">Customer Reviews</h3>
-                                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl text-center">
-                                            <p className="text-slate-400 font-medium text-sm">Real-time ratings from verified customers will appear here.</p>
                                         </div>
                                     </div>
                                 </div>

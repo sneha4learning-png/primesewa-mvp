@@ -82,126 +82,124 @@ const LandingPage = () => {
         };
     }, [userData]);
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-surface-50">
             {/* Hero Section */}
-            <section className="relative bg-[#0B0F19] text-white pt-32 pb-24 px-4 overflow-hidden">
-                {/* Abstract gradients */}
+            <section className="relative mesh-gradient text-white pt-32 pb-24 px-4 overflow-hidden">
+                {/* Decorative Elements */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden pointer-events-none">
-                    <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob"></div>
-                    <div className="absolute top-32 -left-32 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000"></div>
+                    <div className="absolute -top-32 -right-32 w-96 h-96 bg-primary-light/30 rounded-full mix-blend-overlay filter blur-[100px] animate-pulse"></div>
+                    <div className="absolute top-32 -left-32 w-96 h-96 bg-accent/20 rounded-full mix-blend-overlay filter blur-[100px] animate-pulse delay-1000"></div>
                 </div>
 
                 <div className="max-w-7xl mx-auto relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-                    <div className="text-left space-y-8">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md">
-                            <span className="flex h-2 w-2 rounded-full bg-indigo-400 animate-pulse"></span>
-                            <span className="text-sm font-medium text-indigo-300 tracking-wide">Ahmedabad's #1 Service Platform</span>
+                    <div className="text-left space-y-8 animate-fade-in">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md">
+                            <span className="flex h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
+                            <span className="text-sm font-semibold text-white/90 tracking-wide uppercase">Ahmedabad's #1 Service Platform</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-                            <img src="/logo-v2.png" alt="PrimeSewa" className="h-16 md:h-20 object-contain mb-8 animate-float drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
+                            <img src="/logo-v2.png" alt="PrimeSewa" className="h-16 md:h-20 object-contain mb-8 animate-float drop-shadow-2xl" />
                             Your Home Services, <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
-                                Reimagined.
-                            </span>
+                            <span className="text-white">Reimagined.</span>
                         </h1>
-                        <p className="text-xl text-slate-300 max-w-lg font-light leading-relaxed">
+                        <p className="text-xl text-white/80 max-w-lg font-medium leading-relaxed">
                             Book verified plumbers, electricians, and cleaners in minutes. Get transparent pricing and professional quality, guaranteed.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                            <Link to="/dashboard" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                            <Link to="/dashboard" className="hover-lift inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary-dark rounded-full font-bold text-lg shadow-2xl">
                                 Book a Service <ArrowRight className="w-5 h-5" />
                             </Link>
-                            <Link to="/provider/login?signup=true" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-full font-bold text-lg text-white border border-white/10 transition-all">
+                            <Link to="/provider/login?signup=true" className="hover-lift inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full font-bold text-lg text-white border border-white/20">
                                 Become a Partner
                             </Link>
                         </div>
 
-                        <div className="flex items-center gap-6 pt-8 border-t border-white/10 text-slate-400 text-sm">
+                        <div className="flex items-center gap-6 pt-8 border-t border-white/10 text-white/70 text-sm font-semibold">
                             <div className="flex items-center gap-2">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-400" /> Vetted Pros
+                                <CheckCircle2 className="w-5 h-5 text-secondary" /> Vetted Pros
                             </div>
                             <div className="flex items-center gap-2">
-                                <Zap className="w-5 h-5 text-amber-400" /> Instant Assignment
+                                <Zap className="w-5 h-5 text-accent" /> Instant Assignment
                             </div>
                             <div className="flex items-center gap-2">
-                                <ShieldCheck className="w-5 h-5 text-blue-400" /> 100% Secure
+                                <ShieldCheck className="w-5 h-5 text-primary-light" /> 100% Secure
                             </div>
                         </div>
                     </div>
 
-                    <div className="hidden lg:block relative">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-3xl rotate-3 opacity-30 blur-2xl"></div>
-                        <div className="relative bg-slate-800 rounded-3xl shadow-2xl overflow-hidden aspect-[4/3] border border-white/10">
+                    <div className="hidden lg:block relative animate-fade-in group">
+                        <div className="absolute inset-0 bg-primary/20 rounded-[2.5rem] rotate-3 blur-3xl group-hover:rotate-6 transition-transform duration-700"></div>
+                        <div className="relative glass-card-dark rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/3] border border-white/20">
                             {serviceImages.map((img, idx) => (
                                 <img
                                     key={idx}
                                     src={img}
                                     alt="Professional Handyman"
-                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out mix-blend-overlay ${idx === currentImageIndex ? 'opacity-80' : 'opacity-0'}`}
+                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-60' : 'opacity-0'}`}
                                 />
                             ))}
-                            <div className="absolute top-4 right-4 flex gap-2">
+                            <div className="absolute top-6 right-6 flex gap-2 z-20">
                                 {serviceImages.map((_, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setCurrentImageIndex(idx)}
-                                        className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-indigo-400 w-6' : 'bg-white/30'}`}
+                                        className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${idx === currentImageIndex ? 'bg-white w-8' : 'bg-white/30 hover:bg-white/50'}`}
                                     />
                                 ))}
                             </div>
-                            <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
+                            <div className="absolute bottom-8 left-8 right-8 glass-card border-white/20 p-8 rounded-2xl z-20">
                                 {activeBooking ? (
                                     <>
                                         <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-blue-500 text-white shadow-lg animate-pulse">
-                                                    <Clock className="w-6 h-6" />
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-primary text-white shadow-lg animate-pulse">
+                                                    <Clock className="w-7 h-7" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-white">Live Status: {activeBooking.status}</h4>
-                                                    <p className="text-blue-200 text-sm">{activeBooking.service}</p>
+                                                    <h4 className="font-bold text-surface-900 text-lg">Live Status: {activeBooking.status}</h4>
+                                                    <p className="text-primary font-semibold text-sm">{activeBooking.service}</p>
                                                 </div>
                                             </div>
-                                            <Link to="/dashboard" className="text-white bg-white/20 hover:bg-white/30 p-2 rounded-xl transition-all">
+                                            <Link to="/dashboard" className="bg-surface-100 hover:bg-primary hover:text-white p-3 rounded-xl transition-all shadow-sm">
                                                 <ArrowRight className="w-5 h-5" />
                                             </Link>
                                         </div>
-                                        <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+                                        <div className="h-3 w-full bg-surface-100 rounded-full overflow-hidden shadow-inner">
                                             <div
-                                                className={`h-full bg-gradient-to-r from-blue-400 to-indigo-400 transition-all duration-1000 ${activeBooking.trackingStatus === 'inprogress' ? 'w-full' :
+                                                className={`h-full bg-linear-to-r from-primary to-primary-light transition-all duration-1000 shadow-[0_0_10px_rgba(99,102,241,0.5)] ${activeBooking.trackingStatus === 'inprogress' ? 'w-full' :
                                                     activeBooking.trackingStatus === 'arrived' ? 'w-[75%]' :
                                                         activeBooking.trackingStatus === 'enroute' ? 'w-[50%]' :
                                                             activeBooking.status === 'accepted' ? 'w-[25%]' : 'w-[10%]'
                                                     }`}
                                             ></div>
                                         </div>
-                                        <p className="text-[10px] text-center mt-2 font-bold tracking-widest uppercase text-blue-300">
-                                            Track your service in real-time
+                                        <p className="text-[11px] text-center mt-3 font-extrabold tracking-[0.2em] uppercase text-primary/70">
+                                            Real-time Service Tracking
                                         </p>
                                     </>
                                 ) : (
                                     <>
                                         <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-white text-indigo-600 shadow-md">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black bg-primary text-white shadow-xl shadow-primary/20">
                                                     {(providerDetails?.name || 'A').charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-white">{providerDetails?.name || 'Finding Partner...'}</h4>
-                                                    <p className="text-indigo-200 text-sm">{providerDetails?.category || 'Expert Service'}</p>
+                                                    <h4 className="font-bold text-surface-900 text-lg">{providerDetails?.name || 'Finding Partner...'}</h4>
+                                                    <p className="text-primary font-semibold text-sm">{providerDetails?.category || 'Expert Service'}</p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-1 text-amber-400">
-                                                <Star className="w-5 h-5 fill-current" />
-                                                <span className="font-bold text-white">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
+                                            <div className="flex items-center gap-1.5 bg-accent/10 px-3 py-1.5 rounded-lg border border-accent/20">
+                                                <Star className="w-5 h-5 fill-accent text-accent" />
+                                                <span className="font-bold text-accent">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
                                             </div>
                                         </div>
-                                        <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                                            <div className="h-full bg-gradient-to-r transition-all duration-700 from-blue-400 to-blue-500 w-full animate-pulse"></div>
+                                        <div className="h-3 w-full bg-surface-100 rounded-full overflow-hidden shadow-inner">
+                                            <div className="h-full bg-linear-to-r from-primary to-primary-light w-full animate-pulse transition-all duration-700"></div>
                                         </div>
-                                        <p className="text-[10px] text-center mt-2 font-bold tracking-widest uppercase text-blue-300">
-                                            Top Rated Partner
+                                        <p className="text-[11px] text-center mt-3 font-extrabold tracking-[0.2em] uppercase text-primary/70">
+                                            Top-Tier Verified Partner
                                         </p>
                                     </>
                                 )}
@@ -212,28 +210,32 @@ const LandingPage = () => {
             </section>
 
             {/* Service Categories */}
-            <section className="py-24 px-4 bg-white">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <section className="py-24 px-4 bg-white relative overflow-hidden">
+                <div className="absolute -left-24 top-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                         <div className="max-w-2xl">
-                            <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Services at your doorstep</h2>
-                            <p className="mt-4 text-slate-600 text-lg">Choose from our wide range of professional home services in Ahmedabad.</p>
+                            <span className="text-primary font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Our Services</span>
+                            <h2 className="text-4xl md:text-5xl font-extrabold text-surface-900 tracking-tight leading-tight">Professional care at <br /> your doorstep</h2>
+                            <p className="mt-6 text-surface-800/60 text-lg font-medium leading-relaxed">Choose from our wide range of professional home services expertly handled by verified specialists.</p>
                         </div>
-                        <Link to="/dashboard" className="text-blue-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
+                        <Link to="/dashboard" className="group text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all bg-primary/5 px-6 py-3 rounded-full border border-primary/10">
                             View all services <ArrowRight className="w-5 h-5" />
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         {[
-                            { name: 'Plumbing', icon: '🚰', bg: 'bg-blue-50', color: 'text-blue-600' },
-                            { name: 'Electrical', icon: '⚡', bg: 'bg-amber-50', color: 'text-amber-600' },
-                            { name: 'Cleaning', icon: '🧹', bg: 'bg-emerald-50', color: 'text-emerald-600' },
-                            { name: 'Carpentry', icon: '🔨', bg: 'bg-rose-50', color: 'text-rose-600' }
+                            { name: 'Plumbing', icon: '🚰', color: 'bg-primary/5', hover: 'hover:bg-primary/10' },
+                            { name: 'Electrical', icon: '⚡', color: 'bg-accent/5', hover: 'hover:bg-accent/10' },
+                            { name: 'Cleaning', icon: '🧹', color: 'bg-secondary/5', hover: 'hover:bg-secondary/10' },
+                            { name: 'Carpentry', icon: '🔨', color: 'bg-rose-50', hover: 'hover:bg-rose-100' }
                         ].map((service, i) => (
-                            <Link key={i} to="/dashboard" className="group p-8 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-transparent transition-all duration-300 text-center">
-                                <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform">{service.icon}</span>
-                                <h4 className="font-bold text-slate-900">{service.name}</h4>
+                            <Link key={i} to="/dashboard" className={`group p-10 rounded-[2.5rem] border border-surface-100 bg-surface-50/50 ${service.hover} hover-lift transition-all duration-500 text-center`}>
+                                <div className={`w-20 h-20 ${service.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500 shadow-sm`}>
+                                    <span className="text-4xl">{service.icon}</span>
+                                </div>
+                                <h4 className="font-extrabold text-surface-900 text-lg group-hover:text-primary transition-colors">{service.name}</h4>
                             </Link>
                         ))}
                     </div>
@@ -241,104 +243,104 @@ const LandingPage = () => {
             </section>
 
             {/* Features Layer */}
-            <section className="py-24 px-4 bg-slate-50">
+            <section className="py-32 px-4 bg-surface-50 relative">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16 max-w-2xl mx-auto">
-                        <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Why PrimeSewa?</h2>
-                        <p className="mt-4 text-slate-600 text-lg">We've built a platform that puts quality and trust first.</p>
+                    <div className="text-center mb-20 max-w-2xl mx-auto animate-fade-in">
+                        <span className="text-primary font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Trust PrimeSewa</span>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-surface-900 tracking-tight">Why Choose Us?</h2>
+                        <p className="mt-6 text-surface-800/60 text-lg font-medium leading-relaxed">We've built a platform that puts quality, safety, and your satisfaction at the heart of everything we do.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         {/* Feature 1 */}
-                        <div className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
-                            <div className="w-16 h-16 bg-blue-50 group-hover:bg-blue-600 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300 shadow-sm">
-                                <ShieldCheck className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors duration-300" />
+                        <div className="glass-card hover-lift group p-12 rounded-[2.5rem] border-white/60 transition-all duration-500">
+                            <div className="w-20 h-20 bg-primary/10 group-hover:bg-primary rounded-3xl flex items-center justify-center mb-10 transition-all duration-500 shadow-xl shadow-primary/5">
+                                <ShieldCheck className="w-10 h-10 text-primary group-hover:text-white transition-colors duration-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Vetted & Verified</h3>
-                            <p className="text-slate-600 leading-relaxed font-light">Every partner undergoes a 3-step verification process including background checks and skill assessments.</p>
+                            <h3 className="text-2xl font-bold text-surface-900 mb-5 group-hover:text-primary transition-colors">Vetted & Verified</h3>
+                            <p className="text-surface-800/60 leading-relaxed font-medium">Every partner undergoes a rigorous 3-step verification process including background checks and hands-on skill assessments.</p>
                         </div>
 
                         {/* Feature 2 */}
-                        <div className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
-                            <div className="w-16 h-16 bg-emerald-50 group-hover:bg-emerald-500 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300 shadow-sm">
-                                <Clock className="w-8 h-8 text-emerald-600 group-hover:text-white transition-colors duration-300" />
+                        <div className="glass-card hover-lift group p-12 rounded-[2.5rem] border-white/60 transition-all duration-500">
+                            <div className="w-20 h-20 bg-secondary/10 group-hover:bg-secondary rounded-3xl flex items-center justify-center mb-10 transition-all duration-500 shadow-xl shadow-secondary/5">
+                                <Clock className="w-10 h-10 text-secondary group-hover:text-white transition-colors duration-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Fastest Turnaround</h3>
-                            <p className="text-slate-600 leading-relaxed font-light">Forget waiting for calls. Our instant-match system ensures a professional is assigned within minutes.</p>
+                            <h3 className="text-2xl font-bold text-surface-900 mb-5 group-hover:text-secondary transition-colors">Instant Assistance</h3>
+                            <p className="text-surface-800/60 leading-relaxed font-medium">Forget long wait times. Our smart instant-match algorithm ensures a top-rated professional is on their way within minutes.</p>
                         </div>
 
                         {/* Feature 3 */}
-                        <div className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 group">
-                            <div className="w-16 h-16 bg-amber-50 group-hover:bg-amber-500 rounded-2xl flex items-center justify-center mb-8 transition-colors duration-300 shadow-sm">
-                                <Star className="w-8 h-8 text-amber-600 group-hover:text-white transition-colors duration-300" />
+                        <div className="glass-card hover-lift group p-12 rounded-[2.5rem] border-white/60 transition-all duration-500">
+                            <div className="w-20 h-20 bg-accent/10 group-hover:bg-accent rounded-3xl flex items-center justify-center mb-10 transition-all duration-500 shadow-xl shadow-accent/5">
+                                <Star className="w-10 h-10 text-accent group-hover:text-white transition-colors duration-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">Quality First</h3>
-                            <p className="text-slate-600 leading-relaxed font-light">Transparent pricing and a satisfaction guarantee. You only pay once the job is completed to your liking.</p>
+                            <h3 className="text-2xl font-bold text-surface-900 mb-5 group-hover:text-accent transition-colors">Premium Quality</h3>
+                            <p className="text-surface-800/60 leading-relaxed font-medium">Transparent upfront pricing and a rock-solid satisfaction guarantee. You only pay for results that meet our high standards.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* How it Works */}
-            <section className="py-24 px-4 bg-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-indigo-50/30 -skew-x-12 translate-x-1/2"></div>
+            <section className="py-32 px-4 bg-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2"></div>
                 <div className="max-w-7xl mx-auto relative z-10">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
-                        <div className="space-y-8">
-                            <h2 className="text-4xl font-bold text-slate-900 tracking-tight leading-tight">Book a professional <br /> in 3 simple steps</h2>
+                    <div className="grid lg:grid-cols-2 gap-20 items-center">
+                        <div className="space-y-12 animate-fade-in">
+                            <div>
+                                <span className="text-primary font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Process</span>
+                                <h2 className="text-4xl md:text-5xl font-extrabold text-surface-900 tracking-tight leading-tight">Elevated service in <br /> 3 simple steps</h2>
+                            </div>
 
-                            <div className="space-y-8 mt-12">
-                                <div className="flex gap-6 group">
-                                    <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 font-bold text-xl group-hover:scale-110 transition-transform">1</div>
-                                    <div>
-                                        <h4 className="text-xl font-bold text-slate-900">Choose your service</h4>
-                                        <p className="text-slate-500 mt-2">Select the service you need from our extensive range of home solutions.</p>
+                            <div className="space-y-10">
+                                {[
+                                    { step: '01', title: 'Choose your service', desc: 'Browse our curated catalog and select the professional help you need.' },
+                                    { step: '02', title: 'Set Date & Time', desc: 'Flexible scheduling that adapts to your life. Book for now or for later.' },
+                                    { step: '03', title: 'Relax & Enjoy', desc: 'Our pro arrives on time with everything needed to get the job done right.' }
+                                ].map((item, i) => (
+                                    <div key={i} className="flex gap-8 group">
+                                        <div className="w-16 h-16 rounded-3xl bg-surface-900 text-white flex items-center justify-center shrink-0 font-black text-2xl group-hover:bg-primary transition-all duration-500 shadow-xl shadow-surface-900/10">
+                                            {item.step}
+                                        </div>
+                                        <div className="pt-2">
+                                            <h4 className="text-2xl font-bold text-surface-900 mb-2 group-hover:text-primary transition-colors">{item.title}</h4>
+                                            <p className="text-surface-800/60 text-lg font-medium leading-relaxed">{item.desc}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex gap-6 group">
-                                    <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 font-bold text-xl group-hover:scale-110 transition-transform">2</div>
-                                    <div>
-                                        <h4 className="text-xl font-bold text-slate-900">Set Date & Time</h4>
-                                        <p className="text-slate-500 mt-2">Pick a schedule that works for you. We provide slots all through the week.</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-6 group">
-                                    <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 font-bold text-xl group-hover:scale-110 transition-transform">3</div>
-                                    <div>
-                                        <h4 className="text-xl font-bold text-slate-900">Sit back and relax</h4>
-                                        <p className="text-slate-500 mt-2">Our verified professional will arrive punctually and get the job done right.</p>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
 
-                        <div className="relative">
-                            <div className="bg-slate-900 p-8 rounded-[2rem] shadow-2xl space-y-6 max-w-sm mx-auto">
-                                <div className="flex items-center gap-4 border-b border-slate-800 pb-6">
-                                    <div className="w-12 h-12 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                                        <CheckCircle2 className="w-6 h-6" />
+                        <div className="relative animate-fade-in">
+                            <div className="absolute inset-0 bg-primary/10 rounded-[3rem] blur-3xl -rotate-6"></div>
+                            <div className="bg-surface-900 p-12 rounded-[3rem] shadow-2xl space-y-8 max-w-md mx-auto relative border border-white/10">
+                                <div className="flex items-center gap-5 border-b border-white/10 pb-8">
+                                    <div className="w-16 h-16 rounded-2xl bg-primary/20 text-primary flex items-center justify-center shadow-inner">
+                                        <CheckCircle2 className="w-8 h-8" />
                                     </div>
                                     <div>
-                                        <p className="text-indigo-400 text-xs font-bold uppercase tracking-widest">Confirmation</p>
-                                        <p className="text-white font-bold">Booking Scheduled</p>
+                                        <p className="text-primary text-xs font-black uppercase tracking-[0.25em] mb-1">Confirmation</p>
+                                        <p className="text-white text-xl font-bold">Booking Secured</p>
                                     </div>
                                 </div>
-                                <div className="space-y-4">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500 italic">Service</span>
-                                        <span className="text-white font-medium">Power Fixing</span>
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+                                        <span className="text-white/50 font-bold uppercase tracking-widest text-[10px]">Service</span>
+                                        <span className="text-white font-bold">Smart Lighting Fix</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500 italic">Date</span>
-                                        <span className="text-white font-medium">Tomorrow, 10:00 AM</span>
+                                    <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+                                        <span className="text-white/50 font-bold uppercase tracking-widest text-[10px]">Arrival</span>
+                                        <span className="text-white font-bold">Today, 02:30 PM</span>
                                     </div>
                                 </div>
-                                <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                                    <div className="flex -space-x-2">
-                                        <div className="w-8 h-8 rounded-full border-2 border-slate-900 bg-blue-500"></div>
-                                        <div className="w-8 h-8 rounded-full border-2 border-slate-900 bg-indigo-500"></div>
+                                <div className="pt-8 border-t border-white/10 flex items-center justify-between">
+                                    <div className="flex -space-x-3">
+                                        <div className="w-12 h-12 rounded-2xl border-2 border-surface-900 bg-linear-to-tr from-primary to-primary-light shadow-lg"></div>
+                                        <div className="w-12 h-12 rounded-2xl border-2 border-surface-900 bg-linear-to-tr from-secondary to-emerald-300 shadow-lg"></div>
+                                        <div className="w-12 h-12 rounded-2xl border-2 border-surface-900 bg-surface-800 flex items-center justify-center text-[10px] font-bold text-white shadow-lg">15+</div>
                                     </div>
-                                    <span className="text-xs text-slate-400">12+ active pros near you</span>
+                                    <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Experts Available</span>
                                 </div>
                             </div>
                         </div>
@@ -347,51 +349,71 @@ const LandingPage = () => {
             </section>
 
             {/* Footer */}
-            <footer className="py-20 px-4 bg-slate-900 text-white">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-slate-800 pb-16">
-                        <div className="col-span-1 md:col-span-1 space-y-6">
-                            <Link to="/" className="flex items-center gap-2 group">
-                                <img src="/logo-v2.png" alt="PrimeSewa" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
-                                <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-600 tracking-tighter">PrimeSewa</span>
+            <footer className="py-24 px-4 bg-surface-900 text-white relative overflow-hidden">
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-16 border-b border-white/10 pb-20">
+                        <div className="col-span-1 md:col-span-1 space-y-10">
+                            <Link to="/" className="flex items-center gap-3 group">
+                                <div className="w-12 h-12 bg-white rounded-2xl p-2.5 shadow-xl shadow-white/5 group-hover:scale-110 transition-transform duration-500">
+                                    <img src="/logo-v2.png" alt="PrimeSewa" className="w-full h-full object-contain" />
+                                </div>
+                                <span className="text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-white to-white/70 tracking-tighter">PrimeSewa</span>
                             </Link>
-                            <p className="text-slate-400 leading-relaxed font-light">The most trusted home service platform in Ahmedabad. Quality services, guaranteed.</p>
+                            <p className="text-white/50 leading-relaxed font-medium text-lg">The most trusted and technologically advanced home service marketplace in Ahmedabad.</p>
+                            <div className="flex gap-5">
+                                {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
+                                    <a key={i} href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 text-white/40">
+                                        <Icon className="w-5 h-5" />
+                                    </a>
+                                ))}
+                            </div>
                         </div>
                         <div>
-                            <h4 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">For Customers</h4>
-                            <ul className="space-y-4 text-slate-400 text-sm">
+                            <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Customers</h4>
+                            <ul className="space-y-6 text-white/50 text-sm font-bold">
                                 <li><Link to="/dashboard" className="hover:text-white transition-colors">Book a Service</Link></li>
-                                <li><Link to="/dashboard" className="hover:text-white transition-colors">Service Areas</Link></li>
-                                <li><Link to="/login" className="hover:text-white transition-colors">Customer Login</Link></li>
+                                <li><Link to="/dashboard" className="hover:text-white transition-colors">Coverage Areas</Link></li>
+                                <li><Link to="/login" className="hover:text-white transition-colors">Customer Portal</Link></li>
+                                <li><Link to="/legal" className="hover:text-white transition-colors">Safety Protocols</Link></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">For Partners</h4>
-                            <ul className="space-y-4 text-slate-400 text-sm">
-                                <li><Link to="/provider/login?signup=true" className="hover:text-white transition-colors font-bold text-indigo-400">Join as a Partner</Link></li>
-                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Partner Portal</Link></li>
-                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Earnings Dashboard</Link></li>
+                            <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Partners</h4>
+                            <ul className="space-y-6 text-white/50 text-sm font-bold">
+                                <li><Link to="/provider/login?signup=true" className="text-primary-light hover:text-white transition-colors">Become a Partner</Link></li>
+                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Partner Dashboard</Link></li>
+                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Growth Resources</Link></li>
+                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Partner Support</Link></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">Contact</h4>
-                            <ul className="space-y-4 text-slate-400 text-sm italic font-medium">
-                                <li>support@primesewa.com</li>
-                                <li>+91 90000 00000</li>
-                                <li className="not-italic text-slate-500">Bodakdev, <br /> Ahmedabad</li>
+                            <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">Contact Support</h4>
+                            <ul className="space-y-8 text-white/50 text-sm font-bold">
+                                <li className="flex items-center gap-3">
+                                    <Mail className="w-5 h-5 text-primary" />
+                                    <span>hello@primesewa.com</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <Phone className="w-5 h-5 text-primary" />
+                                    <span>+91 90000 00000</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <MapPin className="w-5 h-5 text-primary shrink-0" />
+                                    <span className="leading-relaxed">Bodakdev, HQ Complex <br /> Ahmedabad, GJ 380054</span>
+                                </li>
                             </ul>
                         </div>
                     </div>
-                    <div className="pt-10 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
-                        <p>© 2026 PrimeSewa Technologies. All rights reserved.</p>
-                        <div className="flex gap-8">
+                    <div className="pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] font-black uppercase tracking-[0.2em] text-white/30">
+                        <p>© 2026 PrimeSewa Technologies. Built for Excellence.</p>
+                        <div className="flex gap-12">
                             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
                             <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                         </div>
                     </div>
                 </div>
             </footer>
-
         </div>
     );
 };
