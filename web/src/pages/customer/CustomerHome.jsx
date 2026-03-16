@@ -1082,54 +1082,72 @@ const CustomerHome = () => {
                                         const category = (Array.isArray(p.category) ? p.category[0] : p.category) || 'General';
 
                                         return (
-                                            <div key={p.id} className="group glass-card rounded-[2.5rem] border border-surface-100 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 overflow-hidden">
-                                                <div className="p-8">
-                                                    <div className="flex items-start justify-between mb-8">
-                                                        <div className="flex items-center gap-5">
-                                                            <div className="w-20 h-20 bg-linear-to-br from-surface-50 to-surface-100 rounded-3xl flex items-center justify-center text-3xl font-black text-primary shadow-inner border border-white">
-                                                                {nameInitial}
-                                                            </div>
-                                                            <div>
-                                                                <div className="flex items-center gap-2 mb-1">
-                                                                    <h3 className="text-xl font-black text-surface-900 tracking-tight">{p.name || 'Professional'}</h3>
-                                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                            <div key={p.id} className="group relative bg-white rounded-[3rem] border border-surface-100 hover:border-primary/20 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.06)] overflow-hidden">
+                                                <div className="p-10">
+                                                    <div className="flex items-center justify-between mb-10">
+                                                        <div className="flex items-center gap-6">
+                                                            <div className="relative">
+                                                                <div className="w-20 h-20 bg-surface-50 rounded-[2rem] flex items-center justify-center text-3xl font-black text-primary border border-surface-100 group-hover:scale-105 transition-transform duration-500">
+                                                                    {nameInitial}
                                                                 </div>
-                                                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">{category} Specialist</p>
-                                                                <div className="flex items-center gap-4 mt-3">
-                                                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg border border-amber-100">
+                                                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-4 border-white shadow-lg"></div>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <h3 className="text-2xl font-black text-surface-900 tracking-tight">{p.name || 'Professional'}</h3>
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{category}</span>
+                                                                    <div className="w-1 h-1 rounded-full bg-surface-200"></div>
+                                                                    <div className="flex items-center gap-1.5">
                                                                         <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
-                                                                        <span className="text-xs font-black text-amber-700">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-surface-50 rounded-lg border border-surface-100">
-                                                                        <Briefcase className="w-3.5 h-3.5 text-surface-500" />
-                                                                        <span className="text-xs font-black text-surface-700">{jobCount} Jobs</span>
+                                                                        <span className="text-xs font-black text-surface-900">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="text-[10px] font-black text-surface-400 uppercase tracking-widest mb-1">Starts From</div>
-                                                            <div className="text-2xl font-black text-surface-900">₹{p.price || 499}<span className="text-xs text-surface-400 font-bold">/hr</span></div>
+                                                            <div className="text-3xl font-black text-surface-900 tracking-tighter">₹{p.price || 499}</div>
+                                                            <p className="text-[10px] font-bold text-surface-400 uppercase tracking-widest mt-1">Starting Rate</p>
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-3 py-6 border-y border-surface-50 mb-8">
-                                                        <MapPin className="w-4 h-4 text-primary" />
-                                                        <p className="text-xs font-bold text-surface-600 truncate">Serves Ahmedabad & surrounding areas</p>
+                                                    <div className="flex items-center gap-12 mb-10 border-t border-surface-50 pt-8">
+                                                        <div>
+                                                            <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Total Jobs</p>
+                                                            <div className="flex items-center gap-2">
+                                                                <Briefcase className="w-4 h-4 text-primary" />
+                                                                <span className="text-sm font-black text-surface-900">{jobCount}+</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="h-8 w-px bg-surface-100"></div>
+                                                        <div>
+                                                            <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Identity</p>
+                                                            <div className="flex items-center gap-2">
+                                                                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                                                                <span className="text-sm font-black text-surface-900">Verified</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="h-8 w-px bg-surface-100"></div>
+                                                        <div className="flex-1">
+                                                            <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-1.5">Location</p>
+                                                            <div className="flex items-center gap-2">
+                                                                <MapPin className="w-4 h-4 text-surface-400" />
+                                                                <span className="text-sm font-bold text-surface-600 truncate">Ahmedabad</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
                                                     <div className="flex gap-4">
                                                         <button 
                                                             onClick={() => setSelectedProviderProfile(p)}
-                                                            className="flex-1 py-4 bg-surface-50 hover:bg-surface-100 text-surface-900 font-black rounded-2xl transition-all text-[10px] uppercase tracking-widest border border-surface-200"
+                                                            className="px-8 py-4 bg-surface-50 hover:bg-surface-100 text-surface-900 font-black rounded-2xl transition-all text-[10px] uppercase tracking-widest"
                                                         >
-                                                            View Profile
+                                                            Profile
                                                         </button>
                                                         <button 
                                                             onClick={() => handleBook(p)}
-                                                            className="flex-1 py-4 bg-primary hover:bg-primary-dark text-white font-black rounded-2xl transition-all shadow-xl shadow-primary/20 hover-lift text-[10px] uppercase tracking-widest"
+                                                            className="flex-1 py-4 bg-primary hover:bg-primary-dark text-white font-black rounded-2xl transition-all shadow-xl shadow-primary/20 text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3"
                                                         >
-                                                            Book Now
+                                                            Instant Booking <Wrench className="w-4 h-4" />
                                                         </button>
                                                     </div>
                                                 </div>
