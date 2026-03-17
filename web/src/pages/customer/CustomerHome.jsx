@@ -47,34 +47,42 @@ import { useNotifications } from '../../context/NotificationContext';
 const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) => {
     // Prevent body scroll when modal is open
     useEffect(() => {
+        console.log('ProviderProfileModal Mounted with:', p?.name);
         document.body.style.overflow = 'hidden';
-        return () => { document.body.style.overflow = 'unset'; };
+        return () => { 
+            console.log('ProviderProfileModal Unmounted');
+            document.body.style.overflow = 'unset'; 
+        };
     }, []);
 
     if (!p) return null;
     
-    const name = String(p.name || 'Service Specialist');
-    const initial = name.charAt(0).toUpperCase();
-    const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
-    const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(String(p.rating || 0));
-    const jobs = String(p.jobs || p.jobCount || '0');
-    const areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
-    const price = String(p.price || '499');
-    
-    // Safety check for portfolio and docs
-    const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
-    const proofDocument = typeof p.proofDocument === 'string' ? p.proofDocument : (Array.isArray(p.proofDocument) ? p.proofDocument[0] : '');
-
+    let name, initial, category, ratingValue, jobs, areas, price, portfolio, proofDocument;
+    try {
+        name = String(p.name || 'Service Specialist');
+        initial = name.charAt(0).toUpperCase();
+        category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
+        ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(String(p.rating || 0));
+        jobs = String(p.jobs || p.jobCount || '0');
+        areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
+        price = String(p.price || '499');
+        portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
+        proofDocument = typeof p.proofDocument === 'string' ? p.proofDocument : (Array.isArray(p.proofDocument) ? p.proofDocument[0] : '');
+    } catch (e) {
+        console.error('Error processing provider data:', e);
+        return null;
+    }
 
     return (
-        <div className="fixed inset-0 bg-surface-900/60 backdrop-blur-md z-[100] grid place-items-center p-4 sm:p-8 animate-fade-in overflow-y-auto" onClick={onClose}>
-            <div className="bg-white rounded-[3rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] w-full max-w-2xl max-h-[90vh] overflow-hidden relative flex flex-col border border-white/40 my-auto" onClick={e => e.stopPropagation()}>
-                <div className="h-48 bg-linear-to-br from-primary via-indigo-600 to-indigo-700 relative shrink-0">
-                    <div className="absolute inset-0 bg-mesh opacity-30"></div>
-                    <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white transition-all bg-white/10 hover:bg-white/20 rounded-full p-3 backdrop-blur-lg border border-white/10">
+        <div className="fixed inset-0 bg-black/60 z-[1000] flex items-center justify-center p-4 overflow-y-auto" onClick={onClose}>
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden relative flex flex-col border border-slate-200" onClick={e => e.stopPropagation()}>
+                <div className="h-32 bg-primary relative shrink-0">
+                    <button onClick={onClose} className="absolute top-4 right-4 text-white hover:opacity-70 transition-all bg-black/20 rounded-full p-2">
                         <XCircle className="w-6 h-6" />
                     </button>
                 </div>
+
+
                 
                 <div className="px-10 pb-10 -mt-16 relative flex-1 overflow-y-auto hide-scrollbar">
                     <div className="flex justify-between items-end mb-8">
