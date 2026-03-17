@@ -33,7 +33,7 @@ const ProviderLogin = () => {
     });
 
     const [providers, setProviders] = useState([]);
-    const { setCurrentUser, setUserData } = useAuth();
+    const { currentUser, userData, setCurrentUser, setUserData } = useAuth();
     const { sendNotification } = useNotifications();
     const navigate = useNavigate();
     const location = useLocation();
