@@ -45,6 +45,7 @@ function App() {
             <Route path="profile" element={<CustomerRoute><CustomerProfile /></CustomerRoute>} />
             <Route path="privacy" element={<LegalPage type="privacy" />} />
             <Route path="terms" element={<LegalPage type="terms" />} />
+            <Route path="safety" element={<LegalPage type="safety" />} />
           </Route>
 
           {/* Admin Routes */}

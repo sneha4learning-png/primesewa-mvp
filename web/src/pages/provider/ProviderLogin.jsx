@@ -39,12 +39,17 @@ const ProviderLogin = () => {
     const location = useLocation();
 
     useEffect(() => {
+        // Redirection for already logged-in providers
+        if (currentUser && userData?.role === 'provider') {
+            navigate('/provider');
+        }
+        
         // Check for signup query param
         const searchParams = new URLSearchParams(location.search);
         if (searchParams.get('signup') === 'true') {
             setIsSignup(true);
         }
-    }, [location.search]);
+    }, [location.search, currentUser, userData, navigate]);
 
     useEffect(() => {
         const fetchProviders = async () => {

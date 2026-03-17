@@ -375,16 +375,14 @@ const LandingPage = () => {
                                 <li><Link to="/dashboard" className="hover:text-white transition-colors">Book a Service</Link></li>
                                 <li><Link to="/dashboard" className="hover:text-white transition-colors">Coverage Areas</Link></li>
                                 <li><Link to="/login" className="hover:text-white transition-colors">Customer Portal</Link></li>
-                                <li><Link to="/legal" className="hover:text-white transition-colors">Safety Protocols</Link></li>
+                                <li><Link to="/safety" className="hover:text-white transition-colors">Safety Protocols</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Partners</h4>
                             <ul className="space-y-6 text-white/50 text-sm font-bold">
-                                <li><Link to="/provider/login?signup=true" className="text-primary-light hover:text-white transition-colors">Become a Partner</Link></li>
-                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Partner Dashboard</Link></li>
-                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Growth Resources</Link></li>
-                                <li><Link to="/provider/login" className="hover:text-white transition-colors">Partner Support</Link></li>
+                                <li><Link to="/provider/login?signup=true" className="text-primary-light hover:text-white transition-colors">Partner Registration</Link></li>
+                                <li><Link to="/provider" className="hover:text-white transition-colors">Partner Portal</Link></li>
                             </ul>
                         </div>
                         <div>

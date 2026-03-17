@@ -9,12 +9,18 @@ const LegalPage = ({ type }) => {
                     <ArrowLeft className="w-4 h-4" /> Back to Home
                 </Link>
                 <h1 className="text-4xl font-black text-slate-900 mb-6">
-                    {type === 'privacy' ? 'Privacy Policy' : 'Terms of Service'}
+                    {type === 'privacy' ? 'Privacy Policy' : type === 'safety' ? 'Safety Protocols' : 'Terms of Service'}
                 </h1>
                 <div className="prose text-slate-600 font-medium">
                     <p className="mb-6 text-sm text-slate-400 font-bold uppercase tracking-wider">Last updated: {new Date().toLocaleDateString()}</p>
-                    <p className="mb-4 text-lg">This is a placeholder page for the PrimeSewa {type === 'privacy' ? 'Privacy Policy' : 'Terms of Service'}.</p>
-                    <p className="text-lg">The actual comprehensive document will be updated here prior to the official public launch.</p>
+                    <p className="mb-4 text-lg">
+                        This is a placeholder page for the PrimeSewa {type === 'privacy' ? 'Privacy Policy' : type === 'safety' ? 'Safety Protocols' : 'Terms of Service'}.
+                    </p>
+                    <p className="text-lg">
+                        {type === 'safety' 
+                            ? 'Our safety protocols ensure a secure and trusted environment for both customers and partners. We conduct rigorous identity verification and background checks for every professional joined to our platform.'
+                            : 'The actual comprehensive document will be updated here prior to the official public launch.'}
+                    </p>
                 </div>
             </div>
         </div>
