@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useMemo, Component } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
@@ -46,8 +47,12 @@ import { useNotifications } from '../../context/NotificationContext';
 
 const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) => {
     useEffect(() => {
+        console.log('PORTAL: Modal Mounting for', p?.name);
         document.body.style.overflow = 'hidden';
-        return () => { document.body.style.overflow = 'unset'; };
+        return () => { 
+            console.log('PORTAL: Modal Unmounting');
+            document.body.style.overflow = 'unset'; 
+        };
     }, []);
 
     if (!p) return null;
@@ -60,98 +65,87 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
     const areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
     const price = String(p.price || '499');
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
-    const proofDocument = typeof p.proofDocument === 'string' ? p.proofDocument : (Array.isArray(p.proofDocument) ? p.proofDocument[0] : '');
 
-    return (
+    return createPortal(
         <div 
-            className="fixed inset-0 w-full h-full bg-slate-900/90 flex items-center justify-center p-4 sm:p-6" 
-            style={{ zIndex: 9999, transition: 'none' }}
+            className="fixed inset-0 w-full h-full bg-black/90 flex items-center justify-center p-4 sm:p-6" 
+            style={{ zIndex: 99999, position: 'fixed', top: 0, left: 0 }}
             onClick={onClose}
         >
             <div 
                 className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden relative flex flex-col border border-slate-200"
-                style={{ opacity: 1, visibility: 'visible', transition: 'none' }}
                 onClick={e => e.stopPropagation()}
             >
-                {/* Header Section */}
-                <div className="h-32 bg-indigo-600 shrink-0 relative">
+                {/* Header */}
+                <div className="h-28 bg-indigo-600 shrink-0 relative">
                     <button 
                         onClick={onClose}
-                        className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+                        className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white"
                     >
                         <XCircle className="w-6 h-6" />
                     </button>
-                    <div className="absolute -bottom-12 left-10">
-                        <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center text-4xl font-black text-indigo-600 border-4 border-white shadow-xl">
+                    <div className="absolute -bottom-10 left-10">
+                        <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-3xl font-black text-indigo-600 border-4 border-white shadow-xl">
                             {initial}
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-16 px-10 pb-10 flex-1 overflow-y-auto overflow-x-hidden">
-                    <div className="flex justify-between items-start mb-8">
+                <div className="pt-12 px-10 pb-10 flex-1 overflow-y-auto">
+                    <div className="flex justify-between items-start mb-6">
                         <div>
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">{name}</h2>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
-                                {category} • Ahmedabad
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">{name}</h2>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                {category} • Verified Partner
                             </p>
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <button 
-                                onClick={() => handleBook(p)}
-                                className="px-6 py-3 bg-indigo-600 text-white font-black rounded-xl shadow-lg hover:bg-indigo-700 transition-all text-[10px] uppercase tracking-widest"
-                            >
-                                Book Service
-                            </button>
-                        </div>
+                        <button 
+                            onClick={() => handleBook(p)}
+                            className="px-6 py-3 bg-indigo-600 text-white font-black rounded-xl text-[10px] uppercase"
+                        >
+                            Book
+                        </button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-6 mb-10">
-                        <div className="bg-slate-50 p-5 rounded-2xl text-center">
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                        <div className="bg-slate-50 p-4 rounded-xl text-center">
                             <Star className="w-4 h-4 text-amber-500 mx-auto mb-1 fill-current" />
-                            <div className="text-xl font-black text-slate-900">{(ratingValue > 0 && !isNaN(ratingValue)) ? ratingValue.toFixed(1) : 'New'}</div>
-                            <div className="text-[8px] font-bold text-slate-400 uppercase">Rating</div>
+                            <div className="text-lg font-black text-slate-900">{(ratingValue > 0 && !isNaN(ratingValue)) ? ratingValue.toFixed(1) : 'New'}</div>
                         </div>
-                        <div className="bg-slate-50 p-5 rounded-2xl text-center">
+                        <div className="bg-slate-50 p-4 rounded-xl text-center">
                             <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
-                            <div className="text-xl font-black text-slate-900">{jobs}</div>
-                            <div className="text-[8px] font-bold text-slate-400 uppercase">Completed</div>
+                            <div className="text-lg font-black text-slate-900">{jobs}</div>
                         </div>
-                        <div className="bg-slate-50 p-5 rounded-2xl text-center">
+                        <div className="bg-slate-50 p-4 rounded-xl text-center">
                             <IndianRupee className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
-                            <div className="text-xl font-black text-slate-900">₹{price}</div>
-                            <div className="text-[8px] font-bold text-slate-400 uppercase">Per Hour</div>
+                            <div className="text-lg font-black text-slate-900">₹{price}</div>
                         </div>
                     </div>
 
                     {/* Portfolio */}
                     {portfolio.length > 0 && (
-                        <div className="mb-10">
-                            <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-4">Portfolio</h3>
+                        <div className="mb-8">
+                            <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Work Showcase</h3>
                             <div className="flex gap-3 overflow-x-auto pb-2">
                                 {portfolio.map((img, i) => (
-                                    <img key={i} src={String(img)} className="w-48 h-32 rounded-xl object-cover border border-slate-100 shrink-0" alt="" />
+                                    <img key={i} src={String(img)} className="w-40 h-28 rounded-xl object-cover border border-slate-100 shrink-0" alt="" />
                                 ))}
                             </div>
                         </div>
                     )}
 
                     {/* Verification */}
-                    <div className="bg-slate-900 rounded-2xl p-6 flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
-                            <ShieldCheck className="w-6 h-6 text-indigo-400" />
-                        </div>
+                    <div className="bg-slate-900 rounded-xl p-5 flex items-center gap-4">
+                        <ShieldCheck className="w-5 h-5 text-indigo-400" />
                         <div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-[9px] font-black text-indigo-400 uppercase">Verified Provider</span>
-                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                            </div>
-                            <p className="text-white font-bold text-sm tracking-tight">Identity & Skill Verified</p>
+                            <p className="text-white font-bold text-xs">Verified Professional</p>
+                            <p className="text-[9px] text-white/40 uppercase font-black">Identity & background checked</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
