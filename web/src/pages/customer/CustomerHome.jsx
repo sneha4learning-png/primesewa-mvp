@@ -1379,7 +1379,7 @@ const CustomerHome = () => {
                                                                              b.status}
                                                                         </span>
                                                                     </div>
-                                                                    {b.price && <span className="font-black text-white/90 text-lg">₹{b.price}</span>}
+                                                                    {b.price && <span className="font-black text-white/90 text-lg shrink-0 ml-2">₹{b.price}</span>}
                                                                 </div>
                                                                 <h4 className="font-black text-white tracking-tight text-xl leading-none pt-1 group-hover/card:text-primary transition-colors">{b.service}</h4>
                                                                 <span className="text-xs font-bold text-white/40 uppercase tracking-widest mt-1.5 flex items-center justify-between gap-1.5 relative z-20">

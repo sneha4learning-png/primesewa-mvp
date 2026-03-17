@@ -1,13 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bell, X, Check } from 'lucide-react';
 import { useNotifications } from '../context/NotificationContext';
 
 const NotificationBell = () => {
     const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
+    const bellRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (bellRef.current && !bellRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
 
     return (
-        <div className="relative">
+        <div className="relative" ref={bellRef}>
             <button 
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all"
