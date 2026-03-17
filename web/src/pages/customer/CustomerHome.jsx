@@ -45,7 +45,14 @@ const categories = [
 import { useNotifications } from '../../context/NotificationContext';
 
 const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) => {
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = 'unset'; };
+    }, []);
+
     if (!p) return null;
+    
     const name = String(p.name || 'Service Specialist');
     const initial = name.charAt(0).toUpperCase();
     const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
@@ -58,11 +65,6 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
     const proofDocument = typeof p.proofDocument === 'string' ? p.proofDocument : (Array.isArray(p.proofDocument) ? p.proofDocument[0] : '');
 
-    // Prevent body scroll when modal is open
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => { document.body.style.overflow = 'unset'; };
-    }, []);
 
     return (
         <div className="fixed inset-0 bg-surface-900/60 backdrop-blur-md z-[100] grid place-items-center p-4 sm:p-8 animate-fade-in overflow-y-auto" onClick={onClose}>
@@ -1592,13 +1594,15 @@ const CustomerHome = () => {
 
 
             {/* Provider Detail Modal — Premium Glassmorphism Design */}
-            <ProviderProfileModal 
-                p={selectedProviderProfile} 
-                onClose={() => setSelectedProviderProfile(null)}
-                userData={userData}
-                navigate={navigate}
-                handleBook={handleBook}
-            />
+            {selectedProviderProfile && (
+                <ProviderProfileModal 
+                    p={selectedProviderProfile} 
+                    onClose={() => setSelectedProviderProfile(null)}
+                    userData={userData}
+                    navigate={navigate}
+                    handleBook={handleBook}
+                />
+            )}
         </div>
     );
 };
