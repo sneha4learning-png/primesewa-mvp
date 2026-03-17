@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star } from 'lucide-react';
-// Recharts removed as analytics section was removed
+import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc, query, orderBy, limit } from 'firebase/firestore';
 
@@ -184,6 +184,64 @@ const DashboardOverview = () => {
                 <StatCard title="Pending Bookings" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-amber-500" />
                 <StatCard title="Active Providers" value={stats.activeProviders} icon={Users} colorClass="bg-indigo-500" />
                 <StatCard title="Commission Earned" value={`₹${stats.commissionEarned.toFixed(0)}`} icon={DollarSign} colorClass="bg-emerald-500" />
+            </div>
+
+            {/* Analytical Reports Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-indigo-500" /> Booking Trend (7 Days)
+                        </h3>
+                    </div>
+                    <div className="h-64 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={chartData}>
+                                <defs>
+                                    <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
+                                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    itemStyle={{ fontWeight: 'bold', color: '#4f46e5' }}
+                                />
+                                <Area type="monotone" dataKey="bookings" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorBookings)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <DollarSign className="w-5 h-5 text-emerald-500" /> Revenue Trend (7 Days)
+                        </h3>
+                    </div>
+                    <div className="h-64 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    itemStyle={{ fontWeight: 'bold', color: '#10b981' }}
+                                    formatter={(value) => [`₹${value}`, 'Revenue']}
+                                />
+                                <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} barSize={30}>
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={index === 6 ? '#059669' : '#10b981'} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
             </div>
 
             {/* Top 5 Providers */}

@@ -8,6 +8,7 @@ const CommissionDashboard = () => {
     const [commissions, setCommissions] = useState([]);
     const [totalCommission, setTotalCommission] = useState(0);
     const [timeRange, setTimeRange] = useState('All');
+    const [chartData, setChartData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
 
@@ -64,7 +65,23 @@ const CommissionDashboard = () => {
                 setCommissions(sorted);
                 setTotalCommission(sorted.reduce((acc, curr) => acc + (curr.commission || 0), 0));
 
-                // Analytics data processing removed as chart is hidden
+                // Analytics data processing — process records into a daily trend for the chart
+                const dailyTrend = new Map();
+                // Initialize last 7 days including today
+                for(let i=6; i>=0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const ds = d.toISOString().split('T')[0];
+                    dailyTrend.set(ds, { date: ds, label: d.toLocaleDateString('en-US', { weekday: 'short' }), earnings: 0 });
+                }
+
+                sorted.forEach(c => {
+                    if (dailyTrend.has(c.date)) {
+                        const existing = dailyTrend.get(c.date);
+                        existing.earnings += c.commission;
+                    }
+                });
+                setChartData(Array.from(dailyTrend.values()));
             } catch (err) {
                 console.error('Error processing commissions:', err);
             }
@@ -148,6 +165,36 @@ const CommissionDashboard = () => {
             </div>
 
 
+            {/* Analytics Section */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-emerald-500" /> Earnings Trend (Last 7 Days)
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        <Calendar className="w-3.5 h-3.5" /> Platform Cut: 15%
+                    </div>
+                </div>
+                <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                            <Tooltip 
+                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                itemStyle={{ fontWeight: 'bold', color: '#10b981' }}
+                                formatter={(value) => [`₹${value.toFixed(2)}`, 'Platform Earning']}
+                            />
+                            <Bar dataKey="earnings" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40}>
+                                {chartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={index === 6 ? '#059669' : '#10b981'} fillOpacity={0.8} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
 
             {/* Table */}
             <div id="commission-table" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-6">
