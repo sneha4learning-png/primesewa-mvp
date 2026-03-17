@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, PieChart as PieChartIcon } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
@@ -1469,13 +1469,13 @@ const CustomerHome = () => {
             {
                 selectedProviderProfile && (() => {
                     const p = selectedProviderProfile;
-                    const name = p.name || 'Service Specialist';
+                    const name = String(p.name || 'Service Specialist');
                     const initial = name.charAt(0).toUpperCase();
-                    const category = Array.isArray(p.category) ? p.category[0] : (p.category || 'General specialist');
-                    const rating = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating || 0);
-                    const jobs = p.jobs || p.jobCount || 0;
-                    const areas = (Array.isArray(p.serviceAreas) ? p.serviceAreas[0] : p.serviceAreas) || 'Ahmedabad';
-                    const price = p.price || 499;
+                    const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
+                    const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating || 0);
+                    const jobs = String(p.jobs || p.jobCount || '0');
+                    const areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
+                    const price = String(p.price || '499');
 
                     return (
                         <div className="fixed inset-0 bg-surface-900/40 backdrop-blur-xl z-[100] flex items-center justify-center p-6 sm:p-8 animate-fade-in" onClick={() => setSelectedProviderProfile(null)}>
@@ -1521,7 +1521,7 @@ const CustomerHome = () => {
                                             <div className="flex items-center justify-center gap-1.5 text-amber-500 mb-2">
                                                 <Star className="w-5 h-5 fill-current" />
                                             </div>
-                                            <div className="text-2xl font-black text-surface-900">{rating > 0 ? rating.toFixed(1) : 'New'}</div>
+                                            <div className="text-2xl font-black text-surface-900">{ratingValue > 0 ? ratingValue.toFixed(1) : 'New'}</div>
                                             <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Provider Rating</div>
                                         </div>
                                         <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
@@ -1571,7 +1571,7 @@ const CustomerHome = () => {
                                                     <span className="text-primary font-black text-[10px] uppercase tracking-widest">Verified Identity</span>
                                                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                                                 </div>
-                                                <p className="text-white font-black text-lg tracking-tight">{p.idProofType || 'Government ID'} Linked</p>
+                                                <p className="text-white font-black text-lg tracking-tight">{String(p.idProofType || 'Government ID')} Linked</p>
                                                 <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">Secure & background checked</p>
                                             </div>
                                         </div>
