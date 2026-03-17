@@ -139,13 +139,16 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                         <div className="mb-8">
                             <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Work Showcase</h3>
                             <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
-                                {portfolio.map((img, i) => (
+                                {portfolio.filter(Boolean).map((img, i) => (
                                     <img 
                                         key={i} 
                                         src={String(img)} 
-                                        onError={(e) => e.target.style.display = 'none'}
-                                        className="w-40 h-28 rounded-xl object-cover border border-slate-100 shrink-0" 
-                                        alt="" 
+                                        onError={(e) => {
+                                            e.target.onerror = null; // Prevent infinite loop
+                                            e.target.src = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&q=80";
+                                        }}
+                                        className="w-40 h-28 rounded-xl object-cover border border-slate-100 shrink-0 bg-slate-50" 
+                                        alt="Work Sample" 
                                     />
                                 ))}
                             </div>

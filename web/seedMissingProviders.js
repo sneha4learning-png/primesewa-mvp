@@ -18,39 +18,39 @@ const categories = [
         name: 'Plumbing', price: '₹399/hr',
         portfolio: [
             "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=500&q=80",
-            "https://images.unsplash.com/photo-1607472583893-edb999c15597?w=500&q=80",
-            "https://images.unsplash.com/photo-1584622781564-1d9876a13d00?w=500&q=80"
+            "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&q=80",
+            "https://images.unsplash.com/photo-1607472583893-edb999c15597?w=500&q=80"
         ]
     },
     { 
         name: 'Electrical', price: '₹449/hr',
         portfolio: [
             "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=500&q=80",
-            "https://images.unsplash.com/photo-1509475826633-fed577a2c71b?w=500&q=80",
-            "https://images.unsplash.com/photo-1597424216809-3ba9864aeb18?w=500&q=80"
+            "https://images.unsplash.com/photo-1558223108-630df901230d?w=500&q=80",
+            "https://images.unsplash.com/photo-1565608444338-31620027042f?w=500&q=80"
         ]
     },
     { 
         name: 'Cleaning', price: '₹299/hr',
         portfolio: [
-            "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=500&q=80",
             "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&q=80",
-            "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=500&q=80"
+            "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=500&q=80",
+            "https://images.unsplash.com/photo-1528740561666-dc2479dc08ab?w=500&q=80"
         ]
     },
     { 
         name: 'Carpentry', price: '₹499/hr',
         portfolio: [
             "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=500&q=80",
-            "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&q=80",
-            "https://images.unsplash.com/photo-1588854337115-1c67d9247e4d?w=500&q=80"
+            "https://images.unsplash.com/photo-1588854337115-1c67d9247e4d?w=500&q=80",
+            "https://images.unsplash.com/photo-1601058268499-e52658b8bb88?w=500&q=80"
         ]
     },
     { 
         name: 'Painting', price: '₹349/hr',
         portfolio: [
             "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500&q=80",
-            "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500&q=80",
+            "https://images.unsplash.com/photo-1562648185-4c68e41733fa?w=500&q=80",
             "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?w=500&q=80"
         ]
     },
@@ -73,9 +73,9 @@ const categories = [
     { 
         name: 'Repair', price: '₹399/hr',
         portfolio: [
-            "https://images.unsplash.com/photo-1581244276891-99bc402c6281?w=500&q=80",
-            "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=500&q=80",
-            "https://images.unsplash.com/photo-1517646287270-a54fca7a2310?w=500&q=80"
+            "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=500&q=80",
+            "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500&q=80",
+            "https://images.unsplash.com/photo-1581092162384-8987c1794ed9?w=500&q=80"
         ]
     },
     { 
