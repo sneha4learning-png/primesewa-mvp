@@ -44,6 +44,126 @@ const categories = [
 
 import { useNotifications } from '../../context/NotificationContext';
 
+const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) => {
+    if (!p) return null;
+    const name = String(p.name || 'Service Specialist');
+    const initial = name.charAt(0).toUpperCase();
+    const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
+    const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(String(p.rating || 0));
+    const jobs = String(p.jobs || p.jobCount || '0');
+    const areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
+    const price = String(p.price || '499');
+    
+    // Safety check for portfolio and docs
+    const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
+    const proofDocument = typeof p.proofDocument === 'string' ? p.proofDocument : (Array.isArray(p.proofDocument) ? p.proofDocument[0] : '');
+
+    return (
+        <div className="fixed inset-0 bg-surface-900/40 backdrop-blur-xl z-[100] flex items-center justify-center p-6 sm:p-8 animate-fade-in" onClick={onClose}>
+            <div className="bg-white/80 backdrop-blur-3xl rounded-[3.5rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.3)] w-full max-w-2xl max-h-[90vh] overflow-hidden relative flex flex-col border border-white/20" onClick={e => e.stopPropagation()}>
+                <div className="h-48 bg-linear-to-br from-primary via-indigo-600 to-indigo-700 relative shrink-0">
+                    <div className="absolute inset-0 bg-mesh opacity-30"></div>
+                    <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white transition-all bg-white/10 hover:bg-white/20 rounded-full p-3 backdrop-blur-lg border border-white/10">
+                        <XCircle className="w-6 h-6" />
+                    </button>
+                </div>
+                
+                <div className="px-10 pb-10 -mt-16 relative flex-1 overflow-y-auto hide-scrollbar">
+                    <div className="flex justify-between items-end mb-8">
+                        <div className="w-32 h-32 bg-white rounded-3xl flex items-center justify-center text-5xl font-black text-primary border-8 border-white shadow-2xl shadow-primary/20 rotate-1 group-hover:rotate-0 transition-transform">
+                            {initial}
+                        </div>
+                        <div className="flex flex-col gap-3 items-end mb-2">
+                            <button
+                                onClick={(e) => {
+                                    if (!userData?.uid) { navigate('/login'); return; }
+                                    const phone = String(p.phone || '');
+                                    if (!phone) { alert('Contact details unavailable.'); return; }
+                                    window.location.href = `tel:${phone}`;
+                                }}
+                                className="px-8 py-3 bg-emerald-50 text-emerald-600 font-black rounded-2xl border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 text-[10px] uppercase tracking-widest"
+                            >
+                                <Phone className="w-4 h-4" /> Direct Call
+                            </button>
+                            <button onClick={() => handleBook(p)} className="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-primary/30 hover:bg-primary-dark transition-all hover:scale-105 active:scale-95 text-[10px] uppercase tracking-widest">
+                                Confirm Booking
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <h2 className="text-4xl font-black text-surface-900 tracking-tighter">{name}</h2>
+                        <p className="text-sm font-bold text-surface-400 uppercase tracking-widest flex items-center gap-2">
+                            {category} Specialist <span className="w-1 h-1 rounded-full bg-surface-200"></span> {areas}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-6 mt-10">
+                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
+                            <div className="flex items-center justify-center gap-1.5 text-amber-500 mb-2">
+                                <Star className="w-5 h-5 fill-current" />
+                            </div>
+                            <div className="text-2xl font-black text-surface-900">{(ratingValue > 0 && !isNaN(ratingValue)) ? ratingValue.toFixed(1) : 'New'}</div>
+                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Provider Rating</div>
+                        </div>
+                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
+                            <div className="flex items-center justify-center gap-1.5 text-primary mb-2">
+                                <Briefcase className="w-5 h-5" />
+                            </div>
+                            <div className="text-2xl font-black text-surface-900">{jobs}</div>
+                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Jobs Completed</div>
+                        </div>
+                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
+                            <div className="flex items-center justify-center gap-1.5 text-emerald-500 mb-2">
+                                <IndianRupee className="w-5 h-5" />
+                            </div>
+                            <div className="text-2xl font-black text-surface-900">₹{price}</div>
+                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Starting Rate</div>
+                        </div>
+                    </div>
+
+                    {/* Portfolio Section */}
+                    <div className="mt-12">
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">Work Showcase</p>
+                        <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                            {portfolio.length > 0 ? (
+                                portfolio.map((img, idx) => (
+                                    <div key={idx} className="w-64 h-40 rounded-[2rem] overflow-hidden shrink-0 snap-center border-4 border-white shadow-xl">
+                                        <img src={String(img)} alt="Work Portfolio" className="w-full h-full object-cover" />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="w-full h-40 bg-surface-50 rounded-[2rem] flex flex-col items-center justify-center border-2 border-dashed border-surface-200">
+                                    <Briefcase className="w-8 h-8 text-surface-200 mb-2" />
+                                    <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">No portfolio items available</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Trust & Verification */}
+                    <div className="mt-12 bg-surface-900 rounded-[2.5rem] p-8 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+                        <div className="relative z-10 flex items-center gap-6">
+                            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/20">
+                                <img src={proofDocument || "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop"} alt="Verification" className="w-full h-full object-cover opacity-80" />
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-primary font-black text-[10px] uppercase tracking-widest">Verified Identity</span>
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                                </div>
+                                <p className="text-white font-black text-lg tracking-tight">{String(p.idProofType || 'Government ID')} Linked</p>
+                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">Secure & background checked</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const CustomerHome = () => {
     const navigate = useNavigate();
     const { userData } = useAuth();
@@ -1466,122 +1586,13 @@ const CustomerHome = () => {
 
 
             {/* Provider Detail Modal — Premium Glassmorphism Design */}
-            {
-                selectedProviderProfile && (() => {
-                    const p = selectedProviderProfile;
-                    const name = String(p.name || 'Service Specialist');
-                    const initial = name.charAt(0).toUpperCase();
-                    const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
-                    const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(p.rating || 0);
-                    const jobs = String(p.jobs || p.jobCount || '0');
-                    const areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
-                    const price = String(p.price || '499');
-
-                    return (
-                        <div className="fixed inset-0 bg-surface-900/40 backdrop-blur-xl z-[100] flex items-center justify-center p-6 sm:p-8 animate-fade-in" onClick={() => setSelectedProviderProfile(null)}>
-                            <div className="bg-white/80 backdrop-blur-3xl rounded-[3.5rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.3)] w-full max-w-2xl max-h-[90vh] overflow-hidden relative flex flex-col border border-white/20" onClick={e => e.stopPropagation()}>
-                                <div className="h-48 bg-linear-to-br from-primary via-indigo-600 to-indigo-700 relative shrink-0">
-                                    <div className="absolute inset-0 bg-mesh opacity-30"></div>
-                                    <button onClick={() => setSelectedProviderProfile(null)} className="absolute top-6 right-6 text-white/50 hover:text-white transition-all bg-white/10 hover:bg-white/20 rounded-full p-3 backdrop-blur-lg border border-white/10">
-                                        <XCircle className="w-6 h-6" />
-                                    </button>
-                                </div>
-                                
-                                <div className="px-10 pb-10 -mt-16 relative flex-1 overflow-y-auto hide-scrollbar">
-                                    <div className="flex justify-between items-end mb-8">
-                                        <div className="w-32 h-32 bg-white rounded-3xl flex items-center justify-center text-5xl font-black text-primary border-8 border-white shadow-2xl shadow-primary/20 rotate-1 group-hover:rotate-0 transition-transform">
-                                            {initial}
-                                        </div>
-                                        <div className="flex flex-col gap-3 items-end mb-2">
-                                            <button
-                                                onClick={(e) => {
-                                                    if (!userData?.uid) { navigate('/login'); return; }
-                                                    if (!p.phone) { alert('Contact details unavailable.'); return; }
-                                                    window.location.href = `tel:${p.phone}`;
-                                                }}
-                                                className="px-8 py-3 bg-emerald-50 text-emerald-600 font-black rounded-2xl border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2 text-[10px] uppercase tracking-widest"
-                                            >
-                                                <Phone className="w-4 h-4" /> Direct Call
-                                            </button>
-                                            <button onClick={() => handleBook(p)} className="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-primary/30 hover:bg-primary-dark transition-all hover:scale-105 active:scale-95 text-[10px] uppercase tracking-widest">
-                                                Confirm Booking
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <h2 className="text-4xl font-black text-surface-900 tracking-tighter">{name}</h2>
-                                        <p className="text-sm font-bold text-surface-400 uppercase tracking-widest flex items-center gap-2">
-                                            {category} Specialist <span className="w-1 h-1 rounded-full bg-surface-200"></span> {areas}
-                                        </p>
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-6 mt-10">
-                                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
-                                            <div className="flex items-center justify-center gap-1.5 text-amber-500 mb-2">
-                                                <Star className="w-5 h-5 fill-current" />
-                                            </div>
-                                            <div className="text-2xl font-black text-surface-900">{ratingValue > 0 ? ratingValue.toFixed(1) : 'New'}</div>
-                                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Provider Rating</div>
-                                        </div>
-                                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
-                                            <div className="flex items-center justify-center gap-1.5 text-primary mb-2">
-                                                <Briefcase className="w-5 h-5" />
-                                            </div>
-                                            <div className="text-2xl font-black text-surface-900">{jobs}</div>
-                                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Jobs Completed</div>
-                                        </div>
-                                        <div className="bg-surface-50 rounded-[2rem] p-6 text-center border border-surface-100/50">
-                                            <div className="flex items-center justify-center gap-1.5 text-emerald-500 mb-2">
-                                                <IndianRupee className="w-5 h-5" />
-                                            </div>
-                                            <div className="text-2xl font-black text-surface-900">₹{price}</div>
-                                            <div className="text-[9px] font-black text-surface-400 uppercase tracking-widest mt-1">Starting Rate</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Portfolio Section */}
-                                    <div className="mt-12">
-                                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">Work Showcase</p>
-                                        <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
-                                            {p.portfolio && p.portfolio.length > 0 ? (
-                                                p.portfolio.map((img, idx) => (
-                                                    <div key={idx} className="w-64 h-40 rounded-[2rem] overflow-hidden shrink-0 snap-center border-4 border-white shadow-xl">
-                                                        <img src={img} alt="Work Portfolio" className="w-full h-full object-cover" />
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="w-full h-40 bg-surface-50 rounded-[2rem] flex flex-col items-center justify-center border-2 border-dashed border-surface-200">
-                                                    <Briefcase className="w-8 h-8 text-surface-200 mb-2" />
-                                                    <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">No portfolio items available</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Trust & Verification */}
-                                    <div className="mt-12 bg-surface-900 rounded-[2.5rem] p-8 relative overflow-hidden group">
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
-                                        <div className="relative z-10 flex items-center gap-6">
-                                            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/20">
-                                                <img src={p.proofDocument || "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop"} alt="Verification" className="w-full h-full object-cover opacity-80" />
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-primary font-black text-[10px] uppercase tracking-widest">Verified Identity</span>
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                                                </div>
-                                                <p className="text-white font-black text-lg tracking-tight">{String(p.idProofType || 'Government ID')} Linked</p>
-                                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">Secure & background checked</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })()
-            }
+            <ProviderProfileModal 
+                p={selectedProviderProfile} 
+                onClose={() => setSelectedProviderProfile(null)}
+                userData={userData}
+                navigate={navigate}
+                handleBook={handleBook}
+            />
         </div>
     );
 };
