@@ -58,7 +58,7 @@ const CustomerProfile = () => {
                 <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-500/10">
                     {/* Banner */}
                     <div className="h-40 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?w=1200')] bg-cover mix-blend-overlay opacity-20" />
+                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=2070&auto=format&fit=crop')] bg-cover mix-blend-overlay opacity-20" />
                         <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
                         <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl" />
                     </div>

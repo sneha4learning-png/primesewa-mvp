@@ -7,14 +7,19 @@ import { Phone, ShieldCheck } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const serviceImages = [
-    "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop", // Plumbing
+    "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop", // Electrical
+    "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop", // Cleaning
+    "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop", // Carpentry
+    "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop", // Salon
+    "https://images.unsplash.com/photo-1595438865621-e374be883713?q=80&w=2072&auto=format&fit=crop", // AC Repair
+    "https://images.unsplash.com/photo-1562259949-e85c83efb914?q=80&w=2070&auto=format&fit=crop", // Painting
+    "https://images.unsplash.com/photo-1520038410233-7141be7e6f97?q=80&w=2074&auto=format&fit=crop", // Packers & Movers
+    "https://images.unsplash.com/photo-1581442183244-6338bbade3b9?q=80&w=2070&auto=format&fit=crop", // Pest Control
+    "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070&auto=format&fit=crop"  // Appliance Repair
 ];
 
-const serviceLabels = ['Plumbing', 'Electrical', 'Cleaning', 'Carpentry', 'Salon & Beauty'];
+const serviceLabels = ['Plumbing', 'Electrical', 'Cleaning', 'Carpentry', 'Salon & Beauty', 'AC Repair', 'Home Painting', 'Packers & Movers', 'Pest Control', 'Appliance Repair'];
 
 const LoginPage = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
