@@ -783,13 +783,25 @@ const CustomerHome = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-in">
             {/* Hero Section / Welcome Header */}
-            <div className={`mb-16 relative overflow-hidden rounded-[3.5rem] ${!userData?.uid ? 'bg-surface-900 border border-white/5 p-10 md:p-24 shadow-2xl' : 'bg-linear-to-br from-primary/5 via-transparent to-transparent p-12'}`}>
-                <div className="absolute top-0 right-10 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none animate-pulse"></div>
-                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-light/10 rounded-full blur-[100px] pointer-events-none animate-float"></div>
-
-                {!userData?.uid && (
+            <div className={`mb-16 relative overflow-hidden rounded-[3.5rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-surface-900 border border-white/5 p-10 md:p-24' : 'bg-white border border-slate-100 p-12 hover:shadow-indigo-500/5'}`}>
+                {/* Mesh Gradient Background for Premium Look */}
+                {userData?.uid && (
                     <div className="absolute inset-0 z-0">
-                        {serviceImages.map((img, idx) => (
+                        <img 
+                            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80" 
+                            className="w-full h-full object-cover opacity-[0.08] mix-blend-multiply" 
+                            alt="" 
+                        />
+                        <div className="absolute inset-0 bg-linear-to-br from-indigo-50/50 via-white/80 to-indigo-50/30"></div>
+                    </div>
+                )}
+                
+                <div className="absolute top-0 right-10 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none animate-pulse"></div>
+                {!userData?.uid && (
+                    <>
+                        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-light/10 rounded-full blur-[100px] pointer-events-none animate-float"></div>
+                        <div className="absolute inset-0 z-0 text-white">
+                            {serviceImages.map((img, idx) => (
                             <img
                                 key={idx}
                                 src={img}
@@ -800,6 +812,7 @@ const CustomerHome = () => {
                         <div className="absolute inset-0 mesh-gradient opacity-60 mix-blend-multiply"></div>
                         <div className="absolute inset-0 bg-linear-to-r from-surface-900 via-surface-900/60 to-transparent"></div>
                     </div>
+                    </>
                 )}
 
                 <div className="relative z-10 max-w-3xl">
@@ -1266,9 +1279,21 @@ const CustomerHome = () => {
                                                         </div>
                                                         <div className="flex flex-col items-end whitespace-nowrap">
                                                             <div className="flex items-baseline gap-0.5">
-                                                                <span className="text-xs font-black text-slate-950">₹</span>
-                                                                <span className="text-xl font-black text-slate-950 tracking-tighter">{p.price || 499}</span>
-                                                                <span className="text-slate-400 text-[9px] font-bold">/hr</span>
+                                                                {(() => {
+                                                                    const rawPrice = String(p.price || '499');
+                                                                    const hasCurrency = rawPrice.includes('₹');
+                                                                    const hasUnit = rawPrice.includes('/') || rawPrice.toLowerCase().includes('job');
+                                                                    const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
+                                                                    const unitPart = rawPrice.includes('/') ? rawPrice.split('/')[1] : (rawPrice.toLowerCase().includes('job') ? 'job' : 'hr');
+                                                                    
+                                                                    return (
+                                                                        <>
+                                                                            <span className="text-xs font-black text-slate-950">₹</span>
+                                                                            <span className="text-xl font-black text-slate-950 tracking-tighter">{pricePart}</span>
+                                                                            <span className="text-slate-400 text-[9px] font-bold">/{unitPart}</span>
+                                                                        </>
+                                                                    );
+                                                                })()}
                                                             </div>
                                                             <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest leading-none">Starting Rate</p>
                                                         </div>
