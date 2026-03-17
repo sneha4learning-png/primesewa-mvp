@@ -58,9 +58,15 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
     const proofDocument = typeof p.proofDocument === 'string' ? p.proofDocument : (Array.isArray(p.proofDocument) ? p.proofDocument[0] : '');
 
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = 'unset'; };
+    }, []);
+
     return (
-        <div className="fixed inset-0 bg-surface-900/40 backdrop-blur-xl z-[100] flex items-center justify-center p-6 sm:p-8 animate-fade-in" onClick={onClose}>
-            <div className="bg-white/80 backdrop-blur-3xl rounded-[3.5rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.3)] w-full max-w-2xl max-h-[90vh] overflow-hidden relative flex flex-col border border-white/20" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-surface-900/60 backdrop-blur-md z-[100] grid place-items-center p-4 sm:p-8 animate-fade-in overflow-y-auto" onClick={onClose}>
+            <div className="bg-white rounded-[3rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] w-full max-w-2xl max-h-[90vh] overflow-hidden relative flex flex-col border border-white/40 my-auto" onClick={e => e.stopPropagation()}>
                 <div className="h-48 bg-linear-to-br from-primary via-indigo-600 to-indigo-700 relative shrink-0">
                     <div className="absolute inset-0 bg-mesh opacity-30"></div>
                     <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white transition-all bg-white/10 hover:bg-white/20 rounded-full p-3 backdrop-blur-lg border border-white/10">
