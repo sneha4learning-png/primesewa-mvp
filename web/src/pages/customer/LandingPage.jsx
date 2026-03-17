@@ -148,7 +148,7 @@ const LandingPage = () => {
                                     />
                                 ))}
                             </div>
-                            <div className="absolute bottom-8 left-8 right-8 glass-card border-white/20 p-8 rounded-2xl z-20">
+                            <div className="absolute bottom-6 right-6 left-auto w-auto min-w-[320px] max-w-[400px] glass-card border-white/20 p-6 rounded-2xl z-20 shadow-2xl animate-fade-in group/card">
                                 {activeBooking ? (
                                     <>
                                         <div className="flex items-center justify-between mb-4">
@@ -174,32 +174,32 @@ const LandingPage = () => {
                                                     }`}
                                             ></div>
                                         </div>
-                                        <p className="text-[11px] text-center mt-3 font-extrabold tracking-[0.2em] uppercase text-primary/70">
-                                            Real-time Service Tracking
+                                        <p className="text-[10px] text-center mt-2.5 font-black tracking-[0.25em] uppercase text-primary/60">
+                                            Service Tracking
                                         </p>
                                     </>
                                 ) : (
                                     <>
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black bg-primary text-white shadow-xl shadow-primary/20">
+                                        <div className="flex items-center justify-between mb-3.5">
+                                            <div className="flex items-center gap-3.5">
+                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black bg-primary text-white shadow-lg group-hover/card:scale-105 transition-transform duration-500">
                                                     {(providerDetails?.name || 'A').charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-surface-900 text-lg">{providerDetails?.name || 'Finding Partner...'}</h4>
-                                                    <p className="text-primary font-semibold text-sm">{providerDetails?.category || 'Expert Service'}</p>
+                                                    <h4 className="font-bold text-surface-900 text-base leading-tight">{providerDetails?.name || 'Finding Partner...'}</h4>
+                                                    <p className="text-primary font-bold text-xs mt-0.5">{providerDetails?.category || 'Expert Service'}</p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-1.5 bg-accent/10 px-3 py-1.5 rounded-lg border border-accent/20">
-                                                <Star className="w-5 h-5 fill-accent text-accent" />
-                                                <span className="font-bold text-accent">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
+                                            <div className="flex items-center gap-1 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
+                                                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                                                <span className="font-black text-amber-600 text-xs">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
                                             </div>
                                         </div>
                                         <div className="h-3 w-full bg-surface-100 rounded-full overflow-hidden shadow-inner">
                                             <div className="h-full bg-linear-to-r from-primary to-primary-light w-full animate-pulse transition-all duration-700"></div>
                                         </div>
-                                        <p className="text-[11px] text-center mt-3 font-extrabold tracking-[0.2em] uppercase text-primary/70">
-                                            Top-Tier Verified Partner
+                                        <p className="text-[9px] text-center mt-2.5 font-black tracking-[0.3em] uppercase text-primary/50">
+                                            Verified Partner
                                         </p>
                                     </>
                                 )}
