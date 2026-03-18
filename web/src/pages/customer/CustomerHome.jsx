@@ -91,7 +91,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                     </div>
                 </div>
 
-                <div className="pt-12 px-10 pb-4 flex-1 overflow-y-auto hide-scrollbar flex flex-col">
+                <div className="pt-12 px-10 pb-12 flex-1 overflow-y-auto hide-scrollbar">
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <h2 className="text-2xl font-black text-slate-900 tracking-tight">{name}</h2>
@@ -136,7 +136,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
 
                     {/* Portfolio */}
                     {portfolio.length > 0 && (
-                        <div className="mb-8">
+                        <div className="mb-4">
                             <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Work Showcase</h3>
                             <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
                                 {portfolio.filter(Boolean).map((img, i) => (
@@ -144,7 +144,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                                         key={i} 
                                         src={String(img)} 
                                         onError={(e) => {
-                                            e.target.onerror = null; // Prevent infinite loop
+                                            e.target.onerror = null;
                                             e.target.src = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&q=80";
                                         }}
                                         className="w-40 h-28 rounded-xl object-cover border border-slate-100 shrink-0 bg-slate-50" 
@@ -155,16 +155,14 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                         </div>
                     )}
 
-                    {/* Verification */}
-                    <div className="bg-slate-900 rounded-3xl p-6 flex items-center gap-5 mt-auto mb-2">
+                    {/* Verification - Moved back inside to avoid "stickiness" */}
+                    <div className="mt-12 bg-slate-900 rounded-2xl p-6 flex items-center gap-5">
                         <ShieldCheck className="w-5 h-5 text-indigo-400" />
                         <div>
                             <p className="text-white font-bold text-xs">Verified Professional</p>
                             <p className="text-[9px] text-white/40 uppercase font-black">Identity & background checked</p>
                         </div>
                     </div>
-                    {/* Bottom Spacer - Permanent Fix for "sticky" feel */}
-                    <div className="h-8 shrink-0"></div>
                 </div>
             </div>
         </div>,
