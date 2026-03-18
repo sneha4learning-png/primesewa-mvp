@@ -91,7 +91,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                     </div>
                 </div>
 
-                <div className="pt-12 px-10 pb-10 flex-1 overflow-y-auto">
+                <div className="pt-12 px-10 pb-6 flex-1 overflow-y-auto hide-scrollbar">
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <h2 className="text-2xl font-black text-slate-900 tracking-tight">{name}</h2>
