@@ -91,7 +91,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                     </div>
                 </div>
 
-                <div className="pt-12 px-10 pb-6 flex-1 overflow-y-auto hide-scrollbar">
+                <div className="pt-12 px-10 pb-16 flex-1 overflow-y-auto hide-scrollbar">
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <h2 className="text-2xl font-black text-slate-900 tracking-tight">{name}</h2>
@@ -156,7 +156,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                     )}
 
                     {/* Verification */}
-                    <div className="bg-slate-900 rounded-xl p-5 flex items-center gap-4">
+                    <div className="bg-slate-900 rounded-2xl p-6 flex items-center gap-5 mt-auto">
                         <ShieldCheck className="w-5 h-5 text-indigo-400" />
                         <div>
                             <p className="text-white font-bold text-xs">Verified Professional</p>
