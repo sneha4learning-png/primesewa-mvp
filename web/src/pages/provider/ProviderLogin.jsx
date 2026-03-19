@@ -129,6 +129,30 @@ const ProviderLogin = () => {
             return;
         }
 
+        // Check for suspension/rejection before sending OTP
+        if (!isSignup) {
+            const existingProv = providers.find(p => {
+                const cleanP = (p.phone || '').replace(/\D/g, '').slice(-10);
+                return cleanP === targetPhone;
+            });
+
+            if (existingProv) {
+                const status = (existingProv.status || '').toLowerCase();
+                if (status === 'suspended' || status === 'blocked') {
+                    setError('Your account has been suspended by the administrator. Please contact support for more information.');
+                    return;
+                }
+                if (status === 'rejected') {
+                    setError('Your application was rejected. Please contact support for details.');
+                    return;
+                }
+            } else {
+                // If not found in our pre-fetched list, it might be a new number
+                // But for login, they must exist. We'll let the error happen later or check it here.
+                // Actually, the user wants immediate feedback if they ARE suspended.
+            }
+        }
+
         setIsLoading(true);
         try {
             const formattedPhone = `+91${targetPhone}`;
