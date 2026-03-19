@@ -114,6 +114,20 @@ const UserManagement = () => {
     return (
         <div className="space-y-6">
 
+            {/* Universal Search Bar */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
+                <div className="relative group">
+                    <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                    <input
+                        type="text"
+                        placeholder="Search consumers by name or phone..."
+                        className="w-full h-[48px] pl-12 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-800 font-medium text-sm outline-none transition-all"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            </div>
+
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
