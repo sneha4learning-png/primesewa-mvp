@@ -45,6 +45,21 @@ const categories = [
 
 import { useNotifications } from '../../context/NotificationContext';
 
+const getServiceImage = (category = '') => {
+    const cat = String(category).toLowerCase();
+    if (cat.includes('plumb')) return "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&q=80";
+    if (cat.includes('electri')) return "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80";
+    if (cat.includes('clean')) return "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80";
+    if (cat.includes('carpent')) return "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=800&q=80";
+    if (cat.includes('salon') || cat.includes('beauty')) return "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80";
+    if (cat.includes('ac')) return "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=800&q=80";
+    if (cat.includes('paint')) return "https://images.unsplash.com/photo-1589939705384-5185138a04b9?w=800&q=80";
+    if (cat.includes('pest')) return "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?w=800&q=80";
+    if (cat.includes('mover') || cat.includes('pack')) return "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=800&q=80";
+    if (cat.includes('appliance')) return "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80";
+    return "https://images.unsplash.com/photo-1542013936693-884638332954?w=800&q=80";
+};
+
 const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) => {
     useEffect(() => {
         console.log('PORTAL: Modal Mounting for', p?.name);
@@ -145,7 +160,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                                         src={String(img)} 
                                         onError={(e) => {
                                             e.target.onerror = null;
-                                            e.target.src = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&q=80";
+                                            e.target.src = getServiceImage(category);
                                         }}
                                         className="w-40 h-28 rounded-xl object-cover border border-slate-100 shrink-0 bg-slate-50" 
                                         alt="Work Sample" 
@@ -896,14 +911,14 @@ const CustomerHome = () => {
                                 <div className="flex gap-6 overflow-x-auto pb-6 hide-scrollbar snap-x">
                                     {pendingBookingData.portfolio && pendingBookingData.portfolio.length > 0 ? (
                                         pendingBookingData.portfolio.map((img, idx) => (
-                                            <div key={idx} className="rounded-3xl overflow-hidden h-40 w-64 border border-surface-100 shadow-lg relative group shrink-0 snap-center">
+                                            <div key={idx} className="rounded-3xl overflow-hidden h-40 w-52 border border-surface-100 shadow-lg relative group shrink-0 snap-center">
                                                 <img
                                                     src={img}
                                                     alt={`Work sample ${idx + 1}`}
                                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                     onError={(e) => {
                                                         e.target.onerror = null;
-                                                        e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
+                                                        e.target.src = getServiceImage(pendingBookingData.service);
                                                     }}
                                                 />
                                                 <div className="absolute inset-0 bg-linear-to-t from-surface-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
@@ -914,12 +929,12 @@ const CustomerHome = () => {
                                     ) : (
                                         <div className="rounded-3xl overflow-hidden h-48 w-full border border-surface-100 shadow-lg relative group">
                                             <img
-                                                src={pendingBookingData.previousWorkSample || 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80'}
+                                                src={pendingBookingData.previousWorkSample || getServiceImage(pendingBookingData.service)}
                                                 alt="Previous Work Sample"
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                 onError={(e) => {
                                                     e.target.onerror = null;
-                                                    e.target.src = 'https://images.unsplash.com/photo-1542013936693-884638332954?w=500&q=80';
+                                                    e.target.src = getServiceImage(pendingBookingData.service);
                                                 }}
                                             />
                                         </div>
