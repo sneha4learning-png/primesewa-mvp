@@ -823,9 +823,9 @@ const CustomerHome = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-in">
+        <div className="max-w-7xl mx-auto px-6 py-8 md:py-12 animate-fade-in">
             {/* Hero Section / Welcome Header */}
-            <div className={`mb-8 relative overflow-hidden rounded-[2.5rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-surface-900 border border-white/5 p-10 md:p-24' : 'bg-white border border-slate-100 p-8 md:p-14 hover:shadow-indigo-500/5'}`}>
+            <div className={`mb-8 relative overflow-hidden rounded-3xl shadow-xl transition-all duration-700 ${!userData?.uid ? 'bg-surface-900 border border-white/5 p-10 md:p-24' : 'bg-white border border-slate-100 p-6 md:p-10 hover:shadow-indigo-500/5'}`}>
                 {/* Mesh Gradient Background for Premium Look */}
                 {userData?.uid && (
                     <div className="absolute inset-0 z-0">
@@ -1176,11 +1176,11 @@ const CustomerHome = () => {
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
                     {/* Main Content Area */}
-                    <div className="lg:col-span-3 space-y-16">
+                    <div className="lg:col-span-3 space-y-12">
                         {/* Improved Premium Search */}
                         <div className="relative group max-w-4xl">
-                            <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-primary-light/10 rounded-[2.5rem] blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
-                            <div className="relative flex items-center bg-white border border-surface-100 rounded-[2rem] shadow-2xl shadow-primary/5 overflow-hidden transition-all duration-500 focus-within:ring-1 focus-within:ring-primary/20">
+                            <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-primary-light/10 rounded-2xl blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
+                            <div className="relative flex items-center bg-white border border-surface-100 rounded-2xl shadow-xl shadow-primary/5 overflow-hidden transition-all duration-500 focus-within:ring-1 focus-within:ring-primary/20">
                                 <div className="pl-8 flex items-center">
                                     <Search className="w-6 h-6 text-surface-300 group-focus-within:text-primary transition-colors duration-300" />
                                 </div>
