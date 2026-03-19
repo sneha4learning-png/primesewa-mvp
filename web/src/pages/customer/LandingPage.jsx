@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Star, Clock, CheckCircle2, ChevronRight, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin, ArrowRight, Play, Wrench, Zap } from 'lucide-react';
+import { ShieldCheck, Star, Clock, CheckCircle2, ChevronRight, MapPin, Phone, Mail, ArrowRight, Play, Wrench, Zap } from 'lucide-react';
 import { useAuth } from '../../firebase/AuthContext';
 import { useState, useEffect } from 'react';
 import { db } from '../../firebase/config';
@@ -366,13 +366,6 @@ const LandingPage = () => {
                                 <span className="text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-white to-white/70 tracking-tighter">PrimeSewa</span>
                             </Link>
                             <p className="text-white/50 leading-relaxed font-medium text-lg">The most trusted and technologically advanced home service marketplace in Ahmedabad.</p>
-                            <div className="flex gap-5">
-                                {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                                    <a key={i} href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 text-white/40">
-                                        <Icon className="w-5 h-5" />
-                                    </a>
-                                ))}
-                            </div>
                         </div>
                         <div>
                             <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Customers</h4>

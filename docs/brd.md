@@ -42,9 +42,9 @@ The system will facilitate connecting Customers in Ahmedabad with local verified
 ### A. Dashboard Overview Page
 **Purpose:** High-level operational health snapshot.
 **Metrics Displayed:**
-*   Total Bookings, Pending Bookings, Completed Bookings, Cancellation Rate, Total Revenue, Commission Earned, Active Providers.
+*   Total Bookings, Pending Bookings, Total Revenue, Commission Earned (15%), Active Providers.
 **Calculation Logic:**
-Computed via Firestore `count()` queries on the `bookings` collection. Financials (Total Revenue, Commission Earned) are served from a single, daily-updated aggregated document (`platform_stats`) maintained via Cloud Functions to minimize document reads.
+Computed via real-time Firestore `onSnapshot` listeners on the `bookings` and `providers` collections. Financials (Total Revenue, Commission Earned) are calculated on-the-fly from bookings with `status: 'completed'`.
 
 ### B. Provider Management Module
 **Features:** 
@@ -56,21 +56,21 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 
 ### C. Booking Monitoring Module
 **Features:**
-*   Live list of all bookings across the platform, reverse sorted by most recent.
-*   Filters: Date range, Status, Category, Provider.
-*   Financial Display: Show final negotiated amount or original request amount.
-*   Manual Status Override (Admin god-mode to force cancel or complete a stuck booking).
-*   View booking timeline history.
-**Query Logic:** `db.collection('bookings').where('status', '==', filter).orderBy('createdAt', 'desc')`. Requires composite indexes established in Firestore.
-**Validation:** Any manual override appends a log to the booking's `statusHistory` array detailing the Admin UID and timestamp.
+*   Live list of all bookings across the platform, reverse sorted by `createdAt` timestamp.
+*   Advanced Filters: Status (Pending, Negotiating, Accepted, Completed, Cancelled, Rejected), Date (Today, Yesterday, Tomorrow), Category, Provider.
+*   Financial Display: Show final negotiated price or original request amount.
+*   Booking Journey Timeline: Interactive modal showing lifecycle of each booking.
+**Query Logic:** `db.collection('bookings').onSnapshot(snapshot => { ... sorted by newest first ... })`.
+**Validation:** Admin can track the entire timeline from creation to completion, including provider tracking updates.
 
 ### D. Commission Dashboard
 **Display:** 
-*   List view of recent platform commissions generated per booking.
-*   Aggregated total commission for a selected date range.
-*   Aggregated commission generated per provider.
-*   CSV Export functionality.
-**Query Aggregation Logic:** Reads from a dedicated `/commissions` collection populated exclusively by a secure backend Cloud Function that runs when a booking status changes to `completed`.
+*   List view of recent platform commissions (15% cut) generated per booking.
+*   Aggregated total commission for selected periods (Last 7 Days, This Month, All Time).
+*   Daily Earnings Trend chart (Last 7 Days).
+*   Individual Provider Earning breakdown (85% Net).
+*   CSV Export functionality for financial reporting.
+**Calculation Logic:** Real-time calculation from `bookings` collection filtering for `status == 'completed'`.
 
 ### E. User Management Module
 **Features:**
@@ -87,11 +87,11 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 **Screens & Flow:**
 1.  **Landing Page:** Hero banner, Trust signals, Popular Categories grid. Directs user to login or browse.
 2.  **Login (OTP):** Firebase Phone Auth UI (Mock OTP for MVP). Captures mobile number and verifies OTP.
-3.  **Home Page (`/customer/app`):** Personalized greeting, category selection, top-rated local providers.
-4.  **Category Listing:** Interactive cards to filter top providers by service.
+3.  **Home Page (`/customer/dashboard`):** Personalized greeting, interactive category selection, featured local providers.
+4.  **Category Selection:** Dedicated tiles for: Plumbing, Electrical, Cleaning, Carpentry, Painting, AC Repair, Appliance Repair, Pest Control, Salon & Beauty, Packers & Movers.
 5.  **Provider Listing (Search Results):** Filtered view of active and approved providers matching a selected category.
 6.  **Provider Detail:** Provider initial avatar, ratings, total jobs completed, price estimations.
-7.  **Booking Form:** Captures exact service address, specific **House/Flat/Floor No**, and optional issue description via modal overlay. Integrated with **OpenStreetMap Nominatim** for live address autocomplete and coordinate capture.
+7.  **Booking Form:** Captures exact service address, specific **House/Flat/Floor No**, optional issue description, and preferred Date/Time via modal. Integrated with **OpenStreetMap Nominatim API** for live address autocomplete, reverse geocoding, and coordinate capture.
 8.  **Booking Confirmation:** Success card and status entry placed into "Current Activity". Supports **Guest Booking Persistence**: guest users can fill the form, login, and have their details automatically restored from `sessionStorage`.
 9.  **Booking Status / History:** Live timeline (`pending` > `negotiating` > `accepted` > `completed`). Support for Accepting/Declining custom price proposals. Post-acceptance, a live tracker lets customers monitor provider arrival status. Providers can see precise doorstep details (House No) alongside map links.
 10. **Rating:** Interactive 5-star rating component appears in the "Past Bookings" list once the job is marked `completed`.
@@ -104,8 +104,8 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 **Screens & Flow:**
 1.  **Registration / Login:** Firebase Phone Auth UI (Mock OTP for MVP). Registration requires submitting verifiable identity proof and a portfolio of previous work experience.
 2.  **Dashboard (`/provider`):** Incoming leads and active jobs. Allows accepting, rejecting, or proposing custom prices with instant UI feedback.
-3.  **Active Booking Detail:** Shows customer address, price, and status. Providers can update their arrival tracking status. Includes a button to mark the job as "Completed".
-4.  **Earnings Dashboard (`/provider/earnings`):** Financial ledger showing clear breakdown of Gross Job Total, 15% Platform Fee, and Net Earnings.
+3.  **Active Booking Detail:** Shows customer address (prominent House No), price, and status. Providers update their journey via status buttons: **En Route**, **Arrived**, **In Progress**. Includes a final "Mark as Completed" button.
+4.  **Earnings Overview:** Financial dashboard showing Net Earnings (85%) for Today, This Week, and This Month with a 7-day bar chart trend.
 5.  **Profile (`/provider/profile`):** Read-only view of current ratings, jobs completed, registered phone, and active status.
 
 **Approval Gating Logic:** If a provider is `pending` or `suspended` in the database, they are shown a persistent banner on their dashboard warning them of restricted access until Admin intervention.
@@ -131,14 +131,14 @@ Computed via Firestore `count()` queries on the `bookings` collection. Financial
 1.  **Pending:** Created by customer. Awaiting provider response.
     *   *Path A:* Provider accepts -> shifts to `accepted`.
     *   *Path B:* Provider proposes a new price -> shifts to `negotiating`.
-    *   *Path C:* Provider rejects -> triggers reassignment logic or cancels.
+    *   *Path C:* Provider rejects -> shifts to `rejected`.
 2.  **Negotiating:** Provider proposed a new price.
     *   *Path A:* Customer accepts new price -> shifts to `accepted`.
-    *   *Path B:* Customer declines new price -> shifts to `rejected`.
+    *   *Path B:* Customer declines price -> shifts to `rejected`.
 3.  **Accepted:** Provider has committed.
-    *   *Path A:* Work finishes -> Provider clicks 'Complete' -> shifts to `completed`.
+    *   *Path A:* Work finishes -> Provider updates tracking (`enroute` > `arrived` > `inprogress`) -> clicks 'Complete' -> shifts to `completed`.
     *   *Path B:* Customer cancels -> shifts to `cancelled`.
-4.  **Completed:** Terminal state. Triggers commission calculation.
+4.  **Completed:** Terminal state. Net earnings and commission displayed in dashboards.
 5.  **Cancelled / Rejected:** Terminal state. No commission.
 
 **Firestore Update Flow & Commission:**
@@ -205,7 +205,8 @@ This section highlights the actual technical and feature decisions made during t
     *   Provider Portal: `/provider` and `/provider/login`
 *   **Authentication Resiliency:** Implemented Firebase Phone Auth (reCAPTCHA invisible) with a built-in **Dev Mode Fallback** (OTP: 1234, Admin Password: 'admin') to bypass billing restrictions during testing.
 *   **Automated CI/CD:** Defined a `.github/workflows/deploy.yml` pipeline that dynamically injects environment secrets and deploys to Firebase Hosting on every push to the `main` branch.
-*   **Service Location & Precise Address Tracking:** Integrated **HTML5 Geolocation** and **OpenStreetMap Nominatim API** for free, key-less location services. Captures accurate GPS coordinates for both "Use Current Location" and manual address searches (Forward Geocoding).
+*   **Live Tracking Statuses:** Implemented granular tracking for the provider's journey: `enroute` (🚗), `arrived` (📍), and `inprogress` (🔧), providing real-time transparency to the customer.
 *   **Doorstep Detail (House No):** Implemented a mandatory "House / Flat / Floor No" field to supplement general map addresses, displayed prominently to providers in high-contrast badges for zero-confusion navigation.
 *   **Guest Booking Persistence (Session Recovery):** Implemented `sessionStorage` logic to allow guest users to start a booking, redirect to login, and return with all form data (date, time, address, coordinates) pre-filled.
-*   **Mock State Management:** Utilized persistent local storage via `utils/mockDb.js` alongside Firebase to ensure a seamless end-to-end testing experience for booking logic, provider status toggling, and assignment flows without fully provisioning cloud backends initially.
+*   **Analytics Dashboards:** Integrated **Recharts** for visual tracking of booking trends, revenue, and daily earnings across Admin and Provider panels.
+*   **Mock State Management & Deduplication:** Utilized local phone mock auth with intelligent deduplication logic to prioritize real Firebase Auth profiles over pre-filled dev records during the transition phase.
