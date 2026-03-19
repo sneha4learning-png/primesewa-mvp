@@ -577,6 +577,7 @@ const CustomerHome = () => {
         setTimeError('');
         setSelectedProviderProfile(null);
         setBookingStep(1);
+        window.scrollTo({ top: window.innerWidth < 768 ? 400 : 600, behavior: 'smooth' });
     };
 
     const confirmBooking = async (e) => {
