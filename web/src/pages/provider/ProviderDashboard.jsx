@@ -627,7 +627,7 @@ const ProviderDashboard = () => {
                                         </div>
                                     </div>
                                     <div className="text-xs text-slate-400 flex items-center gap-1">
-                                        <Calendar className="w-3.5 h-3.5" /> {job.date}
+                                        <Calendar className="w-3.5 h-3.5" /> {job.date} • {formatTime(job.time)}
                                     </div>
                                 </div>
                             ))}

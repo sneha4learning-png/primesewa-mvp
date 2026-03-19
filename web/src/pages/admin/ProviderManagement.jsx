@@ -106,6 +106,15 @@ const ProviderManagement = () => {
         }
     };
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return 'N/A';
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
     const filteredProviders = providers.filter(p => {
         const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
             (p.category || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -419,7 +428,7 @@ const ProviderManagement = () => {
                                             <div key={b.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:shadow-sm transition-all bg-white">
                                                 <div>
                                                     <p className="font-bold text-gray-900">{b.service}</p>
-                                                    <p className="text-sm text-gray-500">{b.date} • Customer: {b.customer}</p>
+                                                    <p className="text-sm text-gray-500">{b.date} • {formatTime(b.time)} • Customer: {b.customer}</p>
                                                 </div>
                                                 <div className="text-right flex flex-col items-end gap-2">
                                                     <div>

@@ -1553,7 +1553,7 @@ const CustomerHome = () => {
                                                                 </span>
                                                             </div>
                                                             <h4 className="text-xs font-black text-surface-900">{b.provider || 'Professional'}</h4>
-                                                            <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest mt-1">{b.date || 'N/A'}</p>
+                                                            <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest mt-1">{b.date || 'N/A'} • {formatTime(b.time)}</p>
                                                         </div>
                                                         <p className="font-black text-surface-900 shrink-0 text-sm">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
                                                     </div>

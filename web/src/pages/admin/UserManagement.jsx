@@ -94,6 +94,15 @@ const UserManagement = () => {
         setUserBookings(filtered);
     };
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return 'N/A';
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
     // Table should ONLY show customers, but dropdown uses full mixed list
     const customerList = users.filter(u => u.type === 'customer');
     
@@ -312,7 +321,7 @@ const UserManagement = () => {
                                                 <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
                                                     <div className="flex items-center gap-1.5">
                                                         <Clock className="w-3.5 h-3.5 opacity-60" />
-                                                        {b.date} • {b.time}
+                                                        {b.date} • {formatTime(b.time)}
                                                     </div>
                                                     <div className="w-1 h-1 rounded-full bg-slate-200"></div>
                                                     <div className="flex items-center gap-1.5">
