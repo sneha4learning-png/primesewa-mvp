@@ -156,34 +156,34 @@ const ProviderManagement = () => {
                 {/* Desktop Table */}
                 <table className="hidden md:table w-full text-left border-collapse min-w-[900px]">
                     <thead>
-                        <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-200">
-                            <th className="px-6 py-4 font-medium">Provider Name</th>
-                            <th className="px-6 py-4 font-medium">Category</th>
-                            <th className="px-6 py-4 font-medium">Contact</th>
-                            <th className="px-6 py-4 font-medium">Jobs Done</th>
-                            <th className="px-6 py-4 font-medium">Rating</th>
-                            <th className="px-6 py-4 font-medium">Rate</th>
-                            <th className="px-6 py-4 font-medium relative">Status</th>
-                            <th className="px-6 py-4 font-medium text-right">Actions</th>
+                        <tr className="bg-gray-50 text-gray-500 text-[11px] uppercase tracking-wider border-b border-gray-200">
+                            <th className="px-4 py-4 font-bold">Provider</th>
+                            <th className="px-3 py-4 font-bold">Category</th>
+                            <th className="px-3 py-4 font-bold">Contact</th>
+                            <th className="px-2 py-4 font-bold text-center">Jobs</th>
+                            <th className="px-3 py-4 font-bold text-center">Rating</th>
+                            <th className="px-3 py-4 font-bold">Rate</th>
+                            <th className="px-3 py-4 font-bold">Status</th>
+                            <th className="px-4 py-4 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {paginatedProviders.map(provider => (
-                            <tr key={provider.id} className="hover:bg-blue-50/50 transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-semibold text-gray-900">{provider.name}</div>
-                                    <div className="text-xs text-gray-500">ID: {provider.id}</div>
+                            <tr key={provider.id} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
+                                <td className="px-4 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-bold text-gray-900 leading-none mb-1">{provider.name}</div>
+                                    <div className="text-[10px] text-gray-400 font-medium tracking-tight">ID: {provider.id}</div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">{provider.category || 'No Category'}</span>
+                                <td className="px-3 py-4 whitespace-nowrap">
+                                    <span className="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-tight">{provider.category || 'Service'}</span>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.phone}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{provider.jobs || 0}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    <div className="flex items-center gap-1.5 font-bold text-amber-500">
+                                <td className="px-3 py-4 whitespace-nowrap text-[12px] font-medium text-gray-600">{provider.phone}</td>
+                                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 text-center font-bold">{provider.jobs || 0}</td>
+                                <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    <div className="flex items-center justify-center gap-1 font-black text-amber-500">
                                         {provider.rating > 0 ? (
                                             <>
-                                                <Star className="w-4 h-4 fill-current" />
+                                                <Star className="w-3.5 h-3.5 fill-current" />
                                                 {Number(provider.rating).toFixed(1)}
                                             </>
                                         ) : (
@@ -191,17 +191,17 @@ const ProviderManagement = () => {
                                         )}
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{provider.price || '₹500/hr'}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
+                                <td className="px-3 py-4 whitespace-nowrap text-sm font-black text-emerald-600">₹{String(provider.price || '500').replace('₹', '')}</td>
+                                <td className="px-3 py-4 whitespace-nowrap">
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border
                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
                                             provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                                                 'bg-red-50 text-red-700 border-red-200'}`}>
-                                        {(provider.status || 'pending').charAt(0).toUpperCase() + (provider.status || 'pending').slice(1)}
+                                        {provider.status || 'pending'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div className="flex items-center justify-end gap-2 flex-wrap max-w-[300px]">
+                                <td className="px-4 py-4 whitespace-nowrap text-right">
+                                    <div className="flex items-center justify-end gap-1.5 flex-nowrap">
                                         <button onClick={() => handleViewHistory(provider)} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors shadow-sm border border-blue-100" title="View Details & History">
                                             <Search className="w-4 h-4" />
                                         </button>
