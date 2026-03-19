@@ -265,17 +265,17 @@ const LoginPage = () => {
                             <div className="space-y-4">
                                 <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest text-center">Enter Verification Code</label>
                                 <input
-                                    type="text"
+                                    type="password"
                                     required
                                     maxLength={4}
-                                    className="w-full px-4 py-5 bg-white/5 border border-white/10 rounded-3xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[1.5rem] text-3xl text-white placeholder-white/5 outline-none"
+                                    className="w-full px-4 py-6 bg-white/5 border border-white/10 rounded-3xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[2rem] text-4xl text-white placeholder-white/5 outline-none"
                                     placeholder="••••"
                                     value={otp}
-                                    onChange={e => setOtp(e.target.value)}
+                                    onChange={(e) => setOtp(e.target.value)}
                                 />
                                 <div className="bg-primary/5 p-3 rounded-xl border border-primary/10">
                                     <p className="text-center text-[10px] font-bold text-primary-light uppercase tracking-widest">
-                                        Dev Mode: Use <span className="text-white">1234</span>
+                                        Dev Mode: Use <span className="text-white">••••</span>
                                     </p>
                                 </div>
                             </div>

@@ -497,7 +497,7 @@ const ProviderLogin = () => {
                             <div className="space-y-6">
                                 <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest text-center">Verify Identity Code</label>
                                 <input
-                                    type="text"
+                                    type="password"
                                     required
                                     maxLength={4}
                                     className="w-full px-4 py-6 bg-white/5 border border-white/10 rounded-3xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[2rem] text-4xl text-white placeholder-white/5 outline-none"
@@ -507,7 +507,7 @@ const ProviderLogin = () => {
                                 />
                                 <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 text-center">
                                     <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Code sent to +91 {isSignup ? signupData.phone : phoneNumber}</p>
-                                    <p className="text-[10px] font-black text-primary-light uppercase tracking-widest">Dev Mode: Use <span className="text-white">1234</span></p>
+                                    <p className="text-[10px] font-black text-primary-light uppercase tracking-widest">Dev Mode: Use <span className="text-white">••••</span></p>
                                 </div>
                             </div>
                             <div className="space-y-4">
