@@ -630,7 +630,7 @@ const CustomerHome = () => {
         if (bookingDate === getTodayStr() && bookingTime) {
             const nowStr = getNowTimeStr();
             if (bookingTime <= nowStr) {
-                setTimeError(`Please select a future time. Current time is ${nowStr}.`);
+                setTimeError(`Please select a future time. Current time is ${formatTime(nowStr)}.`);
                 return;
             }
         }
@@ -993,7 +993,7 @@ const CustomerHome = () => {
                                             onChange={(e) => {
                                                 const selected = e.target.value;
                                                 if (bookingDate === getTodayStr() && selected && selected <= getNowTimeStr()) {
-                                                    setTimeError(`Please pick a time after ${getNowTimeStr()} for today.`);
+                                                    setTimeError(`Please pick a time after ${formatTime(getNowTimeStr())} for today.`);
                                                     setBookingTime('');
                                                 } else {
                                                     setTimeError('');
