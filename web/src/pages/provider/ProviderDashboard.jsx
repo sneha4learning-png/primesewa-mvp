@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Naviga
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
-import { collection, doc, updateDoc, addDoc, query, where, serverTimestamp, onSnapshot, increment, getDocs } from 'firebase/firestore';
+import { collection, doc, updateDoc, addDoc, query, where, serverTimestamp, onSnapshot, increment, getDocs, writeBatch } from 'firebase/firestore';
 import { useNotifications } from '../../context/NotificationContext';
 
 const ProviderDashboard = () => {
@@ -201,8 +201,11 @@ const ProviderDashboard = () => {
         const platformCut = finalPrice * 0.15;
 
         try {
+            const batch = writeBatch(db);
+
             // Update booking status
-            await updateDoc(doc(db, 'bookings', job.id), {
+            const bookingRef = doc(db, 'bookings', job.id);
+            batch.update(bookingRef, {
                 status: 'completed',
                 completedAt: serverTimestamp(),
                 price: finalPrice
@@ -211,7 +214,7 @@ const ProviderDashboard = () => {
             // Increment the provider's job counter in the providers collection
             if (userData?.uid) {
                 const providerRef = doc(db, 'providers', userData.uid);
-                await updateDoc(providerRef, {
+                batch.update(providerRef, {
                     jobs: increment(1)
                 });
             } else {
@@ -221,15 +224,16 @@ const ProviderDashboard = () => {
                     const q = query(collection(db, 'providers'), where('name', '==', provName));
                     const qSnap = await getDocs(q);
                     if (!qSnap.empty) {
-                        await updateDoc(doc(db, 'providers', qSnap.docs[0].id), {
+                        batch.update(doc(db, 'providers', qSnap.docs[0].id), {
                             jobs: increment(1)
                         });
                     }
                 }
             }
 
-            // BUG-5: Write commission record to Firestore so Admin commission page shows data
-            await addDoc(collection(db, 'commissions'), {
+            // Write commission record - this isn't strictly part of the provider's state but part of the transaction
+            const commissionRef = doc(collection(db, 'commissions'));
+            batch.set(commissionRef, {
                 bookingId: job.id,
                 provider: job.provider || userData?.name || 'Unknown',
                 amount: finalPrice,
@@ -240,6 +244,8 @@ const ProviderDashboard = () => {
                 date: new Date().toISOString().split('T')[0],
                 createdAt: serverTimestamp()
             });
+
+            await batch.commit();
 
             setActiveJobs(prev => prev.filter(j => j.id !== job.id));
             setHistoricalBookings(prev => prev.map(j => j.id === job.id ? { ...j, status: 'completed' } : j));

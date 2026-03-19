@@ -184,6 +184,47 @@ const CleanupPage = () => {
                     </button>
 
                     <button
+                        onClick={async () => {
+                            setLoading(true);
+                            setStatus('📊 Syncing Job Counts...');
+                            try {
+                                const bookingsSnap = await getDocs(collection(db, 'bookings'));
+                                const providersSnap = await getDocs(collection(db, 'providers'));
+                                const batch = writeBatch(db);
+                                
+                                const counts = new Map();
+                                bookingsSnap.forEach(d => {
+                                    const b = d.data();
+                                    if (b.status === 'completed' && b.provider) {
+                                        counts.set(b.provider, (counts.get(b.provider) || 0) + 1);
+                                    }
+                                });
+
+                                let updated = 0;
+                                providersSnap.forEach(d => {
+                                    const p = d.data();
+                                    const actual = counts.get(p.name) || 0;
+                                    if (p.jobs !== actual) {
+                                        batch.update(doc(db, 'providers', d.id), { jobs: actual });
+                                        updated++;
+                                    }
+                                });
+
+                                await batch.commit();
+                                setStatus(`✅ SUCCESS! Synchronized job counts for ${updated} providers.`);
+                            } catch (err) {
+                                setStatus(`❌ ERROR: ${err.message}`);
+                            } finally {
+                                setLoading(false);
+                            }
+                        }}
+                        disabled={loading}
+                        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 active:scale-95'}`}
+                    >
+                        Sync Global Job Counts (Profiles ↔ Bookings)
+                    </button>
+
+                    <button
                         onClick={unblockAll}
                         disabled={loading}
                         className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 active:scale-95'}`}

@@ -7,6 +7,7 @@ import { UserCircle, Star, StarHalf, Briefcase, Phone, Tag, MapPin } from 'lucid
 const ProviderProfile = () => {
     const { currentUser, userData } = useAuth();
     const [profile, setProfile] = useState(null);
+    const [completedJobsCount, setCompletedJobsCount] = useState(0);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -50,7 +51,25 @@ const ProviderProfile = () => {
             }
         };
 
+        const fetchCompletedJobs = async () => {
+            const providerName = userData?.name || currentUser?.displayName;
+            if (!providerName) return;
+
+            try {
+                const q = query(
+                    collection(db, 'bookings'),
+                    where('provider', '==', providerName),
+                    where('status', '==', 'completed')
+                );
+                const querySnapshot = await getDocs(q);
+                setCompletedJobsCount(querySnapshot.size);
+            } catch (e) {
+                console.error("Error fetching completed jobs count:", e);
+            }
+        };
+
         fetchProfile();
+        fetchCompletedJobs();
     }, [currentUser, userData]);
 
     if (!profile) return <div className="p-8 text-center">Loading Profile...</div>;
@@ -100,7 +119,7 @@ const ProviderProfile = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500 font-medium">Jobs Completed</p>
-                                        <p className="font-bold text-gray-900">{profile.jobs || 0} Jobs</p>
+                                        <p className="font-bold text-gray-900">{completedJobsCount} Jobs</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">

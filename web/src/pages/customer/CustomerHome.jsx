@@ -61,14 +61,29 @@ const getServiceImage = (category = '') => {
 };
 
 const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) => {
+    const [liveJobsCount, setLiveJobsCount] = useState(p?.jobs || p?.jobCount || 0);
+
     useEffect(() => {
         console.log('PORTAL: Modal Mounting for', p?.name);
         document.body.style.overflow = 'hidden';
+
+        const fetchLiveJobs = async () => {
+            if (!p?.name) return;
+            try {
+                const q = query(collection(db, 'bookings'), where('provider', '==', p.name), where('status', '==', 'completed'));
+                const snap = await getDocs(q);
+                setLiveJobsCount(snap.size);
+            } catch (e) {
+                console.error("Error fetching live jobs count in modal:", e);
+            }
+        };
+        fetchLiveJobs();
+
         return () => { 
             console.log('PORTAL: Modal Unmounting');
             document.body.style.overflow = 'unset'; 
         };
-    }, []);
+    }, [p?.name]);
 
     if (!p) return null;
 
@@ -76,7 +91,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
     const initial = name.charAt(0).toUpperCase();
     const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
     const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(String(p.rating || 0));
-    const jobs = String(p.jobs || p.jobCount || '0');
+    const jobs = String(liveJobsCount);
     const areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
     const price = String(p.price || '499');
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
@@ -91,11 +106,17 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
                 className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden relative flex flex-col border border-slate-200"
                 onClick={e => e.stopPropagation()}
             >
-                {/* Header */}
-                <div className="h-28 bg-indigo-600 shrink-0 relative">
+                {/* Header with Service-relevant Image */}
+                <div className="h-40 shrink-0 relative overflow-hidden group/header">
+                    <img 
+                        src={getServiceImage(category)} 
+                        alt={category} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover/header:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-indigo-950/80 via-indigo-950/30 to-transparent"></div>
                     <button 
                         onClick={onClose}
-                        className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white"
+                        className="absolute top-4 right-4 z-50 p-2 bg-black/20 backdrop-blur-md hover:bg-black/40 rounded-full text-white transition-all shadow-lg"
                     >
                         <XCircle className="w-6 h-6" />
                     </button>
