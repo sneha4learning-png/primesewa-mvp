@@ -423,7 +423,7 @@ const ProviderManagement = () => {
                             <div className="p-6">
                                 <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Booking History ({providerBookings.length} jobs)</h4>
                                 {providerBookings.length > 0 ? (
-                                    <div className="space-y-3">
+                                    <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                                         {providerBookings.map(b => (
                                             <div key={b.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:shadow-sm transition-all bg-white">
                                                 <div>
