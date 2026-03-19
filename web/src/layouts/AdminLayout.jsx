@@ -1,8 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { db } from '../firebase/config';
-import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
-import { LayoutDashboard, Users, UserCog, CalendarDays, DollarSign, LogOut, Bell, Menu, X, Wrench, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { LayoutDashboard, Users, UserCog, CalendarDays, DollarSign, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
 import NotificationBell from '../components/NotificationBell';
 

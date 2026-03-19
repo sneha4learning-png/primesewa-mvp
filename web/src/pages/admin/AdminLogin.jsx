@@ -141,6 +141,9 @@ const AdminLogin = () => {
                                     autoFocus
                                 />
                             </div>
+                            <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10 text-center mt-2">
+                                <p className="text-[10px] font-black text-primary-light uppercase tracking-widest">Dev Mode: Use <span className="text-white">••••</span></p>
+                            </div>
                         </div>
 
                         {error && (
