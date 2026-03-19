@@ -167,10 +167,10 @@ const LoginPage = () => {
 
             {/* Login Card */}
             <div className="relative z-10 max-w-md w-full animate-fade-in">
-                <div className="glass-card-dark rounded-[2.5rem] shadow-2xl border-white/10 p-10 text-white">
-                    <div className="text-center mb-10">
-                        <div className="flex flex-col items-center justify-center mb-6">
-                            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-primary/20 p-4 transition-transform hover:scale-110 duration-500">
+                <div className="glass-card-dark rounded-[2.5rem] shadow-2xl border-white/10 p-8 text-white">
+                    <div className="text-center mb-6">
+                        <div className="flex flex-col items-center justify-center mb-4">
+                            <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-2xl shadow-primary/20 p-3 transition-transform hover:scale-110 duration-500">
                                 <img
                                     src="/logo-v2.png"
                                     alt="PrimeSewa"
@@ -178,13 +178,13 @@ const LoginPage = () => {
                                     onError={e => { e.target.style.display = 'none'; }}
                                 />
                             </div>
-                            <span className="text-4xl font-black text-white tracking-tighter">PrimeSewa</span>
-                            <span className="text-[10px] font-black text-primary-light mt-2 uppercase tracking-[0.25em]">Premium Service Marketplace</span>
+                            <span className="text-3xl font-black text-white tracking-tighter">PrimeSewa</span>
+                            <span className="text-[10px] font-black text-primary-light mt-1 uppercase tracking-[0.25em]">Premium Service Marketplace</span>
                         </div>
-                        <h2 className="text-2xl font-bold tracking-tight text-white mb-2">
+                        <h2 className="text-xl font-bold tracking-tight text-white mb-1">
                             {step === 1 ? 'Welcome Back' : 'Security Verification'}
                         </h2>
-                        <p className="text-white/40 text-sm font-medium">
+                        <p className="text-white/40 text-xs font-medium">
                             {step === 1
                                 ? 'Access your portal to book premium services'
                                 : `Verification code sent to +91 ${phoneNumber}`}
@@ -199,7 +199,7 @@ const LoginPage = () => {
                     )}
 
                     {step === 1 ? (
-                        <form onSubmit={handleSendOtp} className="space-y-6">
+                        <form onSubmit={handleSendOtp} className="space-y-4">
                             <div className="space-y-2">
                                 <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Full Name</label>
                                 <input
@@ -242,8 +242,8 @@ const LoginPage = () => {
                                 ) : (<><Phone className="w-5 h-5" /> Get Access Code</>)}
                             </button>
 
-                            <div className="pt-8 border-t border-white/5 mt-4">
-                                <p className="text-center text-[10px] font-black text-white/20 mb-5 uppercase tracking-widest">Partner Channels</p>
+                            <div className="pt-4 border-t border-white/5 mt-4">
+                                <p className="text-center text-[10px] font-black text-white/20 mb-3 uppercase tracking-widest">Partner Channels</p>
                                 <div className="flex gap-4">
                                     <Link
                                         to="/provider/login?signup=true"
@@ -261,14 +261,14 @@ const LoginPage = () => {
                             </div>
                         </form>
                     ) : (
-                        <form onSubmit={handleVerifyOtp} className="space-y-8">
-                            <div className="space-y-4">
+                        <form onSubmit={handleVerifyOtp} className="space-y-4">
+                            <div className="space-y-2">
                                 <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest text-center">Enter Verification Code</label>
                                 <input
                                     type="password"
                                     required
                                     maxLength={4}
-                                    className="w-full px-4 py-6 bg-white/5 border border-white/10 rounded-3xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[2rem] text-4xl text-white placeholder-white/5 outline-none"
+                                    className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[1rem] text-2xl text-white placeholder-white/5 outline-none"
                                     placeholder="••••"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
@@ -279,7 +279,7 @@ const LoginPage = () => {
                                     </p>
                                 </div>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-2">
                                 <button
                                     type="submit"
                                     disabled={isLoading}

@@ -308,10 +308,10 @@ const ProviderLogin = () => {
             </div>
 
             <div className={`relative z-10 w-full animate-fade-in ${isSignup ? 'max-w-2xl' : 'max-w-md'}`}>
-                <div className="glass-card-dark rounded-[2.5rem] shadow-2xl border-white/10 p-10 md:p-12 text-white">
-                    <div className="text-center mb-10 flex flex-col items-center">
-                        <div className="flex flex-col items-center justify-center mb-8">
-                            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-primary/20 p-4 transition-transform hover:scale-110 duration-500">
+                <div className="glass-card-dark rounded-[2.5rem] shadow-2xl border-white/10 p-8 md:p-10 text-white">
+                    <div className="text-center mb-6 flex flex-col items-center">
+                        <div className="flex flex-col items-center justify-center mb-4">
+                            <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-2xl shadow-primary/20 p-3 transition-transform hover:scale-110 duration-500">
                                 <img
                                     src="/logo-v2.png"
                                     alt="PrimeSewa"
@@ -319,23 +319,23 @@ const ProviderLogin = () => {
                                     onError={e => { e.target.style.display = 'none'; }}
                                 />
                             </div>
-                            <span className="text-4xl font-black text-white tracking-tighter">PrimeSewa</span>
-                            <span className="text-[10px] font-black text-primary-light mt-2 uppercase tracking-[0.25em]">Partner Network</span>
+                            <span className="text-3xl font-black text-white tracking-tighter">PrimeSewa</span>
+                            <span className="text-[10px] font-black text-primary-light mt-1 uppercase tracking-[0.25em]">Partner Network</span>
                         </div>
-                        <h2 className="text-2xl font-bold tracking-tight text-white mb-2">{isSignup ? 'Business Registration' : 'Partner Portal'}</h2>
-                        <p className="text-white/40 text-sm font-medium">{isSignup ? 'Scale your service business with our global reach' : 'Manage your enterprise operations'}</p>
+                        <h2 className="text-xl font-bold tracking-tight text-white mb-1">{isSignup ? 'Business Registration' : 'Partner Portal'}</h2>
+                        <p className="text-white/40 text-xs font-medium">{isSignup ? 'Scale your service business with our global reach' : 'Manage your enterprise operations'}</p>
                     </div>
 
                     {error && (
-                        <div className="mb-8 bg-red-500/10 border border-red-500/20 text-red-400 px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3 animate-fade-in">
+                        <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3 animate-fade-in">
                             <AlertCircle className="w-5 h-5 shrink-0" />
                             {error}
                         </div>
                     )}
 
                     {isSignup && step === 1 ? (
-                        <form onSubmit={handleSendOtp} className="space-y-8 animate-fade-in">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <form onSubmit={handleSendOtp} className="space-y-4 animate-fade-in">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Legal Name</label>
                                     <input required type="text" className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white placeholder-white/10 outline-none" value={signupData.name} onChange={e => setSignupData({ ...signupData, name: e.target.value })} placeholder="Full name as per ID" />
@@ -373,7 +373,7 @@ const ProviderLogin = () => {
                                 </div>
                             </div>
 
-                            <div className="pt-6 border-t border-white/5 space-y-6">
+                            <div className="pt-4 border-t border-white/5 space-y-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                                         <ShieldCheck className="w-4 h-4 text-primary-light" />
@@ -381,7 +381,7 @@ const ProviderLogin = () => {
                                     <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Verification & Compliance</p>
                                 </div>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">ID Authority</label>
                                         <select required className="w-full px-5 py-4 bg-white/10 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white outline-none appearance-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1rem' }} value={signupData.idProofType} onChange={e => setSignupData({ ...signupData, idProofType: e.target.value })}>
@@ -397,7 +397,7 @@ const ProviderLogin = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Work Portfolio (Optional)</label>
                                         <label className={`w-full flex justify-center items-center gap-3 py-5 border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-all ${signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? 'border-primary bg-primary/10 text-primary-light' : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/30'}`}>
@@ -423,7 +423,7 @@ const ProviderLogin = () => {
                                 </div>
                             </div>
 
-                            <div className="pt-10 space-y-6">
+                            <div className="pt-6 space-y-4">
                                 <button type="submit" disabled={isLoading} className={`w-full py-5 rounded-2xl font-black text-white transition-all flex items-center justify-center gap-3 hover-lift shadow-2xl ${isLoading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark shadow-primary/20'}`}>
                                     {isLoading ? (
                                         <span className="flex items-center gap-2">
@@ -439,7 +439,7 @@ const ProviderLogin = () => {
                                     </p>
                                 </div>
 
-                                <div className="pt-8 border-t border-white/5">
+                                <div className="pt-4 border-t border-white/5">
                                     <Link to="/login" className="w-full flex items-center justify-center gap-3 py-4 bg-white/5 hover:bg-white/10 text-[10px] font-black text-white/40 rounded-2xl border border-white/10 transition-all uppercase tracking-widest">
                                         🏠 Switch to Client Channel
                                     </Link>
@@ -447,8 +447,8 @@ const ProviderLogin = () => {
                             </div>
                         </form>
                     ) : step === 1 ? (
-                        <form onSubmit={handleSendOtp} className="space-y-8 animate-fade-in">
-                            <div className="space-y-4">
+                        <form onSubmit={handleSendOtp} className="space-y-6 animate-fade-in">
+                            <div className="space-y-2">
                                 <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1 text-center">Authorized Mobile Number</label>
                                 <div className="relative group">
                                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-primary-light/50 font-black text-lg border-r border-white/10 pr-4">+91</span>
@@ -485,7 +485,7 @@ const ProviderLogin = () => {
                                     </p>
                                 </div>
 
-                                <div className="pt-8 border-t border-white/5">
+                                <div className="pt-4 border-t border-white/5">
                                     <Link to="/login" className="w-full flex items-center justify-center gap-3 py-4 bg-white/5 hover:bg-white/10 text-[10px] font-black text-white/40 rounded-2xl border border-white/10 transition-all uppercase tracking-widest">
                                         🏠 Switch to Client Channel
                                     </Link>
@@ -493,24 +493,24 @@ const ProviderLogin = () => {
                             </div>
                         </form>
                     ) : (
-                        <form onSubmit={handleVerifyOtp} className="space-y-10 animate-fade-in">
-                            <div className="space-y-6">
+                        <form onSubmit={handleVerifyOtp} className="space-y-6 animate-fade-in">
+                            <div className="space-y-2">
                                 <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest text-center">Verify Identity Code</label>
                                 <input
                                     type="password"
                                     required
                                     maxLength={4}
-                                    className="w-full px-4 py-6 bg-white/5 border border-white/10 rounded-3xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[2rem] text-4xl text-white placeholder-white/5 outline-none"
+                                    className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[1rem] text-2xl text-white placeholder-white/5 outline-none"
                                     placeholder="••••"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
                                 />
-                                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 text-center">
+                                <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10 text-center">
                                     <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Code sent to +91 {isSignup ? signupData.phone : phoneNumber}</p>
                                     <p className="text-[10px] font-black text-primary-light uppercase tracking-widest">Dev Mode: Use <span className="text-white">••••</span></p>
                                 </div>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-2">
                                 <button
                                     type="submit"
                                     disabled={isLoading}
