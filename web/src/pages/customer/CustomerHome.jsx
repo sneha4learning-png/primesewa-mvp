@@ -825,7 +825,7 @@ const CustomerHome = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-in">
             {/* Hero Section / Welcome Header */}
-            <div className={`mb-16 relative overflow-hidden rounded-[3.5rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-surface-900 border border-white/5 p-10 md:p-24' : 'bg-white border border-slate-100 p-12 hover:shadow-indigo-500/5'}`}>
+            <div className={`mb-8 relative overflow-hidden rounded-[2.5rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-surface-900 border border-white/5 p-10 md:p-24' : 'bg-white border border-slate-100 p-8 md:p-14 hover:shadow-indigo-500/5'}`}>
                 {/* Mesh Gradient Background for Premium Look */}
                 {userData?.uid && (
                     <div className="absolute inset-0 z-0">
@@ -858,12 +858,12 @@ const CustomerHome = () => {
                 )}
 
                 <div className="relative z-10 max-w-3xl">
-                    <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full mb-8 shadow-sm backdrop-blur-md border ${!userData?.uid ? 'bg-white/5 border-white/10' : 'bg-surface-100 border-surface-200'}`}>
-                        <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
-                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${!userData?.uid ? 'text-white' : 'text-slate-600'}`}>Verified Professionals in Ahmedabad</span>
+                    <div className={`inline-flex items-center gap-3 px-5 py-2 rounded-full mb-6 shadow-sm backdrop-blur-md border ${!userData?.uid ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+                        <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${!userData?.uid ? 'text-white' : 'text-slate-500'}`}>Verified Professionals in Ahmedabad</span>
                     </div>
 
-                    <h1 className={`text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[1.1] mb-6 ${!userData?.uid ? 'text-white' : 'text-slate-950'}`}>
+                    <h1 className={`text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[1] mb-2 ${!userData?.uid ? 'text-white' : 'text-slate-950'}`}>
                         {!userData?.uid ? (
                             <>
                                 Premium <br />
@@ -873,7 +873,7 @@ const CustomerHome = () => {
                             </>
                         ) : (
                             <>
-                                <span className="block text-slate-500 text-lg md:text-xl font-bold tracking-tight mb-2">Welcome Back,</span>
+                                <span className="block text-slate-500 text-sm md:text-base font-bold tracking-tight mb-1">Welcome Back,</span>
                                 <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-indigo-600 to-indigo-800">
                                     {userData.name || 'Prime User'}
                                 </span>
@@ -896,7 +896,7 @@ const CustomerHome = () => {
                             </div>
                         </div>
                     ) : (
-                        <p className="text-lg md:text-xl font-bold text-slate-400 mt-4 tracking-tight">What can we help you with today?</p>
+                        <p className="text-sm md:text-base font-bold text-slate-400 mt-2 tracking-tight">What can we help you with today?</p>
                     )}
                 </div>
             </div>
