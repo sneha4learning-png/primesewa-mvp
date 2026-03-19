@@ -151,8 +151,8 @@ const DashboardOverview = () => {
                     return timeB - timeA;
                 });
 
-                setRecentBookings(sortedRecent.filter(b => b.status !== 'rejected' && b.status !== 'cancelled').slice(0, 3));
-                setRecentDeclined(sortedRecent.filter(b => b.status === 'rejected' || b.status === 'cancelled').slice(0, 3));
+                setRecentBookings(sortedRecent.filter(b => b.status !== 'rejected' && b.status !== 'cancelled').slice(0, 6));
+                setRecentDeclined(sortedRecent.filter(b => b.status === 'rejected' || b.status === 'cancelled').slice(0, 6));
 
                 // Get pending providers (robust check for missing status field)
                 setPendingProviders(providers.filter(p => (p.status === 'pending' || !p.status)));
