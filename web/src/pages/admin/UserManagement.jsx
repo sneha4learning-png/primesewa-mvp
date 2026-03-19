@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, UserX, Activity, ShieldAlert, UserCheck, ChevronDown, Filter } from 'lucide-react';
+import { Search, MapPin, UserX, Activity, XCircle, Clock } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
 import { useNotifications } from '../../context/NotificationContext';
@@ -11,6 +11,7 @@ const UserManagement = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
     const [userBookings, setUserBookings] = useState([]);
+    const [allBookings, setAllBookings] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -21,16 +22,17 @@ const UserManagement = () => {
                 const qUsers = query(collection(db, 'users'), where('role', '==', 'customer'));
                 const usersSnap = await getDocs(qUsers);
                 
-                // 2. Fetch Providers
-                const providersSnap = await getDocs(collection(db, 'providers'));
-                
-                // 3. Fetch Bookings for count
+                // 2. Fetch Bookings for count
                 const bookingsSnap = await getDocs(collection(db, 'bookings'));
+                const allBookingsList = [];
                 const bookingCounts = {};
                 bookingsSnap.forEach((doc) => {
                     const b = doc.data();
+                    allBookingsList.push({ id: doc.id, ...b });
                     if (b.customer) bookingCounts[b.customer] = (bookingCounts[b.customer] || 0) + 1;
                 });
+
+                setAllBookings(allBookingsList);
 
                 const allAccounts = [];
                 const seenIds = new Set();
@@ -49,23 +51,6 @@ const UserManagement = () => {
                         status: data.status || 'active',
                         type: 'customer',
                         collection: 'users'
-                    });
-                });
-
-                // Process Providers for the dropdown
-                providersSnap.forEach((doc) => {
-                    const data = doc.data();
-                    if (seenIds.has(doc.id)) return; // Avoid adding same physical record twice if for some reason it's in both
-                    seenIds.add(doc.id);
-                    allAccounts.push({
-                        id: doc.id,
-                        name: data.name || 'Unknown Partner',
-                        phone: data.phone || 'No phone',
-                        joined: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Recent',
-                        totalBookings: 0,
-                        status: (data.status || 'pending').includes('active') ? 'active' : 'blocked', // Normalize status for simple toggle
-                        type: 'partner',
-                        collection: 'providers'
                     });
                 });
 
@@ -103,19 +88,10 @@ const UserManagement = () => {
         }
     };
 
-    const handleViewHistory = async (user) => {
+    const handleViewHistory = (user) => {
         setSelectedUser(user);
-        try {
-            const q = query(collection(db, 'bookings'), where('customer', '==', user.name));
-            const querySnapshot = await getDocs(q);
-            const fetched = [];
-            querySnapshot.forEach((doc) => {
-                fetched.push({ id: doc.id, ...doc.data() });
-            });
-            setUserBookings(fetched);
-        } catch (err) {
-            console.error("Error fetching user history:", err);
-        }
+        const filtered = allBookings.filter(b => b.customer === user.name);
+        setUserBookings(filtered);
     };
 
     // Table should ONLY show customers, but dropdown uses full mixed list
@@ -126,11 +102,6 @@ const UserManagement = () => {
         u.phone.includes(searchTerm)
     );
 
-    // Universal list for the dropdown
-    const universalList = users.filter(u => 
-        u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.phone.includes(searchTerm)
-    );
 
     // Pagination logic
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -142,51 +113,6 @@ const UserManagement = () => {
 
     return (
         <div className="space-y-6">
-            {/* Quick Account Control */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6">
-                    <div className="flex items-center gap-3 text-white mb-2">
-                        <ShieldAlert className="w-6 h-6 text-amber-500" />
-                        <h2 className="text-xl font-black tracking-tight">Quick Account Control</h2>
-                    </div>
-                    <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">Select an account to instantly block or restore access</p>
-                </div>
-                <div className="p-6 bg-slate-50/50">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1 relative">
-                            <select 
-                                className="w-full h-[52px] pl-4 pr-10 appearance-none bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-800 font-bold text-sm shadow-sm cursor-pointer outline-none transition-all"
-                                onChange={(e) => {
-                                    const user = users.find(u => u.id === e.target.value);
-                                    if (user) {
-                                        handleToggleStatus(user.id, user.status);
-                                        e.target.value = ""; // Reset to default "Select user..." option
-                                    }
-                                }}
-                                value=""
-                            >
-                                <option value="" disabled>Select user to toggle status...</option>
-                                {universalList.map(u => (
-                                    <option key={`${u.type}-${u.id}`} value={u.id} className="py-2">
-                                        {u.type === 'customer' ? '[CONSUMER]' : '[PARTNER]'} {u.name} — {u.status === 'active' ? '✅ ACTIVE' : '🚫 BLOCKED'}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        </div>
-                        <div className="flex-1 relative group">
-                            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                            <input
-                                type="text"
-                                placeholder="Universal name or phone search..."
-                                className="w-full h-[52px] pl-12 pr-4 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-800 font-medium text-sm shadow-sm outline-none transition-all"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
@@ -314,6 +240,97 @@ const UserManagement = () => {
                         >
                             Next
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Customer Booking History Modal */}
+            {selectedUser && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedUser(null)}>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden mx-auto max-h-[85vh] flex flex-col animate-in fade-in zoom-in duration-300" onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
+                                    {selectedUser.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">{selectedUser.name}</h3>
+                                    <p className="text-sm text-gray-500 font-medium">Customer • {selectedUser.phone} • Joined {selectedUser.joined}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setSelectedUser(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-all">
+                                <XCircle className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="overflow-y-auto flex-1 p-6 scrollbar-thin scrollbar-thumb-gray-200">
+                            <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                <Activity className="w-4 h-4 text-blue-500" /> Booking History ({userBookings.length} records)
+                            </h4>
+                            
+                            {userBookings.length > 0 ? (
+                                <div className="space-y-4">
+                                    {userBookings.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)).map(b => (
+                                        <div key={b.id} className="group p-5 rounded-2xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/30 transition-all bg-white shadow-sm hover:shadow-md">
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md tracking-widest">
+                                                            {b.service}
+                                                        </span>
+                                                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-widest ${
+                                                            b.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 
+                                                            b.status === 'cancelled' ? 'bg-rose-100 text-rose-700' : 
+                                                            'bg-amber-100 text-amber-700'
+                                                        }`}>
+                                                            {b.status}
+                                                        </span>
+                                                    </div>
+                                                    <h5 className="font-bold text-slate-900 text-base">Partner: {b.provider || 'Unassigned'}</h5>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-black text-slate-900 text-lg">₹{b.proposedPrice || b.price || 0}</p>
+                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Amount</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+                                                <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Clock className="w-3.5 h-3.5 opacity-60" />
+                                                        {b.date} • {b.time}
+                                                    </div>
+                                                    <div className="w-1 h-1 rounded-full bg-slate-200"></div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <MapPin className="w-3.5 h-3.5 opacity-60" />
+                                                        {b.address?.city || 'Ahmedabad'}
+                                                    </div>
+                                                </div>
+                                                <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
+                                                    ID: {b.id.slice(-6).toUpperCase()}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-16 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                        <Clock className="w-8 h-8 text-slate-200" />
+                                    </div>
+                                    <p className="text-slate-400 font-bold text-sm tracking-tight uppercase">No booking history available</p>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                            <button 
+                                onClick={() => setSelectedUser(null)}
+                                className="px-6 py-2.5 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-all text-sm shadow-sm"
+                            >
+                                Close Activity Log
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
