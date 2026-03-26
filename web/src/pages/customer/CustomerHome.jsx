@@ -1562,7 +1562,7 @@ const CustomerHome = () => {
                                                     <div className="flex justify-between items-start">
                                                         <div className="flex-1 min-w-0 pr-4">
                                                             <div className="flex items-center gap-2 mb-2">
-                                                                <p className="font-black text-surface-900 uppercase text-[10px] tracking-widest truncate">{b.service}</p>
+                                                                <p className="font-black text-surface-900 uppercase text-[10px] tracking-widest">{b.service}</p>
                                                                 <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-surface-200 text-surface-500'}`}>
                                                                     {b.status}
                                                                 </span>
