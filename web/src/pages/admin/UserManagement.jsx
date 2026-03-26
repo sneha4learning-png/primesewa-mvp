@@ -181,17 +181,17 @@ const UserManagement = () => {
                                         {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div className="flex items-center justify-end gap-3">
-                                        <button onClick={() => handleViewHistory(user)} className="text-blue-600 hover:text-blue-800 transition-colors" title="View Activity">
+                                        <button onClick={() => handleViewHistory(user)} className="text-blue-600 hover:text-blue-800 transition-colors p-1 rounded-md hover:bg-blue-50" title="View Transaction History">
                                             <Activity className="w-5 h-5" />
                                         </button>
                                         {user.status === 'active' ? (
-                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-red-500 hover:text-red-700 transition-colors" title="Block User Access">
+                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-50" title="Block Customer Access">
                                                 <UserX className="w-5 h-5" />
                                             </button>
                                         ) : (
-                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-green-600 hover:text-green-800 text-sm font-black underline" title="Restore User Access">
+                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-green-600 hover:text-green-800 text-sm font-black underline p-1 rounded-md hover:bg-green-50" title="Restore Customer Access">
                                                 Unblock
                                             </button>
                                         )}

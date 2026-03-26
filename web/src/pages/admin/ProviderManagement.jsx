@@ -211,34 +211,34 @@ const ProviderManagement = () => {
                                 </td>
                                 <td className="px-4 py-4 whitespace-nowrap text-right">
                                     <div className="flex items-center justify-end gap-1.5 flex-nowrap">
-                                        <button onClick={() => handleViewHistory(provider)} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors shadow-sm border border-blue-100" title="View Details & History">
+                                        <button onClick={() => handleViewHistory(provider)} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors shadow-sm border border-blue-100" title="View Full Details & Booking History">
                                             <Search className="w-4 h-4" />
                                         </button>
                                         {provider.status === 'pending' && (
                                             <>
-                                                <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors shadow-sm border border-green-100" title="Approve Provider">
+                                                <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors shadow-sm border border-green-100" title="Approve This Partner">
                                                     <CheckCircle className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm border border-red-100" title="Reject Provider">
+                                                <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm border border-red-100" title="Reject Application">
                                                     <XCircle className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend Provider">
+                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend Account Access">
                                                     <ShieldOff className="w-4 h-4" />
                                                 </button>
                                             </>
                                         )}
                                         {provider.status === 'active' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend Provider">
+                                            <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend This Active Partner">
                                                 <ShieldOff className="w-4 h-4" />
                                             </button>
                                         )}
                                         {provider.status === 'suspended' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm border border-emerald-100" title="Reactivate Provider">
+                                            <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm border border-emerald-100" title="Reactivate This Partner">
                                                 <CheckCircle className="w-4 h-4" />
                                             </button>
                                         )}
                                         {provider.status === 'rejected' && (
-                                            <button onClick={() => handleStatusChange(provider.id, 'pending')} className="p-2 text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors shadow-sm border border-slate-100" title="Review Again">
+                                            <button onClick={() => handleStatusChange(provider.id, 'pending')} className="p-2 text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors shadow-sm border border-slate-100" title="Move Back to Review Status">
                                                 <MoreVertical className="w-4 h-4" />
                                             </button>
                                         )}
