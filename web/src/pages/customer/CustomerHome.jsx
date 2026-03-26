@@ -588,7 +588,7 @@ const CustomerHome = () => {
         );
     };
 
-    const handleAcceptQuote = async (bookingId, proposedPrice) => {
+    const handleAcceptQuote = async (bookingId, proposedPrice, providerUid) => {
         try {
             const bookingRef = doc(db, 'bookings', bookingId);
             await updateDoc(bookingRef, {
@@ -596,7 +596,11 @@ const CustomerHome = () => {
                 price: proposedPrice || 500, // Sync the negotiated price
                 updatedAt: serverTimestamp()
             });
-            // Success notification or sound could go here
+
+            // Notify Provider that their quote was accepted
+            if (providerUid) {
+                sendNotification(providerUid, 'Quote Accepted', `Great news! The customer has accepted your proposed quote of ₹${proposedPrice || 500}. You can start the work now.`, 'success');
+            }
         } catch (error) {
             console.error("Error accepting quote:", error);
         }
@@ -1287,7 +1291,7 @@ const CustomerHome = () => {
                                                     {b.status === 'negotiating' ? (
                                                         <div className="flex gap-3">
                                                             <button 
-                                                                onClick={() => handleAcceptQuote(b.id, b.proposedPrice)}
+                                                                onClick={() => handleAcceptQuote(b.id, b.proposedPrice, b.providerUid)}
                                                                 className="flex-1 py-3 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
                                                             >
                                                                 Accept Quote
