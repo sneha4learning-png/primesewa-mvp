@@ -588,11 +588,12 @@ const CustomerHome = () => {
         );
     };
 
-    const handleAcceptQuote = async (bookingId) => {
+    const handleAcceptQuote = async (bookingId, proposedPrice) => {
         try {
             const bookingRef = doc(db, 'bookings', bookingId);
             await updateDoc(bookingRef, {
                 status: 'accepted',
+                price: proposedPrice || 500, // Sync the negotiated price
                 updatedAt: serverTimestamp()
             });
             // Success notification or sound could go here
@@ -1255,9 +1256,9 @@ const CustomerHome = () => {
                                         <span className="bg-white/10 text-white/60 text-[8px] px-3 py-1 rounded-full font-black border border-white/5 uppercase tracking-widest">{activeBookings.length} Active</span>
                                     </div>
 
-                                    <div className="flex gap-4 overflow-x-auto pb-6 pt-2 hide-scrollbar snap-x">
+                                    <div className="flex gap-4 overflow-x-auto pb-20 pt-2 hide-scrollbar snap-x">
                                         {activeBookings.map(b => (
-                                            <div key={b.id} className="shrink-0 w-80 snap-start bg-white/5 border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-all group/card flex flex-col h-full">
+                                            <div key={b.id} className="shrink-0 w-80 snap-start bg-white/5 border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-all group/card flex flex-col min-h-[260px]">
                                                 <div className="flex justify-between items-start mb-6">
                                                     <div>
                                                         <h3 className="text-white font-black text-sm mb-1 uppercase tracking-tight">{b.service}</h3>
@@ -1286,7 +1287,7 @@ const CustomerHome = () => {
                                                     {b.status === 'negotiating' ? (
                                                         <div className="flex gap-3">
                                                             <button 
-                                                                onClick={() => handleAcceptQuote(b.id)}
+                                                                onClick={() => handleAcceptQuote(b.id, b.proposedPrice)}
                                                                 className="flex-1 py-3 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
                                                             >
                                                                 Accept Quote
