@@ -588,6 +588,35 @@ const CustomerHome = () => {
         );
     };
 
+        }
+    };
+    
+    const handleAcceptQuote = async (bookingId) => {
+        try {
+            const bookingRef = doc(db, 'bookings', bookingId);
+            await updateDoc(bookingRef, {
+                status: 'accepted',
+                updatedAt: serverTimestamp()
+            });
+            // Success notification or sound could go here
+        } catch (error) {
+            console.error("Error accepting quote:", error);
+        }
+    };
+
+    const handleRejectQuote = async (bookingId) => {
+        if (!window.confirm("Are you sure you want to reject this quote? This will cancel the current negotiation.")) return;
+        try {
+            const bookingRef = doc(db, 'bookings', bookingId);
+            await updateDoc(bookingRef, {
+                status: 'rejected_by_customer',
+                updatedAt: serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error rejecting quote:", error);
+        }
+    };
+
     const handleBook = (provider) => {
         // Safely parse price whether it's a string (e.g. '₹500/hr') or a number
         const rawPrice = provider.price;
@@ -1229,10 +1258,10 @@ const CustomerHome = () => {
                                         <span className="bg-white/10 text-white/60 text-[8px] px-3 py-1 rounded-full font-black border border-white/5 uppercase tracking-widest">{activeBookings.length} Active</span>
                                     </div>
 
-                                    <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                                    <div className="flex gap-4 overflow-x-auto pb-6 pt-2 hide-scrollbar snap-x">
                                         {activeBookings.map(b => (
-                                            <div key={b.id} className="shrink-0 w-80 snap-start bg-white/5 border border-white/10 p-5 rounded-3xl hover:bg-white/10 transition-all group/card">
-                                                <div className="flex justify-between items-start mb-4">
+                                            <div key={b.id} className="shrink-0 w-80 snap-start bg-white/5 border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-all group/card flex flex-col h-full">
+                                                <div className="flex justify-between items-start mb-6">
                                                     <div>
                                                         <h3 className="text-white font-black text-sm mb-1 uppercase tracking-tight">{b.service}</h3>
                                                         <div className="flex items-center gap-2">
@@ -1240,28 +1269,47 @@ const CustomerHome = () => {
                                                             <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">{b.status}</span>
                                                         </div>
                                                     </div>
-                                                    <div className="bg-primary/20 p-2 rounded-xl">
+                                                    <div className="bg-primary/20 p-2.5 rounded-xl">
                                                         <Zap className="w-4 h-4 text-primary" />
                                                     </div>
                                                 </div>
 
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center justify-between text-[10px]">
-                                                        <span className="text-white/30 font-bold">Professional</span>
-                                                        <span className="text-white font-black">{b.providerName || 'Assigning...'}</span>
+                                                <div className="space-y-4 mb-6">
+                                                    <div className="flex items-center justify-between text-[11px]">
+                                                        <span className="text-white/30 font-bold uppercase tracking-widest">Professional</span>
+                                                        <span className="text-white font-black">{b.providerName || b.provider || 'Assigning...'}</span>
                                                     </div>
-                                                    <div className="flex items-center justify-between text-[10px]">
-                                                        <span className="text-white/30 font-bold">Estimated Cost</span>
+                                                    <div className="flex items-center justify-between text-[11px]">
+                                                        <span className="text-white/30 font-bold uppercase tracking-widest">Estimated Cost</span>
                                                         <span className="text-white font-black">₹{b.proposedPrice || b.price}</span>
                                                     </div>
                                                 </div>
 
-                                                <button 
-                                                    onClick={() => navigate(`/customer/booking-details/${b.id}`)}
-                                                    className="w-full mt-4 py-3 bg-white text-surface-900 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300"
-                                                >
-                                                    Track Status
-                                                </button>
+                                                <div className="mt-auto pt-2">
+                                                    {b.status === 'negotiating' ? (
+                                                        <div className="flex gap-3">
+                                                            <button 
+                                                                onClick={() => handleAcceptQuote(b.id)}
+                                                                className="flex-1 py-3 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+                                                            >
+                                                                Accept Quote
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleRejectQuote(b.id)}
+                                                                className="px-4 py-3 bg-white/5 border border-white/10 text-white/50 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all"
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button 
+                                                            onClick={() => navigate(`/customer/booking-details/${b.id}`)}
+                                                            className="w-full py-4 bg-white text-surface-900 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300 shadow-xl"
+                                                        >
+                                                            Track Status
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
