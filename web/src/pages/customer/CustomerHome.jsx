@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo, Component } from 'react';
+import { useState, useEffect, useMemo, useRef, Component } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
@@ -240,6 +240,7 @@ const CustomerHome = () => {
     // New Feature States
     const [ratingFilter, setRatingFilter] = useState('0');
     const [selectedProviderProfile, setSelectedProviderProfile] = useState(null);
+    const expertsRef = useRef(null);
     const [bookingDate, setBookingDate] = useState('');
     const [bookingTime, setBookingTime] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
@@ -772,6 +773,13 @@ const CustomerHome = () => {
         });
     }, [onlineProviders, searchQuery, selectedCategory, ratingFilter, sortBy]);
 
+    const handleCategoryClick = (catName) => {
+        setSelectedCategory(catName);
+        if (expertsRef.current) {
+            expertsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     const handleActivityClick = (booking) => {
         // Removed intrusive alert popup that caused confusion about changing status
     };
@@ -1192,28 +1200,72 @@ const CustomerHome = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* Main Content Area */}
                     <div className="lg:col-span-3 space-y-8">
+                        {/* Live Activity - MOVED TO TOP OF MAIN COLUMN */}
+                        {userData?.uid && activeBookings.length > 0 && (
+                            <div className="bg-surface-900 p-1 rounded-[3.5rem] shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-colors duration-700"></div>
+                                <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[3.3rem] flex flex-col border border-white/5">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            <h2 className="text-xl font-black text-white tracking-widest uppercase text-[10px]">Live User Activity</h2>
+                                        </div>
+                                        <span className="bg-white/10 text-white/60 text-[8px] px-3 py-1 rounded-full font-black border border-white/5 uppercase tracking-widest">{activeBookings.length} Active</span>
+                                    </div>
+
+                                    <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                                        {activeBookings.map(b => (
+                                            <div key={b.id} className="shrink-0 w-80 snap-start bg-white/5 border border-white/10 p-5 rounded-3xl hover:bg-white/10 transition-all group/card">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div>
+                                                        <h3 className="text-white font-black text-sm mb-1 uppercase tracking-tight">{b.service}</h3>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'accepted' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] animate-pulse'}`}></div>
+                                                            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">{b.status}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="bg-primary/20 p-2 rounded-xl">
+                                                        <Zap className="w-4 h-4 text-primary" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center justify-between text-[10px]">
+                                                        <span className="text-white/30 font-bold">Professional</span>
+                                                        <span className="text-white font-black">{b.providerName || 'Assigning...'}</span>
+                                                    </div>
+                                                    <div className="flex items-center justify-between text-[10px]">
+                                                        <span className="text-white/30 font-bold">Estimated Cost</span>
+                                                        <span className="text-white font-black">₹{b.proposedPrice || b.price}</span>
+                                                    </div>
+                                                </div>
+
+                                                <button 
+                                                    onClick={() => navigate(`/customer/booking-details/${b.id}`)}
+                                                    className="w-full mt-4 py-3 bg-white text-surface-900 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-300"
+                                                >
+                                                    Track Status
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Improved Premium Search */}
                         <div className="relative group max-w-4xl">
                             <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-primary-light/10 rounded-2xl blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
-                            <div className="relative flex items-center bg-white border border-surface-100 rounded-2xl shadow-xl shadow-primary/5 overflow-hidden transition-all duration-500 focus-within:ring-1 focus-within:ring-primary/20">
-                                <div className="pl-8 flex items-center">
-                                    <Search className="w-6 h-6 text-surface-300 group-focus-within:text-primary transition-colors duration-300" />
-                                </div>
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search for 'Plumbing', 'Electrician', etc."
-                                    className="w-full px-6 py-7 bg-transparent border-none focus:ring-0 text-xl font-semibold text-surface-900 placeholder:text-surface-300"
+                            <div className="relative flex items-center bg-white rounded-3xl shadow-2xl border border-surface-100 p-2 group-focus-within:ring-2 ring-primary/20 transition-all">
+                                <Search className="w-6 h-6 text-surface-400 ml-4" />
+                                <input 
+                                    type="text" 
+                                    placeholder="Which specialist are you looking for today? (e.g. Electrician, Yoga Trainer)" 
+                                    className="w-full p-4 md:p-5 outline-none font-bold text-surface-700 bg-transparent placeholder:text-surface-300 text-sm md:text-base"
                                 />
-                                {searchQuery && (
-                                    <button 
-                                        onClick={() => setSearchQuery('')}
-                                        className="pr-8 text-surface-300 hover:text-surface-500 transition-colors"
-                                    >
-                                        <XCircle className="w-6 h-6" />
-                                    </button>
-                                )}
+                                <button className="bg-surface-900 text-white px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-primary transition-all shadow-xl hover:scale-105 active:scale-95">
+                                    Search
+                                </button>
                             </div>
                         </div>
 
@@ -1226,10 +1278,10 @@ const CustomerHome = () => {
                                 </div>
                                 <div className="flex gap-2">
                                     <button 
-                                        onClick={() => setSelectedCategory(null)}
-                                        className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${!selectedCategory ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-surface-50 text-surface-400 hover:bg-surface-100'}`}
+                                        onClick={() => handleCategoryClick(null)}
+                                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${!selectedCategory ? 'bg-primary text-white shadow-lg' : 'bg-surface-50 text-surface-400 hover:bg-surface-100'}`}
                                     >
-                                        All
+                                        All Services
                                     </button>
                                 </div>
                             </div>
@@ -1238,7 +1290,7 @@ const CustomerHome = () => {
                                 {categories.map((cat) => (
                                     <button
                                         key={cat.id}
-                                        onClick={() => setSelectedCategory(cat.name === selectedCategory ? null : cat.name)}
+                                        onClick={() => handleCategoryClick(cat.name === selectedCategory ? null : cat.name)}
                                         className={`group relative flex flex-col items-center p-6 rounded-[2.5rem] transition-all duration-500 hover-lift ${selectedCategory === cat.name ? 'ring-2 ring-primary bg-white shadow-2xl scale-105' : 'bg-linear-to-br border border-white/40 shadow-sm'} ${cat.color}`}
                                     >
                                         <div className={`w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 ${cat.iconColor}`}>
@@ -1257,7 +1309,7 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Top Providers with Filters */}
-                        <div className="space-y-8">
+                        <div className="space-y-8" ref={expertsRef}>
                             <div className="flex items-end justify-between">
                                 <div>
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full mb-3">
@@ -1413,139 +1465,12 @@ const CustomerHome = () => {
                         </div>
                     </div>
 
-                    {/* Sidebar / Active Bookings */}
+                    {/* Sidebar Area */}
                     <div className="space-y-8">
-                        {/* Current Activity Box */}
-                        <div className="bg-surface-900 p-1 rounded-[3.5rem] shadow-2xl shadow-primary/10 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-colors duration-700"></div>
-                            <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[3.3rem] flex flex-col border border-white/5">
-                                {userData?.uid ? (
-                                    <>
-                                        <div className="flex items-center justify-between mb-10">
-                                            <h2 className="text-2xl font-black text-white tracking-tighter flex items-center gap-3">
-                                                <div className="w-1.5 h-8 bg-primary rounded-full"></div>
-                                                Live Activity
-                                            </h2>
-                                            <div className="px-3 py-1 bg-white/10 rounded-full border border-white/10">
-                                                <span className="text-white/60 font-black text-[9px] uppercase tracking-widest">{activeBookings.length} Active</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-6 relative z-10 flex-1 overflow-y-auto pr-2 hide-scrollbar">
-                                            {activeBookings.length > 0 ? (
-                                                activeBookings.map(b => (
-                                                    <div key={b.id} className="bg-white/5 border border-white/5 p-6 rounded-3xl transition-all relative overflow-hidden group/card hover:bg-white/[0.08]">
-                                                        <div className={`absolute top-0 left-0 w-1.5 h-full transition-all ${['negotiating', 'negotiation'].includes(b.status) ? 'bg-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.5)]' : 'bg-primary shadow-[0_0_15px_rgba(37,99,235,0.5)]'}`}></div>
-                                                        <div className="flex flex-col gap-4">
-                                                            <div className="flex flex-col gap-1">
-                                                                <div className="flex items-center justify-between mb-1">
-                                                                    <div className={`px-3 py-1.5 rounded-xl flex items-center gap-2 shrink-0 ${
-                                                                        ['negotiating', 'negotiation'].includes(b.status) ? 'bg-amber-400/20' : 
-                                                                        b.trackingStatus === 'inprogress' ? 'bg-emerald-400/20' : 
-                                                                        b.trackingStatus ? 'bg-blue-400/20' : 'bg-primary/20'
-                                                                    }`}>
-                                                                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-                                                                            ['negotiating', 'negotiation'].includes(b.status) ? 'bg-amber-400' : 
-                                                                            b.trackingStatus === 'inprogress' ? 'bg-emerald-400' : 
-                                                                            b.trackingStatus ? 'bg-blue-400' : 'bg-primary'
-                                                                        }`}></div>
-                                                                        <span className={`text-[10px] font-black uppercase tracking-wider whitespace-nowrap ${
-                                                                            ['negotiating', 'negotiation'].includes(b.status) ? 'text-amber-400' : 
-                                                                            b.trackingStatus === 'inprogress' ? 'text-emerald-400' : 
-                                                                            b.trackingStatus ? 'text-blue-400' : 'text-primary'
-                                                                        }`}>
-                                                                            {b.status === 'negotiating' ? 'Action Needed' : 
-                                                                             b.trackingStatus === 'inprogress' ? 'In Progress' : 
-                                                                             b.trackingStatus === 'enroute' ? 'On The Way' : 
-                                                                             b.trackingStatus === 'arrived' ? 'Arrived' : 
-                                                                             b.status}
-                                                                        </span>
-                                                                    </div>
-                                                                    {b.price && <span className="font-black text-white/90 text-lg shrink-0 ml-2">₹{b.price}</span>}
-                                                                </div>
-                                                                <h4 className="font-black text-white tracking-tight text-xl leading-none pt-1 group-hover/card:text-primary transition-colors">{b.service}</h4>
-                                                                <span className="text-xs font-bold text-white/40 uppercase tracking-widest mt-1.5 flex items-center justify-between gap-1.5 relative z-20">
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <div className="w-1 h-1 rounded-full bg-white/20"></div>
-                                                                        {b.provider || 'Professional'}
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            const phone = b.providerPhone || b.phone || '';
-                                                                            if (!phone) { alert('Provider phone unavailable.'); return; }
-                                                                            window.location.href = `tel:${phone}`;
-                                                                        }}
-                                                                        className="flex items-center gap-1.5 text-primary hover:text-white transition-colors normal-case bg-primary/10 px-2 py-1 rounded-lg"
-                                                                    >
-                                                                        <Phone className="w-3 h-3" /> Call Pro
-                                                                    </button>
-                                                                </span>
-                                                            </div>
-
-                                                            <div className="flex items-center justify-between py-3 border-y border-white/5">
-                                                                <div className="flex items-center gap-2 text-white/50 text-xs font-medium">
-                                                                    <ClockIcon className="w-3.5 h-3.5 opacity-70" /> 
-                                                                    <span>{b.date} • {formatTime(b.time)}</span>
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Negotiation Controls */}
-                                                            {['negotiating', 'negotiation'].includes(b.status) && b.proposedPrice && (
-                                                                <div className="mt-4 pt-4 border-t border-white/5 bg-white/5 -mx-6 -mb-6 p-6">
-                                                                    <div className="flex items-center justify-between mb-4">
-                                                                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest leading-none">New Quote Given</span>
-                                                                        <span className="text-xl font-black text-white tracking-tighter">₹{b.proposedPrice}</span>
-                                                                    </div>
-                                                                    <div className="flex gap-2">
-                                                                        <button 
-                                                                            onClick={() => handleNegotiation(b.id, true, b.proposedPrice)}
-                                                                            className="flex-1 py-3 bg-primary hover:bg-primary-dark text-white font-black rounded-xl text-[10px] uppercase tracking-widest transition-all"
-                                                                        >
-                                                                            Accept
-                                                                        </button>
-                                                                        <button 
-                                                                            onClick={() => handleNegotiation(b.id, false)}
-                                                                            className="flex-1 py-3 bg-white/5 hover:bg-rose-500/20 hover:text-rose-400 text-white/60 font-black rounded-xl text-[10px] uppercase tracking-widest border border-white/5 transition-all"
-                                                                        >
-                                                                            Reject
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                                                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
-                                                        <ClockIcon className="w-10 h-10 text-white/10" />
-                                                    </div>
-                                                    <p className="text-white/40 font-bold text-sm">No active requests found.</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-center">
-                                        <div className="relative w-56 h-56 mb-10 group">
-                                            <div className="absolute inset-0 bg-primary/20 rounded-[3.5rem] rotate-6 group-hover:rotate-0 transition-transform duration-700 blur shadow-2xl"></div>
-                                            <div className="relative h-full w-full rounded-[3.5rem] overflow-hidden border-4 border-white/10 shadow-2xl">
-                                                {serviceImages.map((img, idx) => (
-                                                    <img key={idx} src={img} alt="Service Pro" className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 ${idx === currentImageIndex ? 'opacity-100' : 'opacity-0'}`} />
-                                                ))}
-                                                <div className="absolute inset-0 bg-linear-to-t from-surface-900/80 to-transparent"></div>
-                                            </div>
-                                        </div>
-                                        <h3 className="text-3xl font-black text-white mb-4 tracking-tighter">Prime Quality</h3>
-                                        <p className="text-white/50 text-sm font-medium leading-relaxed mb-10 px-4 italic">Experience the benchmark of home services. Reliable, professional, and at your doorstep.</p>
-                                        <button onClick={() => navigate('/login')} className="w-full py-5 bg-white text-surface-900 font-black rounded-[2rem] shadow-2xl hover:bg-primary hover:text-white transition-all text-[11px] uppercase tracking-[0.2em]">
-                                            Sign In to Start
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        {/* Sidebar Sections (Activity moved to top of main area, but could show a mini-version here if preferred) */}
+                        {userData?.uid && activeBookings.length > 0 && (
+                             <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest px-4 italic">Live activity tracked above ↑</p>
+                        )}
 
                         {/* Recent History Box */}
                         <div className="glass-card p-6 md:p-8 rounded-[2.5rem] md:rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
