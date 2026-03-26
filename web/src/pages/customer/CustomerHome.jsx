@@ -1560,17 +1560,17 @@ const CustomerHome = () => {
                                             {pastBookings.slice(0, visibleHistoryCount).map(b => (
                                                 <div key={b.id} className="p-4 md:p-6 rounded-2xl md:rounded-3xl bg-surface-50/50 border border-surface-100 hover:border-primary/20 transition-all flex flex-col gap-4 md:gap-5 group">
                                                     <div className="flex justify-between items-start">
-                                                        <div className="flex-1 min-w-0 pr-4">
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <p className="font-black text-surface-900 uppercase text-[10px] tracking-widest">{b.service}</p>
-                                                                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter ${b.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-surface-200 text-surface-500'}`}>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                                <p className="font-black text-surface-900 uppercase text-[10px] tracking-widest leading-none">{b.service}</p>
+                                                                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter whitespace-nowrap ${b.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-surface-200 text-surface-500'}`}>
                                                                     {b.status}
                                                                 </span>
                                                             </div>
-                                                            <h4 className="text-xs font-black text-surface-900">{b.provider || 'Professional'}</h4>
-                                                            <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest mt-1">{b.date || 'N/A'} • {formatTime(b.time)}</p>
+                                                            <h4 className="text-xs font-black text-surface-900 leading-tight">{b.provider || 'Professional'}</h4>
+                                                            <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest mt-1.5">{b.date || 'N/A'} • {formatTime(b.time)}</p>
                                                         </div>
-                                                        <p className="font-black text-surface-900 shrink-0 text-sm">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
+                                                        <p className="font-black text-surface-900 shrink-0 text-sm ml-4 mt-0.5">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
                                                     </div>
 
                                                     {/* Interactive Rating for Completed Jobs */}
