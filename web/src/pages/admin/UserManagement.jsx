@@ -187,11 +187,11 @@ const UserManagement = () => {
                                             <Activity className="w-5 h-5" />
                                         </button>
                                         {user.status === 'active' ? (
-                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-red-500 hover:text-red-700 transition-colors" title="Block User">
+                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-red-500 hover:text-red-700 transition-colors" title="Block User Access">
                                                 <UserX className="w-5 h-5" />
                                             </button>
                                         ) : (
-                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-green-600 hover:text-green-800 text-sm font-medium underline">
+                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-green-600 hover:text-green-800 text-sm font-black underline" title="Restore User Access">
                                                 Unblock
                                             </button>
                                         )}
@@ -218,17 +218,16 @@ const UserManagement = () => {
                             <div className="flex items-center justify-between text-xs text-gray-600">
                                 <div>Phone: <span className="font-semibold">{user.phone}</span></div>
                                 <div>Bookings: <span className="font-bold text-blue-600">{user.totalBookings}</span></div>
-                            </div>
-                            <div className="flex gap-3">
-                                <button onClick={() => handleViewHistory(user)} className="flex-1 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
+                            </div>                            <div className="flex gap-3">
+                                <button onClick={() => handleViewHistory(user)} className="flex-1 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold flex items-center justify-center gap-2" title="View Activity History">
                                     <Activity className="w-4 h-4" /> Activity History
                                 </button>
                                 {user.status === 'active' ? (
-                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-red-50 text-red-700 rounded-lg text-xs font-bold">
+                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-red-50 text-red-700 rounded-lg text-xs font-bold" title="Block User Access">
                                         Block User
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-green-50 text-green-700 rounded-lg text-xs font-bold">
+                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-green-50 text-green-700 rounded-lg text-xs font-bold" title="Unblock User Account">
                                         Unblock
                                     </button>
                                 )}
