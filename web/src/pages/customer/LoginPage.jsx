@@ -213,14 +213,14 @@ const LoginPage = () => {
                             </div>
                             <div className="space-y-2">
                                 <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Mobile Number</label>
-                                <div className="relative">
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-primary-light/50 font-black text-sm">+91</span>
+                                <div className="relative group">
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-primary-light/50 font-black text-sm border-r border-white/10 pr-4">+91</span>
                                     <input
                                         type="tel"
                                         required
                                         maxLength={10}
-                                        className="w-full pl-14 pr-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white placeholder-white/10 outline-none"
-                                        placeholder="Phone number"
+                                        className="w-full pl-16 pr-5 py-4 bg-white/5 border border-white/10 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-black text-white placeholder-white/10 text-xl tracking-[0.1em] outline-none"
+                                        placeholder="000 000 0000"
                                         value={phoneNumber}
                                         onChange={e => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                                     />
