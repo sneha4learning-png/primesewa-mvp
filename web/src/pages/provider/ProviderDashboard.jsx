@@ -332,7 +332,7 @@ const ProviderDashboard = () => {
                                         <p className="text-slate-400 font-bold text-sm tracking-wider mt-1">#{job.id}</p>
                                     </div>
                                     <span className="px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl font-black text-sm border border-indigo-100">
-                                        ₹{job.price}
+                                        ₹{job.proposedPrice || job.price}
                                     </span>
                                 </div>
                                 <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50 p-4 rounded-2xl">
@@ -454,8 +454,8 @@ const ProviderDashboard = () => {
                                             <p className="text-slate-400 font-bold text-sm tracking-wider mt-1">#{req.id}</p>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-xl font-black text-slate-900">₹{req.price}</div>
-                                            <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-[10px] font-black uppercase tracking-widest text-emerald-600 rounded">Net: ₹{(req.price * 0.85).toFixed(0)}</div>
+                                            <div className="text-xl font-black text-slate-900">₹{req.proposedPrice || req.price}</div>
+                                            <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-[10px] font-black uppercase tracking-widest text-emerald-600 rounded">Net: ₹{((req.proposedPrice || req.price) * 0.85).toFixed(0)}</div>
                                         </div>
                                     </div>
                                     <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50/80 p-4 rounded-2xl border border-slate-100/50">
