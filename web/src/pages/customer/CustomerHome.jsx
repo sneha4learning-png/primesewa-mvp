@@ -287,18 +287,20 @@ const CustomerHome = () => {
         return () => clearInterval(timer);
     }, []);
 
-    // NEW: Handle hash navigation for "All Services" globally
+    // NEW: Handle hash navigation for "All Services" and "Dashboard" top locally
     useEffect(() => {
         if (location.hash === '#service-catalog') {
             const el = document.getElementById('service-catalog');
             if (el) {
-                // Short timeout to ensure elements are fully rendered/positioned after location change
                 setTimeout(() => {
                     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 100);
             }
+        } else if (location.hash === '#top' || (location.pathname === '/dashboard' && !location.hash)) {
+            // Scroll to top when hitting 'My Dashboard' link
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-    }, [location.hash]);
+    }, [location.hash, location.pathname]);
 
     // Returns current time as "HH:MM" string for today's minimum time constraint
     const getNowTimeStr = () => {

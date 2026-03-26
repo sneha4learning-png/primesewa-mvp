@@ -38,7 +38,7 @@ const CustomerLayout = () => {
                         {currentUser ? (
                             <div className="flex items-center gap-6 ml-4 border-l border-gray-200 pl-6">
                                 <Link to={isProvider ? "/provider" : "/provider/login"} className="text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
-                                <Link to="/dashboard" className={`text-sm font-bold transition-colors ${location.pathname === '/dashboard' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Dashboard</Link>
+                                <Link to="/dashboard#top" className={`text-sm font-bold transition-colors ${location.hash !== '#service-catalog' && location.pathname === '/dashboard' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Dashboard</Link>
                                 <Link to="/profile" className={`text-sm font-bold transition-colors ${location.pathname === '/profile' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Profile</Link>
                                 <NotificationBell />
                                 <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2 text-sm font-bold border border-rose-200 text-rose-600 bg-rose-50 rounded-full hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-600/20 transition-all">
@@ -90,7 +90,7 @@ const CustomerLayout = () => {
                                 <Link to={isProvider ? "/provider" : "/provider/login"} onClick={closeMobileMenu} className="flex items-center gap-3 px-4 py-3 rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition-colors">
                                     🤝 Provider Portal
                                 </Link>
-                                <Link to="/dashboard" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
+                                <Link to="/dashboard#top" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/dashboard' && location.hash !== '#service-catalog' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
                                     📋 My Dashboard
                                 </Link>
                                 <Link to="/profile" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/profile' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
