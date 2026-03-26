@@ -240,7 +240,7 @@ const CustomerHome = () => {
     // New Feature States
     const [ratingFilter, setRatingFilter] = useState('0');
     const [selectedProviderProfile, setSelectedProviderProfile] = useState(null);
-    const expertsRef = useRef(null);
+    const catalogRef = useRef(null);
     const [bookingDate, setBookingDate] = useState('');
     const [bookingTime, setBookingTime] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
@@ -775,8 +775,8 @@ const CustomerHome = () => {
 
     const handleCategoryClick = (catName) => {
         setSelectedCategory(catName);
-        if (expertsRef.current) {
-            expertsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (catalogRef.current) {
+            catalogRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
@@ -1269,8 +1269,8 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        {/* Categories */}
-                        <div className="space-y-6">
+                        {/* Categories - MOVED REF HERE FOR BEST NAVIGATION */}
+                        <div className="space-y-6" ref={catalogRef}>
                             <div className="flex items-end justify-between">
                                 <div>
                                     <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-1">Service Catalog</p>
@@ -1309,7 +1309,7 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Top Providers with Filters */}
-                        <div className="space-y-8" ref={expertsRef}>
+                        <div className="space-y-8">
                             <div className="flex items-end justify-between">
                                 <div>
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full mb-3">
