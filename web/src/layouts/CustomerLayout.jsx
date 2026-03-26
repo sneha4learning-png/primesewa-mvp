@@ -33,7 +33,7 @@ const CustomerLayout = () => {
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex items-center gap-8">
                         <Link to="/" className={`text-sm font-bold transition-colors ${location.pathname === '/' ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>Home</Link>
-                        <Link to="/dashboard" className={`text-sm font-bold transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>All Services</Link>
+                        <Link to="/dashboard#service-catalog" className={`text-sm font-bold transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>All Services</Link>
 
                         {currentUser ? (
                             <div className="flex items-center gap-6 ml-4 border-l border-gray-200 pl-6">
@@ -80,7 +80,7 @@ const CustomerLayout = () => {
                         <Link to="/" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
                             🏠 Home
                         </Link>
-                        <Link to="/dashboard" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
+                        <Link to="/dashboard#service-catalog" onClick={closeMobileMenu} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
                             🔧 All Services
                         </Link>
 

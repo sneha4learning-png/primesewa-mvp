@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useMemo, useRef, Component } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
@@ -223,6 +223,7 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
 
 const CustomerHome = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { userData } = useAuth();
     const { sendNotification } = useNotifications();
 
@@ -285,6 +286,19 @@ const CustomerHome = () => {
         }, 4000);
         return () => clearInterval(timer);
     }, []);
+
+    // NEW: Handle hash navigation for "All Services" globally
+    useEffect(() => {
+        if (location.hash === '#service-catalog') {
+            const el = document.getElementById('service-catalog');
+            if (el) {
+                // Short timeout to ensure elements are fully rendered/positioned after location change
+                setTimeout(() => {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
+    }, [location.hash]);
 
     // Returns current time as "HH:MM" string for today's minimum time constraint
     const getNowTimeStr = () => {
@@ -1270,7 +1284,7 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Categories - MOVED REF HERE FOR BEST NAVIGATION */}
-                        <div className="space-y-6" ref={catalogRef}>
+                        <div className="space-y-6" ref={catalogRef} id="service-catalog">
                             <div className="flex items-end justify-between">
                                 <div>
                                     <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-1">Service Catalog</p>
