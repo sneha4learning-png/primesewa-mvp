@@ -1245,9 +1245,9 @@ const CustomerHome = () => {
                     <div className="lg:col-span-3 space-y-8">
                         {/* Live Activity - MOVED TO TOP OF MAIN COLUMN */}
                         {userData?.uid && activeBookings.length > 0 && (
-                            <div className="bg-surface-900 p-1 rounded-[3.5rem] shadow-2xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-colors duration-700"></div>
-                                <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[3.3rem] flex flex-col border border-white/5">
+                            <div className="bg-surface-900 p-1 rounded-[3.5rem] shadow-2xl relative group">
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-colors duration-700 pointer-events-none"></div>
+                                <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[3.3rem] flex flex-col border border-white/5 relative overflow-hidden">
                                     <div className="flex items-center justify-between mb-6">
                                         <div className="flex items-center gap-3">
                                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -1256,7 +1256,7 @@ const CustomerHome = () => {
                                         <span className="bg-white/10 text-white/60 text-[8px] px-3 py-1 rounded-full font-black border border-white/5 uppercase tracking-widest">{activeBookings.length} Active</span>
                                     </div>
 
-                                    <div className="flex gap-4 overflow-x-auto pb-20 pt-2 hide-scrollbar snap-x">
+                                    <div className="flex gap-4 overflow-x-auto pb-16 pt-2 custom-scrollbar snap-x">
                                         {activeBookings.map(b => (
                                             <div key={b.id} className="shrink-0 w-80 snap-start bg-white/5 border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-all group/card flex flex-col min-h-[260px]">
                                                 <div className="flex justify-between items-start mb-6">
