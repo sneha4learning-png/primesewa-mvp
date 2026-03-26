@@ -588,9 +588,6 @@ const CustomerHome = () => {
         );
     };
 
-        }
-    };
-    
     const handleAcceptQuote = async (bookingId) => {
         try {
             const bookingRef = doc(db, 'bookings', bookingId);

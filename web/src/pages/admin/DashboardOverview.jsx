@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc, query, orderBy, limit } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex items-center gap-4">
