@@ -89,13 +89,21 @@ const ProviderProfile = () => {
                     <p className="text-indigo-200 flex items-center gap-1 mt-1 font-medium">
                         <Tag className="w-4 h-4" /> {profile.category} Service Partner
                     </p>
-                    <div className="absolute top-4 right-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border
-                            ${profile.status === 'active' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
-                                profile.status === 'pending' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
-                                    'bg-red-500/20 text-red-300 border-red-500/30'}`}>
-                            {profile.status}
-                        </span>
+                    <div className="absolute top-4 right-4 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-white/20 rounded-full transition-all">
+                        {profile.status === 'active' ? (
+                            <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all shadow-sm
+                                ${profile.isOnline 
+                                    ? 'bg-emerald-500 text-white border-emerald-400' 
+                                    : 'bg-rose-500 text-white border-rose-400 opacity-90'}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full bg-white mr-2 ${profile.isOnline ? 'animate-pulse' : ''}`} />
+                                {profile.isOnline ? 'Online' : 'Offline'}
+                            </span>
+                        ) : (
+                            <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all shadow-sm
+                                ${profile.status === 'pending' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-700 text-white border-slate-600'}`}>
+                                {profile.status}
+                            </span>
+                        )}
                     </div>
                 </div>
 
