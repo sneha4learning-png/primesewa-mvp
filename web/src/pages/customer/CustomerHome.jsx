@@ -1189,9 +1189,9 @@ const CustomerHome = () => {
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* Main Content Area */}
-                    <div className="lg:col-span-3 space-y-12">
+                    <div className="lg:col-span-3 space-y-8">
                         {/* Improved Premium Search */}
                         <div className="relative group max-w-4xl">
                             <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-primary-light/10 rounded-2xl blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
@@ -1218,11 +1218,11 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Categories */}
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             <div className="flex items-end justify-between">
                                 <div>
-                                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-2">Service Catalog</p>
-                                    <h2 className="text-4xl font-black text-surface-900 tracking-tighter">Featured Services</h2>
+                                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-1">Service Catalog</p>
+                                    <h2 className="text-3xl font-black text-surface-900 tracking-tighter">Featured Services</h2>
                                 </div>
                                 <div className="flex gap-2">
                                     <button 
@@ -1239,10 +1239,10 @@ const CustomerHome = () => {
                                     <button
                                         key={cat.id}
                                         onClick={() => setSelectedCategory(cat.name === selectedCategory ? null : cat.name)}
-                                        className={`group relative flex flex-col items-center p-8 rounded-[2.5rem] transition-all duration-500 hover-lift ${selectedCategory === cat.name ? 'ring-2 ring-primary bg-white shadow-2xl scale-105' : 'bg-linear-to-br border border-white/40 shadow-sm'} ${cat.color}`}
+                                        className={`group relative flex flex-col items-center p-6 rounded-[2.5rem] transition-all duration-500 hover-lift ${selectedCategory === cat.name ? 'ring-2 ring-primary bg-white shadow-2xl scale-105' : 'bg-linear-to-br border border-white/40 shadow-sm'} ${cat.color}`}
                                     >
-                                        <div className={`w-16 h-16 rounded-3xl bg-white shadow-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 ${cat.iconColor}`}>
-                                            <cat.icon className="w-8 h-8" />
+                                        <div className={`w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 ${cat.iconColor}`}>
+                                            <cat.icon className="w-7 h-7" />
                                         </div>
                                         <span className={`text-[10px] font-black uppercase tracking-widest text-center ${selectedCategory === cat.name ? 'text-primary' : 'text-surface-600'}`}>{cat.name}</span>
                                         
@@ -1257,17 +1257,17 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Top Providers with Filters */}
-                        <div className="space-y-10">
+                        <div className="space-y-8">
                             <div className="flex items-end justify-between">
                                 <div>
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full mb-3">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                                         <span className="text-emerald-600 font-black text-[9px] uppercase tracking-[0.2em]">Live Status</span>
                                     </div>
-                                    <h2 className="text-4xl font-black text-surface-900 tracking-tighter">
+                                    <h2 className="text-3xl font-black text-surface-900 tracking-tighter">
                                         {selectedCategory ? `${selectedCategory} Experts` : 'Available Experts'}
                                     </h2>
-                                    <p className="text-sm font-bold text-surface-400 mt-2">{displayedProviders.length} Professionals available in your area</p>
+                                    <p className="text-sm font-bold text-surface-400 mt-1">{displayedProviders.length} Professionals available in your area</p>
                                 </div>
                                 
                                 <div className="flex flex-wrap items-center gap-3">
@@ -1418,7 +1418,7 @@ const CustomerHome = () => {
                         {/* Current Activity Box */}
                         <div className="bg-surface-900 p-1 rounded-[3.5rem] shadow-2xl shadow-primary/10 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-colors duration-700"></div>
-                            <div className="bg-white/5 backdrop-blur-3xl p-8 rounded-[3.3rem] min-h-[450px] flex flex-col border border-white/5">
+                            <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[3.3rem] flex flex-col border border-white/5">
                                 {userData?.uid ? (
                                     <>
                                         <div className="flex items-center justify-between mb-10">
@@ -1548,7 +1548,7 @@ const CustomerHome = () => {
                         </div>
 
                         {/* Recent History Box */}
-                        <div className="glass-card p-6 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
+                        <div className="glass-card p-6 md:p-8 rounded-[2.5rem] md:rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-xl font-black text-surface-900 tracking-tighter">Recent Jobs</h2>
                                 <span className="bg-surface-50 text-surface-400 text-[10px] px-3 py-1 rounded-full font-black border border-surface-100">{pastBookings.length}</span>
@@ -1634,7 +1634,7 @@ const CustomerHome = () => {
 
                         {/* Service Breakdown Chart */}
                         {userData?.uid && chartData.length > 0 && (
-                            <div className="glass-card p-10 rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
+                            <div className="glass-card p-8 rounded-[3.5rem] border-white/10 shadow-2xl shadow-primary/5">
                                 <div className="flex items-center gap-4 mb-8">
                                     <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
                                         <PieChartIcon className="w-5 h-5 text-primary" />
