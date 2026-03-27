@@ -31,7 +31,7 @@ export const NotificationProvider = ({ children }) => {
         const q = query(
             collection(db, 'notifications'),
             where('userId', 'in', userIdentifiers),
-            limit(50) // Fetch more to allow for in-memory sorting
+            limit(100) // Fetch enough to cover recent activity and unread count
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -40,30 +40,22 @@ export const NotificationProvider = ({ children }) => {
                 ...doc.data()
             }));
             
-            // Sort in-memory: handle missing createdAt or non-timestamp values
+            // Calculate unread count from the broad fetched list (before slicing)
+            const count = fetched.filter(n => !n.read).length;
+            setUnreadCount(count);
+
+            // Sort in-memory for the display list
             const sorted = fetched.sort((a, b) => {
                 const timeA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || 0;
                 const timeB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || 0;
                 return timeB - timeA;
             });
             
-            setNotifications(sorted.slice(0, 20)); // Keep only latest 20
-        });
-
-        // Separate listener for accurate unread count across ALL notifications
-        const unreadQ = query(
-            collection(db, 'notifications'),
-            where('userId', 'in', userIdentifiers),
-            where('read', '==', false)
-        );
-
-        const unsubscribeUnread = onSnapshot(unreadQ, (snapshot) => {
-            setUnreadCount(snapshot.size);
+            setNotifications(sorted.slice(0, 30)); // Keep slightly more for visibility
         });
 
         return () => {
             unsubscribe();
-            unsubscribeUnread();
         };
     }, [currentUser, userData?.role, userData?.name]);
 
@@ -106,6 +98,7 @@ export const NotificationProvider = ({ children }) => {
         try {
             const userIdentifiers = [currentUser.uid];
             if (userData?.role) userIdentifiers.push(userData.role);
+            if (userData?.name) userIdentifiers.push(userData.name);
             
             const q = query(
                 collection(db, 'notifications'),
