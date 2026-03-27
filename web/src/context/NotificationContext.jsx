@@ -31,31 +31,42 @@ export const NotificationProvider = ({ children }) => {
         const q = query(
             collection(db, 'notifications'),
             where('userId', 'in', userIdentifiers),
-            limit(100) // Fetch enough to cover recent activity and unread count
+            limit(100)
         );
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
+        const unsubscribeMain = onSnapshot(q, (snapshot) => {
             const fetched = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
             
-            // Calculate unread count from the broad fetched list (before slicing)
-            const count = fetched.filter(n => !n.read).length;
-            setUnreadCount(count);
-
-            // Sort in-memory for the display list
             const sorted = fetched.sort((a, b) => {
                 const timeA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || 0;
                 const timeB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || 0;
                 return timeB - timeA;
             });
-            
-            setNotifications(sorted.slice(0, 30)); // Keep slightly more for visibility
+            setNotifications(sorted.slice(0, 30));
+        });
+
+        // Use individual listeners for unread count to avoid composite index requirements
+        // This is the most robust way to ensure real-time counts work without manual index setup
+        const countsRef = {};
+        const unreadUnsubs = userIdentifiers.map(id => {
+            const uq = query(
+                collection(db, 'notifications'),
+                where('userId', '==', id),
+                where('read', '==', false)
+            );
+            return onSnapshot(uq, (snap) => {
+                countsRef[id] = snap.size;
+                const total = userIdentifiers.reduce((sum, identifier) => sum + (countsRef[identifier] || 0), 0);
+                setUnreadCount(total);
+            });
         });
 
         return () => {
-            unsubscribe();
+            unsubscribeMain();
+            unreadUnsubs.forEach(unsub => unsub());
         };
     }, [currentUser, userData?.role, userData?.name]);
 

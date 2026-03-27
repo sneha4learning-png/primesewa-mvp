@@ -162,6 +162,8 @@ const ProviderDashboard = () => {
             if (req.customerUid) {
                 sendNotification(req.customerUid, 'New Quote Proposed', `${userData.name} proposed ₹${negotiatedPrice} for your ${req.service} request.`, 'info');
             }
+            // Always notify Admin on price proposals
+            sendNotification('admin', 'Partner Price Quote', `${userData.name} proposed ₹${negotiatedPrice} for ${req.service} to ${req.customer}.`, 'info');
         } catch (e) { console.error(e); }
     };
 

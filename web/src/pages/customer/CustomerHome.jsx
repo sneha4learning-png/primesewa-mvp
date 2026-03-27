@@ -896,6 +896,11 @@ const CustomerHome = () => {
                 }
 
                 await updateDoc(doc(db, 'bookings', booking.id), { rated: true, ratingGiven: ratingState.rating });
+                
+                // Notify Provider & Admin
+                sendNotification(providerId, 'New Service Review', `Customer ${userData.name} gave you ${ratingState.rating} stars for ${booking.service}.`, 'success');
+                sendNotification('admin', 'Service Reviewed', `${userData.name} rated ${booking.provider} with ${ratingState.rating} stars for ${booking.service}.`, 'info');
+
                 setRatingState({ bookingId: null, rating: 0 });
             } catch (err) {
                 console.error(err);
@@ -1302,7 +1307,11 @@ const CustomerHome = () => {
                                                     {b.status === 'negotiating' ? (
                                                         <div className="flex gap-3">
                                                             <button 
-                                                                onClick={() => handleAcceptQuote(b.id, b.proposedPrice, b.providerUid)}
+                                                                onClick={() => {
+                                                                    handleAcceptQuote(b.id, b.proposedPrice, b.providerUid);
+                                                                    // Notify Admin
+                                                                    sendNotification('admin', 'Quote Accepted', `${userData.name} accepted the quote from ${b.provider} for ${b.service}.`, 'success');
+                                                                }}
                                                                 className="flex-1 py-3 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
                                                             >
                                                                 Accept Quote
