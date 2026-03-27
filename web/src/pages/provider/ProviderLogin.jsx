@@ -316,26 +316,26 @@ const ProviderLogin = () => {
     }, []);
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 md:py-16 bg-surface-900">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 md:py-16 bg-slate-50">
             {/* Professional Background Slider */}
             <div className="absolute inset-0 z-0">
                 {serviceImages.map((img, idx) => (
                     <div
                         key={idx}
-                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-20' : 'opacity-0'}`}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-25' : 'opacity-0'}`}
                     >
                         <img src={img} alt="Background" className="w-full h-full object-cover" />
                     </div>
                 ))}
-                <div className="absolute inset-0 mesh-gradient opacity-50 mix-blend-multiply"></div>
-                <div className="absolute inset-0 bg-linear-to-b from-transparent via-surface-900/60 to-surface-900"></div>
+                <div className="absolute inset-0 mesh-gradient opacity-10 mix-blend-multiply"></div>
+                <div className="absolute inset-0 bg-linear-to-b from-transparent via-white/40 to-slate-50"></div>
             </div>
 
             <div className={`relative z-10 w-full animate-fade-in ${isSignup ? 'max-w-2xl' : 'max-w-md'}`}>
-                <div className="glass-card-dark rounded-[2.5rem] shadow-2xl border-white/10 p-8 md:p-10 text-white">
+                <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl shadow-indigo-500/10 border border-white p-8 md:p-10 text-slate-900">
                     <div className="text-center mb-6 flex flex-col items-center">
                         <div className="flex flex-col items-center justify-center mb-4">
-                            <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-2xl shadow-primary/20 p-3 transition-transform hover:scale-110 duration-500">
+                            <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-xl border border-slate-100 p-3 transition-transform hover:scale-110 duration-500">
                                 <img
                                     src="/logo-v2.png"
                                     alt="PrimeSewa"
@@ -343,16 +343,16 @@ const ProviderLogin = () => {
                                     onError={e => { e.target.style.display = 'none'; }}
                                 />
                             </div>
-                            <span className="text-3xl font-black text-white tracking-tighter">PrimeSewa</span>
-                            <span className="text-[10px] font-black text-primary-light mt-1 uppercase tracking-[0.25em]">Partner Network</span>
+                            <span className="text-3xl font-black text-slate-950 tracking-tighter italic">PrimeSewa</span>
+                            <span className="text-[10px] font-black text-primary mt-1 uppercase tracking-[0.25em]">Partner Network</span>
                         </div>
-                        <h2 className="text-xl font-bold tracking-tight text-white mb-1">{isSignup ? 'Business Registration' : 'Partner Portal'}</h2>
-                        <p className="text-white/40 text-xs font-medium">{isSignup ? 'Scale your service business with our global reach' : 'Manage your enterprise operations'}</p>
+                        <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-1">{isSignup ? 'Business Registration' : 'Partner Portal'}</h2>
+                        <p className="text-slate-500 text-xs font-medium">{isSignup ? 'Scale your service business with our global reach' : 'Manage your enterprise operations'}</p>
                     </div>
 
                     {error && (
-                        <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3 animate-fade-in">
-                            <AlertCircle className="w-5 h-5 shrink-0" />
+                        <div className="mb-4 bg-red-50 border border-red-100 text-red-600 px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3 animate-fade-in">
+                            <AlertCircle className="w-5 h-5 shrink-0 text-red-500" />
                             {error}
                         </div>
                     )}
@@ -361,70 +361,70 @@ const ProviderLogin = () => {
                         <form onSubmit={handleSendOtp} className="space-y-4 animate-fade-in">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Legal Name</label>
-                                    <input required type="text" className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white placeholder-white/10 outline-none" value={signupData.name} onChange={e => setSignupData({ ...signupData, name: e.target.value })} placeholder="Full name as per ID" />
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Legal Name</label>
+                                    <input required type="text" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 placeholder-slate-300 outline-none" value={signupData.name} onChange={e => setSignupData({ ...signupData, name: e.target.value })} placeholder="Full name as per ID" />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Business Mobile</label>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Business Mobile</label>
                                     <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-primary-light/50 font-black text-sm">+91</span>
-                                        <input required type="tel" maxLength={10} className="w-full pl-14 pr-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white placeholder-white/10 outline-none" value={signupData.phone} onChange={e => setSignupData({ ...signupData, phone: e.target.value.replace(/\D/g, '') })} placeholder="Phone number" />
+                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/50 font-black text-sm">+91</span>
+                                        <input required type="tel" maxLength={10} className="w-full pl-14 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 placeholder-slate-300 outline-none" value={signupData.phone} onChange={e => setSignupData({ ...signupData, phone: e.target.value.replace(/\D/g, '') })} placeholder="Phone number" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Specialization</label>
-                                    <select required className="w-full px-5 py-4 bg-white/10 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white outline-none appearance-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1rem' }} value={signupData.category} onChange={e => setSignupData({ ...signupData, category: e.target.value })}>
-                                        <option value="Plumbing" className="bg-surface-900">Plumbing</option>
-                                        <option value="Electrical" className="bg-surface-900">Electrical</option>
-                                        <option value="Cleaning" className="bg-surface-900">Cleaning</option>
-                                        <option value="Carpentry" className="bg-surface-900">Carpentry</option>
-                                        <option value="Painting" className="bg-surface-900">Home Painting</option>
-                                        <option value="AC Repair" className="bg-surface-900">AC Repair & Service</option>
-                                        <option value="Appliance Repair" className="bg-surface-900">Appliance Repair</option>
-                                        <option value="Pest Control" className="bg-surface-900">Pest Control</option>
-                                        <option value="Salon & Beauty" className="bg-surface-900">Salon & Beauty</option>
-                                        <option value="Packers & Movers" className="bg-surface-900">Packers & Movers</option>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Specialization</label>
+                                    <select required className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 outline-none appearance-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1rem' }} value={signupData.category} onChange={e => setSignupData({ ...signupData, category: e.target.value })}>
+                                        <option value="Plumbing">Plumbing</option>
+                                        <option value="Electrical">Electrical</option>
+                                        <option value="Cleaning">Cleaning</option>
+                                        <option value="Carpentry">Carpentry</option>
+                                        <option value="Painting">Home Painting</option>
+                                        <option value="AC Repair">AC Repair & Service</option>
+                                        <option value="Appliance Repair">Appliance Repair</option>
+                                        <option value="Pest Control">Pest Control</option>
+                                        <option value="Salon & Beauty">Salon & Beauty</option>
+                                        <option value="Packers & Movers">Packers & Movers</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Base Rate (₹/hr)</label>
-                                    <input required type="number" min="50" className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white placeholder-white/10 outline-none" value={signupData.price} onChange={e => setSignupData({ ...signupData, price: e.target.value })} placeholder="e.g. 400" />
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Base Rate (₹/hr)</label>
+                                    <input required type="number" min="50" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 placeholder-slate-300 outline-none" value={signupData.price} onChange={e => setSignupData({ ...signupData, price: e.target.value })} placeholder="e.g. 400" />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Service Operations (Ahmedabad Areas)</label>
-                                    <input required type="text" className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white placeholder-white/10 outline-none" value={signupData.serviceAreas} onChange={e => setSignupData({ ...signupData, serviceAreas: e.target.value })} placeholder="e.g. Vastrapur, Bopal, SG Highway" />
-                                    <p className="text-[10px] text-primary-light/50 mt-1 font-bold uppercase tracking-widest">Comma separated list of operational zones</p>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Service Operations (Ahmedabad Areas)</label>
+                                    <input required type="text" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 placeholder-slate-300 outline-none" value={signupData.serviceAreas} onChange={e => setSignupData({ ...signupData, serviceAreas: e.target.value })} placeholder="e.g. Vastrapur, Bopal, SG Highway" />
+                                    <p className="text-[10px] text-primary/60 mt-1 font-bold uppercase tracking-widest">Comma separated list of operational zones</p>
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-white/5 space-y-4">
+                            <div className="pt-4 border-t border-slate-100 space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                                        <ShieldCheck className="w-4 h-4 text-primary-light" />
+                                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                        <ShieldCheck className="w-4 h-4 text-primary" />
                                     </div>
-                                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Verification & Compliance</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verification & Compliance</p>
                                 </div>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">ID Authority</label>
-                                        <select required className="w-full px-5 py-4 bg-white/10 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white outline-none appearance-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1rem' }} value={signupData.idProofType} onChange={e => setSignupData({ ...signupData, idProofType: e.target.value })}>
-                                            <option value="Aadhaar" className="bg-surface-900">Aadhaar Card</option>
-                                            <option value="PAN" className="bg-surface-900">PAN Card</option>
-                                            <option value="Driving License" className="bg-surface-900">Driving License</option>
-                                            <option value="Voter ID" className="bg-surface-900">Voter ID</option>
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ID Authority</label>
+                                        <select required className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 outline-none appearance-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2364748b\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.25rem center', backgroundSize: '1rem' }} value={signupData.idProofType} onChange={e => setSignupData({ ...signupData, idProofType: e.target.value })}>
+                                            <option value="Aadhaar">Aadhaar Card</option>
+                                            <option value="PAN">PAN Card</option>
+                                            <option value="Driving License">Driving License</option>
+                                            <option value="Voter ID">Voter ID</option>
                                         </select>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Identification Number</label>
-                                        <input required type="text" className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-white placeholder-white/10 outline-none" value={signupData.idProofNumber} onChange={e => setSignupData({ ...signupData, idProofNumber: e.target.value })} placeholder="XXXX-XXXX-XXXX" />
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Identification Number</label>
+                                        <input required type="text" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 placeholder-slate-300 outline-none" value={signupData.idProofNumber} onChange={e => setSignupData({ ...signupData, idProofNumber: e.target.value })} placeholder="XXXX-XXXX-XXXX" />
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Work Portfolio (Optional)</label>
-                                        <label className={`w-full flex justify-center items-center gap-3 py-5 border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-all ${signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? 'border-primary bg-primary/10 text-primary-light' : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/30'}`}>
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Work Portfolio (Optional)</label>
+                                        <label className={`w-full flex justify-center items-center gap-3 py-5 border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-all ${signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-400'}`}>
                                             <input type="file" multiple accept="image/*" className="hidden" onChange={e => setSignupData({ ...signupData, proofOfWorkImages: Array.from(e.target.files) })} />
                                             {signupData.proofOfWorkImages && signupData.proofOfWorkImages.length > 0 ? (
                                                 <><CheckCircle2 className="w-5 h-5" /> <span className="font-black text-[10px] uppercase tracking-widest">{signupData.proofOfWorkImages.length} Assets Attached</span></>
@@ -434,8 +434,8 @@ const ProviderLogin = () => {
                                         </label>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Identity Document (Mandatory)</label>
-                                        <label className={`w-full flex items-center justify-center gap-3 py-5 border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-all ${signupData.proofDocument ? 'border-primary bg-primary/10 text-primary-light' : 'border-white/10 bg-white/5 hover:bg-white/10 text-white/30'}`}>
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Identity Document (Mandatory)</label>
+                                        <label className={`w-full flex items-center justify-center gap-3 py-5 border-2 border-dashed rounded-[1.25rem] cursor-pointer transition-all ${signupData.proofDocument ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-400'}`}>
                                             <input required type="file" className="hidden" onChange={e => setSignupData({ ...signupData, proofDocument: e.target.files[0] })} />
                                             {signupData.proofDocument ? (
                                                 <><CheckCircle2 className="w-5 h-5" /> <span className="font-black text-[10px] uppercase tracking-widest">Identity Verified</span></>
@@ -458,13 +458,13 @@ const ProviderLogin = () => {
                                 </button>
                                 
                                 <div className="text-center">
-                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                                        Already a partner? <button type="button" onClick={() => setIsSignup(false)} className="text-primary-light hover:underline ml-2">Secure Login</button>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        Already a partner? <button type="button" onClick={() => setIsSignup(false)} className="text-primary hover:underline ml-2">Secure Login</button>
                                     </p>
                                 </div>
 
-                                <div className="pt-4 border-t border-white/5">
-                                    <Link to="/login" className="w-full flex items-center justify-center gap-3 py-4 bg-white/5 hover:bg-white/10 text-[10px] font-black text-white/40 rounded-2xl border border-white/10 transition-all uppercase tracking-widest">
+                                <div className="pt-4 border-t border-slate-100">
+                                    <Link to="/login" className="w-full flex items-center justify-center gap-3 py-4 bg-slate-50 hover:bg-slate-100 text-[10px] font-black text-slate-500 rounded-2xl border border-slate-200 transition-all uppercase tracking-widest">
                                         🏠 Switch to Client Channel
                                     </Link>
                                 </div>
@@ -473,20 +473,20 @@ const ProviderLogin = () => {
                     ) : step === 1 ? (
                         <form onSubmit={handleSendOtp} className="space-y-6 animate-fade-in">
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest ml-1 text-center">Authorized Mobile Number</label>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-center">Authorized Mobile Number</label>
                                 <div className="relative group">
-                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-primary-light/50 font-black text-lg border-r border-white/10 pr-4">+91</span>
+                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/50 font-black text-lg border-r border-slate-200 pr-4">+91</span>
                                     <input
                                         required
                                         type="tel"
                                         maxLength={10}
-                                        className="w-full pl-24 pr-6 py-5 bg-white/5 border border-white/10 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-black text-white text-2xl tracking-[0.2em] outline-none"
+                                        className="w-full pl-24 pr-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-black text-slate-900 text-2xl tracking-[0.2em] outline-none"
                                         placeholder="000 000 0000"
                                         value={phoneNumber}
                                         onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                                     />
                                 </div>
-                                <p className="text-[10px] text-center text-primary-light/40 font-black uppercase tracking-[0.2em]">High Impact Verification Required</p>
+                                <p className="text-[10px] text-center text-primary/60 font-black uppercase tracking-[0.2em]">High Impact Verification Required</p>
                             </div>
                             
                             <div className="space-y-6">
@@ -504,13 +504,13 @@ const ProviderLogin = () => {
                                 </button>
 
                                 <div className="text-center">
-                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                                        New Partner? <button type="button" onClick={() => setIsSignup(true)} className="text-primary-light hover:underline ml-2">Join Network</button>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        New Partner? <button type="button" onClick={() => setIsSignup(true)} className="text-primary hover:underline ml-2">Join Network</button>
                                     </p>
                                 </div>
 
-                                <div className="pt-4 border-t border-white/5">
-                                    <Link to="/login" className="w-full flex items-center justify-center gap-3 py-4 bg-white/5 hover:bg-white/10 text-[10px] font-black text-white/40 rounded-2xl border border-white/10 transition-all uppercase tracking-widest">
+                                <div className="pt-4 border-t border-slate-100">
+                                    <Link to="/login" className="w-full flex items-center justify-center gap-3 py-4 bg-slate-50 hover:bg-slate-100 text-[10px] font-black text-slate-500 rounded-2xl border border-slate-200 transition-all uppercase tracking-widest">
                                         🏠 Switch to Client Channel
                                     </Link>
                                 </div>
@@ -519,19 +519,19 @@ const ProviderLogin = () => {
                     ) : (
                         <form onSubmit={handleVerifyOtp} className="space-y-6 animate-fade-in">
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-white/30 uppercase tracking-widest text-center">Verify Identity Code</label>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Verify Identity Code</label>
                                 <input
                                     type="password"
                                     required
                                     maxLength={4}
-                                    className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[1rem] text-2xl text-white placeholder-white/5 outline-none"
+                                    className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[1rem] text-2xl text-slate-900 placeholder-slate-200 outline-none"
                                     placeholder="••••"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
                                 />
                                 <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10 text-center">
-                                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Code sent to +91 {isSignup ? signupData.phone : phoneNumber}</p>
-                                    <p className="text-[10px] font-black text-primary-light uppercase tracking-widest">Dev Mode: Use <span className="text-white">••••</span></p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Code sent to +91 {isSignup ? signupData.phone : phoneNumber}</p>
+                                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">Dev Mode: Use <span className="text-slate-900">••••</span></p>
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -550,7 +550,7 @@ const ProviderLogin = () => {
                                 <button
                                     type="button"
                                     onClick={() => { setStep(1); setOtp(''); setError(''); }}
-                                    className="w-full py-2 text-[10px] font-black text-white/20 hover:text-white/40 transition-colors uppercase tracking-[0.2em]"
+                                    className="w-full py-2 text-[10px] font-black text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-[0.2em]"
                                 >
                                     ← Modify Credentials
                                 </button>
