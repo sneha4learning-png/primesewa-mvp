@@ -50,19 +50,19 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 bg-slate-50">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 bg-linear-to-br from-indigo-500 via-indigo-600 to-violet-700">
             {/* Professional Background Slider */}
             <div className="absolute inset-0 z-0">
                 {serviceImages.map((img, idx) => (
                     <div
                         key={idx}
-                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-40' : 'opacity-0'}`}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-20' : 'opacity-0'}`}
                     >
-                        <img src={img} alt="Service" className="w-full h-full object-cover" />
+                        <img src={img} alt="Service" className="w-full h-full object-cover mix-blend-overlay" />
                     </div>
                 ))}
-                <div className="absolute inset-0 mesh-gradient opacity-10 mix-blend-multiply"></div>
-                <div className="absolute inset-0 bg-linear-to-b from-white/20 via-white/40 to-slate-50"></div>
+                <div className="absolute inset-0 bg-linear-to-b from-indigo-900/20 via-indigo-950/40 to-indigo-950/60 transition-colors duration-1000"></div>
+                <div className="absolute inset-0 mesh-gradient opacity-30 mix-blend-soft-light"></div>
             </div>
 
             {/* Dot indicators */}
@@ -71,14 +71,14 @@ const AdminLogin = () => {
                     <button
                         key={idx}
                         onClick={() => setCurrentImageIndex(idx)}
-                        className={`transition-all duration-500 rounded-full ${idx === currentImageIndex ? 'w-10 h-1.5 bg-primary' : 'w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400'}`}
+                        className={`transition-all duration-500 rounded-full ${idx === currentImageIndex ? 'w-10 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/20 hover:bg-white/40'}`}
                     />
                 ))}
             </div>
 
             {/* Service label */}
             <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] animate-fade-in">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-fade-in">
                     {serviceLabels[currentImageIndex]}
                 </span>
             </div>
