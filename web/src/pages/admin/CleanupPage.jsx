@@ -74,7 +74,6 @@ const CleanupPage = () => {
                 };
 
                 if (seenUsers.has(uniqueKey)) {
-                    const existing = seenUsers.get(uniqueKey);
                     // Keep the one with more data/bookings or specific ID (testing preference)
                     toDelete.push(u.id);
                 } else {
