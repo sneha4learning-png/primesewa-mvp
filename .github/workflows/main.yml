@@ -1,4 +1,4 @@
-# CI/CD Trigger Comment - Forced Refresh (March 26, 2026, 15:40)
+# CI/CD Trigger Comment - Forced Refresh (March 27, 2026, 18:05)
 name: Deploy Demo
 
 on:
@@ -72,5 +72,5 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          npx firebase-tools deploy --only hosting --project primeseva-mvp --token "$FIREBASE_TOKEN"
+          npx firebase-tools deploy --only hosting --project primesewa-mvp --token "$FIREBASE_TOKEN"
 
