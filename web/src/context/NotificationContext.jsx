@@ -23,6 +23,10 @@ export const NotificationProvider = ({ children }) => {
         if (userData?.role) {
             userIdentifiers.push(userData.role);
         }
+        // Also listen for notifications sent to user's name (common for provider identification)
+        if (userData?.name) {
+            userIdentifiers.push(userData.name);
+        }
 
         const q = query(
             collection(db, 'notifications'),
@@ -61,7 +65,7 @@ export const NotificationProvider = ({ children }) => {
             unsubscribe();
             unsubscribeUnread();
         };
-    }, [currentUser, userData?.role]);
+    }, [currentUser, userData?.role, userData?.name]);
 
     const sendNotification = async (userId, title, message, type = 'info') => {
         try {

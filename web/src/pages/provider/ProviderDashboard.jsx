@@ -143,6 +143,9 @@ const ProviderDashboard = () => {
             if (req.customerUid) {
                 sendNotification(req.customerUid, 'Request Accepted', `${userData.name} has accepted your ${req.service} request and is starting soon.`, 'success');
             }
+
+            // Notify Admin
+            sendNotification('admin', 'Partner Accepted Request', `${userData.name} accepted the ${req.service} request from ${req.customer || 'a customer'}.`, 'info');
         } catch (e) { console.error(e); }
     };
 
@@ -177,6 +180,9 @@ const ProviderDashboard = () => {
             if (req && req.customerUid) {
                 sendNotification(req.customerUid, 'Request Declined', `${userData.name} is unavailable for the ${req.service} request.`, 'error');
             }
+
+            // Notify Admin
+            sendNotification('admin', 'Partner Declined Request', `${userData.name} declined the ${req?.service || 'service'} request from ${req?.customer || 'a customer'}.`, 'warning');
         } catch (e) { console.error(e); }
     };
 
@@ -254,6 +260,9 @@ const ProviderDashboard = () => {
             if (job.customerUid) {
                 sendNotification(job.customerUid, 'Job Completed', `${userData.name} has marked your ${job.service} as completed. Please rate the service!`, 'success');
             }
+
+            // Notify Admin
+            sendNotification('admin', 'Job Finalized', `${userData.name} completed the ${job.service} for ${job.customer}. Platform commission: ₹${platformCut.toFixed(2)}.`, 'success');
 
             // Optimistically update earnings display
             setEarnings(prev => ({

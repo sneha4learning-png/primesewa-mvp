@@ -5,8 +5,10 @@ import { useAuth } from '../firebase/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import NotificationBell from '../components/NotificationBell';
+import { useNotifications } from '../context/NotificationContext';
 const ProviderLayout = () => {
     const { userData, logout } = useAuth();
+    const { unreadCount } = useNotifications();
     const navigate = useNavigate();
     const [isOnline, setIsOnline] = useState(false);
     const [providerId, setProviderId] = useState(null);
@@ -79,7 +81,17 @@ const ProviderLayout = () => {
             <nav className="flex-1 overflow-y-auto py-8">
                 {providerStatus === 'active' ? (
                     <ul className="space-y-2 px-4 relative z-10">
-                        <li><NavLink to="/provider" end className={navLinkClass} onClick={() => setSidebarOpen(false)}><Briefcase className="w-5 h-5" /> Service Requests</NavLink></li>
+                        <li>
+                            <NavLink to="/provider" end className={navLinkClass} onClick={() => setSidebarOpen(false)}>
+                                <Briefcase className="w-5 h-5" /> 
+                                <span>Service Requests</span>
+                                {unreadCount > 0 && (
+                                    <span className="ml-auto bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/10 shadow-lg">
+                                        {unreadCount}
+                                    </span>
+                                )}
+                            </NavLink>
+                        </li>
                         <li><NavLink to="/provider/earnings" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Earnings Center</NavLink></li>
                         <li><NavLink to="/provider/profile" className={navLinkClass} onClick={() => setSidebarOpen(false)}><UserCircle className="w-5 h-5" /> My Profile</NavLink></li>
                     </ul>

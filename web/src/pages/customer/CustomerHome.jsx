@@ -608,12 +608,17 @@ const CustomerHome = () => {
 
     const handleRejectQuote = async (bookingId) => {
         if (!window.confirm("Are you sure you want to reject this quote? This will cancel the current negotiation.")) return;
+        const booking = activeBookings.find(b => b.id === bookingId);
         try {
             const bookingRef = doc(db, 'bookings', bookingId);
             await updateDoc(bookingRef, {
                 status: 'rejected_by_customer',
                 updatedAt: serverTimestamp()
             });
+
+            if (booking && booking.providerUid) {
+                sendNotification(booking.providerUid, 'Quote Rejected', `The customer has declined your proposed quote for the ${booking.service} job.`, 'error');
+            }
         } catch (error) {
             console.error("Error rejecting quote:", error);
         }
@@ -756,9 +761,15 @@ const CustomerHome = () => {
     };
 
     const handleCancelBooking = async (bookingId) => {
+        const booking = activeBookings.find(b => b.id === bookingId);
         try {
             await updateDoc(doc(db, 'bookings', bookingId), { status: 'cancelled' });
             setActiveBookings(prev => prev.filter(b => b.id !== bookingId));
+
+            if (booking && booking.providerUid) {
+                sendNotification(booking.providerUid, 'Booking Cancelled', `The customer has cancelled the ${booking.service} request for ${booking.date}.`, 'error');
+            }
+            sendNotification('admin', 'Booking Cancelled', `${userData?.name || 'A customer'} has cancelled their ${booking?.service || 'service'} request.`, 'warning');
         } catch (err) {
             console.error('Cancel error:', err);
         }
