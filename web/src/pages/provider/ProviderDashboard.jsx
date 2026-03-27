@@ -134,10 +134,13 @@ const ProviderDashboard = () => {
 
     const acceptRequest = async (req) => {
         try {
-            await updateDoc(doc(db, 'bookings', req.id), { status: 'accepted' });
+            await updateDoc(doc(db, 'bookings', req.id), { 
+                status: 'accepted',
+                providerUid: userData.uid // Sync UID for future notifications
+            });
             setRequests(prev => prev.filter(r => r.id !== req.id));
-            setActiveJobs(prev => [{ ...req, status: 'accepted' }, ...prev]);
-            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'accepted' } : r));
+            setActiveJobs(prev => [{ ...req, status: 'accepted', providerUid: userData.uid }, ...prev]);
+            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'accepted', providerUid: userData.uid } : r));
             
             // Notify Customer
             if (req.customerUid) {
@@ -152,9 +155,13 @@ const ProviderDashboard = () => {
     const proposePrice = async (req) => {
         if (!negotiatedPrice) return;
         try {
-            await updateDoc(doc(db, 'bookings', req.id), { status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) });
-            setRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) } : r));
-            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice) } : r));
+            await updateDoc(doc(db, 'bookings', req.id), { 
+                status: 'negotiating', 
+                proposedPrice: parseInt(negotiatedPrice),
+                providerUid: userData.uid // Claim this booking with UID
+            });
+            setRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice), providerUid: userData.uid } : r));
+            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice), providerUid: userData.uid } : r));
             setNegotiatingId(null);
             setNegotiatedPrice('');
 

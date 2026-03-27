@@ -597,9 +597,10 @@ const CustomerHome = () => {
                 updatedAt: serverTimestamp()
             });
 
-            // Notify Provider that their quote was accepted
-            if (providerUid) {
-                sendNotification(providerUid, 'Quote Accepted', `Great news! The customer has accepted your proposed quote of ₹${proposedPrice || 500}. You can start the work now.`, 'success');
+            // Notify Provider that their quote was accepted — priority to UID, fallback to name
+            const targetProvider = providerUid || activeBookings.find(b => b.id === bookingId)?.provider;
+            if (targetProvider) {
+                sendNotification(targetProvider, 'Quote Accepted', `Great news! The customer has accepted your proposed quote of ₹${proposedPrice || 500}. You can start the work now.`, 'success');
             }
         } catch (error) {
             console.error("Error accepting quote:", error);
@@ -616,8 +617,10 @@ const CustomerHome = () => {
                 updatedAt: serverTimestamp()
             });
 
-            if (booking && booking.providerUid) {
-                sendNotification(booking.providerUid, 'Quote Rejected', `The customer has declined your proposed quote for the ${booking.service} job.`, 'error');
+            // Notify Provider — priority to UID, fallback to name
+            const targetProvider = booking?.providerUid || booking?.provider;
+            if (targetProvider) {
+                sendNotification(targetProvider, 'Quote Rejected', `The customer has declined your proposed quote for the ${booking?.service || 'service'} job.`, 'error');
             }
         } catch (error) {
             console.error("Error rejecting quote:", error);
