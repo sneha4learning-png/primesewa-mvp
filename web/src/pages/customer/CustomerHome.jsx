@@ -266,6 +266,8 @@ const CustomerHome = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [networkError, setNetworkError] = useState(false);
     const [isLocating, setIsLocating] = useState(false);
+    const [_dbError, setDbError] = useState(false);
+    const [_loadingData, setLoadingData] = useState(true);
     const [locationCoords, setLocationCoords] = useState(null);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);

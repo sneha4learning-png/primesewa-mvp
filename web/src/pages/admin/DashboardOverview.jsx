@@ -5,17 +5,20 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 
-const StatCard = ({ title, value, icon: Icon, colorClass }) => (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex items-center gap-4">
-        <div className={`p-4 rounded-lg ${colorClass}`}>
-            <Icon className="w-6 h-6 text-white" />
+const StatCard = ({ title, value, icon, colorClass }) => {
+    const Icon = icon;
+    return (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex items-center gap-4">
+            <div className={`p-4 rounded-lg ${colorClass}`}>
+                <Icon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+                <p className="text-sm font-medium text-gray-500">{title}</p>
+                <h3 className="text-2xl font-normal text-gray-900">{value}</h3>
+            </div>
         </div>
-        <div>
-            <p className="text-sm font-medium text-gray-500">{title}</p>
-            <h3 className="text-2xl font-normal text-gray-900">{value}</h3>
-        </div>
-    </div>
-);
+    );
+};
 
 // Converts 24-hour time string (e.g. "16:00") → AM/PM (e.g. "4:00 PM") — consistent with all panels
 const formatTime = (timeStr) => {
