@@ -8,7 +8,6 @@ const UserManagement = () => {
     const { sendNotification } = useNotifications();
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
     const [userBookings, setUserBookings] = useState([]);
     const [allBookings, setAllBookings] = useState([]);
@@ -57,8 +56,6 @@ const UserManagement = () => {
                 setUsers(allAccounts);
             } catch (err) {
                 console.error("Error fetching accounts:", err);
-            } finally {
-                setIsLoading(false);
             }
         };
 
@@ -116,9 +113,6 @@ const UserManagement = () => {
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
     const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm]);
 
     return (
         <div className="space-y-6">
@@ -132,7 +126,10 @@ const UserManagement = () => {
                         placeholder="Search consumers by name or phone..."
                         className="w-full h-[48px] pl-12 pr-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-slate-800 font-medium text-sm outline-none transition-all"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(1);
+                        }}
                     />
                 </div>
             </div>

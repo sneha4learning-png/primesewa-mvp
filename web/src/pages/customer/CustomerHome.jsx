@@ -72,7 +72,7 @@ const getServiceImage = (category = '') => {
     return "https://images.unsplash.com/photo-1542013936693-884638332954?w=800&q=80";
 };
 
-const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) => {
+const ProviderProfileModal = ({ p, onClose, handleBook }) => {
     const [liveJobsCount, setLiveJobsCount] = useState(p?.jobs || p?.jobCount || 0);
 
     useEffect(() => {
@@ -104,7 +104,6 @@ const ProviderProfileModal = ({ p, onClose, userData, navigate, handleBook }) =>
     const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
     const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(String(p.rating || 0));
     const jobs = String(liveJobsCount);
-    const areas = Array.isArray(p.serviceAreas) ? String(p.serviceAreas[0] || 'Ahmedabad') : String(p.serviceAreas || 'Ahmedabad');
     const price = String(p.price || '499');
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
 
@@ -239,15 +238,12 @@ const CustomerHome = () => {
     const { userData } = useAuth();
     const { sendNotification } = useNotifications();
 
-    const [allProviders, setAllProviders] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [bookingStep, setBookingStep] = useState(0); // 0: lists, 1: form, 2: success
     const [onlineProviders, setOnlineProviders] = useState([]);
     const [activeBookings, setActiveBookings] = useState([]);
     const [pastBookings, setPastBookings] = useState([]);
     const [pendingBookingData, setPendingBookingData] = useState(null);
-    const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
-    const [chartData, setChartData] = useState([]);
     const [sortBy, setSortBy] = useState('rating');
 
     // New Feature States
@@ -264,20 +260,13 @@ const CustomerHome = () => {
     const [bookingPincode, setBookingPincode] = useState('');
     const [bookingCity, setBookingCity] = useState('Ahmedabad');
     const [bookingState, setBookingState] = useState('Gujarat');
-    const [slotError, setSlotError] = useState('');
     const [occupiedSlots, setOccupiedSlots] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [visibleCount, setVisibleCount] = useState(5);
     const [visibleHistoryCount, setVisibleHistoryCount] = useState(5);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [networkError, setNetworkError] = useState(false);
-    const [dbError, setDbError] = useState(false);
-    const [loadingData, setLoadingData] = useState(true);
     const [isLocating, setIsLocating] = useState(false);
     const [locationCoords, setLocationCoords] = useState(null);
-    const [addressSuggestions, setAddressSuggestions] = useState([]);
-    const [isSearchingAddress, setIsSearchingAddress] = useState(false);
-    const [addressSearchTimeout, setAddressSearchTimeout] = useState(null);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const serviceImages = [
@@ -298,7 +287,7 @@ const CustomerHome = () => {
             setCurrentImageIndex((prev) => (prev + 1) % serviceImages.length);
         }, 4000);
         return () => clearInterval(timer);
-    }, []);
+    }, [serviceImages.length]);
 
     // NEW: Handle hash navigation for "All Services" and "Dashboard" top locally
     useEffect(() => {
@@ -316,10 +305,6 @@ const CustomerHome = () => {
     }, [location.hash, location.pathname]);
 
     // Returns current time as "HH:MM" string for today's minimum time constraint
-    const getNowTimeStr = () => {
-        const now = new Date();
-        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    };
 
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
@@ -755,7 +740,7 @@ const CustomerHome = () => {
             sessionStorage.setItem('pendingCustomerBooking', JSON.stringify({
                 pendingBookingData,
                 bookingDate,
-                bookingTime,
+                bookingSlot,
                 bookingDesc,
                 bookingAddress,
                 bookingHouseNo,
@@ -839,20 +824,6 @@ const CustomerHome = () => {
         }
     };
 
-    const handleCancelBooking = async (bookingId) => {
-        const booking = activeBookings.find(b => b.id === bookingId);
-        try {
-            await updateDoc(doc(db, 'bookings', bookingId), { status: 'cancelled' });
-            setActiveBookings(prev => prev.filter(b => b.id !== bookingId));
-
-            if (booking && booking.providerUid) {
-                sendNotification(booking.providerUid, 'Booking Cancelled', `The customer has cancelled the ${booking.service} request for ${booking.date}.`, 'error');
-            }
-            sendNotification('admin', 'Booking Cancelled', `${userData?.name || 'A customer'} has cancelled their ${booking?.service || 'service'} request.`, 'warning');
-        } catch (err) {
-            console.error('Cancel error:', err);
-        }
-    };
 
     // Unified Filtering & Sorting Logic — Memoized for performance
     const displayedProviders = useMemo(() => {
@@ -910,30 +881,8 @@ const CustomerHome = () => {
         });
     }, [onlineProviders, searchQuery, selectedCategory, ratingFilter, sortBy]);
 
-    const handleCategoryClick = (catName) => {
-        setSelectedCategory(catName);
-        if (catalogRef.current) {
-            catalogRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    };
 
-    const handleActivityClick = (booking) => {
-        // Removed intrusive alert popup that caused confusion about changing status
-    };
 
-    const handleNegotiation = async (id, accept, proposedPrice) => {
-        try {
-            if (accept) {
-                await updateDoc(doc(db, 'bookings', id), { status: 'accepted', price: proposedPrice });
-                setActiveBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'accepted', price: proposedPrice } : b));
-            } else {
-                await updateDoc(doc(db, 'bookings', id), { status: 'rejected' });
-                setActiveBookings(prev => prev.filter(b => b.id !== id));
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
 
     const submitRating = async (booking) => {
         if (ratingState.rating > 0) {
@@ -951,7 +900,6 @@ const CustomerHome = () => {
                 if (providerId) {
                     // Try to get by ID directly
                     try {
-                        const pRef = doc(db, 'providers', providerId);
                         const pDoc = await getDocs(query(collection(db, 'providers'), where('__name__', '==', providerId)));
                         if (!pDoc.empty) {
                             const p = pDoc.docs[0].data();
@@ -1162,7 +1110,7 @@ const CustomerHome = () => {
                                             type="date"
                                             value={bookingDate}
                                             min={getTodayStr()}
-                                            onChange={(e) => { setBookingDate(e.target.value); setBookingTime(''); }}
+                                            onChange={(e) => { setBookingDate(e.target.value); setBookingSlot(''); }}
                                             className="w-full pl-14 pr-5 py-5 bg-surface-50 border border-surface-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-normal text-surface-900 outline-none"
                                         />
                                     </div>
@@ -1459,6 +1407,8 @@ const CustomerHome = () => {
                                     type="text" 
                                     placeholder="Which specialist are you looking for today? (e.g. Electrician, Yoga Trainer)" 
                                     className="w-full p-4 md:p-5 outline-none font-normal text-surface-700 bg-transparent placeholder:text-surface-300 text-sm md:text-base"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                                 <button className="bg-surface-900 text-white px-6 md:px-10 py-3 md:py-4 rounded-2xl font-medium text-[10px] md:text-xs uppercase tracking-widest hover:bg-primary transition-all shadow-xl hover:scale-105 active:scale-95">
                                     Search
@@ -1548,13 +1498,15 @@ const CustomerHome = () => {
                                                             <div className="flex items-baseline gap-0.5">
                                                                 {(() => {
                                                                     const rawPrice = String(p.price || '499');
-                                                                    const pCats = Array.isArray(p.category) ? p.category : [p.category || ''];
-                                                                    const catObj = categories.find(c => pCats.includes(c.name));
+                                                                    const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
+                                                                    const catObj = categories.find(c => pCats.includes(c.name.toLowerCase()));
                                                                     const defaultUnit = catObj?.type === 'Hourly-based' ? 'hr' : 'job';
                                                                     
-                                                                    const hasUnit = rawPrice.includes('/') || rawPrice.toLowerCase().includes('job') || rawPrice.toLowerCase().includes('hr');
+                                                                    const hasUnitInPrice = rawPrice.includes('/') || rawPrice.toLowerCase().includes('job') || rawPrice.toLowerCase().includes('hr');
                                                                     const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
-                                                                    const unitPart = hasUnit ? (rawPrice.includes('/') ? rawPrice.split('/')[1] : (rawPrice.toLowerCase().includes('job') ? 'job' : 'hr')) : defaultUnit;
+                                                                    
+                                                                    // Force unit based on category type regardless of price string to preserve data integrity
+                                                                    const unitPart = defaultUnit; 
                                                                     
                                                                     return (
                                                                         <>

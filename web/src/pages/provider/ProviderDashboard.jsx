@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { 
-    collection, doc, updateDoc, addDoc, query, where, 
+    collection, doc, updateDoc, query, where, 
     serverTimestamp, onSnapshot, increment, getDocs, 
     writeBatch, Timestamp 
 } from 'firebase/firestore';
@@ -16,7 +16,6 @@ const ProviderDashboard = () => {
     const [requests, setRequests] = useState([]);
     const [activeJobs, setActiveJobs] = useState([]);
     const [payouts, setPayouts] = useState([]);
-    const [payoutFilter, setPayoutFilter] = useState('Upcoming');
     const [earnings, setEarnings] = useState({ today: 0, week: 0, month: 0, pendingPayouts: 0 });
     const [confirmingJobId, setConfirmingJobId] = useState(null);
     const [finalAmountAdjust, setFinalAmountAdjust] = useState('');
@@ -46,8 +45,8 @@ const ProviderDashboard = () => {
             unsubscribeProvider = onSnapshot(providerQuery, (snap) => {
                 if (!snap.empty) setProviderStatus(snap.docs[0].data().status);
             }, e => console.error(e));
-        } else {
-            setProviderStatus(userData?.status || 'pending');
+        } else if (userData?.status && providerStatus !== userData.status) {
+            setProviderStatus(userData.status);
         }
 
         // 2. Real-time listener for ALL bookings assigned to this provider

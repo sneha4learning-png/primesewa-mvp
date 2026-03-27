@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock, Star } from 'lucide-react';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { useNotifications } from '../../context/NotificationContext';
 import { useLocation } from 'react-router-dom';
 import TimelineModal from '../../components/TimelineModal';
@@ -16,7 +16,6 @@ const ProviderManagement = () => {
     const [providerBookings, setProviderBookings] = useState([]);
     const [viewDocumentUrl, setViewDocumentUrl] = useState(null);
     const [timelineBooking, setTimelineBooking] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -44,10 +43,8 @@ const ProviderManagement = () => {
                     });
                 });
                 setProviders(fetched);
-                setIsLoading(false);
             }, (err) => {
                 console.error("Error fetching providers:", err);
-                setIsLoading(false);
             });
 
             return () => unsubProviders();
@@ -127,9 +124,6 @@ const ProviderManagement = () => {
     const totalPages = Math.ceil(filteredProviders.length / itemsPerPage);
     const paginatedProviders = filteredProviders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, statusFilter]);
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -139,7 +133,10 @@ const ProviderManagement = () => {
                 <div className="flex w-full sm:w-auto gap-3">
                     <select
                         value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value);
+                            setCurrentPage(1);
+                        }}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-gray-700 bg-white"
                     >
                         <option value="All">All Statuses</option>
@@ -155,7 +152,10 @@ const ProviderManagement = () => {
                             placeholder="Search providers..."
                             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
                         />
                     </div>
                 </div>

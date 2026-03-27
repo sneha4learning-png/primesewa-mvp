@@ -48,7 +48,6 @@ const CleanupPage = () => {
                 };
 
                 if (seen.has(nameKey)) {
-                    const existing = seen.get(nameKey);
                     toDelete.push(p.id);
                 } else {
                     seen.set(nameKey, { ...p, ...updates });

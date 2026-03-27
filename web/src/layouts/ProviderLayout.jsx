@@ -1,14 +1,12 @@
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X, Wrench, AlertTriangle } from 'lucide-react';
+import { Briefcase, DollarSign, UserCircle, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../firebase/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import NotificationBell from '../components/NotificationBell';
-import { useNotifications } from '../context/NotificationContext';
 const ProviderLayout = () => {
     const { userData, logout } = useAuth();
-    const { unreadCount } = useNotifications();
     const navigate = useNavigate();
     const [isOnline, setIsOnline] = useState(false);
     const [providerId, setProviderId] = useState(null);
