@@ -160,7 +160,7 @@ const LoginPage = () => {
 
             {/* Current service label */}
             <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10">
-                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-fade-in">
+                <span className="text-[10px] font-medium text-white/40 uppercase tracking-[0.3em] animate-fade-in">
                     {serviceLabels[currentImageIndex]}
                 </span>
             </div>
@@ -170,18 +170,17 @@ const LoginPage = () => {
                 <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl shadow-indigo-500/10 border border-white p-8 text-slate-900">
                     <div className="text-center mb-6">
                         <div className="flex flex-col items-center justify-center mb-4">
-                            <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-xl border border-slate-100 p-3 transition-transform hover:scale-110 duration-500">
+                            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-xl border border-slate-100 p-3 transition-transform hover:scale-110 duration-500">
                                 <img
-                                    src="/logo-v2.png"
+                                    src="/primesewa_logo.png"
                                     alt="PrimeSewa"
                                     className="w-full h-full object-contain"
-                                    onError={e => { e.target.style.display = 'none'; }}
                                 />
                             </div>
-                            <span className="text-3xl font-black text-slate-950 tracking-tighter italic">PrimeSewa</span>
-                            <span className="text-[10px] font-black text-primary mt-1 uppercase tracking-[0.25em]">Premium Service Marketplace</span>
+                            <span className="text-3xl font-medium text-slate-950 tracking-tighter italic">PrimeSewa</span>
+                            <span className="text-[10px] font-medium text-primary mt-1 uppercase tracking-[0.25em]">Premium Service Marketplace</span>
                         </div>
-                        <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-1">
+                        <h2 className="text-xl font-normal tracking-tight text-slate-900 mb-1">
                             {step === 1 ? 'Welcome Back' : 'Security Verification'}
                         </h2>
                         <p className="text-slate-500 text-xs font-medium">
@@ -192,7 +191,7 @@ const LoginPage = () => {
                     </div>
 
                     {error && (
-                        <div className="mb-6 bg-red-50 border border-red-100 text-red-600 px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3 animate-fade-in">
+                        <div className="mb-6 bg-red-50 border border-red-100 text-red-600 px-5 py-4 rounded-2xl text-sm font-normal flex items-center gap-3 animate-fade-in">
                             <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
                             {error}
                         </div>
@@ -201,25 +200,25 @@ const LoginPage = () => {
                     {step === 1 ? (
                         <form onSubmit={handleSendOtp} className="space-y-4">
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                                <label className="block text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-semibold text-slate-900 placeholder-slate-300 outline-none"
+                                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-normal text-slate-900 placeholder-slate-300 outline-none"
                                     placeholder="Enter your name"
                                     value={customerName}
                                     onChange={e => setCustomerName(e.target.value)}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
+                                <label className="block text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
                                 <div className="relative group">
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/50 font-black text-sm border-r border-slate-200 pr-4">+91</span>
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/50 font-medium text-sm border-r border-slate-200 pr-4">+91</span>
                                     <input
                                         type="tel"
                                         required
                                         maxLength={10}
-                                        className="w-full pl-16 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-black text-slate-900 placeholder-slate-300 text-xl tracking-[0.1em] outline-none"
+                                        className="w-full pl-16 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium text-slate-900 placeholder-slate-300 text-xl tracking-[0.1em] outline-none"
                                         placeholder="000 000 0000"
                                         value={phoneNumber}
                                         onChange={e => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
@@ -229,7 +228,7 @@ const LoginPage = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className={`w-full py-5 rounded-2xl font-black text-white transition-all flex items-center justify-center gap-3 mt-4 hover-lift shadow-2xl ${isLoading
+                                className={`w-full py-5 rounded-2xl font-medium text-white transition-all flex items-center justify-center gap-3 mt-4 hover-lift shadow-2xl ${isLoading
                                     ? 'bg-primary/50 cursor-not-allowed'
                                     : 'bg-primary hover:bg-primary-dark shadow-primary/20'
                                     }`}
@@ -243,17 +242,17 @@ const LoginPage = () => {
                             </button>
 
                             <div className="pt-4 border-t border-slate-100 mt-4">
-                                <p className="text-center text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">Partner Channels</p>
+                                <p className="text-center text-[10px] font-medium text-slate-400 mb-3 uppercase tracking-widest">Partner Channels</p>
                                 <div className="flex gap-4">
                                     <Link
                                         to="/provider/login?signup=true"
-                                        className="flex-1 py-4 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-black rounded-2xl text-center border border-primary/10 transition-all uppercase tracking-widest"
+                                        className="flex-1 py-4 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-medium rounded-2xl text-center border border-primary/10 transition-all uppercase tracking-widest"
                                     >
                                         Join us
                                     </Link>
                                     <Link
                                         to="/provider/login"
-                                        className="flex-1 py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 text-[10px] font-black rounded-2xl text-center border border-slate-200 transition-all uppercase tracking-widest"
+                                        className="flex-1 py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 text-[10px] font-medium rounded-2xl text-center border border-slate-200 transition-all uppercase tracking-widest"
                                     >
                                         Portal
                                     </Link>
@@ -263,18 +262,18 @@ const LoginPage = () => {
                     ) : (
                         <form onSubmit={handleVerifyOtp} className="space-y-4">
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Enter Verification Code</label>
+                                <label className="block text-[10px] font-medium text-slate-400 uppercase tracking-widest text-center">Enter Verification Code</label>
                                 <input
                                     type="password"
                                     required
                                     maxLength={4}
-                                    className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary transition-all font-black text-center tracking-[1rem] text-2xl text-slate-900 placeholder-slate-200 outline-none"
+                                    className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary transition-all font-medium text-center tracking-[1rem] text-2xl text-slate-900 placeholder-slate-200 outline-none"
                                     placeholder="••••"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
                                 />
                                 <div className="bg-primary/5 p-3 rounded-xl border border-primary/10 text-center">
-                                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
+                                    <p className="text-[10px] font-normal text-primary uppercase tracking-widest">
                                         Dev Mode: Use <span className="text-slate-900">••••</span>
                                     </p>
                                 </div>
@@ -283,7 +282,7 @@ const LoginPage = () => {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className={`w-full py-5 rounded-2xl font-black text-white transition-all flex items-center justify-center gap-3 hover-lift shadow-2xl ${isLoading
+                                    className={`w-full py-5 rounded-2xl font-medium text-white transition-all flex items-center justify-center gap-3 hover-lift shadow-2xl ${isLoading
                                         ? 'bg-primary/50 cursor-not-allowed'
                                         : 'bg-primary hover:bg-primary-dark shadow-primary/20'
                                         }`}
@@ -298,7 +297,7 @@ const LoginPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => { setStep(1); setOtp(''); setError(''); }}
-                                    className="w-full py-2 text-[10px] font-black text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-[0.2em]"
+                                    className="w-full py-2 text-[10px] font-medium text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-[0.2em]"
                                 >
                                     ← Change Number
                                 </button>

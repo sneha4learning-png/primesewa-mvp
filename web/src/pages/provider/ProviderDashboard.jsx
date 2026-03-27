@@ -3,7 +3,11 @@ import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Naviga
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
-import { collection, doc, updateDoc, addDoc, query, where, serverTimestamp, onSnapshot, increment, getDocs, writeBatch } from 'firebase/firestore';
+import { 
+    collection, doc, updateDoc, addDoc, query, where, 
+    serverTimestamp, onSnapshot, increment, getDocs, 
+    writeBatch, Timestamp 
+} from 'firebase/firestore';
 import { useNotifications } from '../../context/NotificationContext';
 
 const ProviderDashboard = () => {
@@ -11,14 +15,19 @@ const ProviderDashboard = () => {
     const { sendNotification } = useNotifications();
     const [requests, setRequests] = useState([]);
     const [activeJobs, setActiveJobs] = useState([]);
-    const [historicalBookings, setHistoricalBookings] = useState([]); // All bookings for history
-    const [historyFilter, setHistoryFilter] = useState('All');
-    const [earnings, setEarnings] = useState({ today: 0, week: 0, month: 0 });
-    const [negotiatingId, setNegotiatingId] = useState(null);
-    const [negotiatedPrice, setNegotiatedPrice] = useState('');
-    const [providerStatus, setProviderStatus] = useState('pending');
-    const [dbError, setDbError] = useState(false);
+    const [payouts, setPayouts] = useState([]);
+    const [payoutFilter, setPayoutFilter] = useState('Upcoming');
+    const [earnings, setEarnings] = useState({ today: 0, week: 0, month: 0, pendingPayouts: 0 });
+    const [confirmingJobId, setConfirmingJobId] = useState(null);
+    const [finalAmountAdjust, setFinalAmountAdjust] = useState('');
     const [chartData, setChartData] = useState([]);
+
+    const [historicalBookings, setHistoricalBookings] = useState([]);
+    const [historyFilter, setHistoryFilter] = useState('All');
+    const [dbError, setDbError] = useState(false);
+    const [providerStatus, setProviderStatus] = useState('pending');
+    const [negotiatedPrice, setNegotiatedPrice] = useState('');
+    const [negotiatingId, setNegotiatingId] = useState(null);
 
     // Pagination states
     const [activePage, setActivePage] = useState(1);
@@ -75,7 +84,8 @@ const ProviderDashboard = () => {
             setEarnings({
                 today: calcEarnings(new Date(new Date().setHours(0, 0, 0, 0))),
                 week: calcEarnings(oneWeekAgo),
-                month: calcEarnings(oneMonthAgo)
+                month: calcEarnings(oneMonthAgo),
+                pendingPayouts: 0 // Will be updated by payouts listener
             });
 
             // Chart: last 7 days earnings
@@ -99,9 +109,24 @@ const ProviderDashboard = () => {
             setDbError(false);
         }, e => { console.error('Bookings listener error:', e); setDbError(true); });
 
+        // 2b. Real-time listener for payouts to update pending state
+        const unsubscribePayouts = onSnapshot(query(collection(db, 'payouts'), where('providerUid', '==', userData?.uid || currentUser?.uid || '')), (snap) => {
+            let totalPending = 0;
+            const fetchedPayouts = [];
+            snap.forEach(d => {
+                const data = d.data();
+                if (data.status === 'pending') totalPending += (data.amount || 0);
+                fetchedPayouts.push({ id: d.id, ...data });
+            });
+            setEarnings(prev => ({ ...prev, pendingPayouts: totalPending }));
+            setPayouts(fetchedPayouts);
+        });
+
+        // Cleanup on unmount
         return () => {
             unsubscribeProvider();
             unsubscribeBookings();
+            unsubscribePayouts();
         };
     }, [userData, currentUser]);
 
@@ -209,11 +234,13 @@ const ProviderDashboard = () => {
         } catch (e) { console.error('Tracking update error:', e); }
     };
 
-    const completeJob = async (job) => {
+    const completeJob = async (job, finalAdjustment = null) => {
         const rawPrice = job.proposedPrice || job.price || job.amount || 0;
-        const finalPrice = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
-        const netEarning = finalPrice * 0.85;
-        const platformCut = finalPrice * 0.15;
+        const originalPrice = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
+        
+        const finalPrice = finalAdjustment ? parseInt(finalAdjustment) : originalPrice;
+        const netEarning = Math.floor(finalPrice * 0.85); // Use Math.floor per user requirement for precise integer payouts
+        const platformCut = finalPrice - netEarning;
 
         try {
             const batch = writeBatch(db);
@@ -252,20 +279,36 @@ const ProviderDashboard = () => {
                 bookingId: job.id,
                 provider: job.provider || userData?.name || 'Unknown',
                 amount: finalPrice,
-                commission: parseFloat(platformCut.toFixed(2)),
-                providerEarning: parseFloat(netEarning.toFixed(2)),
+                commission: platformCut,
+                providerEarning: netEarning,
                 service: job.service,
                 customer: job.customer,
                 date: new Date().toISOString().split('T')[0],
                 createdAt: serverTimestamp()
             });
 
+            // Schedule Payout (7 days from now)
+            const payoutDate = new Date();
+            payoutDate.setDate(payoutDate.getDate() + 7);
+            
+            const payoutRef = doc(collection(db, 'payouts'));
+            batch.set(payoutRef, {
+                providerUid: userData.uid,
+                providerName: userData.name,
+                bookingId: job.id,
+                service: job.service,
+                amount: netEarning,
+                status: 'pending',
+                scheduledFor: payoutDate,
+                createdAt: serverTimestamp()
+            });
+
             await batch.commit();
 
             setActiveJobs(prev => prev.filter(j => j.id !== job.id));
-            setHistoricalBookings(prev => prev.map(j => j.id === job.id ? { ...j, status: 'completed' } : j));
-
-            // Notify Customer
+            setHistoricalBookings(prev => prev.map(j => j.id === job.id ? { ...j, status: 'completed', price: finalPrice } : j));
+            setConfirmingJobId(null);
+            setFinalAmountAdjust('');
             if (job.customerUid) {
                 sendNotification(job.customerUid, 'Job Completed', `${userData.name} has marked your ${job.service} as completed. Please rate the service!`, 'success');
             }
@@ -291,30 +334,47 @@ const ProviderDashboard = () => {
                     <span><strong>Database connection error.</strong> Could not load bookings from Firestore. Check your Firebase credentials.</span>
                 </div>
             )}
+                        <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 mb-8 flex items-start gap-4">
+                            <Clock className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
+                            <div>
+                                <h4 className="text-sm font-medium text-indigo-900">7-Day Payment Hold Policy</h4>
+                                <p className="text-xs text-indigo-700 font-normal leading-relaxed mt-1">
+                                    To ensure safety and quality, all payouts are held for 7 days after job completion. You will see your verified earnings transferred automatically once the hold period expires.
+                                </p>
+                            </div>
+                        </div>
+
             {/* Earnings Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-2">
                 <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-4 text-indigo-50 font-medium tracking-wide text-sm uppercase">
                             <Wallet className="w-5 h-5 opacity-80" /> Today's Net
                         </div>
-                        <h2 className="text-4xl font-black tracking-tight">₹{earnings.today.toFixed(0)}</h2>
+                        <h2 className="text-4xl font-medium tracking-tight">₹{earnings.today.toFixed(0)}</h2>
                     </div>
                 </div>
                 <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-center hover:shadow-lg transition-all duration-300">
-                    <div className="text-slate-500 text-sm font-bold mb-3 uppercase tracking-wider">This Week</div>
-                    <h2 className="text-3xl font-black text-slate-800 tracking-tight">₹{earnings.week.toFixed(0)}</h2>
+                    <div className="text-slate-500 text-sm font-normal mb-3 uppercase tracking-wider">This Week</div>
+                    <h2 className="text-3xl font-medium text-slate-800 tracking-tight">₹{earnings.week.toFixed(0)}</h2>
                 </div>
                 <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-center hover:shadow-lg transition-all duration-300">
-                    <div className="text-slate-500 text-sm font-bold mb-3 uppercase tracking-wider">This Month</div>
-                    <h2 className="text-3xl font-black text-slate-800 tracking-tight">₹{earnings.month.toFixed(0)}</h2>
+                    <div className="text-slate-500 text-sm font-normal mb-3 uppercase tracking-wider">This Month</div>
+                    <h2 className="text-3xl font-medium text-slate-800 tracking-tight">₹{earnings.month.toFixed(0)}</h2>
+                </div>
+                <div className="bg-indigo-50 rounded-3xl p-8 border border-indigo-100 shadow-sm flex flex-col justify-center hover:shadow-lg transition-all duration-300">
+                    <div className="text-indigo-400 text-sm font-bold mb-3 uppercase tracking-widest flex items-center gap-2">
+                        <Clock className="w-4 h-4" /> Pending Payout
+                    </div>
+                    <h2 className="text-3xl font-black text-indigo-900 tracking-tight">₹{earnings.pendingPayouts.toFixed(0)}</h2>
+                    <p className="text-[10px] text-indigo-300 uppercase font-medium mt-2 tracking-widest">7-day safety hold</p>
                 </div>
             </div>
 
             {/* Chart Container */}
             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 mb-8">
-                <h3 className="text-xl font-black text-slate-800 mb-6">Earnings (Last 7 Days)</h3>
+                <h3 className="text-xl font-medium text-slate-800 mb-6">Earnings (Last 7 Days)</h3>
                 <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -334,7 +394,7 @@ const ProviderDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Active/Accepted Jobs */}
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                    <h2 className="text-2xl font-medium text-slate-900 flex items-center gap-3">
                         <div className="p-2 bg-indigo-50 rounded-xl">
                             <Clock className="w-6 h-6 text-indigo-600" />
                         </div>
@@ -346,10 +406,10 @@ const ProviderDashboard = () => {
                                 <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 rounded-l-3xl"></div>
                                 <div className="flex justify-between items-start mb-5">
                                     <div>
-                                        <h3 className="font-black text-xl text-slate-900 group-hover:text-indigo-600 transition-colors">{job.service}</h3>
-                                        <p className="text-slate-400 font-bold text-sm tracking-wider mt-1">#{job.id}</p>
+                                        <h3 className="font-medium text-xl text-slate-900 group-hover:text-indigo-600 transition-colors">{job.service}</h3>
+                                        <p className="text-slate-400 font-normal text-sm tracking-wider mt-1">#{job.id}</p>
                                     </div>
-                                    <span className="px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl font-black text-sm border border-indigo-100">
+                                    <span className="px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-sm border border-indigo-100">
                                         ₹{job.proposedPrice || job.price}
                                     </span>
                                 </div>
@@ -359,25 +419,25 @@ const ProviderDashboard = () => {
                                         <div className="flex flex-col w-full">
                                             {job.houseNo ? (
                                                 <div className="bg-slate-100 px-3 py-1 rounded-lg mb-2 border-l-4 border-indigo-500">
-                                                    <span className="text-[10px] uppercase font-black text-slate-400 block tracking-widest">Door / Flat No</span>
-                                                    <span className="font-black text-slate-900 text-sm">{job.houseNo}</span>
+                                                    <span className="text-[10px] uppercase font-medium text-slate-400 block tracking-widest">Door / Flat No</span>
+                                                    <span className="font-medium text-slate-900 text-sm">{job.houseNo}</span>
                                                 </div>
                                             ) : (
-                                                <div className="text-[10px] font-bold text-amber-600 mb-1">⚠️ No house number</div>
+                                                <div className="text-[10px] font-normal text-amber-600 mb-1">⚠️ No house number</div>
                                             )}
                                             <span className="text-slate-600 text-sm leading-relaxed">{job.address}</span>
                                             {job.description && (
                                                 <div className="mt-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/50">
-                                                    <span className="text-[10px] uppercase font-black text-indigo-400 block tracking-widest mb-1">Issue Description</span>
+                                                    <span className="text-[10px] uppercase font-medium text-indigo-400 block tracking-widest mb-1">Issue Description</span>
                                                     <p className="text-xs font-medium text-slate-700 italic">"{job.description}"</p>
                                                 </div>
                                             )}
                                             {job.location && (
                                                 <div className="flex gap-2 mt-4">
-                                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/20">
+                                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-normal rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/20">
                                                         <Navigation className="w-3.5 h-3.5" /> G-Maps
                                                     </a>
-                                                    <a href={`https://www.openstreetmap.org/directions?from=&to=${job.location.lat}%2C${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-200">
+                                                    <a href={`https://www.openstreetmap.org/directions?from=&to=${job.location.lat}%2C${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-normal rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-200">
                                                         <MapPin className="w-3.5 h-3.5" /> OSM
                                                     </a>
                                                 </div>
@@ -388,19 +448,19 @@ const ProviderDashboard = () => {
                                         <Phone className="w-4 h-4 text-slate-400 shrink-0" />
                                         <a
                                             href={`tel:${job.customerPhone || job.phone || ''}`}
-                                            className="text-blue-600 hover:text-blue-700 font-bold underline-offset-2 hover:underline"
+                                            className="text-blue-600 hover:text-blue-700 font-normal underline-offset-2 hover:underline"
                                             onClick={e => { if (!job.customerPhone && !job.phone) { e.preventDefault(); alert('Customer phone number not available for this booking.'); } }}
                                         >
                                             Call {job.customer}
                                         </a>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{formatTime(job.time)}</span>
+                                        <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{formatTime(job.time)}</span>
                                     </div>
                                 </div>
                                 {/* Live Tracker Status Buttons */}
                                 <div className="mb-4">
-                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Update Your Status</p>
+                                    <p className="text-xs font-normal text-slate-500 uppercase tracking-wider mb-2">Update Your Status</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {[
                                             { key: 'enroute', label: '🚗 En Route', color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
@@ -418,7 +478,7 @@ const ProviderDashboard = () => {
                                                     key={s.key}
                                                     onClick={() => updateTrackingStatus(job, s.key)}
                                                     disabled={isPastOrCurrent}
-                                                    className={`py-2 text-xs font-bold rounded-xl border transition-all ${s.color} ${isCurrent ? 'ring-2 ring-offset-1 ring-current bg-opacity-100' : ''} ${isPastOrCurrent ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                                    className={`py-2 text-xs font-normal rounded-xl border transition-all ${s.color} ${isCurrent ? 'ring-2 ring-offset-1 ring-current bg-opacity-100' : ''} ${isPastOrCurrent ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                                                 >
                                                     {s.label}
                                                 </button>
@@ -426,16 +486,42 @@ const ProviderDashboard = () => {
                                         })}
                                     </div>
                                 </div>
-                                <button onClick={() => completeJob(job)} className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-900/20 active:scale-[0.98]">
-                                    <CheckCircle className="w-5 h-5 text-emerald-400" /> Mark as Completed
-                                </button>
+                                {confirmingJobId === job.id ? (
+                                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                        <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 mb-2">
+                                            <p className="text-[10px] font-normal text-amber-700 uppercase tracking-widest mb-2">Confirm Final Amount (incl. extra work)</p>
+                                            <div className="relative">
+                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-normal">₹</span>
+                                                <input
+                                                    type="number"
+                                                    className="w-full pl-10 pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-normal text-slate-800"
+                                                    placeholder={job.proposedPrice || job.price}
+                                                    value={finalAmountAdjust}
+                                                    onChange={(e) => setFinalAmountAdjust(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <button onClick={() => setConfirmingJobId(null)} className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-normal rounded-xl transition-all">
+                                                Back
+                                            </button>
+                                            <button onClick={() => completeJob(job, finalAmountAdjust)} className="flex-[2] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-normal rounded-xl shadow-lg transition-all flex justify-center items-center gap-2">
+                                                Confirm & Complete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => { setConfirmingJobId(job.id); setFinalAmountAdjust(job.proposedPrice || job.price); }} className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-normal transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-900/20 active:scale-[0.98]">
+                                        <CheckCircle className="w-5 h-5 text-emerald-400" /> Mark as Completed
+                                    </button>
+                                )}
                             </div>
                         ))}
                         {totalActivePages > 1 && (
                             <div className="flex justify-center items-center gap-4 mt-4 bg-white p-4 rounded-2xl border border-slate-100">
-                                <button onClick={() => setActivePage(p => Math.max(1, p - 1))} disabled={activePage === 1} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
-                                <span className="text-sm font-bold text-slate-600">{activePage} / {totalActivePages}</span>
-                                <button onClick={() => setActivePage(p => Math.min(totalActivePages, p + 1))} disabled={activePage === totalActivePages} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
+                                <button onClick={() => setActivePage(p => Math.max(1, p - 1))} disabled={activePage === 1} className="px-4 py-2 text-sm font-normal bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
+                                <span className="text-sm font-normal text-slate-600">{activePage} / {totalActivePages}</span>
+                                <button onClick={() => setActivePage(p => Math.min(totalActivePages, p + 1))} disabled={activePage === totalActivePages} className="px-4 py-2 text-sm font-normal bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
                             </div>
                         )}
                         {activeJobs.length === 0 && (
@@ -443,7 +529,7 @@ const ProviderDashboard = () => {
                                 <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
                                     <Clock className="w-8 h-8 text-slate-300" />
                                 </div>
-                                <p className="text-slate-500 font-bold">No active jobs. Accept requests to start earning!</p>
+                                <p className="text-slate-500 font-normal">No active jobs. Accept requests to start earning!</p>
                             </div>
                         )}
                     </div>
@@ -451,7 +537,7 @@ const ProviderDashboard = () => {
 
                 {/* Incoming Requests */}
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                    <h2 className="text-2xl font-medium text-slate-900 flex items-center gap-3">
                         <div className="p-2 bg-rose-50 rounded-xl relative">
                             <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
@@ -468,12 +554,12 @@ const ProviderDashboard = () => {
                                 <div className="relative z-10">
                                     <div className="flex justify-between items-start mb-5">
                                         <div>
-                                            <h3 className="font-black text-xl text-slate-900">{req.service}</h3>
-                                            <p className="text-slate-400 font-bold text-sm tracking-wider mt-1">#{req.id}</p>
+                                            <h3 className="font-medium text-xl text-slate-900">{req.service}</h3>
+                                            <p className="text-slate-400 font-normal text-sm tracking-wider mt-1">#{req.id}</p>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-xl font-black text-slate-900">₹{req.proposedPrice || req.price}</div>
-                                            <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-[10px] font-black uppercase tracking-widest text-emerald-600 rounded">Net: ₹{((req.proposedPrice || req.price) * 0.85).toFixed(0)}</div>
+                                            <div className="text-xl font-medium text-slate-900">₹{req.proposedPrice || req.price}</div>
+                                            <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-[10px] font-medium uppercase tracking-widest text-emerald-600 rounded">Net: ₹{((req.proposedPrice || req.price) * 0.85).toFixed(0)}</div>
                                         </div>
                                     </div>
                                     <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50/80 p-4 rounded-2xl border border-slate-100/50">
@@ -483,25 +569,25 @@ const ProviderDashboard = () => {
                                                 {/* Doorstep detail shown prominently */}
                                                 {(req.houseNo || req.house) ? (
                                                     <div className="bg-slate-100 px-3 py-1 rounded-lg mb-2 border-l-4 border-indigo-500">
-                                                        <span className="text-[10px] uppercase font-black text-slate-400 block tracking-widest">Door / Flat No</span>
-                                                        <span className="font-black text-slate-900 text-sm">{req.houseNo || req.house}</span>
+                                                        <span className="text-[10px] uppercase font-medium text-slate-400 block tracking-widest">Door / Flat No</span>
+                                                        <span className="font-medium text-slate-900 text-sm">{req.houseNo || req.house}</span>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-[10px] font-bold text-amber-600 mb-1">⚠️ No house number provided</div>
+                                                    <div className="text-[10px] font-normal text-amber-600 mb-1">⚠️ No house number provided</div>
                                                 )}
                                                 <span className="text-slate-600 text-sm leading-relaxed">{req.address}</span>
                                                 {req.description && (
                                                     <div className="mt-3 bg-rose-50/30 p-3 rounded-xl border border-rose-100/30">
-                                                        <span className="text-[10px] uppercase font-black text-rose-400 block tracking-widest mb-1">Issue Description</span>
+                                                        <span className="text-[10px] uppercase font-medium text-rose-400 block tracking-widest mb-1">Issue Description</span>
                                                         <p className="text-xs font-medium text-slate-700 italic">"{req.description}"</p>
                                                     </div>
                                                 )}
                                                 {req.location && (
                                                     <div className="flex gap-2 mt-3">
-                                                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 font-black hover:underline flex items-center gap-1 bg-blue-50 px-2 py-1 rounded">
+                                                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 font-medium hover:underline flex items-center gap-1 bg-blue-50 px-2 py-1 rounded">
                                                             <Navigation className="w-2.5 h-2.5" /> Google Directions
                                                         </a>
-                                                        <a href={`https://www.openstreetmap.org/directions?from=&to=${req.location.lat}%2C${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-slate-600 font-black hover:underline flex items-center gap-1 bg-slate-100 px-2 py-1 rounded">
+                                                        <a href={`https://www.openstreetmap.org/directions?from=&to=${req.location.lat}%2C${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-slate-600 font-medium hover:underline flex items-center gap-1 bg-slate-100 px-2 py-1 rounded">
                                                             <MapPin className="w-2.5 h-2.5" /> OSM View
                                                         </a>
                                                     </div>
@@ -509,13 +595,13 @@ const ProviderDashboard = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-bold text-slate-700">{formatTime(req.time)}</span>
+                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{formatTime(req.time)}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Phone className="w-4 h-4 text-slate-400 shrink-0" />
                                             <a
                                                 href={`tel:${req.customerPhone || req.phone || ''}`}
-                                                className="text-blue-600 hover:text-blue-700 font-bold underline-offset-2 hover:underline"
+                                                className="text-blue-600 hover:text-blue-700 font-normal underline-offset-2 hover:underline"
                                                 onClick={e => { if (!req.customerPhone && !req.phone) { e.preventDefault(); alert('Customer phone number not available for this booking.'); } }}
                                             >
                                                 Call {req.customer}
@@ -525,39 +611,39 @@ const ProviderDashboard = () => {
 
                                     {req.status === 'negotiating' ? (
                                         <div className="flex gap-3">
-                                            <div className="flex-1 py-3.5 bg-amber-50 border-2 border-amber-100 text-amber-700 font-bold rounded-2xl flex justify-center items-center gap-2">
+                                            <div className="flex-1 py-3.5 bg-amber-50 border-2 border-amber-100 text-amber-700 font-normal rounded-2xl flex justify-center items-center gap-2">
                                                 <Clock className="w-5 h-5" /> Quote Sent: ₹{req.proposedPrice} (Waiting for Customer)
                                             </div>
                                         </div>
                                     ) : negotiatingId === req.id ? (
                                         <div className="flex gap-3 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                             <div className="relative flex-1">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black">₹</span>
+                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">₹</span>
                                                 <input
                                                     type="number"
-                                                    className="w-full pl-10 pr-4 py-3.5 bg-white border-2 border-indigo-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none font-bold text-slate-800 transition-all shadow-inner"
+                                                    className="w-full pl-10 pr-4 py-3.5 bg-white border-2 border-indigo-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none font-normal text-slate-800 transition-all shadow-inner"
                                                     placeholder="Your Price"
                                                     value={negotiatedPrice}
                                                     onChange={(e) => setNegotiatedPrice(e.target.value)}
                                                     autoFocus
                                                 />
                                             </div>
-                                            <button onClick={() => proposePrice(req)} className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95 whitespace-nowrap flex items-center gap-2">
+                                            <button onClick={() => proposePrice(req)} className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-2xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95 whitespace-nowrap flex items-center gap-2">
                                                 Send <Navigation className="w-4 h-4" />
                                             </button>
-                                            <button onClick={() => setNegotiatingId(null)} className="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all active:scale-95">
+                                            <button onClick={() => setNegotiatingId(null)} className="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-normal rounded-2xl transition-all active:scale-95">
                                                 <XCircle className="w-5 h-5 mx-auto" />
                                             </button>
                                         </div>
                                     ) : (
                                         <div className="flex gap-3">
-                                            <button onClick={() => rejectRequest(req.id)} className="flex-[0.8] py-3.5 bg-white border-2 border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200 font-black rounded-2xl transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
+                                            <button onClick={() => rejectRequest(req.id)} className="flex-[0.8] py-3.5 bg-white border-2 border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200 font-medium rounded-2xl transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
                                                 Reject
                                             </button>
-                                            <button onClick={() => setNegotiatingId(req.id)} className="flex-[1.2] py-3.5 bg-white border-2 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 font-black rounded-2xl transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
+                                            <button onClick={() => setNegotiatingId(req.id)} className="flex-[1.2] py-3.5 bg-white border-2 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 font-medium rounded-2xl transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
                                                 <IndianRupee className="w-5 h-5" /> Propose Quote
                                             </button>
-                                            <button onClick={() => acceptRequest(req)} className="flex-[1.2] py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-lg shadow-indigo-600/20 transition-all flex justify-center items-center gap-2 active:scale-[0.98] group-hover:-translate-y-0.5">
+                                            <button onClick={() => acceptRequest(req)} className="flex-[1.2] py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-2xl shadow-lg shadow-indigo-600/20 transition-all flex justify-center items-center gap-2 active:scale-[0.98] group-hover:-translate-y-0.5">
                                                 Accept Request
                                             </button>
                                         </div>
@@ -567,9 +653,9 @@ const ProviderDashboard = () => {
                         ))}
                         {totalRequestPages > 1 && (
                             <div className="flex justify-center items-center gap-4 mt-4 bg-white p-4 rounded-2xl border border-slate-100">
-                                <button onClick={() => setRequestPage(p => Math.max(1, p - 1))} disabled={requestPage === 1} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
-                                <span className="text-sm font-bold text-slate-600">{requestPage} / {totalRequestPages}</span>
-                                <button onClick={() => setRequestPage(p => Math.min(totalRequestPages, p + 1))} disabled={requestPage === totalRequestPages} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
+                                <button onClick={() => setRequestPage(p => Math.max(1, p - 1))} disabled={requestPage === 1} className="px-4 py-2 text-sm font-normal bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
+                                <span className="text-sm font-normal text-slate-600">{requestPage} / {totalRequestPages}</span>
+                                <button onClick={() => setRequestPage(p => Math.min(totalRequestPages, p + 1))} disabled={requestPage === totalRequestPages} className="px-4 py-2 text-sm font-normal bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
                             </div>
                         )}
                         {requests.length === 0 && (
@@ -577,7 +663,7 @@ const ProviderDashboard = () => {
                                 <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
                                     <CheckCircle className="w-8 h-8 text-emerald-400" />
                                 </div>
-                                <p className="text-slate-500 font-bold">You're all caught up. <br /><span className="text-sm font-medium mt-1 inline-block">New requests will appear here.</span></p>
+                                <p className="text-slate-500 font-normal">You're all caught up. <br /><span className="text-sm font-medium mt-1 inline-block">New requests will appear here.</span></p>
                             </div>
                         )}
                     </div>
@@ -588,14 +674,14 @@ const ProviderDashboard = () => {
             {historicalBookings.length > 0 && (
                 <div className="bg-slate-50 border-2 border-slate-100 rounded-3xl p-8 mb-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                        <h3 className="text-xl font-black text-slate-800 flex items-center gap-2">
+                        <h3 className="text-xl font-medium text-slate-800 flex items-center gap-2">
                             <CheckCircle className="w-6 h-6 text-slate-400" />
                             Booking History
                         </h3>
                         <select
                             value={historyFilter}
                             onChange={(e) => { setHistoryFilter(e.target.value); setHistoryPage(1); }}
-                            className="px-4 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 font-bold text-slate-700 outline-none"
+                            className="px-4 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 font-normal text-slate-700 outline-none"
                         >
                             <option value="All">All Bookings</option>
                             <option value="Pending">Pending & Quotes</option>
@@ -605,7 +691,7 @@ const ProviderDashboard = () => {
                         </select>
                     </div>
                     {filteredHistory.length === 0 ? (
-                        <div className="text-center py-10 text-slate-500 font-bold border-2 border-dashed border-slate-200 rounded-2xl">
+                        <div className="text-center py-10 text-slate-500 font-normal border-2 border-dashed border-slate-200 rounded-2xl">
                             No bookings found for the selected filter.
                         </div>
                     ) : (
@@ -614,16 +700,16 @@ const ProviderDashboard = () => {
                                 <div key={job.id} className="bg-white p-5 rounded-box border border-slate-200 opacity-75 hover:opacity-100 transition-opacity">
                                     <div className="flex justify-between items-start mb-3">
                                         <div>
-                                            <h4 className="font-bold text-slate-800">{job.service}</h4>
+                                            <h4 className="font-normal text-slate-800">{job.service}</h4>
                                             <p className="text-xs text-slate-500">#{job.id}</p>
                                             {job.ratingGiven && (
                                                 <div className="flex items-center gap-1 text-amber-500 mt-1">
                                                     <Star className="w-3.5 h-3.5 fill-current" />
-                                                    <span className="text-xs font-bold w-full truncate">{Number(job.ratingGiven).toFixed(1)} Rating</span>
+                                                    <span className="text-xs font-normal w-full truncate">{Number(job.ratingGiven).toFixed(1)} Rating</span>
                                                 </div>
                                             )}
                                         </div>
-                                        <span className={`shrink-0 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                        <span className={`shrink-0 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-lg ${job.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : job.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
                                             {job.status}
                                         </span>
                                     </div>
@@ -636,8 +722,8 @@ const ProviderDashboard = () => {
                                             <div className="flex flex-col w-full">
                                                 {job.houseNo ? (
                                                     <div className="bg-slate-50 px-2 py-0.5 rounded border-l-2 border-slate-400 mb-1">
-                                                        <span className="text-[9px] uppercase font-bold text-slate-400 block tracking-tight">House No</span>
-                                                        <span className="font-bold text-slate-800 text-xs">{job.houseNo}</span>
+                                                        <span className="text-[9px] uppercase font-normal text-slate-400 block tracking-tight">House No</span>
+                                                        <span className="font-normal text-slate-800 text-xs">{job.houseNo}</span>
                                                     </div>
                                                 ) : null}
                                                 <span className="line-clamp-2 text-slate-500 leading-tight">{job.address || 'Ahmedabad'}</span>
@@ -653,9 +739,9 @@ const ProviderDashboard = () => {
                     )}
                     {totalHistoryPages > 1 && (
                         <div className="flex justify-center items-center gap-4 mt-8 bg-white p-4 rounded-2xl border border-slate-100 w-fit mx-auto">
-                            <button onClick={() => setHistoryPage(p => Math.max(1, p - 1))} disabled={historyPage === 1} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
-                            <span className="text-sm font-bold text-slate-600">{historyPage} / {totalHistoryPages}</span>
-                            <button onClick={() => setHistoryPage(p => Math.min(totalHistoryPages, p + 1))} disabled={historyPage === totalHistoryPages} className="px-4 py-2 text-sm font-bold bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
+                            <button onClick={() => setHistoryPage(p => Math.max(1, p - 1))} disabled={historyPage === 1} className="px-4 py-2 text-sm font-normal bg-slate-100 rounded-xl disabled:opacity-50">Prev</button>
+                            <span className="text-sm font-normal text-slate-600">{historyPage} / {totalHistoryPages}</span>
+                            <button onClick={() => setHistoryPage(p => Math.min(totalHistoryPages, p + 1))} disabled={historyPage === totalHistoryPages} className="px-4 py-2 text-sm font-normal bg-slate-100 rounded-xl disabled:opacity-50">Next</button>
                         </div>
                     )}
                 </div>

@@ -141,9 +141,9 @@ const UserManagement = () => {
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Activity className="w-5 h-5 text-blue-500" />
-                        <h2 className="text-lg font-black text-slate-800">Consumer Directory</h2>
+                        <h2 className="text-lg font-medium text-slate-800">Consumer Directory</h2>
                     </div>
-                    <span className="text-[10px] font-black uppercase bg-blue-50 text-blue-600 px-3 py-1 rounded-full tracking-tighter shadow-sm border border-blue-100">
+                    <span className="text-[10px] font-medium uppercase bg-blue-50 text-blue-600 px-3 py-1 rounded-full tracking-tighter shadow-sm border border-blue-100">
                         {users.length} Database Records
                     </span>
                 </div>
@@ -165,13 +165,13 @@ const UserManagement = () => {
                         {paginatedUsers.map(user => (
                             <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-semibold text-gray-900">{user.name}</div>
+                                    <div className="text-sm font-normal text-gray-900">{user.name}</div>
                                     <div className="text-xs text-gray-500">ID: {user.id}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.phone}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.joined}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-bold text-sm">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-normal text-sm">
                                         {user.totalBookings}
                                     </span>
                                 </td>
@@ -191,7 +191,7 @@ const UserManagement = () => {
                                                 <UserX className="w-5 h-5" />
                                             </button>
                                         ) : (
-                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-green-600 hover:text-green-800 text-sm font-black underline p-1 rounded-md hover:bg-green-50" title="Restore Customer Access">
+                                            <button onClick={() => handleToggleStatus(user.id, user.status)} className="text-green-600 hover:text-green-800 text-sm font-medium underline p-1 rounded-md hover:bg-green-50" title="Restore Customer Access">
                                                 Unblock
                                             </button>
                                         )}
@@ -208,26 +208,26 @@ const UserManagement = () => {
                         <div key={user.id} className="p-4 flex flex-col gap-4">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <div className="text-sm font-bold text-gray-900">{user.name}</div>
+                                    <div className="text-sm font-normal text-gray-900">{user.name}</div>
                                     <div className="text-xs text-gray-500 capitalize">{user.status} • Member Since {user.joined}</div>
                                 </div>
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-normal uppercase ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                     {user.status}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between text-xs text-gray-600">
-                                <div>Phone: <span className="font-semibold">{user.phone}</span></div>
-                                <div>Bookings: <span className="font-bold text-blue-600">{user.totalBookings}</span></div>
+                                <div>Phone: <span className="font-normal">{user.phone}</span></div>
+                                <div>Bookings: <span className="font-normal text-blue-600">{user.totalBookings}</span></div>
                             </div>                            <div className="flex gap-3">
-                                <button onClick={() => handleViewHistory(user)} className="flex-1 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold flex items-center justify-center gap-2" title="View Activity History">
+                                <button onClick={() => handleViewHistory(user)} className="flex-1 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-normal flex items-center justify-center gap-2" title="View Activity History">
                                     <Activity className="w-4 h-4" /> Activity History
                                 </button>
                                 {user.status === 'active' ? (
-                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-red-50 text-red-700 rounded-lg text-xs font-bold" title="Block User Access">
+                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-red-50 text-red-700 rounded-lg text-xs font-normal" title="Block User Access">
                                         Block User
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-green-50 text-green-700 rounded-lg text-xs font-bold" title="Unblock User Account">
+                                    <button onClick={() => handleToggleStatus(user.id, user.status)} className="flex-1 py-2 bg-green-50 text-green-700 rounded-lg text-xs font-normal" title="Unblock User Account">
                                         Unblock
                                     </button>
                                 )}
@@ -251,14 +251,14 @@ const UserManagement = () => {
                         <button
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
-                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                            className={`px-4 py-2 border rounded-lg text-sm font-normal transition-all ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
                         >
                             Previous
                         </button>
                         <button
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
-                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                            className={`px-4 py-2 border rounded-lg text-sm font-normal transition-all ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
                         >
                             Next
                         </button>
@@ -272,11 +272,11 @@ const UserManagement = () => {
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden mx-auto max-h-[85vh] flex flex-col animate-in fade-in zoom-in duration-300" onClick={e => e.stopPropagation()}>
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
+                                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white font-medium text-xl shadow-lg">
                                     {selectedUser.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">{selectedUser.name}</h3>
+                                    <h3 className="text-xl font-normal text-gray-900">{selectedUser.name}</h3>
                                     <p className="text-sm text-gray-500 font-medium">Customer • {selectedUser.phone} • Joined {selectedUser.joined}</p>
                                 </div>
                             </div>
@@ -286,7 +286,7 @@ const UserManagement = () => {
                         </div>
                         
                         <div className="overflow-y-auto flex-1 p-6 scrollbar-thin scrollbar-thumb-gray-200">
-                            <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                            <h4 className="text-xs font-medium text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                                 <Activity className="w-4 h-4 text-blue-500" /> Booking History ({userBookings.length} records)
                             </h4>
                             
@@ -297,10 +297,10 @@ const UserManagement = () => {
                                             <div className="flex items-start justify-between mb-3">
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md tracking-widest">
+                                                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md tracking-widest">
                                                             {b.service}
                                                         </span>
-                                                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-widest ${
+                                                        <span className={`text-[10px] font-medium uppercase px-2 py-0.5 rounded-md tracking-widest ${
                                                             b.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 
                                                             b.status === 'cancelled' ? 'bg-rose-100 text-rose-700' : 
                                                             'bg-amber-100 text-amber-700'
@@ -308,11 +308,11 @@ const UserManagement = () => {
                                                             {b.status}
                                                         </span>
                                                     </div>
-                                                    <h5 className="font-bold text-slate-900 text-base">Partner: {b.provider || 'Unassigned'}</h5>
+                                                    <h5 className="font-normal text-slate-900 text-base">Partner: {b.provider || 'Unassigned'}</h5>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-black text-slate-900 text-lg">₹{b.proposedPrice || b.price || 0}</p>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Amount</p>
+                                                    <p className="font-medium text-slate-900 text-lg">₹{b.proposedPrice || b.price || 0}</p>
+                                                    <p className="text-[10px] text-slate-400 font-normal uppercase tracking-widest">Amount</p>
                                                 </div>
                                             </div>
                                             
@@ -328,7 +328,7 @@ const UserManagement = () => {
                                                         {b.address?.city || 'Ahmedabad'}
                                                     </div>
                                                 </div>
-                                                <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
+                                                <div className="text-[9px] font-medium text-slate-300 uppercase tracking-widest">
                                                     ID: {b.id.slice(-6).toUpperCase()}
                                                 </div>
                                             </div>
@@ -340,7 +340,7 @@ const UserManagement = () => {
                                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                                         <Clock className="w-8 h-8 text-slate-200" />
                                     </div>
-                                    <p className="text-slate-400 font-bold text-sm tracking-tight uppercase">No booking history available</p>
+                                    <p className="text-slate-400 font-normal text-sm tracking-tight uppercase">No booking history available</p>
                                 </div>
                             )}
                         </div>
@@ -348,7 +348,7 @@ const UserManagement = () => {
                         <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
                             <button 
                                 onClick={() => setSelectedUser(null)}
-                                className="px-6 py-2.5 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-all text-sm shadow-sm"
+                                className="px-6 py-2.5 bg-white border border-slate-200 rounded-xl font-normal text-slate-600 hover:bg-slate-100 transition-all text-sm shadow-sm"
                             >
                                 Close Activity Log
                             </button>

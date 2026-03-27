@@ -25,30 +25,30 @@ const CustomerLayout = () => {
             {/* Navbar */}
             <header className="h-16 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 group" onClick={closeMobileMenu}>
-                        <img src="/logo-v2.png" alt="PrimeSewa" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
-                        <span className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
+                    <Link to="/" className="flex items-center gap-4 group" onClick={closeMobileMenu}>
+                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-14 h-14 object-contain transition-transform" />
+                        <span className="text-2xl font-medium bg-clip-text text-transparent bg-linear-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
                     </Link>
 
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex items-center gap-8">
-                        <Link to="/" className={`text-sm font-bold transition-colors ${location.pathname === '/' ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>Home</Link>
-                        <Link to="/dashboard#service-catalog" className={`text-sm font-bold transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>All Services</Link>
+                        <Link to="/" className={`text-sm font-medium transition-colors ${location.pathname === '/' ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>Home</Link>
+                        <Link to="/dashboard#service-catalog" className={`text-sm font-medium transition-colors ${location.pathname === '/dashboard' && !currentUser ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'}`}>All Services</Link>
 
                         {currentUser ? (
                             <div className="flex items-center gap-6 ml-4 border-l border-gray-200 pl-6">
-                                <Link to={isProvider ? "/provider" : "/provider/login"} className="text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
-                                <Link to="/dashboard#top" className={`text-sm font-bold transition-colors ${location.hash !== '#service-catalog' && location.pathname === '/dashboard' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Dashboard</Link>
-                                <Link to="/profile" className={`text-sm font-bold transition-colors ${location.pathname === '/profile' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Profile</Link>
+                                <Link to={isProvider ? "/provider" : "/provider/login"} className="text-sm font-medium text-indigo-500 hover:text-indigo-600 transition-colors">Provider Portal</Link>
+                                <Link to="/dashboard#top" className={`text-sm font-medium transition-colors ${location.hash !== '#service-catalog' && location.pathname === '/dashboard' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Dashboard</Link>
+                                <Link to="/profile" className={`text-sm font-medium transition-colors ${location.pathname === '/profile' ? 'text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-100' : 'text-gray-600 hover:text-indigo-600'}`}>My Profile</Link>
                                 <NotificationBell />
-                                <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2 text-sm font-bold border border-rose-200 text-rose-600 bg-rose-50 rounded-full hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-600/20 transition-all">
+                                <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2 text-sm font-medium border border-rose-200 text-rose-600 bg-rose-50 rounded-full hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-600/20 transition-all">
                                     <LogOut className="w-4 h-4" /> Logout
                                 </button>
                             </div>
                         ) : (
                             <div className="flex items-center gap-4 ml-4 border-l border-gray-200 pl-6">
-                                <Link to="/provider/login?signup=true" className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">Become a Partner</Link>
-                                <Link to="/login" className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-indigo-600/20 hover:shadow-lg hover:-translate-y-0.5">
+                                <Link to="/provider/login?signup=true" className="text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">Become a Partner</Link>
+                                <Link to="/login" className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-indigo-600/20 hover:shadow-lg hover:-translate-y-0.5">
                                     Sign In
                                 </Link>
                             </div>

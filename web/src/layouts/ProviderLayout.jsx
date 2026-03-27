@@ -70,10 +70,10 @@ const ProviderLayout = () => {
         <>
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
-                <span className="flex items-center gap-3">
-                    <img src="/logo-v2.png" alt="PrimeSewa" className="w-10 h-10 object-contain shadow-2xl" />
-                    <span className="text-2xl font-black text-white tracking-tighter">PrimeSewa</span>
-                </span>
+                    <Link to="/provider" className="flex items-center gap-4 group">
+                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-14 h-14 object-contain transition-transform" />
+                        <span className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
+                    </Link>
                 <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                     <X className="w-5 h-5" />
                 </button>
@@ -85,11 +85,6 @@ const ProviderLayout = () => {
                             <NavLink to="/provider" end className={navLinkClass} onClick={() => setSidebarOpen(false)}>
                                 <Briefcase className="w-5 h-5" /> 
                                 <span>Service Requests</span>
-                                {unreadCount > 0 && (
-                                    <span className="ml-auto bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-white/10 shadow-lg">
-                                        {unreadCount}
-                                    </span>
-                                )}
                             </NavLink>
                         </li>
                         <li><NavLink to="/provider/earnings" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Earnings Center</NavLink></li>

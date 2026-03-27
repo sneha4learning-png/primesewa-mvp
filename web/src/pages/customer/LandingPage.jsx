@@ -89,7 +89,7 @@ const LandingPage = () => {
     return (
         <div className="flex flex-col min-h-screen bg-surface-50">
             {/* Hero Section */}
-            <section className="relative mesh-gradient text-white pt-32 pb-24 px-4 overflow-hidden">
+            <section className="relative mesh-gradient text-white pt-24 pb-16 px-4 overflow-hidden">
                 {/* Decorative Elements */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden pointer-events-none">
                     <div className="absolute -top-32 -right-32 w-96 h-96 bg-primary-light/30 rounded-full mix-blend-overlay filter blur-[100px] animate-pulse"></div>
@@ -102,8 +102,8 @@ const LandingPage = () => {
                             <span className="flex h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
                             <span className="text-sm font-semibold text-white/90 tracking-wide uppercase">Ahmedabad's #1 Service Platform</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
-                            <img src="/logo-v2.png" alt="PrimeSewa" className="h-16 md:h-20 object-contain mb-8 animate-float drop-shadow-2xl" />
+                        <h1 className="text-5xl md:text-7xl font-medium tracking-tight leading-[1.1]">
+                            <img src="/primesewa_logo.png" alt="PrimeSewa" className="h-20 md:h-24 object-contain mb-8 animate-float drop-shadow-2xl" />
                             Your Home Services, <br />
                             <span className="text-white">Reimagined.</span>
                         </h1>
@@ -112,10 +112,10 @@ const LandingPage = () => {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                            <Link to="/dashboard" className="hover-lift inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary-dark rounded-full font-bold text-lg shadow-2xl">
+                            <Link to="/dashboard" className="hover-lift inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary-dark rounded-full font-normal text-lg shadow-2xl">
                                 Book a Service <ArrowRight className="w-5 h-5" />
                             </Link>
-                            <Link to="/provider/login?signup=true" className="hover-lift inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full font-bold text-lg text-white border border-white/20">
+                            <Link to="/provider/login?signup=true" className="hover-lift inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full font-normal text-lg text-white border border-white/20">
                                 Become a Partner
                             </Link>
                         </div>
@@ -162,7 +162,7 @@ const LandingPage = () => {
                                                     <Clock className="w-7 h-7" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-surface-900 text-lg">Live Status: {activeBooking.status}</h4>
+                                                    <h4 className="font-normal text-surface-900 text-lg">Live Status: {activeBooking.status}</h4>
                                                     <p className="text-primary font-semibold text-sm">{activeBooking.service}</p>
                                                 </div>
                                             </div>
@@ -179,7 +179,7 @@ const LandingPage = () => {
                                                     }`}
                                             ></div>
                                         </div>
-                                        <p className="text-[10px] text-center mt-2.5 font-black tracking-[0.25em] uppercase text-primary/60">
+                                        <p className="text-[10px] text-center mt-2.5 font-medium tracking-[0.25em] uppercase text-primary/60">
                                             Service Tracking
                                         </p>
                                     </>
@@ -187,23 +187,23 @@ const LandingPage = () => {
                                     <>
                                         <div className="flex items-center justify-between mb-3.5">
                                             <div className="flex items-center gap-3.5">
-                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black bg-primary text-white shadow-lg group-hover/card:scale-105 transition-transform duration-500">
+                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-medium bg-primary text-white shadow-lg group-hover/card:scale-105 transition-transform duration-500">
                                                     {(providerDetails?.name || 'A').charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-surface-900 text-base leading-tight">{providerDetails?.name || 'Finding Partner...'}</h4>
-                                                    <p className="text-primary font-bold text-xs mt-0.5">{providerDetails?.category || 'Expert Service'}</p>
+                                                    <h4 className="font-normal text-surface-900 text-base leading-tight">{providerDetails?.name || 'Finding Partner...'}</h4>
+                                                    <p className="text-primary font-normal text-xs mt-0.5">{providerDetails?.category || 'Expert Service'}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-1 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
                                                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                                                <span className="font-black text-amber-600 text-xs">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
+                                                <span className="font-medium text-amber-600 text-xs">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
                                             </div>
                                         </div>
                                         <div className="h-3 w-full bg-surface-100 rounded-full overflow-hidden shadow-inner">
                                             <div className="h-full bg-linear-to-r from-primary to-primary-light w-full animate-pulse transition-all duration-700"></div>
                                         </div>
-                                        <p className="text-[9px] text-center mt-2.5 font-black tracking-[0.3em] uppercase text-primary/50">
+                                        <p className="text-[9px] text-center mt-2.5 font-medium tracking-[0.3em] uppercase text-primary/50">
                                             Verified Partner
                                         </p>
                                     </>
@@ -215,16 +215,16 @@ const LandingPage = () => {
             </section>
 
             {/* Service Categories */}
-            <section className="py-24 px-4 bg-white relative overflow-hidden">
+            <section className="py-16 px-4 bg-white relative overflow-hidden">
                 <div className="absolute -left-24 top-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
                 <div className="max-w-7xl mx-auto relative z-10">
-                    <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                         <div className="max-w-2xl">
-                            <span className="text-primary font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Our Services</span>
-                            <h2 className="text-4xl md:text-5xl font-extrabold text-surface-900 tracking-tight leading-tight">Professional care at <br /> your doorstep</h2>
-                            <p className="mt-6 text-surface-800/60 text-lg font-medium leading-relaxed">Choose from our wide range of professional home services expertly handled by verified specialists.</p>
+                            <span className="text-primary font-normal tracking-[0.2em] uppercase text-xs mb-3 block">Our Services</span>
+                            <h2 className="text-3xl md:text-5xl font-medium text-surface-900 tracking-tight leading-tight">Professional care at <br /> your doorstep</h2>
+                            <p className="mt-4 text-surface-800/60 text-lg font-medium leading-relaxed">Choose from our wide range of professional home services expertly handled by verified specialists.</p>
                         </div>
-                        <Link to="/dashboard" className="group text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all bg-primary/5 px-6 py-3 rounded-full border border-primary/10">
+                        <Link to="/dashboard" className="group text-primary font-normal flex items-center gap-2 hover:gap-4 transition-all bg-primary/5 px-6 py-3 rounded-full border border-primary/10">
                             View all services <ArrowRight className="w-5 h-5" />
                         </Link>
                     </div>
@@ -234,68 +234,122 @@ const LandingPage = () => {
                             { name: 'Plumbing', icon: '🚰', color: 'bg-primary/5', hover: 'hover:bg-primary/10' },
                             { name: 'Electrical', icon: '⚡', color: 'bg-accent/5', hover: 'hover:bg-accent/10' },
                             { name: 'Cleaning', icon: '🧹', color: 'bg-secondary/5', hover: 'hover:bg-secondary/10' },
-                            { name: 'Carpentry', icon: '🔨', color: 'bg-rose-50', hover: 'hover:bg-rose-100' }
+                            { name: 'Carpentry', icon: '🔨', color: 'bg-rose-50', hover: 'hover:bg-rose-100' },
+                            { name: 'AC Repair', icon: '❄️', color: 'bg-cyan-50', hover: 'hover:bg-cyan-100' },
+                            { name: 'Painting', icon: '🎨', color: 'bg-purple-50', hover: 'hover:bg-purple-100' },
+                            { name: 'Salon', icon: '💇', color: 'bg-indigo-50', hover: 'hover:bg-indigo-100' },
+                            { name: 'Pest Control', icon: '🛡️', color: 'bg-red-50', hover: 'hover:bg-red-100' }
                         ].map((service, i) => (
-                            <Link key={i} to="/dashboard" className={`group p-10 rounded-[2.5rem] border border-surface-100 bg-surface-50/50 ${service.hover} hover-lift transition-all duration-500 text-center`}>
-                                <div className={`w-20 h-20 ${service.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500 shadow-sm`}>
-                                    <span className="text-4xl">{service.icon}</span>
+                            <Link key={i} to="/dashboard" className={`group p-8 rounded-[2.5rem] border border-surface-100 bg-surface-50/50 ${service.hover} hover-lift transition-all duration-500 text-center`}>
+                                <div className={`w-16 h-16 ${service.color} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500 shadow-sm`}>
+                                    <span className="text-3xl">{service.icon}</span>
                                 </div>
-                                <h4 className="font-extrabold text-surface-900 text-lg group-hover:text-primary transition-colors">{service.name}</h4>
+                                <h4 className="font-bold text-surface-900 text-base group-hover:text-primary transition-colors">{service.name}</h4>
                             </Link>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Features Layer */}
-            <section className="py-32 px-4 bg-surface-50 relative">
+            {/* Testimonials */}
+            <section className="py-20 px-4 bg-white">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-20 max-w-2xl mx-auto animate-fade-in">
-                        <span className="text-primary font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Trust PrimeSewa</span>
-                        <h2 className="text-4xl md:text-5xl font-extrabold text-surface-900 tracking-tight">Why Choose Us?</h2>
-                        <p className="mt-6 text-surface-800/60 text-lg font-medium leading-relaxed">We've built a platform that puts quality, safety, and your satisfaction at the heart of everything we do.</p>
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
+                        <div className="max-w-xl">
+                            <span className="text-primary font-normal tracking-[0.2em] uppercase text-[10px] mb-4 block">Testimonials</span>
+                            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Loved by Ahmedabad</h2>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex -space-x-3">
+                                {[
+                                    "https://images.unsplash.com/photo-1599566150163-29194dcaad36", // Indian man
+                                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb", // Indian woman
+                                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d", // Man
+                                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330"  // Woman
+                                ].map((url, i) => (
+                                    <div key={i} className={`w-12 h-12 rounded-2xl border-4 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black overflow-hidden shadow-sm`}>
+                                        <img src={`${url}?q=80&w=150&auto=format&fit=crop`} alt="User" className="w-full h-full object-cover" />
+                                    </div>
+                                ))}
+                                <div className="w-12 h-12 rounded-2xl border-4 border-white bg-slate-900 text-white flex items-center justify-center text-[10px] font-black">5k+</div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm font-black text-slate-900">4.8 / 5.0</p>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Average User Rating</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        {/* Feature 1 */}
-                        <div className="glass-card hover-lift group p-12 rounded-[2.5rem] border-white/60 transition-all duration-500">
-                            <div className="w-20 h-20 bg-primary/10 group-hover:bg-primary rounded-3xl flex items-center justify-center mb-10 transition-all duration-500 shadow-xl shadow-primary/5">
-                                <ShieldCheck className="w-10 h-10 text-primary group-hover:text-white transition-colors duration-500" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            { name: "Anjali Sharma", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2", role: "Home Owner", text: "The plumbing service was exceptional. The partner arrived within 30 minutes and fixed everything with professional tools. Highly recommended!", rating: 5 },
+                            { name: "Vikram Patel", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d", role: "Business Owner", text: "Finally a reliable platform in Ahmedabad. I used PrimeSewa for my office deep cleaning, and the quality was comparable to top urban brands.", rating: 5 },
+                            { name: "Sneha Mehta", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb", role: "Working Professional", text: "The salon service at home is a game changer. Transparent pricing and expert beauticians. Five stars for the convenience!", rating: 4 }
+                        ].map((t, i) => (
+                            <div key={i} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group">
+                                <div className="flex gap-1 mb-6 text-amber-400">
+                                    {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                </div>
+                                <p className="text-lg font-medium text-slate-700 leading-relaxed mb-10 italic">"{t.text}"</p>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black overflow-hidden shadow-md">
+                                        <img src={`${t.img}?q=80&w=150&auto=format&fit=crop`} alt={t.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-slate-900 text-sm">{t.name}</h4>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.role}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <h3 className="text-2xl font-bold text-surface-900 mb-5 group-hover:text-primary transition-colors">Vetted & Verified</h3>
-                            <p className="text-surface-800/60 leading-relaxed font-medium">Every partner undergoes a rigorous 3-step verification process including background checks and hands-on skill assessments.</p>
-                        </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
-                        {/* Feature 2 */}
-                        <div className="glass-card hover-lift group p-12 rounded-[2.5rem] border-white/60 transition-all duration-500">
-                            <div className="w-20 h-20 bg-secondary/10 group-hover:bg-secondary rounded-3xl flex items-center justify-center mb-10 transition-all duration-500 shadow-xl shadow-secondary/5">
-                                <Clock className="w-10 h-10 text-secondary group-hover:text-white transition-colors duration-500" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-surface-900 mb-5 group-hover:text-secondary transition-colors">Instant Assistance</h3>
-                            <p className="text-surface-800/60 leading-relaxed font-medium">Forget long wait times. Our smart instant-match algorithm ensures a top-rated professional is on their way within minutes.</p>
+            {/* Safety Banner */}
+            <section className="py-12 px-4 bg-indigo-900 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+                <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+                    <div className="max-w-xl text-center md:text-left">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-indigo-200 text-[10px] font-black uppercase tracking-widest mb-6 border border-white/10">
+                            <ShieldCheck className="w-3.5 h-3.5" /> Safety First Protocol
                         </div>
-
-                        {/* Feature 3 */}
-                        <div className="glass-card hover-lift group p-12 rounded-[2.5rem] border-white/60 transition-all duration-500">
-                            <div className="w-20 h-20 bg-accent/10 group-hover:bg-accent rounded-3xl flex items-center justify-center mb-10 transition-all duration-500 shadow-xl shadow-accent/5">
-                                <Star className="w-10 h-10 text-accent group-hover:text-white transition-colors duration-500" />
+                        <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight mb-6">Your safety is our <br /> highest priority.</h2>
+                        <p className="text-indigo-100/60 text-lg font-medium leading-relaxed">We've implemented industry-leading safety standards to ensure every service is secure, sanitized, and professional.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full md:w-auto">
+                        <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 flex items-center gap-4 hover:bg-white/10 transition-colors group">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <ShieldCheck className="w-6 h-6" />
                             </div>
-                            <h3 className="text-2xl font-bold text-surface-900 mb-5 group-hover:text-accent transition-colors">Premium Quality</h3>
-                            <p className="text-surface-800/60 leading-relaxed font-medium">Transparent upfront pricing and a rock-solid satisfaction guarantee. You only pay for results that meet our high standards.</p>
+                            <div>
+                                <h4 className="text-white font-black text-sm uppercase tracking-widest">Insurance Cover</h4>
+                                <p className="text-indigo-200/50 text-[10px] font-medium mt-0.5">Protection for every booking</p>
+                            </div>
+                        </div>
+                        <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 flex items-center gap-4 hover:bg-white/10 transition-colors group">
+                            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <Zap className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="text-white font-black text-sm uppercase tracking-widest">Sanitized Tools</h4>
+                                <p className="text-indigo-200/50 text-[10px] font-medium mt-0.5">Strict hygiene protocols</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* How it Works */}
-            <section className="py-32 px-4 bg-white relative overflow-hidden">
+            <section className="py-12 px-4 bg-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2"></div>
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="grid lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-12 animate-fade-in">
                             <div>
-                                <span className="text-primary font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Process</span>
-                                <h2 className="text-4xl md:text-5xl font-extrabold text-surface-900 tracking-tight leading-tight">Elevated service in <br /> 3 simple steps</h2>
+                                <span className="text-primary font-normal tracking-[0.2em] uppercase text-sm mb-4 block">Process</span>
+                                <h2 className="text-4xl md:text-5xl font-medium text-surface-900 tracking-tight leading-tight">Elevated service in <br /> 3 simple steps</h2>
                             </div>
 
                             <div className="space-y-10">
@@ -305,11 +359,11 @@ const LandingPage = () => {
                                     { step: '03', title: 'Relax & Enjoy', desc: 'Our pro arrives on time with everything needed to get the job done right.' }
                                 ].map((item, i) => (
                                     <div key={i} className="flex gap-8 group">
-                                        <div className="w-16 h-16 rounded-3xl bg-surface-900 text-white flex items-center justify-center shrink-0 font-black text-2xl group-hover:bg-primary transition-all duration-500 shadow-xl shadow-surface-900/10">
+                                        <div className="w-16 h-16 rounded-3xl bg-surface-900 text-white flex items-center justify-center shrink-0 font-medium text-2xl group-hover:bg-primary transition-all duration-500 shadow-xl shadow-surface-900/10">
                                             {item.step}
                                         </div>
                                         <div className="pt-2">
-                                            <h4 className="text-2xl font-bold text-surface-900 mb-2 group-hover:text-primary transition-colors">{item.title}</h4>
+                                            <h4 className="text-2xl font-normal text-surface-900 mb-2 group-hover:text-primary transition-colors">{item.title}</h4>
                                             <p className="text-surface-800/60 text-lg font-medium leading-relaxed">{item.desc}</p>
                                         </div>
                                     </div>
@@ -325,27 +379,27 @@ const LandingPage = () => {
                                         <CheckCircle2 className="w-8 h-8" />
                                     </div>
                                     <div>
-                                        <p className="text-primary text-xs font-black uppercase tracking-[0.25em] mb-1">Confirmation</p>
-                                        <p className="text-white text-xl font-bold">Booking Secured</p>
+                                        <p className="text-primary text-xs font-medium uppercase tracking-[0.25em] mb-1">Confirmation</p>
+                                        <p className="text-white text-xl font-normal">Booking Secured</p>
                                     </div>
                                 </div>
                                 <div className="space-y-6">
                                     <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
-                                        <span className="text-white/50 font-bold uppercase tracking-widest text-[10px]">Service</span>
-                                        <span className="text-white font-bold">Smart Lighting Fix</span>
+                                        <span className="text-white/50 font-normal uppercase tracking-widest text-[10px]">Service</span>
+                                        <span className="text-white font-normal">Smart Lighting Fix</span>
                                     </div>
                                     <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
-                                        <span className="text-white/50 font-bold uppercase tracking-widest text-[10px]">Arrival</span>
-                                        <span className="text-white font-bold">Today, 02:30 PM</span>
+                                        <span className="text-white/50 font-normal uppercase tracking-widest text-[10px]">Arrival</span>
+                                        <span className="text-white font-normal">Today, 02:30 PM</span>
                                     </div>
                                 </div>
                                 <div className="pt-8 border-t border-white/10 flex items-center justify-between">
                                     <div className="flex -space-x-3">
                                         <div className="w-12 h-12 rounded-2xl border-2 border-surface-900 bg-linear-to-tr from-primary to-primary-light shadow-lg"></div>
                                         <div className="w-12 h-12 rounded-2xl border-2 border-surface-900 bg-linear-to-tr from-secondary to-emerald-300 shadow-lg"></div>
-                                        <div className="w-12 h-12 rounded-2xl border-2 border-surface-900 bg-surface-800 flex items-center justify-center text-[10px] font-bold text-white shadow-lg">15+</div>
+                                        <div className="w-12 h-12 rounded-2xl border-2 border-surface-900 bg-surface-800 flex items-center justify-center text-[10px] font-normal text-white shadow-lg">15+</div>
                                     </div>
-                                    <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Experts Available</span>
+                                    <span className="text-[11px] font-normal text-white/40 uppercase tracking-widest">Experts Available</span>
                                 </div>
                             </div>
                         </div>
@@ -359,17 +413,17 @@ const LandingPage = () => {
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-16 border-b border-white/10 pb-20">
                         <div className="col-span-1 md:col-span-1 space-y-10">
-                            <Link to="/" className="flex items-center gap-3 group">
-                                <div className="w-12 h-12 bg-white rounded-2xl p-2.5 shadow-xl shadow-white/5 group-hover:scale-110 transition-transform duration-500">
-                                    <img src="/logo-v2.png" alt="PrimeSewa" className="w-full h-full object-contain" />
+                            <Link to="/" className="flex items-center gap-4 group">
+                                <div className="w-16 h-16 bg-white rounded-3xl p-3 shadow-xl shadow-white/5 group-hover:scale-110 transition-transform duration-500">
+                                    <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-full h-full object-contain" />
                                 </div>
-                                <span className="text-3xl font-black bg-clip-text text-transparent bg-linear-to-r from-white to-white/70 tracking-tighter">PrimeSewa</span>
+                                <span className="text-3xl font-medium bg-clip-text text-transparent bg-linear-to-r from-white to-white/70 tracking-tighter">PrimeSewa</span>
                             </Link>
                             <p className="text-white/50 leading-relaxed font-medium text-lg">The most trusted and technologically advanced home service marketplace in Ahmedabad.</p>
                         </div>
                         <div>
-                            <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Customers</h4>
-                            <ul className="space-y-6 text-white/50 text-sm font-bold">
+                            <h4 className="font-medium text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Customers</h4>
+                            <ul className="space-y-6 text-white/50 text-sm font-normal">
                                 <li><Link to="/dashboard" className="hover:text-white transition-colors">Book a Service</Link></li>
                                 <li><Link to="/dashboard" className="hover:text-white transition-colors">Coverage Areas</Link></li>
                                 <li><Link to="/login" className="hover:text-white transition-colors">Customer Portal</Link></li>
@@ -377,15 +431,15 @@ const LandingPage = () => {
                             </ul>
                         </div>
                         <div>
-                            <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Partners</h4>
-                            <ul className="space-y-6 text-white/50 text-sm font-bold">
+                            <h4 className="font-medium text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">For Partners</h4>
+                            <ul className="space-y-6 text-white/50 text-sm font-normal">
                                 <li><Link to="/provider/login?signup=true" className="text-primary-light hover:text-white transition-colors">Partner Registration</Link></li>
                                 <li><Link to="/provider" className="hover:text-white transition-colors">Partner Portal</Link></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="font-black text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">Contact Support</h4>
-                            <ul className="space-y-8 text-white/50 text-sm font-bold">
+                            <h4 className="font-medium text-white mb-10 uppercase tracking-[0.2em] text-[11px] opacity-40">Contact Support</h4>
+                            <ul className="space-y-8 text-white/50 text-sm font-normal">
                                 <li className="flex items-center gap-3">
                                     <Mail className="w-5 h-5 text-primary" />
                                     <span>hello@primesewa.com</span>
@@ -401,7 +455,7 @@ const LandingPage = () => {
                             </ul>
                         </div>
                     </div>
-                    <div className="pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] font-black uppercase tracking-[0.2em] text-white/30">
+                    <div className="pt-12 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] font-medium uppercase tracking-[0.2em] text-white/30">
                         <p>© 2026 PrimeSewa Technologies. Built for Excellence.</p>
                         <div className="flex gap-12">
                             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>

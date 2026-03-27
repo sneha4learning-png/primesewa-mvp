@@ -135,7 +135,7 @@ const ProviderManagement = () => {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             {timelineBooking && <TimelineModal booking={timelineBooking} onClose={() => setTimelineBooking(null)} />}
             <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h2 className="text-xl font-semibold text-gray-800">Provider Fleet</h2>
+                <h2 className="text-xl font-normal text-gray-800">Provider Fleet</h2>
                 <div className="flex w-full sm:w-auto gap-3">
                     <select
                         value={statusFilter}
@@ -166,30 +166,30 @@ const ProviderManagement = () => {
                 <table className="hidden md:table w-full text-left border-collapse min-w-[900px]">
                     <thead>
                         <tr className="bg-gray-50 text-gray-500 text-[11px] uppercase tracking-wider border-b border-gray-200">
-                            <th className="px-4 py-4 font-bold">Provider</th>
-                            <th className="px-3 py-4 font-bold">Category</th>
-                            <th className="px-3 py-4 font-bold">Contact</th>
-                            <th className="px-2 py-4 font-bold text-center">Jobs</th>
-                            <th className="px-3 py-4 font-bold text-center">Rating</th>
-                            <th className="px-3 py-4 font-bold">Rate</th>
-                            <th className="px-3 py-4 font-bold">Status</th>
-                            <th className="px-4 py-4 font-bold text-right">Actions</th>
+                            <th className="px-4 py-4 font-normal">Provider</th>
+                            <th className="px-3 py-4 font-normal">Category</th>
+                            <th className="px-3 py-4 font-normal">Contact</th>
+                            <th className="px-2 py-4 font-normal text-center">Jobs</th>
+                            <th className="px-3 py-4 font-normal text-center">Rating</th>
+                            <th className="px-3 py-4 font-normal">Rate</th>
+                            <th className="px-3 py-4 font-normal">Status</th>
+                            <th className="px-4 py-4 font-normal text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {paginatedProviders.map(provider => (
                             <tr key={provider.id} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
                                 <td className="px-4 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-bold text-gray-900 leading-none mb-1">{provider.name}</div>
+                                    <div className="text-sm font-normal text-gray-900 leading-none mb-1">{provider.name}</div>
                                     <div className="text-[10px] text-gray-400 font-medium tracking-tight">ID: {provider.id}</div>
                                 </td>
                                 <td className="px-3 py-4 whitespace-nowrap">
-                                    <span className="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-tight">{provider.category || 'Service'}</span>
+                                    <span className="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-normal uppercase tracking-tight">{provider.category || 'Service'}</span>
                                 </td>
                                 <td className="px-3 py-4 whitespace-nowrap text-[12px] font-medium text-gray-600">{provider.phone}</td>
-                                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 text-center font-bold">{provider.jobs || 0}</td>
+                                <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 text-center font-normal">{provider.jobs || 0}</td>
                                 <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    <div className="flex items-center justify-center gap-1 font-black text-amber-500">
+                                    <div className="flex items-center justify-center gap-1 font-medium text-amber-500">
                                         {provider.rating > 0 ? (
                                             <>
                                                 <Star className="w-3.5 h-3.5 fill-current" />
@@ -200,9 +200,9 @@ const ProviderManagement = () => {
                                         )}
                                     </div>
                                 </td>
-                                <td className="px-3 py-4 whitespace-nowrap text-sm font-black text-emerald-600">₹{String(provider.price || '500').replace('₹', '')}</td>
+                                <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-emerald-600">₹{String(provider.price || '500').replace('₹', '')}</td>
                                 <td className="px-3 py-4 whitespace-nowrap">
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider border
                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
                                             provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                                                 'bg-red-50 text-red-700 border-red-200'}`}>
@@ -262,10 +262,10 @@ const ProviderManagement = () => {
                         <div key={provider.id} className="p-4 space-y-3">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-bold text-gray-900 text-sm">{provider.name}</p>
+                                    <p className="font-normal text-gray-900 text-sm">{provider.name}</p>
                                     <p className="text-xs text-gray-500 mt-0.5">ID: {provider.id.slice(0, 10)}…</p>
                                 </div>
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-normal border
                                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
                                         provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                                             'bg-red-50 text-red-700 border-red-200'}`}>
@@ -275,39 +275,39 @@ const ProviderManagement = () => {
                             <div className="flex items-center gap-3 text-xs text-gray-600 flex-wrap">
                                 <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">{provider.category || 'No Category'}</span>
                                 <span>{provider.jobs || 0} jobs</span>
-                                <span className={`font-bold flex items-center gap-1 ${provider.rating > 0 ? 'text-amber-500' : 'text-slate-400'}`}>
+                                <span className={`font-normal flex items-center gap-1 ${provider.rating > 0 ? 'text-amber-500' : 'text-slate-400'}`}>
                                     <Star className={`w-3 h-3 ${provider.rating > 0 ? 'fill-current' : ''}`} />
                                     {provider.rating > 0 ? Number(provider.rating).toFixed(1) : 'New'}
                                 </span>
-                                <span className="text-emerald-600 font-semibold">{provider.price || '₹500/hr'}</span>
+                                <span className="text-emerald-600 font-normal">{provider.price || '₹500/hr'}</span>
                                 <span>{provider.phone}</span>
                             </div>
                             <div className="flex items-center gap-2 flex-wrap">
-                                <button onClick={() => handleViewHistory(provider)} className="flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg text-xs font-bold border border-blue-100 transition-colors">
+                                <button onClick={() => handleViewHistory(provider)} className="flex items-center gap-1.5 px-3 py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg text-xs font-normal border border-blue-100 transition-colors">
                                     <Search className="w-3.5 h-3.5" /> View Details
                                 </button>
                                 {provider.status === 'pending' && (
                                     <>
-                                        <button onClick={() => handleStatusChange(provider.id, 'active')} className="flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg text-xs font-bold border border-green-100 transition-colors">
+                                        <button onClick={() => handleStatusChange(provider.id, 'active')} className="flex items-center gap-1.5 px-3 py-1.5 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg text-xs font-normal border border-green-100 transition-colors">
                                             <CheckCircle className="w-3.5 h-3.5" /> Approve
                                         </button>
-                                        <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-xs font-bold border border-red-100 transition-colors">
+                                        <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="flex items-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-xs font-normal border border-red-100 transition-colors">
                                             <XCircle className="w-3.5 h-3.5" /> Reject
                                         </button>
                                     </>
                                 )}
                                 {provider.status === 'active' && (
-                                    <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="flex items-center gap-1.5 px-3 py-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg text-xs font-bold border border-amber-100 transition-colors">
+                                    <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="flex items-center gap-1.5 px-3 py-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg text-xs font-normal border border-amber-100 transition-colors">
                                         <ShieldOff className="w-3.5 h-3.5" /> Suspend
                                     </button>
                                 )}
                                 {provider.status === 'suspended' && (
-                                    <button onClick={() => handleStatusChange(provider.id, 'active')} className="flex items-center gap-1.5 px-3 py-1.5 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg text-xs font-bold border border-emerald-100 transition-colors">
+                                    <button onClick={() => handleStatusChange(provider.id, 'active')} className="flex items-center gap-1.5 px-3 py-1.5 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg text-xs font-normal border border-emerald-100 transition-colors">
                                         <CheckCircle className="w-3.5 h-3.5" /> Reactivate
                                     </button>
                                 )}
                                 {provider.status === 'rejected' && (
-                                    <button onClick={() => handleStatusChange(provider.id, 'pending')} className="flex items-center gap-1.5 px-3 py-1.5 text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-bold border border-slate-100 transition-colors">
+                                    <button onClick={() => handleStatusChange(provider.id, 'pending')} className="flex items-center gap-1.5 px-3 py-1.5 text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg text-xs font-normal border border-slate-100 transition-colors">
                                         <MoreVertical className="w-3.5 h-3.5" /> Review Again
                                     </button>
                                 )}
@@ -330,14 +330,14 @@ const ProviderManagement = () => {
                         <button
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
-                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                            className={`px-4 py-2 border rounded-lg text-sm font-normal transition-all ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
                         >
                             Previous
                         </button>
                         <button
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
-                            className={`px-4 py-2 border rounded-lg text-sm font-bold transition-all ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
+                            className={`px-4 py-2 border rounded-lg text-sm font-normal transition-all ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'}`}
                         >
                             Next
                         </button>
@@ -351,7 +351,7 @@ const ProviderManagement = () => {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden mx-4 max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">{selectedProvider.name}</h3>
+                                <h3 className="text-xl font-normal text-gray-900">{selectedProvider.name}</h3>
                                 <p className="text-sm text-gray-500">{selectedProvider.category} • {selectedProvider.phone}</p>
                             </div>
                             <button onClick={() => setSelectedProvider(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors">
@@ -361,19 +361,19 @@ const ProviderManagement = () => {
                         <div className="overflow-y-auto flex-1">
                             {/* Identity & Work Records — shown for review */}
                             <div className="p-6 border-b border-gray-100">
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Identity & Credentials</h4>
+                                <h4 className="text-sm font-normal text-gray-500 uppercase tracking-wider mb-4">Identity & Credentials</h4>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">ID Type</p>
-                                        <p className="font-bold text-gray-800">{selectedProvider.idProofType || <span className="text-gray-400 font-normal">Not provided</span>}</p>
+                                        <p className="text-xs text-gray-500 font-normal uppercase mb-1">ID Type</p>
+                                        <p className="font-normal text-gray-800">{selectedProvider.idProofType || <span className="text-gray-400 font-normal">Not provided</span>}</p>
                                     </div>
                                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">ID Number</p>
-                                        <p className="font-bold text-gray-800">{selectedProvider.idProofNumber || <span className="text-gray-400 font-normal">Not provided</span>}</p>
+                                        <p className="text-xs text-gray-500 font-normal uppercase mb-1">ID Number</p>
+                                        <p className="font-normal text-gray-800">{selectedProvider.idProofNumber || <span className="text-gray-400 font-normal">Not provided</span>}</p>
                                     </div>
                                     {/* Work Description explicitly removed below */}
                                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 col-span-2">
-                                        <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Identity Document</p>
+                                        <p className="text-xs text-gray-500 font-normal uppercase mb-2">Identity Document</p>
                                         {(typeof selectedProvider.proofDocument === 'string' && selectedProvider.proofDocument.startsWith('http')) ? (
                                             <a href={selectedProvider.proofDocument} target="_blank" rel="noreferrer" className="block w-full max-w-[200px] min-h-[140px] bg-white rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity shadow-sm">
                                                 <img
@@ -387,14 +387,14 @@ const ProviderManagement = () => {
                                                 <div className="p-3 bg-white rounded-full text-slate-400 shadow-sm">
                                                     <FileText className="w-6 h-6" />
                                                 </div>
-                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">No document uploaded</p>
+                                                <p className="text-[10px] text-slate-500 font-normal uppercase tracking-wider">No document uploaded</p>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                                 {/* Removed workDescription rendering here */}
                                 <div className="mt-4">
-                                    <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Work Portfolio / Sample</p>
+                                    <p className="text-xs text-gray-500 font-normal uppercase mb-2">Work Portfolio / Sample</p>
                                     <div className="flex gap-3 overflow-x-auto pb-2">
                                         {selectedProvider.previousWorkSample ? (
                                             <a href={selectedProvider.previousWorkSample} target="_blank" rel="noreferrer" className="block w-32 h-24 rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity flex-shrink-0">
@@ -403,17 +403,17 @@ const ProviderManagement = () => {
                                         ) : (
                                             <div className="w-full py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 gap-1.5 min-h-[96px]">
                                                 <Briefcase className="w-6 h-6 opacity-20" />
-                                                <p className="text-[10px] font-bold uppercase tracking-widest">No work samples uploaded</p>
+                                                <p className="text-[10px] font-normal uppercase tracking-widest">No work samples uploaded</p>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                                 {selectedProvider.status === 'pending' && (
                                     <div className="mt-4 flex gap-3">
-                                        <button onClick={() => { handleStatusChange(selectedProvider.id, 'active'); setSelectedProvider(null); }} className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm transition-colors">
+                                        <button onClick={() => { handleStatusChange(selectedProvider.id, 'active'); setSelectedProvider(null); }} className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white font-normal rounded-xl text-sm transition-colors">
                                             ✓ Approve Provider
                                         </button>
-                                        <button onClick={() => { handleStatusChange(selectedProvider.id, 'rejected'); setSelectedProvider(null); }} className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-sm border border-red-200 transition-colors">
+                                        <button onClick={() => { handleStatusChange(selectedProvider.id, 'rejected'); setSelectedProvider(null); }} className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-normal rounded-xl text-sm border border-red-200 transition-colors">
                                             ✕ Reject
                                         </button>
                                     </div>
@@ -421,19 +421,19 @@ const ProviderManagement = () => {
                             </div>
                             {/* Booking History */}
                             <div className="p-6">
-                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Booking History ({providerBookings.length} jobs)</h4>
+                                <h4 className="text-sm font-normal text-gray-500 uppercase tracking-wider mb-4">Booking History ({providerBookings.length} jobs)</h4>
                                 {providerBookings.length > 0 ? (
                                     <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                                         {providerBookings.map(b => (
                                             <div key={b.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:shadow-sm transition-all bg-white">
                                                 <div>
-                                                    <p className="font-bold text-gray-900">{b.service}</p>
+                                                    <p className="font-normal text-gray-900">{b.service}</p>
                                                     <p className="text-sm text-gray-500">{b.date} • {formatTime(b.time)} • Customer: {b.customer}</p>
                                                 </div>
                                                 <div className="text-right flex flex-col items-end gap-2">
                                                     <div>
-                                                        <p className="font-bold text-emerald-600">₹{b.proposedPrice || b.price}</p>
-                                                        <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
+                                                        <p className="font-normal text-emerald-600">₹{b.proposedPrice || b.price}</p>
+                                                        <span className={`inline-block mt-1 px-2 py-0.5 text-[10px] font-normal uppercase tracking-wider rounded ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>{b.status}</span>
                                                     </div>
                                                     <button
                                                         onClick={() => setTimelineBooking(b)}
@@ -461,7 +461,7 @@ const ProviderManagement = () => {
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <h3 className="text-lg font-normal text-gray-900 flex items-center gap-2">
                                     <FileText className="w-5 h-5 text-blue-600" /> Identity / Proof Document
                                 </h3>
                             </div>
@@ -480,7 +480,7 @@ const ProviderManagement = () => {
                                     <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <FileText className="w-12 h-12 text-blue-500" />
                                     </div>
-                                    <h4 className="text-xl font-bold text-gray-800 mb-2">Simulated Document</h4>
+                                    <h4 className="text-xl font-normal text-gray-800 mb-2">Simulated Document</h4>
                                     <p className="text-gray-500 mb-6">In the live app, this will display the actual uploaded PDF/Image via an iframe or img tag.</p>
                                     <code className="text-xs bg-gray-100 p-2 rounded block break-all text-gray-600 border border-gray-200">
                                         {viewDocumentUrl}

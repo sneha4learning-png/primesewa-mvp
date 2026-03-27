@@ -84,8 +84,16 @@ export const AuthProvider = ({ children }) => {
                 }
             } else {
                 // Only clear if we don't have a fake dev-mode user (which isn't in firebase auth)
-                const savedUserObj = savedUser ? JSON.parse(savedUser) : null;
-                if (!savedUserObj || !savedUserObj.uid?.startsWith('dev-') && !savedUserObj.uid?.startsWith('mock-')) {
+                try {
+                    const savedUserObj = savedUser ? JSON.parse(savedUser) : null;
+                    if (!savedUserObj || (!savedUserObj.uid?.startsWith('dev-') && !savedUserObj.uid?.startsWith('mock-'))) {
+                        setCurrentUser(null);
+                        setUserData(null);
+                        localStorage.removeItem('ps_user');
+                        localStorage.removeItem('ps_userData');
+                    }
+                } catch (e) {
+                    // If parsing fails, just clear everything to be safe
                     setCurrentUser(null);
                     setUserData(null);
                     localStorage.removeItem('ps_user');

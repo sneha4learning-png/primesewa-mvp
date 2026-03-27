@@ -13,9 +13,9 @@ const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
     <>
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
-            <span className="flex items-center gap-3">
-                <img src="/logo-v2.png" alt="PrimeSewa" className="w-10 h-10 object-contain shadow-2xl" />
-                <span className="text-2xl font-black text-white tracking-tighter">PrimeSewa</span>
+            <span className="flex items-center gap-4">
+                <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-14 h-14 object-contain" />
+                <span className="text-2xl font-medium text-white tracking-tighter">PrimeSewa</span>
             </span>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                 <X className="w-5 h-5" />
@@ -26,7 +26,7 @@ const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
                 <li><NavLink to="/admin" end className={navLinkClass} onClick={() => setSidebarOpen(false)}><LayoutDashboard className="w-5 h-5" /> Dashboard</NavLink></li>
                 <li><NavLink to="/admin/providers" className={navLinkClass} onClick={() => setSidebarOpen(false)}><UserCog className="w-5 h-5" /> Provider Fleet</NavLink></li>
                 <li><NavLink to="/admin/bookings" className={navLinkClass} onClick={() => setSidebarOpen(false)}><CalendarDays className="w-5 h-5" /> Live Bookings</NavLink></li>
-                <li><NavLink to="/admin/commissions" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Commissions</NavLink></li>
+                <li><NavLink to="/admin/commissions" className={navLinkClass} onClick={() => setSidebarOpen(false)}><DollarSign className="w-5 h-5" /> Payouts & Commissions</NavLink></li>
                 <li><NavLink to="/admin/users" className={navLinkClass} onClick={() => setSidebarOpen(false)}><Users className="w-5 h-5" /> Consumers</NavLink></li>
             </ul>
         </nav>
@@ -68,20 +68,20 @@ const AdminLayout = () => {
             <main className="flex-1 flex flex-col overflow-hidden relative">
                 <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-4 lg:px-10 z-10 sticky top-0 shadow-sm">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                        <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
                             <Menu className="w-5 h-5" />
                         </button>
-                        <h1 className="text-base lg:text-xl font-bold text-slate-800 tracking-tight">Command Center</h1>
+                        <h1 className="text-base lg:text-xl font-medium text-slate-800 tracking-tight">Command Center</h1>
                     </div>
                     <div className="flex items-center gap-3 lg:gap-5">
                         <NotificationBell />
                         <div className="hidden sm:flex flex-col text-right">
-                            <span className="text-sm font-bold text-slate-900">System Admin</span>
+                            <span className="text-sm font-medium text-slate-900">System Admin</span>
                             <span className="text-xs font-medium text-emerald-600 flex items-center gap-1 justify-end">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Root Access
                             </span>
                         </div>
-                        <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-white font-bold shadow-md">A</div>
+                        <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-white font-medium shadow-md">A</div>
                     </div>
                 </header>
                 <div className="flex-1 overflow-y-auto p-4 lg:p-10 relative">
