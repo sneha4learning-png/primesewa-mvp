@@ -468,7 +468,13 @@ const CustomerHome = () => {
                 isOnline: true,
                 status: 'active',
                 serviceAreas: ['Bopal', 'Satellite', 'Bodakdev'],
-                portfolio: ["https://images.unsplash.com/photo-1599305090598-fe179d501c27?q=80&w=500&auto=format&fit=crop"]
+                portfolio: ["https://images.unsplash.com/photo-1599305090598-fe179d501c27?q=80&w=500&auto=format&fit=crop"],
+                subServiceRates: {
+                    'Haircut': 249,
+                    'Shave': 199,
+                    'Hair Color': 499,
+                    'Facial': 799
+                }
             };
 
             const salonWomenExpert = {
@@ -482,7 +488,13 @@ const CustomerHome = () => {
                 isOnline: true,
                 status: 'active',
                 serviceAreas: ['Prahlad Nagar', 'Vastrapur', 'Maninagar'],
-                portfolio: ["https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=500&auto=format&fit=crop"]
+                portfolio: ["https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=500&auto=format&fit=crop"],
+                subServiceRates: {
+                    'Threading': 149,
+                    'Haircut': 599,
+                    'Facial': 1199,
+                    'Pedicure': 899
+                }
             };
 
             const finalOnlineProviders = fetchedProviders.filter(p => {
@@ -788,7 +800,14 @@ const CustomerHome = () => {
 
         const subNames = selectedSubServices.map(s => s.name).join(', ');
         const finalServiceName = selectedSubServices.length > 0 ? `${selectedCategory} (${subNames})` : (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Plumbing';
-        const finalPrice = selectedSubServices.length > 0 ? selectedSubServices.reduce((sum, s) => sum + s.price, 0) : (typeof provider.price === 'number' ? provider.price : parseInt((provider.price || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500);
+        
+        // Use provider-specific rates if they exist, otherwise fallback to category default
+        const calculatedTotal = selectedSubServices.reduce((sum, s) => {
+            const rate = provider.subServiceRates?.[s.name] ?? s.price;
+            return sum + rate;
+        }, 0);
+        
+        const finalPrice = selectedSubServices.length > 0 ? calculatedTotal : (typeof provider.price === 'number' ? provider.price : parseInt((provider.price || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500);
 
         const newBooking = {
             id: `B${Math.floor(Math.random() * 10000)}`,
@@ -1641,11 +1660,17 @@ const CustomerHome = () => {
                                                                     const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
                                                                     const unitPart = defaultUnit; 
                                                                     
+                                                                    // Dynamic Pricing: Total of selected sub-services using this PROVIDER'S specific rates
+                                                                    const providerSpecificTotal = selectedSubServices.reduce((sum, s) => {
+                                                                        const rate = p.subServiceRates?.[s.name] ?? s.price;
+                                                                        return sum + rate;
+                                                                    }, 0);
+
                                                                     return (
                                                                         <>
                                                                             <span className="text-xs font-medium text-slate-950">₹</span>
                                                                             <span className="text-xl font-medium text-slate-950 tracking-tighter">
-                                                                                {selectedSubServices.length > 0 ? selectedSubServices.reduce((sum, s) => sum + s.price, 0) : pricePart}
+                                                                                {selectedSubServices.length > 0 ? providerSpecificTotal : pricePart}
                                                                             </span>
                                                                             <span className="text-slate-400 text-[9px] font-normal">/{unitPart}</span>
                                                                         </>
@@ -1653,7 +1678,7 @@ const CustomerHome = () => {
                                                                 })()}
                                                             </div>
                                                             <p className="text-[7px] font-medium text-slate-300 uppercase tracking-widest leading-none text-right">
-                                                                {selectedSubServices.length > 0 ? 'Selection Total' : 'Starting Rate'}
+                                                                {selectedSubServices.length > 0 ? 'Expert Specific Price' : 'Starting Rate'}
                                                             </p>
                                                         </div>                                  </div>
                                                     </div>
