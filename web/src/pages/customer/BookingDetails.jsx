@@ -12,6 +12,7 @@ export default function BookingDetails() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (!id) return;
         const unsub = onSnapshot(doc(db, 'bookings', id), (docSnap) => {
             if (docSnap.exists()) {
