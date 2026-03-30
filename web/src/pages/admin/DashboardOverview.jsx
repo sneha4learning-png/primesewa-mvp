@@ -315,11 +315,11 @@ const DashboardOverview = () => {
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-blue-500" />
-                <StatCard title="Pending Jobs" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-amber-500" />
-                <StatCard title="Active Pros" value={stats.activeProviders} icon={Users} colorClass="bg-indigo-500" />
-                <StatCard title="Revenue (15%)" value={`₹${stats.commissionEarned.toFixed(0)}`} icon={BarChartIcon} colorClass="bg-emerald-500" />
-                <StatCard title="Pending Payouts" value={`₹${Math.floor(stats.pendingPayouts)}`} icon={DollarSign} colorClass="bg-rose-500" />
+                <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-gradient-to-br from-blue-500 to-blue-700" />
+                <StatCard title="Pending Jobs" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-gradient-to-br from-amber-500 to-orange-600" />
+                <StatCard title="Active Pros" value={stats.activeProviders} icon={Users} colorClass="bg-gradient-to-br from-indigo-500 to-violet-700" />
+                <StatCard title="Revenue (15%)" value={`₹${stats.commissionEarned.toFixed(0)}`} icon={BarChartIcon} colorClass="bg-gradient-to-br from-emerald-500 to-teal-700" />
+                <StatCard title="Pending Payouts" value={`₹${Math.floor(stats.pendingPayouts)}`} icon={DollarSign} colorClass="bg-gradient-to-br from-rose-500 to-pink-700" />
             </div>
 
             {/* Analytical Reports Section */}
