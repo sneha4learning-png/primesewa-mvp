@@ -45,6 +45,7 @@ const DashboardOverview = () => {
     const [dbError, setDbError] = useState(false);
     const [chartData, setChartData] = useState([]);
     const [topProviders, setTopProviders] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
 
     useEffect(() => {
@@ -274,6 +275,8 @@ const DashboardOverview = () => {
             alert("Reset failed: " + err.message);
         }
     };
+
+    if (isLoading) return <div className="min-h-[400px] flex items-center justify-center text-indigo-600 font-medium tracking-wide">Initializing Analytics...</div>;
 
     return (
         <div className="space-y-6">
