@@ -328,12 +328,21 @@ const CustomerHome = () => {
     const handleBook = (provider) => {
         if (selectedSubServices.length === 0) {
             // AUTO-GUIDE USER IF NO SERVICE SELECTED
-            setSelectedCategory(p.category || 'Professional Service');
+            setSelectedCategory(provider.category || 'Professional Service');
             catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
-        const total = selectedSubServices.reduce((sum, s) => sum + (provider.subServiceRates?.[s.name] || s.price), 0);
-        setPendingBookingData({ ...provider, price: total, service: `${selectedCategory} (${selectedSubServices.map(s => s.name).join(', ')})` });
+
+        // CORRECT LOGIC: BASE RATE + SUM OF SERVICES
+        const baseRate = parseFloat(String(provider.price || 150).replace(/₹|\/hr/g, '')) || 150;
+        const servicesTotal = selectedSubServices.reduce((sum, s) => sum + (provider.subServiceRates?.[s.name] || s.price), 0);
+        const finalTotal = baseRate + servicesTotal;
+        
+        setPendingBookingData({ 
+            ...provider, 
+            price: finalTotal, 
+            service: `${selectedCategory} (${selectedSubServices.map(s => s.name).join(', ')})` 
+        });
         setBookingStep(1);
     };
 

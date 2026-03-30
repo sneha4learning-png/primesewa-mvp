@@ -44,7 +44,8 @@ const CleanupPage = () => {
                     status: 'active', // Force active for sanitized records
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
                     category: isSneha ? 'Carpentry' : (p.category || 'Professional Service'),
-                    price: (isSneha || isNewProv) ? (isSneha ? '₹200' : '₹500') : (String(p.price || '₹500').replace('/hr', ''))
+                    // ENSURING BASE RATE IS UNDER ₹200 AS REQUESTED
+                    price: (isSneha || isNewProv) ? (isSneha ? '₹150' : '₹199') : (String(p.price || '₹149').replace('/hr', ''))
                 };
 
                 if (seen.has(nameKey)) {
