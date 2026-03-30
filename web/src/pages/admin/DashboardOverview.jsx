@@ -282,13 +282,44 @@ const DashboardOverview = () => {
             ];
 
             for (const job of seedJobs) {
-                const newDoc = doc(collection(db, 'bookings'));
+                const bRef = doc(collection(db, 'bookings'));
                 const timestamp = serverTimestamp();
-                batch.set(newDoc, { 
+                batch.set(bRef, { 
                     ...job, 
                     createdAt: timestamp,
                     serviceType: 'Job-based'
                 });
+
+                // Generate matching Financial Records for Payout Dashboard
+                if (job.status === 'completed') {
+                    const jobPrice = job.price || 0;
+                    const platformFee = Math.round(jobPrice * 0.15);
+                    const providerEarning = jobPrice - platformFee;
+
+                    // 1. Commission Record
+                    const cRef = doc(collection(db, 'commissions'));
+                    batch.set(cRef, {
+                        amount: platformFee,
+                        bookingId: bRef.id,
+                        provider: job.provider,
+                        service: job.service,
+                        status: 'processed',
+                        createdAt: timestamp
+                    });
+
+                    // 2. Payout Record
+                    const pRef = doc(collection(db, 'payouts'));
+                    batch.set(pRef, {
+                        amount: providerEarning,
+                        bookingId: bRef.id,
+                        provider: job.provider,
+                        service: job.service,
+                        status: 'pending', // To show in "Pending Payouts"
+                        providerPhone: '9999999999',
+                        scheduledDate: job.date,
+                        createdAt: timestamp
+                    });
+                }
             }
 
             await batch.commit();
