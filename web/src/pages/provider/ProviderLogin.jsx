@@ -245,7 +245,7 @@ const ProviderLogin = () => {
                     ...providerData,
                     status: 'pending',
                     category: signupData.category,
-                    price: `₹${signupData.price}/hr`,
+                    price: `₹${signupData.price}`,
                     serviceAreas: signupData.serviceAreas,
                     photoURL: signupData.photoURL || '',
                     // Identity & Work Records
@@ -394,7 +394,7 @@ const ProviderLogin = () => {
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Base Rate (₹/hr)</label>
+                                    <label className="block text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Base Rate (₹)</label>
                                     <input required type="number" min="50" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-normal text-slate-900 placeholder-slate-300 outline-none" value={signupData.price} onChange={e => setSignupData({ ...signupData, price: e.target.value })} placeholder="e.g. 400" />
                                 </div>
                                 <div className="md:col-span-2 space-y-3">

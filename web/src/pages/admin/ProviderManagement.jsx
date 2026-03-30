@@ -279,7 +279,7 @@ const ProviderManagement = () => {
                                     <Star className={`w-3 h-3 ${provider.rating > 0 ? 'fill-current' : ''}`} />
                                     {provider.rating > 0 ? Number(provider.rating).toFixed(1) : 'New'}
                                 </span>
-                                <span className="text-emerald-600 font-normal">{provider.price || '₹500/hr'}</span>
+                                <span className="text-emerald-600 font-normal">{String(provider.price || '₹500').replace('/hr', '')}</span>
                                 <span>{provider.phone}</span>
                             </div>
                             <div className="flex items-center gap-2 flex-wrap">
