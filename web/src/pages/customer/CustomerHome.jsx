@@ -355,10 +355,11 @@ const CustomerHome = () => {
         addressSearchTimeout.current = setTimeout(async () => {
             setIsSearchingAddress(true);
             try {
-                // RESTRICT TO INDIA FOR DEMO RELEVANCE
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&countrycodes=in`);
+                // RESTRICT TO AHMEDABAD, INDIA FOR DEMO RELEVANCE
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Ahmedabad')}&format=json&addressdetails=1&limit=5&countrycodes=in`);
                 const data = await res.json();
-                setAddressSuggestions(data || []);
+                // Filter to ensure results are in Ahmedabad
+                setAddressSuggestions((data || []).filter(s => s.display_name.toLowerCase().includes('ahmedabad')));
             } catch (e) {
                 console.error("OSM Search Error:", e);
             } finally {
