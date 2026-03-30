@@ -191,9 +191,17 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                             <XCircle className="w-6 h-6" />
                         </button>
                     </div>
-                    <div className="absolute -bottom-8 left-10 z-20">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center text-2xl sm:text-3xl font-medium text-indigo-600 border-4 border-white shadow-xl">
-                            {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover rounded-xl" /> : initial}
+                    <div className="absolute -bottom-10 left-10 z-20">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-3xl flex items-center justify-center text-3xl sm:text-4xl font-black text-indigo-600 border-[6px] border-white shadow-2xl shadow-indigo-600/20 overflow-hidden group/modal-avatar">
+                            {p.photoURL ? (
+                                <img src={p.photoURL} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover/modal-avatar:scale-110" />
+                            ) : (
+                                <div className="w-full h-full bg-slate-50 flex items-center justify-center relative">
+                                    <span className="relative z-10">{initial}</span>
+                                    {/* ADDING A SUBTLE BACKGROUND ICON AS REQUESTED FOR AVATAR FEEL */}
+                                    <UserCircle className="absolute w-full h-full text-indigo-100 opacity-50 scale-150" />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -210,23 +218,27 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                             <button onClick={() => handleBook(p)} className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl text-[9px] uppercase shadow-lg shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95">Book</button>
                         </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
-                        <div className="bg-slate-50 p-3 sm:p-4 rounded-2xl text-center border border-slate-100">
-                            <Star className="w-3.5 h-3.5 text-amber-500 mx-auto mb-1 fill-current" />
-                            <div className="text-base sm:text-lg font-medium text-slate-900 leading-none">{(ratingValue > 0 && !isNaN(ratingValue)) ? ratingValue.toFixed(1) : 'New'}</div>
-                            <div className="text-[7px] font-medium text-slate-400 uppercase tracking-tighter mt-1">Rating</div>
+                    <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
+                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-amber-200">
+                            <Star className="w-4 h-4 text-amber-500 mx-auto mb-1.5 fill-current" />
+                            <div className="text-lg sm:text-xl font-black text-slate-900 leading-none">
+                                {(ratingValue > 0 && liveJobsCount > 0) ? ratingValue.toFixed(1) : 'New'}
+                            </div>
+                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">{ratingValue > 0 && liveJobsCount > 0 ? 'Rating' : 'Partner Status'}</div>
                         </div>
-                        <div className="bg-slate-50 p-3 sm:p-4 rounded-2xl text-center border border-slate-100">
-                            <Briefcase className="w-3.5 h-3.5 text-indigo-500 mx-auto mb-1" />
-                            <div className="text-base sm:text-lg font-medium text-slate-900 leading-none">{jobs}</div>
-                            <div className="text-[7px] font-medium text-slate-400 uppercase tracking-tighter mt-1">Jobs</div>
+                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-indigo-200">
+                            <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1.5" />
+                            <div className="text-lg sm:text-xl font-black text-slate-900 leading-none">
+                                {liveJobsCount > 0 ? liveJobsCount : 'Verifying'}
+                            </div>
+                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">Active Jobs</div>
                         </div>
-                        <div className="bg-slate-50 p-3 sm:p-4 rounded-2xl text-center border border-slate-100">
-                            <IndianRupee className="w-3.5 h-3.5 text-emerald-500 mx-auto mb-1" />
-                            <div className="text-base sm:text-lg font-medium text-slate-900 leading-none">
+                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-emerald-200">
+                            <IndianRupee className="w-4 h-4 text-emerald-500 mx-auto mb-1.5" />
+                            <div className="text-lg sm:text-xl font-black text-slate-900 leading-none tracking-tighter">
                                 ₹{String(price).replace(/₹|\/hr/g, '')}
                             </div>
-                            <div className="text-[7px] font-medium text-slate-400 uppercase tracking-tighter mt-1">Base Rate</div>
+                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">Base Cost</div>
                         </div>
                     </div>
                     {portfolio.length > 0 && (
