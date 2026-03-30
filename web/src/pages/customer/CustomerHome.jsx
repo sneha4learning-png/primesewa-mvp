@@ -262,7 +262,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
 const CustomerHome = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { userData } = useAuth();
+    const { userData, logout } = useAuth();
     const { sendNotification } = useNotifications();
 
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -626,7 +626,7 @@ const CustomerHome = () => {
                                         <div key={b.id} className="shrink-0 w-80 bg-white/5 p-6 rounded-3xl border border-white/10">
                                             <h3 className="text-white font-bold text-sm mb-2">{b.service}</h3>
                                             <p className="text-white/40 text-[10px] uppercase tracking-widest mb-4">Status: {b.status}</p>
-                                            <button onClick={() => navigate(`/customer/booking-details/${b.id}`)} className="w-full py-3 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-colors">View Details</button>
+                                            <button onClick={() => navigate(`/booking-details/${b.id}`)} className="w-full py-3 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-colors">View Details</button>
                                         </div>
                                     ))}
                                 </div>
