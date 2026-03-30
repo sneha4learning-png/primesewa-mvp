@@ -158,9 +158,15 @@ const DashboardOverview = () => {
                     needsUpdate = true;
                 }
 
-                // Fix Taxonomy Contradictions (SALON & BEAUTY -> Salon for Women)
-                if (p.category === 'Salon' || p.category === 'SALON & BEAUTY' || p.category === 'Beauty' || p.category === 'salon & beauty') {
+                // Fix Taxonomy Contradictions (Aggressive Normalization)
+                const currentCat = String(p.category || '').toUpperCase();
+                const currentName = String(p.name || '').toUpperCase();
+                
+                if (currentCat === 'SALON & BEAUTY' || currentCat === 'BEAUTY' || currentCat === 'SALON' || currentName.includes('ANJALI') || currentName.includes('PRIME SALON')) {
                     updatePayload.category = 'Salon for Women';
+                    needsUpdate = true;
+                } else if (currentCat === 'SALON FOR MEN' || currentName.includes('RAJESH') || currentName.includes('GROOMING')) {
+                    updatePayload.category = 'Salon for Men';
                     needsUpdate = true;
                 }
 
@@ -238,13 +244,21 @@ const DashboardOverview = () => {
             }
 
             // Also patch existing non-golden providers to avoid taxonomy junk
-            existingProviders.forEach(p => {
+            for (const p of existingProviders) {
                 if (!goldenFleet.some(g => g.name === p.name)) {
                     let cat = p.category;
-                    if (cat === 'SALON & BEAUTY' || cat === 'Beauty' || p.name?.includes('Anjali')) cat = 'Salon for Women';
+                    const cName = String(p.name || '').toUpperCase();
+                    const cCat = String(p.category || '').toUpperCase();
+
+                    if (cCat === 'SALON & BEAUTY' || cCat === 'BEAUTY' || cName.includes('ANJALI') || cName.includes('PRIME SALON')) {
+                        cat = 'Salon for Women';
+                    } else if (cName.includes('RAJESH') || cName.includes('GROOMING')) {
+                        cat = 'Salon for Men';
+                    }
+                    
                     batch.update(doc(db, 'providers', p.id), { category: cat, status: 'active', isOnline: true });
                 }
-            });
+            }
 
             // 3. Inject 6 "Perfect" Live Jobs for Demo
             const seedJobs = [
