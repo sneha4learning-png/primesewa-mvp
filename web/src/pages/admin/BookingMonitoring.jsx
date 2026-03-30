@@ -83,17 +83,6 @@ const BookingMonitoring = () => {
         setCurrentPage(1);
     }, [filterStatus, filterDate, filterCategory, filterProvider]);
 
-    const handleMarkCompleted = async (id) => {
-        if (!window.confirm("Mark this booking as Completed? This will reflect in provider earnings.")) return;
-        try {
-            const ref = doc(db, 'bookings', id);
-            await updateDoc(ref, { status: 'completed' });
-        } catch (err) {
-            console.error("Error marking as completed:", err);
-            alert("Failed to update status.");
-        }
-    };
-
     const getStatusColor = (status) => {
         switch (status) {
             case 'completed': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -203,24 +192,13 @@ const BookingMonitoring = () => {
                                         </span>
                                     </td>
                                     <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
-                                        <div className="flex justify-end gap-2">
-                                            {booking.status !== 'completed' && (
-                                                <button
-                                                    onClick={() => handleMarkCompleted(booking.id)}
-                                                    className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all border border-emerald-100 shadow-sm"
-                                                    title="Force Complete"
-                                                >
-                                                    <CheckCircle2 className="w-4 h-4" />
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => setTimelineBooking(booking)}
-                                                className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all border border-indigo-100 shadow-sm"
-                                                title="Review Timeline"
-                                            >
-                                                <Clock className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={() => setTimelineBooking(booking)}
+                                            className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all border border-indigo-100 shadow-sm"
+                                            title="Review Timeline"
+                                        >
+                                            <Clock className="w-4 h-4" />
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -241,22 +219,12 @@ const BookingMonitoring = () => {
                                         <div className="text-sm font-bold text-gray-900">{booking.service}</div>
                                         <div className="text-xs text-gray-500">{booking.date} • {booking.slot || formatTime(booking.time)} • ₹{booking.price || booking.proposedPrice || booking.amount}</div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        {booking.status !== 'completed' && (
-                                            <button
-                                                onClick={() => handleMarkCompleted(booking.id)}
-                                                className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl"
-                                            >
-                                                <CheckCircle2 className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                        <button
-                                            onClick={() => setTimelineBooking(booking)}
-                                            className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl"
-                                        >
-                                            <Clock className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => setTimelineBooking(booking)}
+                                        className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl"
+                                    >
+                                        <Clock className="w-4 h-4" />
+                                    </button>
                                 </div>
                                 <div className="flex gap-4 text-xs text-gray-500 pt-2 border-t border-gray-50">
                                     <div>Cust: <span className="font-semibold text-gray-800">{booking.customer || 'N/A'}</span></div>
