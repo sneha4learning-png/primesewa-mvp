@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
 class ErrorBoundary extends Component {
@@ -57,7 +57,7 @@ const categories = [
         ]
     },
     { 
-        id: '4', name: 'Carpentry', icon: Wrench, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500', type: 'Job-based', subtitle: 'Furniture',
+        id: '4', name: 'Carpentry', icon: Hammer, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500', type: 'Job-based', subtitle: 'Furniture',
         subServices: [
             { name: 'Hinge/Handle Repair', price: 99 },
             { name: 'Furniture Assembly', price: 499 },
@@ -66,7 +66,7 @@ const categories = [
         ]
     },
     { 
-        id: '5', name: 'Painting', icon: Sparkles, color: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-500', type: 'Job-based', subtitle: 'Home Wall',
+        id: '5', name: 'Painting', icon: Paintbrush, color: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-500', type: 'Job-based', subtitle: 'Home Wall',
         subServices: [
             { name: 'Single Wall Painting', price: 399 },
             { name: 'Kitchen Damp Treatment', price: 899 },
@@ -75,7 +75,7 @@ const categories = [
         ]
     },
     { 
-        id: '6', name: 'AC Repair', icon: Wrench, color: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-500', type: 'Job-based', subtitle: 'Cooling',
+        id: '6', name: 'AC Repair', icon: Wind, color: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-500', type: 'Job-based', subtitle: 'Cooling',
         subServices: [
             { name: 'AC Servicing (Split)', price: 499 },
             { name: 'Gas Charging', price: 1899 },
@@ -84,7 +84,7 @@ const categories = [
         ]
     },
     { 
-        id: '7', name: 'Appliance Repair', icon: Zap, color: 'from-rose-500/10 to-rose-600/5', iconColor: 'text-rose-500', type: 'Job-based', subtitle: 'Fridge & TV',
+        id: '7', name: 'Appliance Repair', icon: Monitor, color: 'from-rose-500/10 to-rose-600/5', iconColor: 'text-rose-500', type: 'Job-based', subtitle: 'Fridge & TV',
         subServices: [
             { name: 'Washing Machine Repair', price: 399 },
             { name: 'Refrigerator Repair', price: 449 },
@@ -93,7 +93,7 @@ const categories = [
         ]
     },
     { 
-        id: '10', name: 'Salon for Men', icon: Sparkles, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500', type: 'Job-based', subtitle: 'Haircare',
+        id: '10', name: 'Salon for Men', icon: Scissors, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500', type: 'Job-based', subtitle: 'Haircare',
         subServices: [
             { name: 'Haircut', price: 199 },
             { name: 'Shave', price: 149 },
@@ -102,7 +102,7 @@ const categories = [
         ]
     },
     { 
-        id: '12', name: 'Salon for Women', icon: Sparkles, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500', type: 'Job-based', subtitle: 'Beauty',
+        id: '12', name: 'Salon for Women', icon: Scissors, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500', type: 'Job-based', subtitle: 'Beauty',
         subServices: [
             { name: 'Threading', price: 99 },
             { name: 'Haircut', price: 499 },
@@ -111,7 +111,7 @@ const categories = [
         ]
     },
     { 
-        id: '9', name: 'Pest Control', icon: ShieldCheck, color: 'from-red-500/10 to-red-600/5', iconColor: 'text-red-500', type: 'Job-based', subtitle: 'Protection',
+        id: '9', name: 'Pest Control', icon: Bug, color: 'from-red-500/10 to-red-600/5', iconColor: 'text-red-500', type: 'Job-based', subtitle: 'Protection',
         subServices: [
             { name: 'General Pest Control', price: 699 },
             { name: 'Cockroach Management', price: 899 },
@@ -119,19 +119,6 @@ const categories = [
             { name: 'Bed Bug Treatment', price: 1199 }
         ]
     },
-];
-
-const availableSlots = [
-    { id: 'slot_9', label: '09:00 AM - 10:00 AM', startHour: 9 },
-    { id: 'slot_10', label: '10:00 AM - 11:00 AM', startHour: 10 },
-    { id: 'slot_11', label: '11:00 AM - 12:00 PM', startHour: 11 },
-    { id: 'slot_12', label: '12:00 PM - 01:00 PM', startHour: 12 },
-    { id: 'slot_13', label: '01:00 PM - 02:00 PM', startHour: 13 },
-    { id: 'slot_14', label: '02:00 PM - 03:00 PM', startHour: 14 },
-    { id: 'slot_15', label: '03:00 PM - 04:00 PM', startHour: 15 },
-    { id: 'slot_16', label: '04:00 PM - 05:00 PM', startHour: 16 },
-    { id: 'slot_17', label: '05:00 PM - 06:00 PM', startHour: 17 },
-    { id: 'slot_18', label: '06:00 PM - 07:00 PM', startHour: 18 },
 ];
 
 import { useNotifications } from '../../context/NotificationContext';
