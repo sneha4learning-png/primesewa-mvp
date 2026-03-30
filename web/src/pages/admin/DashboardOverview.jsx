@@ -173,20 +173,28 @@ const DashboardOverview = () => {
             // 2. Reset Provider Stats & Categories for Consistency
             const pSnap = await getDocs(collection(db, 'providers'));
             pSnap.forEach(d => {
-                const name = d.data().name || '';
-                let cat = d.data().category;
-                if (name.includes('Anjali')) cat = 'Salon for Women';
-                if (name.includes('Rajesh')) cat = 'Salon for Men';
-                if (name.includes('Sanjay')) cat = 'Electrical';
+                const pData = d.data();
+                const name = pData.name || '';
+                let cat = pData.category;
+                
+                if (name.includes('Anjali')) { cat = 'Salon for Women'; }
+                if (name.includes('Rajesh')) { cat = 'Salon for Men'; }
+                if (name.includes('Sanjay')) { cat = 'Electrical'; }
 
                 let resetRating = '4.9'; 
-                if (name.includes('Anjali') || name.includes('Painting') || name.includes('Sparkle')) resetRating = '5.0'; 
-                if (name.includes('Rajesh')) resetRating = '4.8';
-                if (name.includes('Sanjay')) resetRating = '4.9';
+                if (name.includes('Anjali') || name.includes('Painting') || name.includes('Sparkle')) {
+                    resetRating = '5.0'; 
+                }
+                if (name.includes('Rajesh')) {
+                    resetRating = '4.8';
+                }
+                if (name.includes('Sanjay')) {
+                    resetRating = '4.9';
+                }
                 
                 batch.update(d.ref, {
                     rating: resetRating,
-                    ratingCount: 15, // Realistic initial counts
+                    ratingCount: 15,
                     jobs: 15,
                     status: 'active',
                     category: cat,
@@ -201,7 +209,7 @@ const DashboardOverview = () => {
                     customer: 'Aarav Sharma',
                     provider: 'Sanjay Services', 
                     price: 448, 
-                    status: 'completed', // ALL JOBS COMPLETED PER USER REQUEST
+                    status: 'completed', 
                     date: new Date().toISOString().split('T')[0],
                     slot: '10:00 - 11:00 AM',
                     address: 'Flat 402, Satellite, Ahmedabad'
