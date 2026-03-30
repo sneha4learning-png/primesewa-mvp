@@ -229,15 +229,15 @@ const DashboardOverview = () => {
                 batch.set(pRef, {
                     name: gold.name,
                     category: gold.category,
-                    rating: gold.rating,
+                    rating: 0, // CLEAN SLATE: NO RATINGS YET
                     isExpert: gold.isExpert,
                     isOnline: true,
                     isApproved: true,
                     isVerified: true,
                     phone: '91'+Math.floor(Math.random()*1000000000),
                     subServiceRates: customRates,
-                    ratingCount: 15,
-                    jobs: 15,
+                    ratingCount: 0,
+                    jobs: 0,
                     status: 'active',
                     patchApplied: true
                 }, { merge: true });
@@ -245,12 +245,14 @@ const DashboardOverview = () => {
 
             // 2.7 ALSO SYNC AND DIVERSIFY RATES FOR ALL OTHER PROVIDERS
             for (const p of existingProviders) {
-                const isGolden = goldenFleet.some(g => g.name === p.name);
+                const normName = String(p.name || '').toLowerCase().trim();
+                const isGolden = goldenFleet.some(g => String(g.name).toLowerCase().trim() === normName);
+                
                 let cat = p.category;
                 const cName = String(p.name || '').toUpperCase();
                 const cCat = String(p.category || '').toUpperCase();
 
-                // Taxonomy Fixes
+                // Taxonomy Normalization
                 if (cCat === 'SALON & BEAUTY' || cCat === 'BEAUTY' || cName.includes('ANJALI') || cName.includes('PRIME SALON')) {
                     cat = 'Salon for Women';
                 } else if (cName.includes('RAJESH') || cName.includes('GROOMING')) {
@@ -258,8 +260,8 @@ const DashboardOverview = () => {
                 }
 
                 if (!isGolden) {
-                    // Inject Unique Rates for Comparison Demo
-                    const multiplier = 0.85 + (Math.random() * 0.3); // 0.85x to 1.15x
+                    // Force Diversified Pricing for Comparison
+                    const multiplier = 0.82 + (Math.random() * 0.35); // Diversification: 0.82x to 1.17x
                     const customRates = {};
                     const basePrices = [
                         {n: 'Tap Fix', p: 149}, {n: 'Pipe Leak', p: 299}, {n: 'Drain Block', p: 449}, {n: 'Tank Clean', p: 899},
@@ -275,10 +277,20 @@ const DashboardOverview = () => {
                         status: 'active', 
                         isOnline: true,
                         subServiceRates: customRates,
+                        rating: 0,
+                        ratingCount: 0,
+                        jobs: 0,
                         patchApplied: true
                     });
                 } else {
-                    batch.update(doc(db, 'providers', p.id), { category: cat, status: 'active', isOnline: true });
+                    batch.update(doc(db, 'providers', p.id), { 
+                        category: cat, 
+                        status: 'active', 
+                        isOnline: true,
+                        rating: 0,
+                        ratingCount: 0,
+                        jobs: 0
+                    });
                 }
             }
 
