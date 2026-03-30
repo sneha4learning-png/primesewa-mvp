@@ -198,7 +198,7 @@ const DashboardOverview = () => {
                     customer: 'Aarav Sharma',
                     provider: 'Sanjay Services', 
                     price: 448, 
-                    status: 'pending',
+                    status: 'completed', // ALL JOBS COMPLETED PER USER REQUEST
                     date: new Date().toISOString().split('T')[0],
                     slot: '10:00 - 11:00 AM',
                     address: 'Flat 402, Satellite, Ahmedabad'
@@ -208,7 +208,7 @@ const DashboardOverview = () => {
                     customer: 'Meera Patel',
                     provider: 'Anjali Premium Beauty',
                     price: 1248, 
-                    status: 'completed', // MARKED AS COMPLETED
+                    status: 'completed',
                     date: new Date().toISOString().split('T')[0],
                     slot: '02:00 - 05:00 PM',
                     address: 'B-Block, Bopal, Ahmedabad'
@@ -218,7 +218,7 @@ const DashboardOverview = () => {
                     customer: 'Ishaan Gupta',
                     provider: 'Sanjay Services',
                     price: 598, 
-                    status: 'completed', // MARKED AS COMPLETED
+                    status: 'completed',
                     date: new Date().toISOString().split('T')[0],
                     slot: '11:00 AM - 12:00 PM',
                     address: 'S-Sector, SG Highway, Ahmedabad'
@@ -228,7 +228,7 @@ const DashboardOverview = () => {
                     customer: 'Vikram Singh',
                     provider: 'Rajesh Grooming Studio',
                     price: 348, 
-                    status: 'completed', // MARKED AS COMPLETED
+                    status: 'completed',
                     date: new Date().toISOString().split('T')[0],
                     slot: '06:00 - 07:00 PM',
                     address: 'Garden View, Prahlad Nagar'
@@ -238,7 +238,7 @@ const DashboardOverview = () => {
                     customer: 'Sanya Mirza',
                     provider: 'Sanjay Services',
                     price: 598, 
-                    status: 'accepted',
+                    status: 'completed',
                     date: new Date().toISOString().split('T')[0],
                     slot: '09:00 - 11:00 AM',
                     address: 'New Paldi, Ahmedabad'
