@@ -33,33 +33,38 @@ const LandingPage = () => {
 
     useEffect(() => {
         // 1. Listen to Top Rated Active/Online Provider
+        // 1. Listen to Active Providers
+        // Query simplified to only 'status' equality to avoid requiring complex composite indices
         const topProviderQuery = query(
             collection(db, 'providers'),
             where('status', '==', 'active'),
-            orderBy('rating', 'desc'),
-            limit(10) // Get top 10 to filter online manually for better robustness
+            limit(50) 
         );
 
         const unsubscribeTop = onSnapshot(topProviderQuery, (snapshot) => {
             const providers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
             
+            // Sort by rating desc manually in-memory (most robust for environments without indices)
+            const sortedProviders = providers.sort((a, b) => {
+                const rA = Number(a.rating) || 0;
+                const rB = Number(b.rating) || 0;
+                return rB - rA;
+            });
+
             // Deduplicate by name if multiple exist
             const uniqueProvidersMap = new Map();
-            providers.forEach(p => {
+            sortedProviders.forEach(p => {
                 const nameKey = (p.name || '').toLowerCase().trim();
                 const existing = uniqueProvidersMap.get(nameKey);
-                const pRating = parseFloat(p.rating) || 0;
-                const eRating = existing ? (parseFloat(existing.rating) || 0) : 0;
-                
-                if (!existing || pRating > eRating) {
-                    uniqueProvidersMap.set(nameKey, p);
-                }
+                if (!existing) uniqueProvidersMap.set(nameKey, p);
             });
 
             const uniqueProviders = Array.from(uniqueProvidersMap.values());
-            // Filter online manually to handle type mismatches (string "true" vs boolean)
+            // Filter online manually
             const topOnline = uniqueProviders.find(p => p.isOnline === true || String(p.isOnline) === 'true');
             if (topOnline) setProviderDetails(topOnline);
+        }, (err) => {
+            console.warn("Index-free query fallback or error:", err);
         });
 
         // 2. Listen to User's Active Booking for Tracking (if logged in)
