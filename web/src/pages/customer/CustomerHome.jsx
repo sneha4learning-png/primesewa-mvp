@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
@@ -1509,6 +1509,74 @@ const CustomerHome = () => {
                             </div>
                         )}
 
+                        {/* Sticky Booking Summary Bar (Urban Company Style) */}
+                        {selectedSubServices.length > 0 && !pendingBookingData && (
+                            <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-slate-200 shadow-[0_-20px_40px_rgba(0,0,0,0.08)] px-6 py-5 animate-in slide-in-from-bottom duration-500">
+                                <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-3 mb-1">
+                                            <span className="text-xl font-black text-slate-900 tracking-tighter">₹{selectedSubServices.reduce((sum, s) => sum + s.price, 0)}</span>
+                                            <div className="w-1 h-1 rounded-full bg-slate-300"></div>
+                                            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">{selectedSubServices.length} {selectedSubServices.length === 1 ? 'Service' : 'Services'} Selected</span>
+                                        </div>
+                                        <p className="text-[9px] text-slate-400 font-medium truncate uppercase tracking-widest leading-none">
+                                            {selectedSubServices.map(s => s.name).join(', ')}
+                                        </p>
+                                    </div>
+                                    <button 
+                                        onClick={() => {
+                                            const expertSection = document.getElementById('service-catalog');
+                                            expertSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }}
+                                        className="bg-indigo-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
+                                    >
+                                        Proceed to Book
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Premium Service Spotlight Banner (Urban Company Style) */}
+                        <div className="w-full mb-12 relative overflow-hidden rounded-[3rem] bg-indigo-950 group h-[400px] md:h-[480px]">
+                            <img 
+                                src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=2069&auto=format&fit=crop" 
+                                alt="Professional Services" 
+                                className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-[2000ms] ease-out"
+                            />
+                            <div className="absolute inset-0 bg-linear-to-r from-indigo-950 via-indigo-950/40 to-transparent"></div>
+                            <div className="relative h-full flex flex-col justify-center px-12 md:px-20 max-w-3xl">
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full mb-8 border border-white/10 w-fit">
+                                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                                    <span className="text-white font-black text-[10px] uppercase tracking-widest leading-none">PrimeSewa Verified</span>
+                                </div>
+                                <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.05] tracking-tighter mb-6">
+                                    Expert services, <br />
+                                    <span className="text-emerald-400">at your doorstep.</span>
+                                </h1>
+                                <p className="text-lg md:text-xl text-white/70 font-medium leading-relaxed mb-10 max-w-xl">
+                                    Book top-rated professionals for all your home services, from salon to repairs, with transparent pricing and verified experts.
+                                </p>
+                                <div className="flex gap-4">
+                                    <button 
+                                        onClick={() => catalogRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                                        className="bg-white text-indigo-950 px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-emerald-400 hover:text-white transition-all shadow-2xl active:scale-95"
+                                    >
+                                        Book Now
+                                    </button>
+                                    <div className="hidden md:flex items-center gap-4 text-white/50 pl-6 border-l border-white/10">
+                                        <div className="text-center">
+                                            <div className="text-lg font-black text-white leading-none">50k+</div>
+                                            <div className="text-[9px] uppercase font-bold tracking-widest mt-1">Users</div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-lg font-black text-white leading-none">4.9/5</div>
+                                            <div className="text-[9px] uppercase font-bold tracking-widest mt-1">Rating</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Improved Premium Search */}
                         <div className="relative group max-w-4xl">
                             <div className="absolute -inset-1 bg-linear-to-r from-primary/20 to-primary-light/10 rounded-2xl blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
@@ -1562,7 +1630,7 @@ const CustomerHome = () => {
                                                     <div className="flex items-center justify-between mt-auto">
                                                         <span className="text-lg font-black tracking-tighter">₹{sub.price}</span>
                                                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isSelected ? 'bg-white/20 text-white' : 'bg-white text-indigo-600 shadow-sm border border-slate-200'}`}>
-                                                            {isSelected ? <CheckCircle2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                                                            {isSelected ? <CheckCircle2 className="w-4 h-4" /> : <PlusIcon className="w-4 h-4" />}
                                                         </div>
                                                     </div>
                                                 </div>

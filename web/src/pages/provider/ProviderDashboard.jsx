@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, Calendar, Star } from 'lucide-react';
+import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, AlertCircle, Calendar, Star, Zap } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
@@ -341,30 +341,61 @@ const ProviderDashboard = () => {
                         </div>
 
             {/* Earnings Overview */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-2">
-                <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
+            {/* Refined Earnings Overview - Wallet Style */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform"></div>
                     <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-4 text-indigo-50 font-medium tracking-wide text-sm uppercase">
-                            <Wallet className="w-5 h-5 opacity-80" /> Today's Net
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Today's Net</p>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-3 bg-emerald-50 rounded-2xl">
+                                <IndianRupee className="w-5 h-5 text-emerald-600" />
+                            </div>
+                            <h3 className="text-3xl font-black text-slate-900 tracking-tighter">₹{earnings.today.toFixed(0)}</h3>
                         </div>
-                        <h2 className="text-4xl font-medium tracking-tight">₹{earnings.today.toFixed(0)}</h2>
+                        <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[9px] uppercase tracking-widest">
+                            <CheckCircle className="w-2.5 h-2.5" />
+                            Completed Today
+                        </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-center hover:shadow-lg transition-all duration-300">
-                    <div className="text-slate-500 text-sm font-normal mb-3 uppercase tracking-wider">This Week</div>
-                    <h2 className="text-3xl font-medium text-slate-800 tracking-tight">₹{earnings.week.toFixed(0)}</h2>
-                </div>
-                <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-center hover:shadow-lg transition-all duration-300">
-                    <div className="text-slate-500 text-sm font-normal mb-3 uppercase tracking-wider">This Month</div>
-                    <h2 className="text-3xl font-medium text-slate-800 tracking-tight">₹{earnings.month.toFixed(0)}</h2>
-                </div>
-                <div className="bg-indigo-50 rounded-3xl p-8 border border-indigo-100 shadow-sm flex flex-col justify-center hover:shadow-lg transition-all duration-300">
-                    <div className="text-indigo-400 text-sm font-bold mb-3 uppercase tracking-widest flex items-center gap-2">
-                        <Clock className="w-4 h-4" /> Pending Payout
+
+                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform"></div>
+                    <div className="relative z-10">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Safety Hold</p>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-3 bg-amber-50 rounded-2xl">
+                                <Wallet className="w-5 h-5 text-amber-600" />
+                            </div>
+                            <h3 className="text-3xl font-black text-slate-900 tracking-tighter">₹{earnings.pendingPayouts.toFixed(0)}</h3>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-amber-600 font-bold text-[9px] uppercase tracking-widest">
+                            <Clock className="w-2.5 h-2.5" />
+                            Pending Payout
+                        </div>
                     </div>
-                    <h2 className="text-3xl font-black text-indigo-900 tracking-tight">₹{earnings.pendingPayouts.toFixed(0)}</h2>
-                    <p className="text-[10px] text-indigo-300 uppercase font-medium mt-2 tracking-widest">7-day safety hold</p>
+                </div>
+
+                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform"></div>
+                    <div className="relative z-10">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Weekly Gross</p>
+                        <h3 className="text-3xl font-black text-slate-900 tracking-tighter mb-2">₹{earnings.week.toFixed(0)}</h3>
+                        <div className="flex items-center gap-1.5 text-indigo-600 font-bold text-[9px] uppercase tracking-widest">
+                            <Star className="w-3 h-3 fill-current" />
+                            Active Week
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform"></div>
+                    <div className="relative z-10">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Monthly Reach</p>
+                        <h3 className="text-3xl font-black text-slate-900 tracking-tighter mb-2">₹{earnings.month.toFixed(0)}</h3>
+                        <p className="text-[9px] text-slate-400 font-medium tracking-tight">Across all completed jobs</p>
+                    </div>
                 </div>
             </div>
 
@@ -390,127 +421,99 @@ const ProviderDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Active/Accepted Jobs */}
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-medium text-slate-900 flex items-center gap-3">
-                        <div className="p-2 bg-indigo-50 rounded-xl">
-                            <Clock className="w-6 h-6 text-indigo-600" />
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
+                        <div className="p-2.5 bg-emerald-50 rounded-2xl">
+                             <Clock className="w-6 h-6 text-emerald-600" />
                         </div>
-                        Active Jobs
+                        In Field Now
+                        <span className="text-[10px] bg-emerald-500 text-white px-2.5 py-1 rounded-full">{activeJobs.length}</span>
                     </h2>
                     <div className="space-y-5">
                         {paginatedActive.map(job => (
-                            <div key={job.id} className="bg-white p-7 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 rounded-l-3xl"></div>
-                                <div className="flex justify-between items-start mb-5">
-                                    <div>
-                                        <h3 className="font-medium text-xl text-slate-900 group-hover:text-indigo-600 transition-colors">{job.service}</h3>
-                                        <p className="text-slate-400 font-normal text-sm tracking-wider mt-1">#{job.id}</p>
-                                    </div>
-                                    <span className="px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-sm border border-indigo-100">
-                                        ₹{job.price || job.proposedPrice || job.amount}
-                                    </span>
-                                </div>
-                                <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50 p-4 rounded-2xl">
-                                    <div className="flex items-start gap-3">
-                                        <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
-                                        <div className="flex flex-col w-full">
-                                            {job.houseNo ? (
-                                                <div className="bg-slate-100 px-3 py-1 rounded-lg mb-2 border-l-4 border-indigo-500">
-                                                    <span className="text-[10px] uppercase font-medium text-slate-400 block tracking-widest">Door / Flat No</span>
-                                                    <span className="font-medium text-slate-900 text-sm">{job.houseNo}</span>
-                                                </div>
-                                            ) : (
-                                                <div className="text-[10px] font-normal text-amber-600 mb-1">⚠️ No house number</div>
-                                            )}
-                                            <span className="text-slate-600 text-sm leading-relaxed">{job.address}</span>
-                                            {job.description && (
-                                                <div className="mt-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/50">
-                                                    <span className="text-[10px] uppercase font-medium text-indigo-400 block tracking-widest mb-1">Issue Description</span>
-                                                    <p className="text-xs font-medium text-slate-700 italic">"{job.description}"</p>
-                                                </div>
-                                            )}
-                                            {job.location && (
-                                                <div className="flex gap-2 mt-4">
-                                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${job.location.lat},${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-normal rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/20">
-                                                        <Navigation className="w-3.5 h-3.5" /> G-Maps
-                                                    </a>
-                                                    <a href={`https://www.openstreetmap.org/directions?from=&to=${job.location.lat}%2C${job.location.lng}`} target="_blank" rel="noreferrer" className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-normal rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-200">
-                                                        <MapPin className="w-3.5 h-3.5" /> OSM
-                                                    </a>
-                                                </div>
-                                            )}
+                            <div key={job.id} className="bg-indigo-950 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group border border-white/5">
+                                <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -mr-40 -mt-20 group-hover:scale-125 transition-transform duration-1000"></div>
+                                
+                                <div className="relative z-10 flex flex-col h-full">
+                                    <div className="flex justify-between items-start mb-8">
+                                        <div className="space-y-1">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full mb-3 border border-white/10">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                                                <span className="text-white font-bold text-[8px] uppercase tracking-widest">{job.trackingStatus || 'Active Job'}</span>
+                                            </div>
+                                            <h3 className="text-2xl font-medium text-white tracking-tight leading-tight">{job.service}</h3>
+                                            <div className="flex items-center gap-2 text-white/40 text-xs mt-2">
+                                                <MapPin className="w-3.5 h-3.5" />
+                                                <span className="truncate max-w-[200px]">{job.address}</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-2xl font-black text-white tracking-tighter">₹{job.proposedPrice || job.price}</div>
+                                            <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest mt-1">Expected Payout</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                                        <a
-                                            href={`tel:${job.customerPhone || job.phone || ''}`}
-                                            className="text-blue-600 hover:text-blue-700 font-normal underline-offset-2 hover:underline"
-                                            onClick={e => { if (!job.customerPhone && !job.phone) { e.preventDefault(); alert('Customer phone number not available for this booking.'); } }}
-                                        >
-                                            Call {job.customer}
-                                        </a>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{job.slot || formatTime(job.time)}</span>
-                                    </div>
-                                </div>
-                                {/* Live Tracker Status Buttons */}
-                                <div className="mb-4">
-                                    <p className="text-xs font-normal text-slate-500 uppercase tracking-wider mb-2">Update Your Status</p>
-                                    <div className="grid grid-cols-2 gap-2">
+
+                                    {/* Action Tracking Bar */}
+                                    <div className="grid grid-cols-3 gap-2 mb-8">
                                         {[
-                                            { key: 'enroute', label: '🚗 En Route', color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' },
-                                            { key: 'arrived', label: '📍 Arrived', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
-                                            { key: 'inprogress', label: '🔧 In Progress', color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' },
+                                            { key: 'enroute', label: 'En-Route', icon: Navigation },
+                                            { key: 'arrived', label: 'Arrived', icon: MapPin },
+                                            { key: 'inprogress', label: 'Working', icon: Zap },
                                         ].map((s) => {
                                             const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
                                             const currentStatusLevel = job.trackingStatus ? statusOrder[job.trackingStatus] || 0 : 0;
                                             const thisStatusLevel = statusOrder[s.key];
                                             const isPastOrCurrent = currentStatusLevel >= thisStatusLevel;
-                                            const isCurrent = job.trackingStatus === s.key;
-
+                                            
                                             return (
                                                 <button
                                                     key={s.key}
                                                     onClick={() => updateTrackingStatus(job, s.key)}
                                                     disabled={isPastOrCurrent}
-                                                    className={`py-2 text-xs font-normal rounded-xl border transition-all ${s.color} ${isCurrent ? 'ring-2 ring-offset-1 ring-current bg-opacity-100' : ''} ${isPastOrCurrent ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                                    className={`py-3 px-2 rounded-2xl flex flex-col items-center gap-1.5 transition-all border ${isPastOrCurrent ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10'}`}
                                                 >
-                                                    {s.label}
+                                                    <s.icon className="w-4 h-4" />
+                                                    <span className="text-[8px] font-black uppercase tracking-widest">{s.label}</span>
                                                 </button>
                                             );
                                         })}
                                     </div>
-                                </div>
-                                {confirmingJobId === job.id ? (
-                                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                        <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 mb-2">
-                                            <p className="text-[10px] font-normal text-amber-700 uppercase tracking-widest mb-2">Confirm Final Amount (incl. extra work)</p>
-                                            <div className="relative">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-normal">₹</span>
-                                                <input
-                                                    type="number"
-                                                    className="w-full pl-10 pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-normal text-slate-800"
-                                                    placeholder={job.proposedPrice || job.price}
-                                                    value={finalAmountAdjust}
-                                                    onChange={(e) => setFinalAmountAdjust(e.target.value)}
-                                                />
-                                            </div>
+
+                                    <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest mb-1.5">Customer</p>
+                                            <p className="text-sm font-black text-white">{job.customer}</p>
                                         </div>
-                                        <div className="flex gap-3">
-                                            <button onClick={() => setConfirmingJobId(null)} className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-normal rounded-xl transition-all">
-                                                Back
+                                        <div className="flex gap-2">
+                                            <button 
+                                                onClick={() => window.open(`tel:${job.customerPhone || ''}`)}
+                                                className="w-12 h-12 bg-white/10 hover:bg-white rounded-2xl flex items-center justify-center text-white hover:text-indigo-950 transition-all border border-white/10"
+                                            >
+                                                <Phone className="w-5 h-5" />
                                             </button>
-                                            <button onClick={() => completeJob(job, finalAmountAdjust)} className="flex-[2] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-normal rounded-xl shadow-lg transition-all flex justify-center items-center gap-2">
-                                                Confirm & Complete
+                                            <button 
+                                                onClick={() => setConfirmingJobId(job.id)}
+                                                className="px-6 bg-white text-indigo-950 rounded-2xl h-12 font-black uppercase text-[10px] tracking-widest hover:bg-emerald-400 hover:text-white transition-all shadow-xl active:scale-95"
+                                            >
+                                                Complete
                                             </button>
                                         </div>
                                     </div>
-                                ) : (
-                                    <button onClick={() => { setConfirmingJobId(job.id); setFinalAmountAdjust(job.proposedPrice || job.price); }} className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-normal transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-900/20 active:scale-[0.98]">
-                                        <CheckCircle className="w-5 h-5 text-emerald-400" /> Mark as Completed
-                                    </button>
-                                )}
+
+                                    {confirmingJobId === job.id && (
+                                        <div className="mt-8 pt-8 border-t border-white/20 animate-in slide-in-from-bottom duration-300">
+                                            <p className="text-white/60 text-[10px] uppercase font-bold tracking-[0.2em] mb-4">Confirm Final Amount</p>
+                                            <div className="flex gap-3">
+                                                <input
+                                                    type="number"
+                                                    value={finalAmountAdjust}
+                                                    onChange={(e) => setFinalAmountAdjust(e.target.value)}
+                                                    className="flex-1 bg-white/10 border border-white/10 rounded-2xl px-6 py-4 text-white font-black outline-none focus:ring-2 ring-emerald-400"
+                                                />
+                                                <button onClick={() => completeJob(job, finalAmountAdjust)} className="bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Confirm</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
                         {totalActivePages > 1 && (
@@ -531,119 +534,68 @@ const ProviderDashboard = () => {
                     </div>
                 </div>
 
-                {/* Incoming Requests */}
+                {/* 2. Incoming Requests (Urban Company Style) */}
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-medium text-slate-900 flex items-center gap-3">
-                        <div className="p-2 bg-rose-50 rounded-xl relative">
-                            <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
-                            </span>
-                            <AlertTriangle className="w-6 h-6 text-rose-500" />
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
+                        <div className="p-2.5 bg-rose-50 rounded-2xl">
+                             <AlertCircle className="w-6 h-6 text-rose-500" />
                         </div>
-                        Incoming Requests
+                        New Requests
+                        <span className="text-[10px] bg-rose-500 text-white px-2.5 py-1 rounded-full">{requests.length}</span>
                     </h2>
-                    <div className="space-y-5">
+                    <div className="space-y-6">
                         {paginatedRequests.map(req => (
-                            <div key={req.id} className="bg-white p-7 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-slate-200 transition-all duration-300 relative group overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full blur-3xl group-hover:bg-indigo-50/50 transition-colors pointer-events-none"></div>
-                                <div className="relative z-10">
-                                    <div className="flex justify-between items-start mb-5">
+                            <div key={req.id} className="bg-white rounded-[2.5rem] p-8 border-2 border-slate-50 hover:border-indigo-100 shadow-sm transition-all group relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -mr-12 -mt-12 group-hover:scale-125 transition-transform"></div>
+                                
+                                <div className="flex justify-between items-start mb-6 relative z-10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-xl font-black text-indigo-600">
+                                            {(req.customer || '?').charAt(0)}
+                                        </div>
                                         <div>
-                                            <h3 className="font-medium text-xl text-slate-900">{req.service}</h3>
-                                            <p className="text-slate-400 font-normal text-sm tracking-wider mt-1">#{req.id}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-xl font-medium text-slate-900">₹{req.proposedPrice || req.price}</div>
-                                            <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-[10px] font-medium uppercase tracking-widest text-emerald-600 rounded">Net: ₹{((req.proposedPrice || req.price) * 0.85).toFixed(0)}</div>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50/80 p-4 rounded-2xl border border-slate-100/50">
-                                        <div className="flex items-start gap-3">
-                                            <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
-                                            <div className="flex flex-col w-full">
-                                                {/* Doorstep detail shown prominently */}
-                                                {(req.houseNo || req.house) ? (
-                                                    <div className="bg-slate-100 px-3 py-1 rounded-lg mb-2 border-l-4 border-indigo-500">
-                                                        <span className="text-[10px] uppercase font-medium text-slate-400 block tracking-widest">Door / Flat No</span>
-                                                        <span className="font-medium text-slate-900 text-sm">{req.houseNo || req.house}</span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-[10px] font-normal text-amber-600 mb-1">⚠️ No house number provided</div>
-                                                )}
-                                                <span className="text-slate-600 text-sm leading-relaxed">{req.address}</span>
-                                                {req.description && (
-                                                    <div className="mt-3 bg-rose-50/30 p-3 rounded-xl border border-rose-100/30">
-                                                        <span className="text-[10px] uppercase font-medium text-rose-400 block tracking-widest mb-1">Issue Description</span>
-                                                        <p className="text-xs font-medium text-slate-700 italic">"{req.description}"</p>
-                                                    </div>
-                                                )}
-                                                {req.location && (
-                                                    <div className="flex gap-2 mt-3">
-                                                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${req.location.lat},${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 font-medium hover:underline flex items-center gap-1 bg-blue-50 px-2 py-1 rounded">
-                                                            <Navigation className="w-2.5 h-2.5" /> Google Directions
-                                                        </a>
-                                                        <a href={`https://www.openstreetmap.org/directions?from=&to=${req.location.lat}%2C${req.location.lng}`} target="_blank" rel="noreferrer" className="text-[10px] text-slate-600 font-medium hover:underline flex items-center gap-1 bg-slate-100 px-2 py-1 rounded">
-                                                            <MapPin className="w-2.5 h-2.5" /> OSM View
-                                                        </a>
-                                                    </div>
-                                                )}
+                                            <h3 className="text-lg font-bold text-slate-900 tracking-tight">{req.customer || 'Guest User'}</h3>
+                                            <div className="flex items-center gap-1 mt-1">
+                                                <Star className="w-3 h-3 text-amber-500 fill-current" />
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Premium Task</span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{req.slot || formatTime(req.time)}</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                                            <a
-                                                href={`tel:${req.customerPhone || req.phone || ''}`}
-                                                className="text-blue-600 hover:text-blue-700 font-normal underline-offset-2 hover:underline"
-                                                onClick={e => { if (!req.customerPhone && !req.phone) { e.preventDefault(); alert('Customer phone number not available for this booking.'); } }}
-                                            >
-                                                Call {req.customer}
-                                            </a>
-                                        </div>
                                     </div>
+                                    <div className="text-right">
+                                        <div className="text-2xl font-black text-slate-950 tracking-tighter">₹{req.proposedPrice || req.price}</div>
+                                        <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest mt-1 leading-none">Job Value</p>
+                                    </div>
+                                </div>
 
-                                    {req.status === 'negotiating' ? (
-                                        <div className="flex gap-3">
-                                            <div className="flex-1 py-3.5 bg-amber-50 border-2 border-amber-100 text-amber-700 font-normal rounded-2xl flex justify-center items-center gap-2">
-                                                <Clock className="w-5 h-5" /> Quote Sent: ₹{req.proposedPrice} (Waiting for Customer)
-                                            </div>
+                                <div className="bg-slate-50 rounded-3xl p-6 mb-8 border border-slate-100">
+                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Required Services</p>
+                                    <h4 className="text-base font-bold text-slate-900 mb-6">{req.service}</h4>
+                                    
+                                    <div className="grid grid-cols-2 gap-6 pt-6 border-t border-slate-200/50">
+                                        <div className="flex items-center gap-3">
+                                            <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />
+                                            <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{req.date}</span>
                                         </div>
-                                    ) : negotiatingId === req.id ? (
-                                        <div className="flex gap-3 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                            <div className="relative flex-1">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">₹</span>
-                                                <input
-                                                    type="number"
-                                                    className="w-full pl-10 pr-4 py-3.5 bg-white border-2 border-indigo-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none font-normal text-slate-800 transition-all shadow-inner"
-                                                    placeholder="Your Price"
-                                                    value={negotiatedPrice}
-                                                    onChange={(e) => setNegotiatedPrice(e.target.value)}
-                                                    autoFocus
-                                                />
-                                            </div>
-                                            <button onClick={() => proposePrice(req)} className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-2xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95 whitespace-nowrap flex items-center gap-2">
-                                                Send <Navigation className="w-4 h-4" />
-                                            </button>
-                                            <button onClick={() => setNegotiatingId(null)} className="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-normal rounded-2xl transition-all active:scale-95">
-                                                <XCircle className="w-5 h-5 mx-auto" />
-                                            </button>
+                                        <div className="flex items-center gap-3">
+                                            <Clock className="w-4 h-4 text-indigo-400 shrink-0" />
+                                            <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{req.slot || formatTime(req.time)}</span>
                                         </div>
-                                    ) : (
-                                        <div className="flex gap-3">
-                                            <button onClick={() => rejectRequest(req.id)} className="flex-[0.8] py-3.5 bg-white border-2 border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200 font-medium rounded-2xl transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
-                                                Reject
-                                            </button>
-                                            <button onClick={() => setNegotiatingId(req.id)} className="flex-[1.2] py-3.5 bg-white border-2 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 font-medium rounded-2xl transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
-                                                <IndianRupee className="w-5 h-5" /> Propose Quote
-                                            </button>
-                                            <button onClick={() => acceptRequest(req)} className="flex-[1.2] py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-2xl shadow-lg shadow-indigo-600/20 transition-all flex justify-center items-center gap-2 active:scale-[0.98] group-hover:-translate-y-0.5">
-                                                Accept Request
-                                            </button>
-                                        </div>
-                                    )}
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={() => acceptRequest(req)}
+                                        className="flex-[2] bg-indigo-600 text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-600/20 active:scale-95"
+                                    >
+                                        Accept Job
+                                    </button>
+                                    <button 
+                                        onClick={() => setNegotiatingId(req.id)}
+                                        className="flex-1 bg-white border-2 border-slate-100 text-slate-500 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:border-indigo-100 hover:text-indigo-600 transition-all"
+                                    >
+                                        Quote
+                                    </button>
                                 </div>
                             </div>
                         ))}
