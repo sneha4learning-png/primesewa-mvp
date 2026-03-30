@@ -139,7 +139,7 @@ const DashboardOverview = () => {
             setStats(prev => ({ ...prev, pendingPayouts: Math.floor(total) }));
         }, (err) => console.error("Payouts Listener Error:", err));
 
-        // 4. Data Hygiene Patcher (Legacy Cleanup)
+        // 4. Data Hygiene Patcher (Legacy Cleanup & Taxonomy Unification)
         const unsubPatch = onSnapshot(collection(db, 'providers'), async (snap) => {
             const neighborhoods = [
                 ['Vastrapur', 'Satellite', 'Bopal'], ['SG Highway', 'Prahlad Nagar', 'Ghatlodia'],
@@ -147,10 +147,25 @@ const DashboardOverview = () => {
             ];
             for (const d of snap.docs) {
                 const p = d.data();
+                let needsUpdate = false;
+                const updatePayload = {};
+
+                // Fix Location/Areas
                 if (!p.serviceAreas || p.serviceAreas.length === 0 || p.location === 'Ahmedabad') {
                     const idx = d.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % neighborhoods.length;
-                    const selected = neighborhoods[idx];
-                    await updateDoc(doc(db, 'providers', d.id), { serviceAreas: selected, location: selected.join(', '), patchApplied: true });
+                    updatePayload.serviceAreas = neighborhoods[idx];
+                    updatePayload.location = neighborhoods[idx].join(', ');
+                    needsUpdate = true;
+                }
+
+                // Fix Taxonomy Contradictions (SALON & BEAUTY -> Salon for Women)
+                if (p.category === 'Salon' || p.category === 'SALON & BEAUTY' || p.category === 'Beauty' || p.category === 'salon & beauty') {
+                    updatePayload.category = 'Salon for Women';
+                    needsUpdate = true;
+                }
+
+                if (needsUpdate) {
+                    await updateDoc(doc(db, 'providers', d.id), { ...updatePayload, patchApplied: true });
                 }
             }
         });
@@ -179,9 +194,9 @@ const DashboardOverview = () => {
                 const name = pData.name || '';
                 let cat = pData.category;
                 
-                // ENSURE CATEGORIES FOR THE DEMO PARTNERS
-                if (name.includes('Anjali')) { cat = 'Salon for Women'; }
-                if (name.includes('Rajesh')) { cat = 'Salon for Men'; }
+                // UNIFY CATEGORY TAXONOMY WITH CUSTOMER PANEL
+                if (name.includes('Anjali') || cat === 'SALON & BEAUTY' || cat === 'Beauty') { cat = 'Salon for Women'; }
+                if (name.includes('Rajesh') || name.includes('Grooming')) { cat = 'Salon for Men'; }
                 if (name.includes('Sanjay')) { cat = 'Electrical'; }
 
                 let resetRating = '4.8'; 
