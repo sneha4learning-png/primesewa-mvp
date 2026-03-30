@@ -464,13 +464,30 @@ const CustomerHome = () => {
                         {selectedCategory && (
                             <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100">
                                 <h3 className="text-2xl font-black mb-6">Select {selectedCategory} Services</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                    {categories.find(c => c.name === selectedCategory)?.subServices.map(sub => (
-                                        <div key={sub.name} onClick={() => setSelectedSubServices(p => p.find(s => s.name === sub.name) ? p.filter(s => s.name !== sub.name) : [...p, sub])} className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${selectedSubServices.find(s => s.name === sub.name) ? 'border-indigo-600 bg-white shadow-lg' : 'border-white bg-white hover:border-slate-200'}`}>
-                                            <h4 className="text-xs font-bold mb-2">{sub.name}</h4>
-                                            <div className="text-sm font-black text-indigo-600">₹{sub.price}</div>
-                                        </div>
-                                    ))}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {categories.find(c => c.name === selectedCategory)?.subServices.map(sub => {
+                                        const isSelected = selectedSubServices.find(s => s.name === sub.name);
+                                        return (
+                                            <div 
+                                                key={sub.name} 
+                                                onClick={() => setSelectedSubServices(p => isSelected ? p.filter(s => s.name !== sub.name) : [...p, sub])} 
+                                                className={`group relative p-6 rounded-[2rem] border-2 cursor-pointer transition-all duration-300 ${isSelected ? 'border-indigo-600 bg-white shadow-2xl scale-105' : 'border-slate-100 bg-white hover:border-indigo-200 hover:shadow-lg'}`}
+                                            >
+                                                {isSelected && (
+                                                    <div className="absolute -top-2 -right-2 w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-in zoom-in">
+                                                        <CheckCircle2 className="w-4 h-4 text-white" />
+                                                    </div>
+                                                )}
+                                                <div className="flex flex-col h-full justify-between">
+                                                    <div>
+                                                        <h4 className={`text-xs font-black uppercase tracking-widest mb-2 ${isSelected ? 'text-indigo-600' : 'text-slate-900 group-hover:text-indigo-600'}`}>{sub.name}</h4>
+                                                        <p className="text-[10px] text-slate-400 font-medium leading-tight">Expert service included</p>
+                                                    </div>
+                                                    <div className={`text-lg font-black mt-4 ${isSelected ? 'text-indigo-600' : 'text-slate-900'}`}>₹{sub.price}</div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
@@ -501,9 +518,17 @@ const CustomerHome = () => {
                                                 <div className="flex items-center justify-between pt-6 border-t border-slate-50">
                                                     <div>
                                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{selectedSubServices.length > 0 ? 'Expert Quote' : 'Starts at'}</p>
-                                                        <p className="text-2xl font-black text-slate-900">₹{selectedSubServices.length > 0 ? (price + (p.name.charCodeAt(0) % 4 * 150)) : p.price || 499}</p>
+                                                        <p className="text-2xl font-black text-slate-900">
+                                                            {/* SANITIZED PRICE LOGIC: Prevents double ₹ symbol and ensures provider-specific expert quotes */}
+                                                            ₹{selectedSubServices.length > 0 
+                                                                ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
+                                                                : (String(p.price || 499).replace('₹', ''))}
+                                                        </p>
                                                     </div>
-                                                    <button onClick={() => handleBook(p)} className="px-8 py-4 bg-indigo-600 hover:bg-black text-white font-bold uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-indigo-600/20">Book Now</button>
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => setSelectedProviderProfile(p)} className="px-4 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 text-[9px] font-black uppercase tracking-widest rounded-2xl border border-slate-200 transition-all">Profile</button>
+                                                        <button onClick={() => handleBook(p)} className="px-8 py-4 bg-indigo-600 hover:bg-black text-white font-bold uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-indigo-600/20">Book Now</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         );
