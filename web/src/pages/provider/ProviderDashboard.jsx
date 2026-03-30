@@ -545,54 +545,68 @@ const ProviderDashboard = () => {
                     </h2>
                     <div className="space-y-6">
                         {paginatedRequests.map(req => (
-                            <div key={req.id} className="bg-white rounded-[2.5rem] p-8 border-2 border-slate-50 hover:border-indigo-100 shadow-sm transition-all group relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -mr-12 -mt-12 group-hover:scale-125 transition-transform"></div>
+                            <div key={req.id} className="group relative bg-white rounded-[3rem] border border-slate-100 p-8 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-700 overflow-hidden mb-6 last:mb-0">
+                                {/* UC Background Accent */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-bl-full translate-x-8 -translate-y-8 animate-pulse"></div>
                                 
-                                <div className="flex justify-between items-start mb-6 relative z-10">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-xl font-black text-indigo-600">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-6 relative z-10">
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-16 h-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center text-2xl font-black text-white shadow-xl">
                                             {(req.customer || '?').charAt(0)}
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-slate-900 tracking-tight">{req.customer || 'Guest User'}</h3>
-                                            <div className="flex items-center gap-1 mt-1">
-                                                <Star className="w-3 h-3 text-amber-500 fill-current" />
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Premium Task</span>
+                                            <h3 className="text-xl font-black text-slate-950 tracking-tighter mb-1">{req.customer || 'Guest User'}</h3>
+                                            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full w-fit">
+                                                <Zap className="w-3 h-3 fill-current" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">{req.serviceType || 'Job Request'}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <div className="text-2xl font-black text-slate-950 tracking-tighter">₹{req.proposedPrice || req.price}</div>
-                                        <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest mt-1 leading-none">Job Value</p>
+                                    <div className="text-left sm:text-right bg-indigo-50/50 px-6 py-4 rounded-[1.5rem] border border-indigo-100/50 min-w-[140px]">
+                                        <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1.5 leading-none">Job Value (Net)</p>
+                                        <div className="text-3xl font-black text-indigo-600 tracking-tighter">₹{req.proposedPrice || req.price}</div>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-50 rounded-3xl p-6 mb-8 border border-slate-100">
-                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Required Services</p>
-                                    <h4 className="text-base font-bold text-slate-900 mb-6">{req.service}</h4>
+                                <div className="bg-slate-50/50 rounded-[2.5rem] p-8 mb-8 border border-slate-100 relative overflow-hidden group-hover:bg-white transition-colors duration-500">
+                                    <div className="flex flex-wrap items-center gap-2 mb-6">
+                                        {((req.service || '').includes('(') ? (req.service.split('(')[1].replace(')', '').split(', ')) : [req.service]).map((s, i) => (
+                                            <span key={i} className="px-4 py-2 bg-white text-slate-600 rounded-xl text-[10px] font-bold border border-slate-100 shadow-sm">{s}</span>
+                                        ))}
+                                    </div>
                                     
-                                    <div className="grid grid-cols-2 gap-6 pt-6 border-t border-slate-200/50">
-                                        <div className="flex items-center gap-3">
-                                            <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />
-                                            <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{req.date}</span>
+                                    <div className="flex flex-col gap-4">
+                                        <div className="flex items-center gap-4 text-slate-600">
+                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm">
+                                                <Calendar className="w-4 h-4 text-indigo-500" />
+                                            </div>
+                                            <span className="text-xs font-black uppercase tracking-widest">{req.date}</span>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <Clock className="w-4 h-4 text-indigo-400 shrink-0" />
-                                            <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{req.slot || formatTime(req.time)}</span>
+                                        <div className="flex items-center gap-4 text-slate-600">
+                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm">
+                                                <Clock className="w-4 h-4 text-indigo-500" />
+                                            </div>
+                                            <span className="text-xs font-black uppercase tracking-widest">{req.slot || formatTime(req.time)}</span>
+                                        </div>
+                                        <div className="flex items-center gap-4 text-slate-600">
+                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm">
+                                                <MapPin className="w-4 h-4 text-indigo-500" />
+                                            </div>
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[200px]">{req.address || 'Ahmedabad Location'}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="flex gap-3">
+                                <div className="flex gap-4">
                                     <button 
                                         onClick={() => acceptRequest(req)}
-                                        className="flex-[2] bg-indigo-600 text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-600/20 active:scale-95"
+                                        className="flex-[2.5] bg-slate-950 text-white h-16 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-primary transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
                                     >
-                                        Accept Job
+                                        Accept Request <CheckCircle2 className="w-4 h-4" />
                                     </button>
                                     <button 
                                         onClick={() => setNegotiatingId(req.id)}
-                                        className="flex-1 bg-white border-2 border-slate-100 text-slate-500 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:border-indigo-100 hover:text-indigo-600 transition-all"
+                                        className="flex-1 bg-white border-2 border-slate-100 text-slate-500 h-16 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:border-indigo-100 hover:text-indigo-600 transition-all active:scale-95"
                                     >
                                         Quote
                                     </button>

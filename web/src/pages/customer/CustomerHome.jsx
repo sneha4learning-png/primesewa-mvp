@@ -791,10 +791,17 @@ const CustomerHome = () => {
     const handleBook = (provider) => {
         const categoryData = categories.find(c => c.name === (Array.isArray(provider.category) ? provider.category[0] : provider.category));
         
-        // Multi-selection requirement: must pick at least one sub-service for Job-based categories
-        if (categoryData?.subServices?.length > 0 && selectedSubServices.length === 0) {
-            alert(`Please select at least one ${selectedCategory} service to continue.`);
-            window.scrollTo({ top: catalogRef.current?.offsetTop - 150, behavior: 'smooth' });
+        // Urban Company Standard: Users MUST select specific tasks/services before they can book an expert.
+        // This ensures the professional knows exactly what the job entails and the price is committed.
+        if (selectedSubServices.length === 0) {
+            const catName = selectedCategory || (Array.isArray(provider.category) ? provider.category[0] : provider.category) || 'service';
+            alert(`Please select at least one ${catName} service before booking. ${provider.name} needs to know your requirements to provide the best service.`);
+            
+            // Scroll back up to the service selection area
+            const selectionArea = document.getElementById('service-catalog');
+            if (selectionArea) {
+                selectionArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
             return;
         }
 
@@ -1595,46 +1602,49 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        {/* Service Selection UI (Urban Company Style) - MULTI SELECTION */}
+                        {/* Urban Company Style Sub-service Catalog - MULTI SELECTION */}
                         {selectedCategory && (
-                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
-                                <div className="flex justify-between items-center mb-8">
-                                    <h3 className="text-xl font-medium text-slate-800 flex items-center gap-3">
-                                        <Sparkles className="w-5 h-4 text-indigo-500" />
-                                        Select {selectedCategory} services:
-                                    </h3>
+                            <div className="bg-slate-50/50 rounded-[3rem] p-8 md:p-12 border border-slate-100 mb-16 animate-in fade-in slide-in-from-top-6 duration-700">
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                                    <div>
+                                        <h3 className="text-3xl font-black text-slate-900 tracking-tighter mb-2">
+                                            {selectedCategory} <span className="text-primary">Packages</span>
+                                        </h3>
+                                        <p className="text-slate-500 font-medium text-sm">Select one or more services to see available experts and final pricing.</p>
+                                    </div>
                                     {selectedSubServices.length > 0 && (
-                                        <div className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-bold uppercase tracking-widest border border-indigo-100 animate-pulse">
-                                            Total: ₹{selectedSubServices.reduce((sum, s) => sum + s.price, 0)}
+                                        <div className="px-8 py-4 bg-primary text-white rounded-[1.5rem] text-sm font-black uppercase tracking-widest shadow-2xl shadow-primary/20 animate-bounce-subtle">
+                                            {selectedSubServices.length} Selected • ₹{selectedSubServices.reduce((sum, s) => sum + s.price, 0)}
                                         </div>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                     {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => {
                                         const isSelected = selectedSubServices.find(s => s.name === sub.name);
                                         return (
-                                            <button
+                                            <div
                                                 key={sub.name}
-                                                onClick={() => {
-                                                    setSelectedSubServices(prev => 
-                                                        isSelected ? prev.filter(s => s.name !== sub.name) : [...prev, sub]
-                                                    );
-                                                }}
-                                                className={`p-6 rounded-[2rem] border text-left transition-all relative overflow-hidden group ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'bg-slate-50 border-slate-100 text-slate-700 hover:border-indigo-200 hover:bg-white hover:shadow-lg'}`}
+                                                className={`group bg-white p-8 rounded-[2.5rem] border-2 transition-all duration-500 flex justify-between items-center ${isSelected ? 'border-primary shadow-2xl ring-4 ring-primary/5' : 'border-slate-100 hover:border-primary/20 hover:shadow-xl'}`}
                                             >
-                                                <div className="relative z-10">
-                                                    <div className={`text-[8px] font-black uppercase tracking-widest mb-3 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
-                                                        {isSelected ? 'Selected' : 'Best Seller'}
+                                                <div className="flex-1 pr-4">
+                                                    <div className="flex items-center gap-3 mb-3">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:bg-primary transition-colors"></span>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{isSelected ? 'Added to cart' : 'Bestseller'}</span>
                                                     </div>
-                                                    <div className="text-xs font-bold mb-5 leading-relaxed h-10 line-clamp-2">{sub.name}</div>
-                                                    <div className="flex items-center justify-between mt-auto">
-                                                        <span className="text-lg font-black tracking-tighter">₹{sub.price}</span>
-                                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isSelected ? 'bg-white/20 text-white' : 'bg-white text-indigo-600 shadow-sm border border-slate-200'}`}>
-                                                            {isSelected ? <CheckCircle2 className="w-4 h-4" /> : <PlusIcon className="w-4 h-4" />}
-                                                        </div>
-                                                    </div>
+                                                    <h4 className="text-lg font-bold text-slate-900 mb-4 leading-tight">{sub.name}</h4>
+                                                    <div className="text-2xl font-black text-slate-950 tracking-tighter">₹{sub.price}</div>
                                                 </div>
-                                            </button>
+                                                <button 
+                                                    onClick={() => {
+                                                        setSelectedSubServices(prev => 
+                                                            isSelected ? prev.filter(s => s.name !== sub.name) : [...prev, sub]
+                                                        );
+                                                    }}
+                                                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${isSelected ? 'bg-primary text-white rotate-90' : 'bg-slate-50 text-primary hover:bg-primary hover:text-white hover:scale-110 active:scale-95 border border-slate-100'}`}
+                                                >
+                                                    {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <PlusIcon className="w-5 h-5" />}
+                                                </button>
+                                            </div>
                                         );
                                     })}
                                 </div>
@@ -1717,44 +1727,36 @@ const CustomerHome = () => {
                                                                         <span className="text-[10px] font-medium text-slate-900">{ratingValue !== '0.0' ? ratingValue : 'New'}</span>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                                                    <div className="flex flex-col items-end whitespace-nowrap">
-                                                        <div className="flex items-baseline gap-0.5 group/price relative">
-                                                            {(() => {
-                                                                const rawPrice = String(p.price || '499');
-                                                                const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
-                                                                const catObj = categories.find(c => pCats.includes(c.name.toLowerCase()));
-                                                                const defaultUnit = catObj?.type === 'Hourly-based' ? 'hr' : 'job';
-                                                                const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
-                                                                const unitPart = defaultUnit; 
-                                                                
-                                                                // Dynamic Pricing: Total of selected sub-services using this PROVIDER'S specific rates or a dynamic market adjustment
-                                                                const providerSpecificTotal = selectedSubServices.reduce((sum, s) => {
-                                                                    // Real data: Use p.subServiceRates if it exists
-                                                                    if (p.subServiceRates?.[s.name]) return sum + Number(p.subServiceRates[s.name]);
+                                                                                                                    <div className="flex flex-col items-end whitespace-nowrap">
+                                                            <div className="flex items-baseline gap-0.5 group/price relative">
+                                                                {(() => {
+                                                                    const rawPrice = String(p.price || '499');
+                                                                    const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
+                                                                    const catObj = categories.find(c => pCats.includes(c.name.toLowerCase()));
+                                                                    const defaultUnit = catObj?.type === 'Hourly-based' ? 'hr' : 'job';
+                                                                    const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
+                                                                    const unitPart = defaultUnit; 
                                                                     
-                                                                    // Market logic to ensure DIFFERENT rates for comparison:
-                                                                    // Calculate a "Premium Offset" based on the provider's name or rating
-                                                                    const seed = (p.name || 'Prime').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                                                                    const offsetStep = 50; // Increments of 50
-                                                                    const premiumFactor = (seed % 3) * offsetStep; // 0, 50, or 100
-                                                                    
-                                                                    // If rating is high (>=4.5), add another small premium
-                                                                    const ratingPremium = ratingValue >= 4.5 ? 49 : 0;
-                                                                    
-                                                                    return sum + s.price + premiumFactor + ratingPremium;
-                                                                }, 0);
+                                                                    // Dynamic Pricing: Total of selected sub-services using this PROVIDER'S specific rates or a dynamic market adjustment
+                                                                    const providerSpecificTotal = selectedSubServices.reduce((sum, s) => {
+                                                                        if (p.subServiceRates?.[s.name]) return sum + Number(p.subServiceRates[s.name]);
+                                                                        const seed = (p.name || 'Prime').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                                                                        const offsetStep = 50; 
+                                                                        const premiumFactor = (seed % 3) * offsetStep; 
+                                                                        const ratingPremium = ratingValue >= 4.5 ? 49 : 0;
+                                                                        return sum + s.price + premiumFactor + ratingPremium;
+                                                                    }, 0);
 
-                                                                return (
-                                                                    <>
-                                                                        <span className="text-xs font-medium text-slate-950">₹</span>
-                                                                        <span className="text-xl font-medium text-slate-950 tracking-tighter">
-                                                                            {selectedSubServices.length > 0 ? providerSpecificTotal : (Number(pricePart) + ((p.name || '').length % 3 * 50))}
-                                                                        </span>
-                                                                        <span className="text-slate-400 text-[9px] font-normal">/{unitPart}</span>
-                                                                        
-                                                                        {/* Price Breakdown Hover Card for Comparison */}
-                                                                        {selectedSubServices.length > 0 && (
+                                                                    // Urban Company Rule: Show "Starting from" if no services are selected, otherwise show committed total
+                                                                    return selectedSubServices.length > 0 ? (
+                                                                        <>
+                                                                            <span className="text-xs font-medium text-slate-950">₹</span>
+                                                                            <span className="text-xl font-medium text-slate-950 tracking-tighter">
+                                                                                {providerSpecificTotal}
+                                                                            </span>
+                                                                            <span className="text-slate-400 text-[9px] font-normal">/{unitPart}</span>
+                                                                            
+                                                                            {/* Price Breakdown Hover Card for Comparison */}
                                                                             <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 rounded-2xl p-4 shadow-2xl opacity-0 invisible group-hover/price:opacity-100 group-hover/price:visible transition-all z-50 pointer-events-none">
                                                                                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-50 pb-2">Rate Breakdown</p>
                                                                                 <div className="space-y-2">
@@ -1774,15 +1776,22 @@ const CustomerHome = () => {
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        )}
-                                                                    </>
-                                                                );
-                                                            })()}
+                                                                        </>
+                                                                    ) : (
+                                                                        <div className="text-right">
+                                                                            <div className="flex items-center justify-end gap-1 mb-0.5">
+                                                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Starts at</span>
+                                                                                <span className="text-sm font-black text-slate-950 tracking-tighter">₹{pricePart}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })()}
+                                                            </div>
+                                                            <p className="text-[7px] font-medium text-slate-300 uppercase tracking-widest leading-none text-right mt-1">
+                                                                {selectedSubServices.length > 0 ? 'Expert Specific Price' : 'Selection required'}
+                                                            </p>
                                                         </div>
-                                                        <p className="text-[7px] font-medium text-slate-300 uppercase tracking-widest leading-none text-right">
-                                                            {selectedSubServices.length > 0 ? 'Expert Specific Price' : 'Starting Rate'}
-                                                        </p>
-                                                    </div></div>
+                                          </div></div>
                                                     </div>
 
                                                     <div className="flex items-center gap-6 mb-6 border-t border-slate-50 pt-6">
