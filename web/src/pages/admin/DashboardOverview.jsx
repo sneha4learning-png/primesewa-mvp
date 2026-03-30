@@ -219,13 +219,22 @@ const DashboardOverview = () => {
                 snap.forEach(d => batch.delete(d.ref));
             }
 
-            // 2. Reset Provider Stats
+            // 2. Reset Provider Stats & Categories for Consistency
             const pSnap = await getDocs(collection(db, 'providers'));
             pSnap.forEach(d => {
+                const name = d.data().name || '';
+                let cat = d.data().category;
+                
+                // Ensure Demo Providers have correct categories
+                if (name.includes('Anjali')) cat = 'Salon for Women';
+                if (name.includes('Rajesh')) cat = 'Salon for Men';
+                if (name.includes('Sanjay')) cat = 'Electrical';
+                
                 batch.update(d.ref, {
                     rating: '5.0',
                     ratingCount: 0,
                     jobs: 0,
+                    category: cat,
                     patchApplied: true
                 });
             });
@@ -233,50 +242,50 @@ const DashboardOverview = () => {
             // 3. Inject 5 "Perfect" Live Jobs for Demo
             const seedJobs = [
                 {
-                    service: 'Plumbing (Tap Repair, Pipe Leakage)',
+                    service: 'Plumbing (Tap Fix, Pipe Leak)',
                     customer: 'Aarav Sharma',
-                    provider: 'Rajesh Grooming Studio', // Reusing a valid provider name
-                    price: 749,
+                    provider: 'Sanjay Services', 
+                    price: 448, // 149 + 299
                     status: 'pending',
                     date: new Date().toISOString().split('T')[0],
                     slot: '10:00 - 11:00 AM',
                     address: 'Flat 402, Satellite, Ahmedabad'
                 },
                 {
-                    service: 'Cleaning (Bathroom Deep Clean, Kitchen Chimney)',
+                    service: 'Cleaning (Bathroom Deep Clean, Kitchen Deep Clean)',
                     customer: 'Meera Patel',
                     provider: 'Anjali Premium Beauty',
-                    price: 2499,
+                    price: 1248, // 449 + 799
                     status: 'accepted',
                     date: new Date().toISOString().split('T')[0],
                     slot: '02:00 - 05:00 PM',
                     address: 'B-Block, Bopal, Ahmedabad'
                 },
                 {
-                    service: 'Electrical (Fan Installation, MCB Repair)',
+                    service: 'Electrical (Fan Fix, MCB Fix)',
                     customer: 'Ishaan Gupta',
-                    provider: 'Rajesh Grooming Studio',
-                    price: 549,
+                    provider: 'Sanjay Services',
+                    price: 598, // 249 + 349
                     status: 'completed',
                     date: new Date().toISOString().split('T')[0],
                     slot: '11:00 AM - 12:00 PM',
                     address: 'S-Sector, SG Highway, Ahmedabad'
                 },
                 {
-                    service: 'Salon for Men (Haircut & Head Massage)',
+                    service: 'Salon for Men (Haircut, Shave)',
                     customer: 'Vikram Singh',
                     provider: 'Rajesh Grooming Studio',
-                    price: 399,
+                    price: 348, // 199 + 149
                     status: 'pending',
                     date: new Date().toISOString().split('T')[0],
                     slot: '06:00 - 07:00 PM',
                     address: 'Garden View, Prahlad Nagar'
                 },
                 {
-                    service: 'Carpentry (Hinge Adjustment, Bed Repair)',
+                    service: 'Carpentry (Hinge/Handle Repair, Furniture Assembly)',
                     customer: 'Sanya Mirza',
-                    provider: 'Anjali Premium Beauty',
-                    price: 1249,
+                    provider: 'Sanjay Services',
+                    price: 598, // 99 + 499
                     status: 'negotiating',
                     date: new Date().toISOString().split('T')[0],
                     slot: '09:00 - 11:00 AM',
