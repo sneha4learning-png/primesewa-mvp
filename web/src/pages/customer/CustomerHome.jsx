@@ -702,8 +702,15 @@ const CustomerHome = () => {
                                                 )}
                                                 
                                                 <div className="flex items-center gap-6 mb-8">
-                                                    <div className="w-20 h-20 bg-slate-50 rounded-[1.75rem] flex items-center justify-center text-3xl font-black text-slate-200 overflow-hidden shadow-inner group-hover:rotate-3 transition-all duration-500 border border-slate-100">
-                                                        {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : initial}
+                                                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-3xl font-black text-indigo-600 border border-slate-100 shadow-inner group-hover:scale-105 transition-all relative overflow-hidden">
+                                                        {p.photoURL ? (
+                                                            <img src={p.photoURL} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-slate-50 flex items-center justify-center relative">
+                                                                <span className="relative z-10">{initial}</span>
+                                                                <UserCircle className="absolute w-full h-full text-indigo-100 opacity-50 scale-150" />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div>
                                                         <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-2">{p.name}</h4>
