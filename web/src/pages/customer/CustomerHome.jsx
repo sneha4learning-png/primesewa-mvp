@@ -300,11 +300,23 @@ const CustomerHome = () => {
         
         if (bookingDate === getTodayStr()) {
             const currentHour = new Date().getHours();
-            // Filter out hours that have already passed (allowing for 1 hour lead time)
-            return slots.filter(s => s.hour > currentHour);
+            // Map slots to include isPast status instead of filtering
+            return slots.map(s => ({
+                ...s,
+                isPast: s.hour <= currentHour
+            }));
         }
-        return slots;
+        return slots.map(s => ({ ...s, isPast: false }));
     }, [bookingDate]);
+
+    useEffect(() => {
+        if (bookingSlot) {
+            const selected = availableSlots.find(s => s.id === bookingSlot);
+            if (selected && selected.isPast) {
+                setBookingSlot('');
+            }
+        }
+    }, [availableSlots, bookingSlot]);
 
     const handleMyLocation = () => {
         if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
@@ -575,7 +587,15 @@ const CustomerHome = () => {
                                     </label>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                         {availableSlots.map(s => (
-                                            <button key={s.id} type="button" onClick={() => setBookingSlot(s.id)} className={`py-4 px-3 border-2 rounded-2xl text-[9px] font-black uppercase tracking-tighter transition-all duration-300 ${bookingSlot === s.id ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-white border-slate-50 text-slate-400 hover:border-indigo-200'}`}>{s.label}</button>
+                                            <button 
+                                                key={s.id} 
+                                                type="button" 
+                                                onClick={() => !s.isPast && setBookingSlot(s.id)} 
+                                                disabled={s.isPast}
+                                                className={`py-4 px-3 border-2 rounded-2xl text-[9px] font-black uppercase tracking-tighter transition-all duration-300 ${s.isPast ? 'bg-slate-50 border-slate-50 text-slate-300 cursor-not-allowed opacity-50' : bookingSlot === s.id ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-white border-slate-50 text-slate-400 hover:border-indigo-200'}`}
+                                            >
+                                                {s.label}
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
