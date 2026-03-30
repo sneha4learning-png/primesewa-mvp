@@ -405,9 +405,9 @@ const CustomerHome = () => {
     }, [userData]);
 
     const handleBook = (provider) => {
-        // CORRECT LOGIC: BASE RATE (Capped at 199) + SUM OF SERVICES
-        const baseRate = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
-        const servicesTotal = selectedSubServices.reduce((sum, s) => sum + (s.price || 0), 0);
+        // FINAL DYNAMIC PRICE: CUSTOMER SPECIFIC PROVIDER RATE + Visiting Fee (Capped @ 199)
+        const baseRate = Math.min(parseInt(String(provider.price || 199).replace(/\D/g, '')), 199);
+        const servicesTotal = selectedSubServices.reduce((sum, s) => sum + (provider.subServiceRates?.[s.name] || s.price || 0), 0);
         const finalTotal = baseRate + servicesTotal;
         
         setPendingBookingData({ 
@@ -418,7 +418,7 @@ const CustomerHome = () => {
             category: selectedCategory,
             service: selectedSubServices.length > 0 
                 ? `${selectedCategory} (${selectedSubServices.map(s => s.name).join(', ')})`
-                : `${selectedCategory} Expert Consultation (Base Price Only)`
+                : `${selectedCategory} Expert Consultation`
         });
         setBookingStep(1);
         setSelectedProviderProfile(null);
@@ -755,7 +755,7 @@ const CustomerHome = () => {
                                                         <h4 className={`text-xs font-black uppercase tracking-widest mb-2 ${isSelected ? 'text-indigo-600' : 'text-slate-900 group-hover:text-indigo-600'}`}>{sub.name}</h4>
                                                         <p className="text-[10px] text-slate-400 font-medium leading-tight">Expert service included</p>
                                                     </div>
-                                                    <div className={`text-lg font-black mt-4 ${isSelected ? 'text-indigo-600' : 'text-slate-900'}`}>₹{sub.price}</div>
+                                                    <p className="text-[9px] font-black tracking-widest text-indigo-400/60 uppercase mt-auto">Service Included</p>
                                                 </div>
                                             </div>
                                         );
@@ -818,12 +818,12 @@ const CustomerHome = () => {
                                                 <div className="flex items-center justify-between pt-7 border-t border-slate-50">
                                                     <div>
                                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 opacity-60">
-                                                            {selectedSubServices.length > 0 ? 'Expert Quote' : 'Base Rate'}
+                                                            Total for Selection
                                                         </p>
-                                                        <p className="text-3xl font-black text-slate-950 tracking-tighter">
+                                                        <p className="text-3xl font-black text-indigo-600 tracking-tighter">
                                                             ₹{(() => {
                                                                 const base = Math.min(parseInt(String(p.price || 149).replace(/\D/g, '')), 199);
-                                                                const subTotal = selectedSubServices.reduce((a,b) => a + (b.price || 0), 0);
+                                                                const subTotal = selectedSubServices.reduce((a,s) => a + (p.subServiceRates?.[s.name] || s.price || 0), 0);
                                                                 return subTotal + base;
                                                             })()}
                                                         </p>
