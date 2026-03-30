@@ -180,34 +180,34 @@ const DashboardOverview = () => {
         try {
             const batch = writeBatch(db);
             
-            // 1. Purge Bookings, Payouts, Commissions
+            // 1. Purge Dynamic Content
             const colRefs = ['bookings', 'payouts', 'commissions'];
             for (const col of colRefs) {
                 const snap = await getDocs(collection(db, col));
                 snap.forEach(d => batch.delete(d.ref));
             }
 
-            // 2. Reset Provider Stats, Categories & DYNAMIC PRICING
+            // 2. ENSURE CORE PROVIDERS EXIST (AUTO-ONBOARDING)
+            const goldenFleet = [
+                { name: 'Anjali Premium Beauty', category: 'Salon for Women', rating: '5.0', multiplier: 1.25, isExpert: true },
+                { name: 'Rajesh Grooming Studio', category: 'Salon for Men', rating: '4.7', multiplier: 0.9, isExpert: false },
+                { name: 'Sanjay Services', category: 'Electrical', rating: '4.9', multiplier: 1.05, isExpert: false },
+                { name: 'Priya Home Care', category: 'Cleaning', rating: '4.8', multiplier: 1.1, isExpert: false },
+                { name: 'Vikram Painting Expert', category: 'Painting', rating: '4.7', multiplier: 1.0, isExpert: false }
+            ];
+
             const pSnap = await getDocs(collection(db, 'providers'));
-            pSnap.forEach(d => {
-                const pData = d.data();
-                const name = pData.name || '';
-                let cat = pData.category;
+            const existingProviders = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            for (const gold of goldenFleet) {
+                let pRef;
+                const match = existingProviders.find(p => p.name === gold.name);
                 
-                // UNIFY CATEGORY TAXONOMY WITH CUSTOMER PANEL
-                if (name.includes('Anjali') || cat === 'SALON & BEAUTY' || cat === 'Beauty') { cat = 'Salon for Women'; }
-                if (name.includes('Rajesh') || name.includes('Grooming')) { cat = 'Salon for Men'; }
-                if (name.includes('Sanjay')) { cat = 'Electrical'; }
-
-                let resetRating = '4.8'; 
-                let isExpert = false;
-                let multiplier = 1.0;
-
-                if (name.includes('Anjali')) { resetRating = '5.0'; isExpert = true; multiplier = 1.25; }
-                if (name.includes('Rajesh')) { resetRating = '4.7'; multiplier = 0.9; }
-                if (name.includes('Sanjay')) { resetRating = '4.9'; multiplier = 1.05; }
-                if (name.includes('Priya')) { resetRating = '4.8'; multiplier = 1.1; }
-                if (name.includes('Vikram')) { resetRating = '4.7'; multiplier = 1.0; }
+                if (match) {
+                    pRef = doc(db, 'providers', match.id);
+                } else {
+                    pRef = doc(collection(db, 'providers'));
+                }
 
                 // BUILD DYNAMIC RATES
                 const customRates = {};
@@ -217,20 +217,33 @@ const DashboardOverview = () => {
                     {n: 'Haircut', p: 199}, {n: 'Shave', p: 149}, {n: 'Facial', p: 599}, {n: 'Threading', p: 49}
                 ];
                 basePrices.forEach(x => {
-                    customRates[x.n] = Math.round(x.p * multiplier);
+                    customRates[x.n] = Math.round(x.p * gold.multiplier);
                 });
-                
-                batch.update(d.ref, {
-                    rating: resetRating,
-                    isExpert: isExpert,
-                    isOnline: true, // CRITICAL FIX: ENSURES CUSTOMERS CAN SEE THEM
+
+                batch.set(pRef, {
+                    name: gold.name,
+                    category: gold.category,
+                    rating: gold.rating,
+                    isExpert: gold.isExpert,
+                    isOnline: true,
+                    isApproved: true,
+                    isVerified: true,
+                    phone: '91'+Math.floor(Math.random()*1000000000),
                     subServiceRates: customRates,
                     ratingCount: 15,
                     jobs: 15,
                     status: 'active',
-                    category: cat,
                     patchApplied: true
-                });
+                }, { merge: true });
+            }
+
+            // Also patch existing non-golden providers to avoid taxonomy junk
+            existingProviders.forEach(p => {
+                if (!goldenFleet.some(g => g.name === p.name)) {
+                    let cat = p.category;
+                    if (cat === 'SALON & BEAUTY' || cat === 'Beauty' || p.name?.includes('Anjali')) cat = 'Salon for Women';
+                    batch.update(doc(db, 'providers', p.id), { category: cat, status: 'active', isOnline: true });
+                }
             });
 
             // 3. Inject 6 "Perfect" Live Jobs for Demo
