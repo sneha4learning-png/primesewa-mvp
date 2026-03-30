@@ -48,163 +48,112 @@ const DashboardOverview = () => {
 
 
     useEffect(() => {
-        // 1. Real-time stats and data
-        const unsubBookings = onSnapshot(collection(db, 'bookings'), (bSnap) => {
-            const allBookings = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setIsLoading(true);
+        setDbError(false);
+
+        // 1. Bookings & Revenue Listener (Drives Stats & Charts)
+        const unsubBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
+            const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
             
-            // 2. Real-time providers
-            const unsubProviders = onSnapshot(collection(db, 'providers'), (pSnap) => {
-                const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                
-                // DATABASE PURGE LOGIC: If more than 5 bookings exist, we archive/remove older ones per request
-                // and reset the metrics (ratings, earnings) based on only the survivors
-                const bookings = allBookings
-                    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-                    .slice(0, 5);
-
-                const activeProvidersCount = providers.filter(p => p.status === 'active').length;
-
-                let totalCommission = 0;
-                let totalRevenue = 0;
-                let totalPendingJobs = 0;
-
-                allBookings.forEach(b => {
-                    if (b.status === 'pending') totalPendingJobs++;
-                    if (b.status === 'completed') {
-                        const rawPrice = b.proposedPrice || b.price || b.amount || 0;
-                        const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                        totalRevenue += amount;
-                        totalCommission += amount * 0.15;
-                    }
-                });
-
-                // Generate Chart Data (Last 7 Days)
-                const last7Days = Array.from({ length: 7 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() - (6 - i));
-                    return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), bookings: 0, revenue: 0 };
-                });
-
-                allBookings.forEach(b => {
-                    const bDateStr = b.date || (b.createdAt?.toDate ? b.createdAt.toDate().toISOString().split('T')[0] : null);
-                    if (bDateStr) {
-                        const dayObj = last7Days.find(d => d.date === bDateStr);
-                        if (dayObj) {
-                            dayObj.bookings += 1;
-                            if (b.status === 'completed') {
-                                const rawPrice = b.proposedPrice || b.price || b.amount || 0;
-                                dayObj.revenue += typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                            }
-                        }
-                    }
-                });
-                setChartData(last7Days);
-
-                // Deduplicate providers by name, prioritizing those with higher ratings/jobs
-                const uniqueProvidersMap = new Map();
-                providers.forEach(p => {
-                    const nameKey = (p.name || '').toLowerCase().trim();
-                    if (!nameKey) return;
-                    const existing = uniqueProvidersMap.get(nameKey);
-                    
-                    const pRating = parseFloat(p.rating) || 0;
-                    const eRating = existing ? (parseFloat(existing.rating) || 0) : 0;
-                    const pJobs = parseInt(p.jobs) || completedCounts.get(p.name) || 0;
-                    const eJobs = existing ? (parseInt(existing.jobs) || completedCounts.get(existing.name) || 0) : 0;
-
-                    if (!existing || pRating > eRating || (pRating === eRating && pJobs > eJobs)) {
-                        uniqueProvidersMap.set(nameKey, p);
-                    }
-                });
-
-                const uniqueProviders = Array.from(uniqueProvidersMap.values());
-
-                // Top 5 Providers - Recalculated ONLY on the 5 LIVE bookings
-                const activeProvs = uniqueProviders.filter(p => p.status === 'active').map(p => {
-                    // Reset ratings and jobs to clear legacy data
-                    const liveJobs = bookings.filter(b => b.provider === p.name && b.status === 'completed').length;
-                    return {
-                        ...p,
-                        rating: liveJobs > 0 ? (p.rating || '4.5') : 'New', // Keep rating only if they have live jobs
-                        jobs: liveJobs
-                    };
-                });
-                activeProvs.sort((a, b) => (b.jobs || 0) - (a.jobs || 0));
-                setTopProviders(activeProvs.slice(0, 5));
-
-                const unsubPayouts = onSnapshot(collection(db, 'payouts'), (paySnap) => {
-                    const payouts = paySnap.docs.map(d => d.data());
-                    const pendingPayoutsTotal = payouts.filter(p => p.status === 'pending').reduce((a, c) => a + (c.amount || 0), 0);
-                    
-                    setStats(prev => ({
-                        ...prev,
-                        totalBookings: allBookings.length, 
-                        pendingBookings: totalPendingJobs,
-                        totalRevenue: totalRevenue,
-                        commissionEarned: totalCommission,
-                        activeProviders: activeProvidersCount,
-                        pendingPayouts: Math.floor(pendingPayoutsTotal)
-                    }));
-                }, (err) => {
-                    console.error('Payouts Listener Error:', err);
-                });
-
-                const sortedRecent = [...bookings].sort((a, b) => {
-                    const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.date || 0).getTime();
-                    const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.date || 0).getTime();
-                    return timeB - timeA;
-                });
-
-                setRecentBookings(sortedRecent.filter(b => b.status !== 'rejected' && b.status !== 'cancelled').slice(0, 6));
-                setRecentDeclined(sortedRecent.filter(b => b.status === 'rejected' || b.status === 'cancelled').slice(0, 6));
-
-                // Get pending providers (robust check for missing status field)
-                setPendingProviders(providers.filter(p => (p.status === 'pending' || !p.status)));
-                 return () => unsubPayouts();
-            }, (err) => {
-                console.error('Providers Listener Error:', err);
-                setDbError(true);
-            });
-
-            // Improved patcher with better randomization and loop protection
-            const unsubProvPatch = onSnapshot(collection(db, 'providers'), async (snap) => {
-                const neighborhoods = [
-                    ['Vastrapur', 'Satellite', 'Bopal'],
-                    ['SG Highway', 'Prahlad Nagar', 'Ghatlodia'],
-                    ['Maninagar', 'Naroda', 'Nikol'],
-                    ['C.G. Road', 'Navrangpura', 'Paldi'],
-                    ['Chandkheda', 'Motera', 'Sabarmati'],
-                    ['Naranpura', 'Memnagar', 'Guraul'],
-                    ['South Bopal', 'Ambawadi', 'Vasna']
-                ];
-                
-                for (const d of snap.docs) {
-                    const p = d.data();
-                    // Multi-flag check: If they ONLY have the city name or no areas at all
-                    const isGeneric = !p.serviceAreas || p.serviceAreas.length === 0 || p.location === 'Ahmedabad' || p.location === 'Ahmedabad Location';
-                    
-                    if (isGeneric) {
-                        const ref = doc(db, 'providers', d.id);
-                        // Assign a neighborhood set based on their ID string to ensure variety and stability
-                        const index = d.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % neighborhoods.length;
-                        const selected = neighborhoods[index];
-                        
-                        await updateDoc(ref, { 
-                            serviceAreas: selected, 
-                            location: selected.join(', '),
-                            patchApplied: true // Guard flag
-                        });
-                    }
+            let totalCommission = 0;
+            let totalRevenue = 0;
+            let totalPendingJobs = 0;
+            
+            all.forEach(b => {
+                if (b.status === 'pending') totalPendingJobs++;
+                if (b.status === 'completed') {
+                    const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                    const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                    totalRevenue += amount;
+                    totalCommission += amount * 0.15;
                 }
             });
 
-            return () => { unsubProviders(); unsubProvPatch(); };
+            // Modern View: Last 5 for table, but totals for cards
+            const sorted = [...all].sort((a, b) => {
+                    const tsA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds || 0) * 1000 || new Date(a.date || 0).getTime();
+                    const tsB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds || 0) * 1000 || new Date(b.date || 0).getTime();
+                    return tsB - tsA;
+                });
+
+            setRecentBookings(sorted.filter(b => !['cancelled', 'rejected'].includes(b.status)).slice(0, 6));
+            setRecentDeclined(sorted.filter(b => ['cancelled', 'rejected'].includes(b.status)).slice(0, 6));
+
+            setStats(prev => ({
+                ...prev,
+                totalBookings: all.length,
+                pendingBookings: totalPendingJobs,
+                totalRevenue,
+                commissionEarned: totalCommission
+            }));
+
+            // Chart Data Generation
+            const last7Days = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+                return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), bookings: 0, revenue: 0 };
+            });
+
+            all.forEach(b => {
+                const bDateStr = b.date || (b.createdAt?.toDate ? b.createdAt.toDate().toISOString().split('T')[0] : null);
+                if (bDateStr) {
+                    const dayObj = last7Days.find(d => d.date === bDateStr);
+                    if (dayObj) {
+                        dayObj.bookings += 1;
+                        if (b.status === 'completed') {
+                            const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                            dayObj.revenue += typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                        }
+                    }
+                }
+            });
+            setChartData(last7Days);
+            setIsLoading(false);
         }, (err) => {
-            console.error('Bookings Listener Error:', err);
+            console.error("Bookings Listener Error:", err);
             setDbError(true);
         });
 
-        return () => unsubBookings();
+        // 2. Providers & Top Partners Listener
+        const unsubProviders = onSnapshot(collection(db, 'providers'), (snapshot) => {
+            const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const activeCount = fetched.filter(p => p.status === 'active').length;
+            setPendingProviders(fetched.filter(p => p.status === 'pending' || !p.status));
+            setStats(prev => ({ ...prev, activeProviders: activeCount }));
+            
+            const top = [...fetched]
+                .filter(p => p.status === 'active')
+                .sort((a, b) => (parseInt(b.jobs || 0) - parseInt(a.jobs || 0)))
+                .slice(0, 5);
+            setTopProviders(top);
+        }, (err) => console.error("Providers Listener Error:", err));
+
+        // 3. Payouts Listener
+        const unsubPayouts = onSnapshot(collection(db, 'payouts'), (snapshot) => {
+            const total = snapshot.docs
+                .map(d => d.data())
+                .filter(p => p.status === 'pending')
+                .reduce((a, c) => a + (Number(c.amount) || 0), 0);
+            setStats(prev => ({ ...prev, pendingPayouts: Math.floor(total) }));
+        }, (err) => console.error("Payouts Listener Error:", err));
+
+        // 4. Data Hygiene Patcher (Legacy Cleanup)
+        const unsubPatch = onSnapshot(collection(db, 'providers'), async (snap) => {
+            const neighborhoods = [
+                ['Vastrapur', 'Satellite', 'Bopal'], ['SG Highway', 'Prahlad Nagar', 'Ghatlodia'],
+                ['Maninagar', 'Naroda', 'Nikol'], ['C.G. Road', 'Navrangpura', 'Paldi']
+            ];
+            for (const d of snap.docs) {
+                const p = d.data();
+                if (!p.serviceAreas || p.serviceAreas.length === 0 || p.location === 'Ahmedabad') {
+                    const idx = d.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % neighborhoods.length;
+                    const selected = neighborhoods[idx];
+                    await updateDoc(doc(db, 'providers', d.id), { serviceAreas: selected, location: selected.join(', '), patchApplied: true });
+                }
+            }
+        });
+
+        return () => { unsubBookings(); unsubProviders(); unsubPayouts(); unsubPatch(); };
     }, []);
     
     // ADMIN UTILITY: Hard Reset for Demo — ONLY implementation permitted per project head
@@ -236,6 +185,7 @@ const DashboardOverview = () => {
                     rating: '5.0',
                     ratingCount: 0,
                     jobs: 0,
+                    status: 'active',
                     category: cat,
                     patchApplied: true
                 });
@@ -247,7 +197,7 @@ const DashboardOverview = () => {
                     service: 'Plumbing (Tap Fix, Pipe Leak)',
                     customer: 'Aarav Sharma',
                     provider: 'Sanjay Services', 
-                    price: 448, // 149 + 299
+                    price: 448, 
                     status: 'pending',
                     date: new Date().toISOString().split('T')[0],
                     slot: '10:00 - 11:00 AM',
@@ -257,8 +207,8 @@ const DashboardOverview = () => {
                     service: 'Cleaning (Bathroom Deep Clean, Kitchen Deep Clean)',
                     customer: 'Meera Patel',
                     provider: 'Anjali Premium Beauty',
-                    price: 1248, // 449 + 799
-                    status: 'accepted',
+                    price: 1248, 
+                    status: 'completed', // MARKED AS COMPLETED
                     date: new Date().toISOString().split('T')[0],
                     slot: '02:00 - 05:00 PM',
                     address: 'B-Block, Bopal, Ahmedabad'
@@ -267,8 +217,8 @@ const DashboardOverview = () => {
                     service: 'Electrical (Fan Fix, MCB Fix)',
                     customer: 'Ishaan Gupta',
                     provider: 'Sanjay Services',
-                    price: 598, // 249 + 349
-                    status: 'completed',
+                    price: 598, 
+                    status: 'completed', // MARKED AS COMPLETED
                     date: new Date().toISOString().split('T')[0],
                     slot: '11:00 AM - 12:00 PM',
                     address: 'S-Sector, SG Highway, Ahmedabad'
@@ -277,8 +227,8 @@ const DashboardOverview = () => {
                     service: 'Salon for Men (Haircut, Shave)',
                     customer: 'Vikram Singh',
                     provider: 'Rajesh Grooming Studio',
-                    price: 348, // 199 + 149
-                    status: 'pending',
+                    price: 348, 
+                    status: 'completed', // MARKED AS COMPLETED
                     date: new Date().toISOString().split('T')[0],
                     slot: '06:00 - 07:00 PM',
                     address: 'Garden View, Prahlad Nagar'
@@ -287,8 +237,8 @@ const DashboardOverview = () => {
                     service: 'Carpentry (Hinge/Handle Repair, Furniture Assembly)',
                     customer: 'Sanya Mirza',
                     provider: 'Sanjay Services',
-                    price: 598, // 99 + 499
-                    status: 'negotiating',
+                    price: 598, 
+                    status: 'accepted',
                     date: new Date().toISOString().split('T')[0],
                     slot: '09:00 - 11:00 AM',
                     address: 'New Paldi, Ahmedabad'
