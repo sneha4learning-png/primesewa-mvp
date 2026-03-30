@@ -278,9 +278,12 @@ const CustomerHome = () => {
     const [bookingCity, setBookingCity] = useState('Ahmedabad');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isLocating, setIsLocating] = useState(false);
+    const [addressSuggestions, setAddressSuggestions] = useState([]);
+    const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+    const addressSearchTimeout = useRef(null);
     const [selectedSubServices, setSelectedSubServices] = useState([]);
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
-    const [isLocating, setIsLocating] = useState(false);
 
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
@@ -338,6 +341,30 @@ const CustomerHome = () => {
             } catch (e) { console.error(e); }
             setIsLocating(false);
         }, () => setIsLocating(false));
+    };
+
+    const handleAddressSearch = (query) => {
+        setBookingArea(query);
+        if (query.trim().length < 3) {
+            setAddressSuggestions([]);
+            return;
+        }
+
+        if (addressSearchTimeout.current) clearTimeout(addressSearchTimeout.current);
+        
+        addressSearchTimeout.current = setTimeout(async () => {
+            setIsSearchingAddress(true);
+            try {
+                // RESTRICT TO INDIA FOR DEMO RELEVANCE
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&countrycodes=in`);
+                const data = await res.json();
+                setAddressSuggestions(data || []);
+            } catch (e) {
+                console.error("OSM Search Error:", e);
+            } finally {
+                setIsSearchingAddress(false);
+            }
+        }, 600);
     };
 
     useEffect(() => {
@@ -616,12 +643,42 @@ const CustomerHome = () => {
                                         <p className="text-[9px] font-bold text-slate-400 uppercase ml-2">House/Apt</p>
                                         <input required placeholder="eg. 402, Sunshine Villa" value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner" />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 relative">
                                         <p className="text-[9px] font-bold text-slate-400 uppercase ml-2">Locality / Landmark</p>
-                                        <input required placeholder="eg. Near City Mall" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner" />
+                                        <div className="relative group">
+                                            <input 
+                                                required 
+                                                placeholder="eg. Near City Mall" 
+                                                value={bookingArea} 
+                                                onChange={e => handleAddressSearch(e.target.value)} 
+                                                className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner" 
+                                            />
+                                            {isSearchingAddress && <Loader2 className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-500 animate-spin" />}
+                                        </div>
+                                        {addressSuggestions.length > 0 && (
+                                            <div className="absolute z-50 left-0 right-0 mt-2 bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                                {addressSuggestions.map((s, idx) => (
+                                                    <button 
+                                                        key={idx}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setBookingArea(s.display_name.split(',')[0] + (s.display_name.split(',')[1] ? ', ' + s.display_name.split(',')[1] : ''));
+                                                            setAddressSuggestions([]);
+                                                        }}
+                                                        className="w-full p-4 text-left hover:bg-slate-50 border-b border-slate-50 last:border-none flex items-start gap-3 transition-colors"
+                                                    >
+                                                        <MapPin className="w-4 h-4 text-slate-400 mt-1 flex-shrink-0" />
+                                                        <div>
+                                                            <p className="text-xs font-bold text-slate-900 leading-tight">{s.display_name.split(',')[0]}</p>
+                                                            <p className="text-[10px] text-slate-400 truncate max-w-[280px]">{s.display_name.split(',').slice(1, 4).join(', ')}</p>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                <textarea required placeholder="Any specific instructions for the expert? (Optional)" value={bookingDesc} onChange={e => setBookingDesc(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner min-h-[120px]" />
+                                <textarea placeholder="Any specific instructions for the expert? (Optional)" value={bookingDesc} onChange={e => setBookingDesc(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner min-h-[120px]" />
                             </div>
                         </div>
 
