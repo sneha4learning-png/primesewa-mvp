@@ -175,16 +175,19 @@ const DashboardOverview = () => {
             pSnap.forEach(d => {
                 const name = d.data().name || '';
                 let cat = d.data().category;
-                
-                // Ensure Demo Providers have correct categories
                 if (name.includes('Anjali')) cat = 'Salon for Women';
                 if (name.includes('Rajesh')) cat = 'Salon for Men';
                 if (name.includes('Sanjay')) cat = 'Electrical';
+
+                let resetRating = '4.9'; 
+                if (name.includes('Anjali') || name.includes('Painting') || name.includes('Sparkle')) resetRating = '5.0'; 
+                if (name.includes('Rajesh')) resetRating = '4.8';
+                if (name.includes('Sanjay')) resetRating = '4.9';
                 
                 batch.update(d.ref, {
-                    rating: '5.0',
-                    ratingCount: 0,
-                    jobs: 0,
+                    rating: resetRating,
+                    ratingCount: 15, // Realistic initial counts
+                    jobs: 15,
                     status: 'active',
                     category: cat,
                     patchApplied: true
