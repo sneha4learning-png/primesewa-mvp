@@ -200,7 +200,7 @@ const ProviderManagement = () => {
                                         )}
                                     </div>
                                 </td>
-                                <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-emerald-600">₹{String(provider.price || '500').replace('₹', '')}</td>
+                                <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-emerald-600">₹{Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199)}</td>
                                 <td className="px-3 py-4 whitespace-nowrap">
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider border
                     ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
@@ -279,7 +279,7 @@ const ProviderManagement = () => {
                                     <Star className={`w-3 h-3 ${provider.rating > 0 ? 'fill-current' : ''}`} />
                                     {provider.rating > 0 ? Number(provider.rating).toFixed(1) : 'New'}
                                 </span>
-                                <span className="text-emerald-600 font-normal">{String(provider.price || '₹500').replace('/hr', '')}</span>
+                                <span className="text-emerald-600 font-normal">₹{Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199)}</span>
                                 <span>{provider.phone}</span>
                             </div>
                             <div className="flex items-center gap-2 flex-wrap">
