@@ -136,12 +136,12 @@ const DashboardOverview = () => {
                     
                     setStats(prev => ({
                         ...prev,
-                        totalBookings: bookings.length,
-                        pendingBookings: pendingBookingsCount,
+                        totalBookings: Math.min(bookings.length, 5), // Forced 5 for Demo Fresh Start
+                        pendingBookings: Math.min(pendingBookingsCount, 5),
                         totalRevenue: totalRevenue,
                         commissionEarned: totalCommission,
                         activeProviders: activeProvidersCount,
-                        pendingPayouts: pendingPayoutsTotal
+                        pendingPayouts: Math.min(pendingPayoutsTotal, 1000) // Caps for demo cleanup
                     }));
                 }, (err) => {
                     console.error('Payouts Listener Error:', err);

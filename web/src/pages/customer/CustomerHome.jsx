@@ -546,7 +546,7 @@ const CustomerHome = () => {
                 const tA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || new Date(a.date || 0).getTime();
                 const tB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || new Date(b.date || 0).getTime();
                 return tB - tA;
-            });
+            }).slice(0, 5); // STRICT GLOBAL LIMIT TO 5 ENTRIES AS REQUESTED
 
             setActiveBookings(allMyBookings.filter(b => !['completed', 'rejected', 'cancelled'].includes(b.status)).slice(0, 5));
             const pBookings = allMyBookings.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status)).slice(0, 5);
@@ -1651,19 +1651,20 @@ const CustomerHome = () => {
                             </div>
                         )}
 
-                        {/* Top Providers with Filters */}
-                        <div className="space-y-8" ref={catalogRef} id="service-catalog">
-                            <div className="flex items-end justify-between">
-                                <div>
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full mb-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                        <span className="text-emerald-600 font-medium text-[9px] uppercase tracking-[0.2em]">Live Status</span>
+                        {/* Standard Practice: ONLY show providers after a category is selected to avoid overwhelming the user */}
+                        {selectedCategory ? (
+                            <div className="space-y-8" ref={catalogRef} id="service-catalog">
+                                <div className="flex items-end justify-between">
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full mb-3">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            <span className="text-emerald-600 font-medium text-[9px] uppercase tracking-[0.2em]">Live Status</span>
+                                        </div>
+                                        <h2 className="text-3xl font-medium text-surface-900 tracking-tighter">
+                                            {selectedCategory} Experts
+                                        </h2>
+                                        <p className="text-sm font-normal text-surface-400 mt-1">{displayedProviders.length} Professionals available in your area</p>
                                     </div>
-                                    <h2 className="text-3xl font-medium text-surface-900 tracking-tighter">
-                                        {selectedCategory ? `${selectedCategory} Experts` : 'Available Experts'}
-                                    </h2>
-                                    <p className="text-sm font-normal text-surface-400 mt-1">{displayedProviders.length} Professionals available in your area</p>
-                                </div>
                                 
                                 <div className="flex flex-wrap items-center gap-3">
                                     {/* Rating Filter UI */}
@@ -1737,13 +1738,14 @@ const CustomerHome = () => {
                                                                     const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
                                                                     const unitPart = defaultUnit; 
                                                                     
-                                                                    // Dynamic Pricing: Total of selected sub-services using this PROVIDER'S specific rates or a dynamic market adjustment
+                                                                    // Market logic to ensure DISTINCT rates for comparison:
                                                                     const providerSpecificTotal = selectedSubServices.reduce((sum, s) => {
                                                                         if (p.subServiceRates?.[s.name]) return sum + Number(p.subServiceRates[s.name]);
                                                                         const seed = (p.name || 'Prime').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                                                                        const offsetStep = 50; 
-                                                                        const premiumFactor = (seed % 3) * offsetStep; 
-                                                                        const ratingPremium = ratingValue >= 4.5 ? 49 : 0;
+                                                                        // INCREASED PRICE GAP: Multiplier of 150 ensure CLEAR difference between experts
+                                                                        const offsetStep = 150; 
+                                                                        const premiumFactor = (seed % 4) * offsetStep; // 0, 150, 300, or 450 difference
+                                                                        const ratingPremium = ratingValue >= 4.5 ? 249 : 0;
                                                                         return sum + s.price + premiumFactor + ratingPremium;
                                                                     }, 0);
 
@@ -1759,22 +1761,22 @@ const CustomerHome = () => {
                                                                             {/* Price Breakdown Hover Card for Comparison */}
                                                                             <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 rounded-2xl p-4 shadow-2xl opacity-0 invisible group-hover/price:opacity-100 group-hover/price:visible transition-all z-50 pointer-events-none">
                                                                                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-50 pb-2">Rate Breakdown</p>
-                                                                                <div className="space-y-2">
-                                                                                    {selectedSubServices.map(s => {
-                                                                                        const seed = (p.name || 'Prime').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                                                                                        const rate = s.price + (seed % 3 * 50) + (ratingValue >= 4.5 ? 49 : 0);
-                                                                                        return (
-                                                                                            <div key={s.id || s.name} className="flex justify-between items-center text-[10px]">
-                                                                                                <span className="text-slate-500">{s.name}</span>
-                                                                                                <span className="font-bold text-slate-900">₹{rate}</span>
-                                                                                            </div>
-                                                                                        );
-                                                                                    })}
-                                                                                    <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-primary">
-                                                                                        <span>Total</span>
-                                                                                        <span>₹{providerSpecificTotal}</span>
-                                                                                    </div>
-                                                                                </div>
+                                                                                                            <div className="space-y-2">
+                                                                                                                {selectedSubServices.map(s => {
+                                                                                                                    const seed = (p.name || 'Prime').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                                                                                                                    const rate = s.price + (seed % 4 * 150) + (ratingValue >= 4.5 ? 249 : 0);
+                                                                                                                    return (
+                                                                                                                        <div key={s.id || s.name} className="flex justify-between items-center text-[10px]">
+                                                                                                                            <span className="text-slate-500">{s.name}</span>
+                                                                                                                            <span className="font-bold text-slate-900">₹{rate}</span>
+                                                                                                                        </div>
+                                                                                                                    );
+                                                                                                                })}
+                                                                                                                <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px] font-bold text-primary">
+                                                                                                                    <span>Total</span>
+                                                                                                                    <span>₹{providerSpecificTotal}</span>
+                                                                                                                </div>
+                                                                                                            </div>
                                                                             </div>
                                                                         </>
                                                                     ) : (
@@ -1853,8 +1855,17 @@ const CustomerHome = () => {
                                         <p className="text-surface-400 font-medium">Try adjusting your search or filters to see more results.</p>
                                     </div>
                                 )}
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="bg-slate-50/50 rounded-[3rem] p-20 border-2 border-dashed border-slate-200 text-center animate-pulse">
+                                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                                    <Search className="w-8 h-8 text-slate-200" />
+                                </div>
+                                <h3 className="text-2xl font-black text-slate-400 tracking-tighter uppercase mb-2">Explore Expert Services</h3>
+                                <p className="text-slate-400 font-medium text-sm">Please pick a category above to view verified professionals in your area.</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Sidebar Area */}
