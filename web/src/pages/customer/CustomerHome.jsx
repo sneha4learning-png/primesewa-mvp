@@ -647,78 +647,91 @@ const CustomerHome = () => {
                             </div>
                         )}
                                             {/* PROFESSIONALS LISTING - NOW SHOWS RECOMMENDED BY DEFAULT IF NO CATEGORY IS SELECTED */}
-                        <div className="space-y-6" ref={catalogRef} id="service-catalog">
-                            <div className="flex items-end justify-between">
-                                <h2 className="text-3xl font-black tracking-tighter">
-                                    {selectedCategory ? `Top ${selectedCategory} Experts` : 'Recommended for You'}
-                                </h2>
-                                {!selectedCategory && <button onClick={() => setSelectedCategory('Plumbing')} className="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b-2 border-indigo-100 hover:border-indigo-600 pb-1 flex items-center gap-1 transition-all">Explore All <PlusIcon className="w-3 h-3" /></button>}
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {displayedProviders.length > 0 ? displayedProviders.map(p => {
-                                    // Default list shows everyone, so we filter to 'Popular' names if no category selected for a cleaner 'Home' view
-                                    if (!selectedCategory && !['Prime Cleaning Expert', 'Prime Plumbing Expert', 'Quick Electrical Solutions'].includes(p.name)) return null;
-
-                                    const rating = parseFloat(p.rating || 0).toFixed(1);
-                                    const initial = (p.name || 'P').charAt(0).toUpperCase();
-                                    const price = selectedSubServices.reduce((sum, x) => sum + (p.subServiceRates?.[x.name] || x.price), 0);
-                                    return (
-                                        <div key={p.id} className="bg-white p-7 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
-                                            {/* MODERN EXPERT BADGE - CLEANER & MORE PROFESSIONAL */}
-                                            {rating >= 4.8 && (
-                                                <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-700 to-indigo-500 px-4 py-2 rounded-bl-[1.5rem] flex items-center gap-2 shadow-lg z-10 transition-transform group-hover:scale-110">
-                                                    <Star className="w-3.5 h-3.5 text-white fill-current" />
-                                                    <span className="text-[9px] font-black text-white uppercase tracking-widest">Expert Pick</span>
-                                                </div>
-                                            )}
-                                            
-                                            <div className="flex items-center gap-6 mb-8">
-                                                <div className="w-20 h-20 bg-slate-50 rounded-[1.75rem] flex items-center justify-center text-3xl font-black text-slate-200 overflow-hidden shadow-inner group-hover:rotate-3 transition-all duration-500 border border-slate-100">
-                                                    {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : initial}
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-2">{p.name}</h4>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="flex bg-amber-50 px-2 py-1 rounded-lg items-center gap-1">
-                                                            <Star className="w-3 h-3 text-amber-500 fill-current" />
-                                                            <span className="text-[11px] font-black text-amber-600 uppercase">
-                                                                {rating > 0 && rating !== '0.0' ? rating : 'New'}
-                                                            </span>
+                        {selectedCategory ? (
+                            <div className="space-y-6 animate-fade-in" ref={catalogRef} id="service-catalog">
+                                <div className="flex items-end justify-between">
+                                    <div>
+                                        <h3 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-2">{selectedCategory} Professionals</h3>
+                                        <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Recommended Experts</h2>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Filter className="w-4 h-4 text-slate-400" />
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Providers</span>
+                                    </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {displayedProviders.length > 0 ? displayedProviders.map(p => {
+                                        const rating = parseFloat(p.rating || 0).toFixed(1);
+                                        const initial = (p.name || 'P').charAt(0).toUpperCase();
+                                        const price = selectedSubServices.reduce((sum, x) => sum + (p.subServiceRates?.[x.name] || x.price), 0);
+                                        return (
+                                            <div key={p.id} className="bg-white p-7 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                                                {/* MODERN EXPERT BADGE - CLEANER & MORE PROFESSIONAL */}
+                                                {rating >= 4.8 && (
+                                                    <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-700 to-indigo-500 px-4 py-2 rounded-bl-[1.5rem] flex items-center gap-2 shadow-lg z-10 transition-transform group-hover:scale-110">
+                                                        <Star className="w-3.5 h-3.5 text-white fill-current" />
+                                                        <span className="text-[9px] font-black text-white uppercase tracking-widest">Expert Pick</span>
+                                                    </div>
+                                                )}
+                                                
+                                                <div className="flex items-center gap-6 mb-8">
+                                                    <div className="w-20 h-20 bg-slate-50 rounded-[1.75rem] flex items-center justify-center text-3xl font-black text-slate-200 overflow-hidden shadow-inner group-hover:rotate-3 transition-all duration-500 border border-slate-100">
+                                                        {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : initial}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-2">{p.name}</h4>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex bg-amber-50 px-2 py-1 rounded-lg items-center gap-1">
+                                                                <Star className="w-3 h-3 text-amber-500 fill-current" />
+                                                                <span className="text-[11px] font-black text-amber-600 uppercase">
+                                                                    {rating > 0 && rating !== '0.0' ? rating : 'New'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+                                                            <span className="text-[10px] font-bold text-slate-400 capitalize">{p.category || 'Prime'} Professional</span>
                                                         </div>
-                                                        <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
-                                                        <span className="text-[10px] font-bold text-slate-400 capitalize">{p.category || 'Prime'} Professional</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex items-center justify-between pt-7 border-t border-slate-50">
+                                                    <div>
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 opacity-60">
+                                                            {selectedSubServices.length > 0 ? 'Expert Quote' : 'Base Rate'}
+                                                        </p>
+                                                        <p className="text-3xl font-black text-slate-950 tracking-tighter">
+                                                            ₹{selectedSubServices.length > 0 
+                                                                ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
+                                                                : (String(p.price || 150).replace(/₹|\/hr/g, ''))}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex gap-3">
+                                                        <button onClick={() => setSelectedProviderProfile(p)} className="h-14 px-5 bg-slate-50 hover:bg-white text-slate-400 hover:text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-slate-100 transition-all shadow-sm hover:shadow-md">Info</button>
+                                                        <button onClick={() => handleBook(p)} className="h-14 px-10 bg-indigo-600 hover:bg-slate-950 text-white font-black uppercase text-[11px] tracking-[0.1em] rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Book Now</button>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <div className="flex items-center justify-between pt-7 border-t border-slate-50">
-                                                <div>
-                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 opacity-60">
-                                                        {selectedSubServices.length > 0 ? 'Expert Quote' : 'Base Rate'}
-                                                    </p>
-                                                    <p className="text-3xl font-black text-slate-950 tracking-tighter">
-                                                        ₹{selectedSubServices.length > 0 
-                                                            ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
-                                                            : (String(p.price || 499).replace(/₹|\/hr/g, ''))}
-                                                    </p>
-                                                </div>
-                                                <div className="flex gap-3">
-                                                    <button onClick={() => setSelectedProviderProfile(p)} className="h-14 px-5 bg-slate-50 hover:bg-white text-slate-400 hover:text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-slate-100 transition-all shadow-sm hover:shadow-md">Info</button>
-                                                    <button onClick={() => handleBook(p)} className="h-14 px-10 bg-indigo-600 hover:bg-slate-950 text-white font-black uppercase text-[11px] tracking-[0.1em] rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Book Now</button>
-                                                </div>
-                                            </div>
+                                        );
+                                    }) : (
+                                        <div className="md:col-span-2 py-20 text-center bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
+                                            <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                                            <p className="text-slate-500 font-bold">No professionals found matching your filters.</p>
+                                            <button onClick={() => { setSearchQuery(''); setSelectedCategory(null); }} className="mt-4 text-indigo-600 font-black text-[10px] uppercase tracking-widest hover:underline">Clear all filters</button>
                                         </div>
-                                    );
-                                }).filter(Boolean) : (
-                                    <div className="md:col-span-2 py-20 text-center bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
-                                        <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                                        <p className="text-slate-500 font-bold">No professionals found matching your filters.</p>
-                                        <button onClick={() => { setSearchQuery(''); setSelectedCategory(null); }} className="mt-4 text-indigo-600 font-black text-[10px] uppercase tracking-widest hover:underline">Clear all filters</button>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="py-24 text-center bg-indigo-50/30 rounded-[4rem] border border-dashed border-indigo-100">
+                                <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-600/5">
+                                    <Zap className="w-10 h-10 text-indigo-400" />
+                                </div>
+                                <h3 className="text-2xl font-black text-slate-900 tracking-tighter mb-2 uppercase">Ready to started?</h3>
+                                <p className="text-slate-400 font-medium max-w-xs mx-auto text-xs leading-relaxed uppercase tracking-widest">
+                                    Please select a service category above to discover verified experts in your area.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     <div className="space-y-8">
