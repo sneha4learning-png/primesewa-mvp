@@ -700,9 +700,10 @@ const CustomerHome = () => {
                                                             {selectedSubServices.length > 0 ? 'Expert Quote' : 'Base Rate'}
                                                         </p>
                                                         <p className="text-3xl font-black text-slate-950 tracking-tighter">
-                                                            ₹{selectedSubServices.length > 0 
-                                                                ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
-                                                                : (String(p.price || 150).replace(/₹|\/hr/g, ''))}
+                                                            ₹{(() => {
+                                                                const base = Math.min(parseInt(String(p.price || 149).replace(/\D/g, '')), 199);
+                                                                return selectedSubServices.length > 0 ? (price + base) : base;
+                                                            })()}
                                                         </p>
                                                     </div>
                                                     <div className="flex gap-3">

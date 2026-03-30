@@ -45,7 +45,10 @@ const CleanupPage = () => {
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
                     category: isSneha ? 'Carpentry' : (p.category || 'Professional Service'),
                     // ENSURING BASE RATE IS UNDER ₹200 AS REQUESTED
-                    price: (isSneha || isNewProv) ? (isSneha ? '₹150' : '₹199') : (String(p.price || '₹149').replace('/hr', ''))
+                    // ENFORCING GLOBAL CAP: Any rate over 200 is reset to standard 149 for demo consistency
+                    price: (isSneha || isNewProv) 
+                        ? (isSneha ? '₹150' : '₹199') 
+                        : (parseInt(String(p.price || 0).replace(/\D/g, '')) > 200 ? '₹149' : (String(p.price || '₹149').replace(/₹|\/hr/g, '')))
                 };
 
                 if (seen.has(nameKey)) {
