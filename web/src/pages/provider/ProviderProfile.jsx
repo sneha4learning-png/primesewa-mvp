@@ -2,12 +2,39 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { UserCircle, Star, StarHalf, Briefcase, Phone, Tag, MapPin } from 'lucide-react';
+import { UserCircle, Star, StarHalf, Briefcase, Phone, Tag, MapPin, UploadCloud } from 'lucide-react';
+import { updateDoc, doc as fsDoc } from 'firebase/firestore'; 
 
 const ProviderProfile = () => {
     const { currentUser, userData } = useAuth();
     const [profile, setProfile] = useState(null);
     const [completedJobsCount, setCompletedJobsCount] = useState(0);
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    const handlePhotoUpdate = async (e) => {
+        const file = e.target.files[0];
+        if (!file || !profile) return;
+
+        setIsUpdating(true);
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            try {
+                const docId = profile.uid || profile._docId;
+                if (!docId) throw new Error("No document ID found");
+                
+                const provRef = fsDoc(db, 'providers', docId);
+                await updateDoc(provRef, { photoURL: reader.result });
+                setProfile(prev => ({ ...prev, photoURL: reader.result }));
+                alert("Profile photo updated successfully!");
+            } catch (err) {
+                console.error("Error updating photo:", err);
+                alert("Failed to update photo. Please try again.");
+            } finally {
+                setIsUpdating(false);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -82,8 +109,25 @@ const ProviderProfile = () => {
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="bg-indigo-900 px-8 py-10 text-center flex flex-col items-center relative">
-                    <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-indigo-600 shadow-lg border-4 border-indigo-200">
-                        {profile.name.charAt(0)}
+                    <div className="relative group/avatar cursor-pointer">
+                        <div className={`w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-indigo-600 shadow-lg border-4 border-indigo-200 overflow-hidden relative ${isUpdating ? 'animate-pulse' : ''}`}>
+                            {profile.photoURL ? (
+                                <img src={profile.photoURL} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                profile.name?.charAt(0) || 'P'
+                            )}
+                        </div>
+                        <label htmlFor="p-profile-photo" className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                            <UploadCloud className="w-8 h-8 text-white" />
+                        </label>
+                        <input 
+                            type="file" 
+                            id="p-profile-photo" 
+                            className="hidden" 
+                            accept="image/*" 
+                            onChange={handlePhotoUpdate}
+                            disabled={isUpdating}
+                        />
                     </div>
                     <h2 className="mt-4 text-2xl font-bold text-white tracking-wide">{profile.name}</h2>
                     <p className="text-indigo-200 flex items-center gap-1 mt-1 font-medium">

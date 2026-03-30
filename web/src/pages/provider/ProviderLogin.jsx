@@ -34,7 +34,8 @@ const ProviderLogin = () => {
         yearsExperience: '',
         workDescription: '',
         previousWorkSample: '',
-        proofOfWorkImages: []
+        proofOfWorkImages: [],
+        photoURL: ''
     });
 
     const [providers, setProviders] = useState([]);
@@ -246,6 +247,7 @@ const ProviderLogin = () => {
                     category: signupData.category,
                     price: `₹${signupData.price}/hr`,
                     serviceAreas: signupData.serviceAreas,
+                    photoURL: signupData.photoURL || '',
                     // Identity & Work Records
                     idProofType: signupData.idProofType,
                     idProofNumber: signupData.idProofNumber,
@@ -468,6 +470,31 @@ const ProviderLogin = () => {
                                             )}
                                         </label>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-6 border-t border-slate-100 flex items-center gap-6">
+                                <div className="w-16 h-16 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden shrink-0 relative group">
+                                    {signupData.photoURL ? (
+                                        <img src={signupData.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className="w-6 h-6 text-slate-300" />
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-1">Identity Portrait</label>
+                                    <p className="text-[9px] text-slate-400 font-medium mb-2 uppercase tracking-wide">Helps customers recognize you</p>
+                                    <input type="file" accept="image/*" className="hidden" id="p-photo" onChange={e => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => setSignupData({ ...signupData, photoURL: reader.result });
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }} />
+                                    <label htmlFor="p-photo" className="inline-block text-[10px] font-bold text-primary bg-primary/5 px-4 py-2 rounded-xl cursor-pointer hover:bg-primary/10 transition-all uppercase tracking-widest border border-primary/20">
+                                        {signupData.photoURL ? 'Change Photo' : 'Upload Avatar (Optional)'}
+                                    </label>
                                 </div>
                             </div>
 

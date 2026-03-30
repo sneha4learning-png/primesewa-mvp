@@ -33,7 +33,8 @@ const BookingMonitoring = () => {
                 return tsB - tsA; // descending: newest first
             });
 
-            setBookings(sorted);
+            // USER REQUEST: ONLY 5 BOOKINGS FOR DEMO PURPOSES
+            setBookings(sorted.slice(0, 5));
             setIsLoading(false);
         }, (err) => {
             console.error('Bookings listener error:', err);

@@ -54,11 +54,14 @@ const ProviderDashboard = () => {
                     return tB - tA;
                 });
 
-            setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating').slice(0, 5));
-            setActiveJobs(myBookings.filter(b => b.status === 'accepted').slice(0, 5));
-            setHistoricalBookings(myBookings.slice(0, 5));
+            // USER REQUEST: ONLY 5 BOOKINGS FOR DEMO PURPOSES
+            const myLiveBookings = myBookings.slice(0, 5);
 
-            const completedJobs = myBookings.filter(b => b.status === 'completed');
+            setRequests(myLiveBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
+            setActiveJobs(myLiveBookings.filter(b => b.status === 'accepted'));
+            setHistoricalBookings(myLiveBookings);
+
+            const completedJobs = myLiveBookings.filter(b => b.status === 'completed');
 
             const calcEarnings = (fromDate) => completedJobs
                 .filter(job => new Date(job.date || job.completedAt?.toDate?.() || 0) >= fromDate)

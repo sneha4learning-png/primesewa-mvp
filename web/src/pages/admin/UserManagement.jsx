@@ -23,11 +23,18 @@ const UserManagement = () => {
                 
                 // 2. Fetch Bookings for count
                 const bookingsSnap = await getDocs(collection(db, 'bookings'));
-                const allBookingsList = [];
+                // USER REQUEST: ONLY 5 BOOKINGS FOR DEMO PURPOSES
+                const allBookingsListFull = [];
                 const bookingCounts = {};
                 bookingsSnap.forEach((doc) => {
                     const b = doc.data();
-                    allBookingsList.push({ id: doc.id, ...b });
+                    allBookingsListFull.push({ id: doc.id, ...b });
+                });
+
+                const sortedAll = allBookingsListFull.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                const allBookingsList = sortedAll.slice(0, 5);
+
+                allBookingsList.forEach(b => {
                     if (b.customer) bookingCounts[b.customer] = (bookingCounts[b.customer] || 0) + 1;
                 });
 
