@@ -21,6 +21,7 @@ import LandingPage from './pages/customer/LandingPage';
 import LoginPage from './pages/customer/LoginPage';
 import CustomerHome from './pages/customer/CustomerHome';
 import CustomerProfile from './pages/customer/CustomerProfile';
+import BookingDetails from './pages/customer/BookingDetails';
 import LegalPage from './pages/customer/LegalPage';
 
 // Provider Pages
@@ -43,6 +44,7 @@ function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="dashboard" element={<CustomerHome />} />
             <Route path="profile" element={<CustomerRoute><CustomerProfile /></CustomerRoute>} />
+            <Route path="booking-details/:id" element={<CustomerRoute><BookingDetails /></CustomerRoute>} />
             <Route path="privacy" element={<LegalPage type="privacy" />} />
             <Route path="terms" element={<LegalPage type="terms" />} />
             <Route path="safety" element={<LegalPage type="safety" />} />
