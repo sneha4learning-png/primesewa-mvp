@@ -358,13 +358,6 @@ const CustomerHome = () => {
     }, [userData]);
 
     const handleBook = (provider) => {
-        if (selectedSubServices.length === 0) {
-            // AUTO-GUIDE USER IF NO SERVICE SELECTED
-            setSelectedCategory(provider.category || 'Professional Service');
-            catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-        }
-
         // CORRECT LOGIC: BASE RATE (Capped at 199) + SUM OF SERVICES
         const baseRate = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
         const servicesTotal = selectedSubServices.reduce((sum, s) => sum + (s.price || 0), 0);
@@ -376,7 +369,9 @@ const CustomerHome = () => {
             providerPhone: provider.phone || '',
             price: finalTotal, 
             category: selectedCategory,
-            service: `${selectedCategory} (${selectedSubServices.map(s => s.name).join(', ')})` 
+            service: selectedSubServices.length > 0 
+                ? `${selectedCategory} (${selectedSubServices.map(s => s.name).join(', ')})`
+                : `${selectedCategory} Expert Consultation (Base Price Only)`
         });
         setBookingStep(1);
     };
