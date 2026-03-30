@@ -300,6 +300,30 @@ const CustomerHome = () => {
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
     const [isLocating, setIsLocating] = useState(false);
 
+    const getTodayStr = () => new Date().toISOString().split('T')[0];
+
+    const availableSlots = useMemo(() => {
+        const slots = [
+            { id: '09:00', label: '09:00 AM - 10:00 AM', hour: 9 },
+            { id: '10:00', label: '10:00 AM - 11:00 AM', hour: 10 },
+            { id: '11:00', label: '11:00 AM - 12:00 PM', hour: 11 },
+            { id: '12:00', label: '12:00 PM - 01:00 PM', hour: 12 },
+            { id: '13:00', label: '01:00 PM - 02:00 PM', hour: 13 },
+            { id: '14:00', label: '02:00 PM - 03:00 PM', hour: 14 },
+            { id: '15:00', label: '03:00 PM - 04:00 PM', hour: 15 },
+            { id: '16:00', label: '04:00 PM - 05:00 PM', hour: 16 },
+            { id: '17:00', label: '05:00 PM - 06:00 PM', hour: 17 },
+            { id: '18:00', label: '06:00 PM - 07:00 PM', hour: 18 },
+        ];
+        
+        if (bookingDate === getTodayStr()) {
+            const currentHour = new Date().getHours();
+            // Filter out hours that have already passed (allowing for 1 hour lead time)
+            return slots.filter(s => s.hour > currentHour);
+        }
+        return slots;
+    }, [bookingDate]);
+
     const handleMyLocation = () => {
         if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
         setIsLocating(true);
@@ -309,14 +333,18 @@ const CustomerHome = () => {
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
                 const data = await res.json();
                 if (data.display_name) {
-                    setBookingArea(data.display_name.split(',')[0] + ', ' + (data.address.suburb || data.address.neighbourhood || ''));
+                    const primary = data.display_name.split(',')[0].trim();
+                    const secondary = (data.address.suburb || data.address.neighbourhood || '').trim();
+                    if (primary === secondary || !secondary) {
+                        setBookingArea(primary);
+                    } else {
+                        setBookingArea(`${primary}, ${secondary}`);
+                    }
                 }
             } catch (e) { console.error(e); }
             setIsLocating(false);
         }, () => setIsLocating(false));
     };
-
-    const getTodayStr = () => new Date().toISOString().split('T')[0];
 
     useEffect(() => {
         const unsubscribeProviders = onSnapshot(collection(db, 'providers'), (snapshot) => {
