@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DollarSign, Download, Filter, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useNotifications } from '../../context/NotificationContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const CommissionDashboard = () => {
@@ -12,6 +13,7 @@ const CommissionDashboard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [payouts, setPayouts] = useState([]);
     const [activeTab, setActiveTab] = useState('Commissions');
+    const { sendNotification } = useNotifications();
     const itemsPerPage = 8;
 
     useEffect(() => {
@@ -103,8 +105,19 @@ const CommissionDashboard = () => {
     const markAsPaid = async (payoutId) => {
         if (!window.confirm('Mark this payout as paid? The provider will be notified.')) return;
         try {
+            const payout = payouts.find(p => p.id === payoutId);
             const ref = doc(db, 'payouts', payoutId);
             await updateDoc(ref, { status: 'paid', paidAt: serverTimestamp() });
+            
+            if (payout?.providerUid) {
+                await sendNotification(
+                    payout.providerUid, 
+                    'Payout Completed', 
+                    `Your payout of ₹${Number(payout.amount).toFixed(0)} for ${payout.service || 'services'} has been processed. Check your earnings center.`, 
+                    'success'
+                );
+            }
+
             alert('Payout processed successfully!');
         } catch (e) { 
             console.error('Payout update failed:', e); 
