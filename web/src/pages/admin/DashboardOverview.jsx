@@ -278,126 +278,19 @@ const DashboardOverview = () => {
                         patchApplied: true
                     });
                 } else {
-                    // Update only taxonomy/status for golden ones (rates handled in golden loop)
                     batch.update(doc(db, 'providers', p.id), { category: cat, status: 'active', isOnline: true });
-                }
-            }
-
-            // 3. Inject 6 "Perfect" Live Jobs for Demo
-            const seedJobs = [
-                {
-                    service: 'Plumbing (Tap Fix, Pipe Leak)',
-                    customer: 'Aarav Sharma',
-                    provider: 'Sanjay Services', 
-                    price: 448, 
-                    status: 'completed', 
-                    date: new Date().toISOString().split('T')[0],
-                    slot: '10:00 - 11:00 AM',
-                    address: 'Flat 402, Satellite, Ahmedabad'
-                },
-                {
-                    service: 'Cleaning (Full Home Deep Clean)',
-                    customer: 'Meera Patel',
-                    provider: 'Priya Home Care', 
-                    price: 1499, 
-                    status: 'completed',
-                    date: new Date().toISOString().split('T')[0],
-                    slot: '02:00 - 05:00 PM',
-                    address: 'B-Block, Bopal, Ahmedabad'
-                },
-                {
-                    service: 'Electrical (Fan Fix, MCB Fix)',
-                    customer: 'Ishaan Gupta',
-                    provider: 'Sanjay Services',
-                    price: 598, 
-                    status: 'completed',
-                    date: new Date().toISOString().split('T')[0],
-                    slot: '11:00 AM - 12:00 PM',
-                    address: 'S-Sector, SG Highway, Ahmedabad'
-                },
-                {
-                    service: 'Salon for Men (Haircut & Shave)',
-                    customer: 'Vikram Singh',
-                    provider: 'Rajesh Grooming Studio',
-                    price: 348, 
-                    status: 'completed',
-                    date: new Date().toISOString().split('T')[0],
-                    slot: '09:00 - 10:00 AM',
-                    address: 'Garden View, Prahlad Nagar'
-                },
-                {
-                    service: 'Salon for Women (Henna & Pedicure)',
-                    customer: 'Sanya Mirza',
-                    provider: 'Anjali Premium Beauty',
-                    price: 798, 
-                    status: 'completed',
-                    date: new Date().toISOString().split('T')[0],
-                    slot: '01:00 - 03:00 PM',
-                    address: 'New Paldi, Ahmedabad'
-                },
-                {
-                    service: 'Carpentry (Hinge/Handle Repair, Furniture Assembly)',
-                    customer: 'Rahul Khanna',
-                    provider: 'Sanjay Services',
-                    price: 598, 
-                    status: 'negotiating', // This will show as 1 Pending Job
-                    date: new Date().toISOString().split('T')[0],
-                    slot: '05:00 - 06:00 PM',
-                    address: 'M-Block, Satellite, Ahmedabad'
-                }
-            ];
-
-            for (const job of seedJobs) {
-                const bRef = doc(collection(db, 'bookings'));
-                const timestamp = serverTimestamp();
-                batch.set(bRef, { 
-                    ...job, 
-                    createdAt: timestamp,
-                    serviceType: 'Job-based'
-                });
-
-                // Generate matching Financial Records for Payout Dashboard
-                if (job.status === 'completed') {
-                    const jobPrice = job.price || 0;
-                    const platformFee = Math.round(jobPrice * 0.15);
-                    const providerEarning = jobPrice - platformFee;
-
-                    // 1. Commission Record
-                    const cRef = doc(collection(db, 'commissions'));
-                    batch.set(cRef, {
-                        amount: platformFee,
-                        bookingId: bRef.id,
-                        provider: job.provider,
-                        service: job.service,
-                        status: 'processed',
-                        createdAt: timestamp
-                    });
-
-                    // 2. Payout Record
-                    const pRef = doc(collection(db, 'payouts'));
-                    batch.set(pRef, {
-                        amount: providerEarning,
-                        bookingId: bRef.id,
-                        provider: job.provider,
-                        service: job.service,
-                        status: 'pending', // To show in "Pending Payouts"
-                        providerPhone: '9999999999',
-                        scheduledDate: job.date,
-                        createdAt: timestamp
-                    });
                 }
             }
 
             await batch.commit();
             const summary = `
-✅ SUCCESS: Hard Reset Complete!
+✅ SUCCESS: Database Cleaned!
 --------------------------------
-👥 Providers Synced: ${goldenFleet.length} (Anjali, Rajesh, Sanjay, Priya, Vikram)
-💼 Live Jobs Injected: ${seedJobs.length} (5 Completed, 1 Pending)
-💰 Financial Entries: ${seedJobs.filter(j=>j.status==='completed').length * 2} (Payouts & Commissions)
-🛡️ Status: ALL Experts are now ONLINE and categorized.
+👥 Providers Ready: ${goldenFleet.length + existingProviders.length} (Categorized & Rates Diversified)
+🧹 Bookings Purged: ALL (Live Monitor is now empty)
+💰 Financials Purged: ALL (Commission & Payouts at ₹0)
 
-Please verify the 'Provider Fleet' and 'Booking Monitor' now. 🏁
+The system is now a clean slate for fresh testing! 🏁
             `;
             alert(summary);
             window.location.reload();
