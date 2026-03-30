@@ -230,7 +230,7 @@ const DashboardOverview = () => {
                 <StatCard title="Pending Jobs" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-amber-500" />
                 <StatCard title="Active Pros" value={stats.activeProviders} icon={Users} colorClass="bg-indigo-500" />
                 <StatCard title="Revenue (15%)" value={`₹${stats.commissionEarned.toFixed(0)}`} icon={BarChartIcon} colorClass="bg-emerald-500" />
-                <StatCard title="Pending Payouts" value={`₹${stats.pendingPayouts.toFixed(0)}`} icon={DollarSign} colorClass="bg-rose-500" />
+                <StatCard title="Pending Payouts" value={`₹${Math.floor(stats.pendingPayouts)}`} icon={DollarSign} colorClass="bg-rose-500" />
             </div>
 
             {/* Analytical Reports Section */}

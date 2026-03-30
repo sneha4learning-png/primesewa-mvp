@@ -195,7 +195,7 @@ const CommissionDashboard = () => {
                         </div>
                         <h3 className="text-lg font-medium text-emerald-50">Total Revenue (15%)</h3>
                     </div>
-                    <p className="text-4xl font-normal tracking-tight">₹{totalCommission.toFixed(0)}</p>
+                    <p className="text-4xl font-normal tracking-tight">₹{Math.floor(totalCommission)}</p>
                     <p className="text-emerald-100 mt-2 text-sm">For the selected period</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
@@ -205,7 +205,7 @@ const CommissionDashboard = () => {
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                     <p className="text-sm font-normal text-gray-500 mb-2">Total Job Value</p>
                     <p className="text-3xl font-normal text-gray-900">
-                        ₹{commissions.reduce((a, c) => a + (c.amount || 0), 0).toFixed(0)}
+                        ₹{Math.floor(commissions.reduce((a, c) => a + (c.amount || 0), 0))}
                     </p>
                 </div>
             </div>
@@ -338,11 +338,11 @@ const CommissionDashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                             <p className="text-xs text-slate-400 uppercase tracking-widest mb-1.5">Pending Disbursements</p>
-                            <p className="text-3xl font-normal text-amber-600">₹{payouts.filter(p => p.status === 'pending').reduce((a, c) => a + (c.amount || 0), 0).toFixed(0)}</p>
+                            <p className="text-3xl font-normal text-amber-600">₹{Math.floor(payouts.filter(p => p.status === 'pending').reduce((a, c) => a + (c.amount || 0), 0))}</p>
                         </div>
                         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                             <p className="text-xs text-slate-400 uppercase tracking-widest mb-1.5">Total Paid Out</p>
-                            <p className="text-3xl font-normal text-emerald-600">₹{payouts.filter(p => p.status === 'paid').reduce((a, c) => a + (c.amount || 0), 0).toFixed(0)}</p>
+                            <p className="text-3xl font-normal text-emerald-600">₹{Math.floor(payouts.filter(p => p.status === 'paid').reduce((a, c) => a + (c.amount || 0), 0))}</p>
                         </div>
                     </div>
 
@@ -368,7 +368,7 @@ const CommissionDashboard = () => {
                                             <p className="text-sm font-medium text-gray-900">{p.providerName}</p>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{p.service}</td>
-                                        <td className="px-6 py-4 text-right text-sm font-medium text-gray-900">₹{p.amount?.toFixed(0)}</td>
+                                        <td className="px-6 py-4 text-right text-sm font-medium text-gray-900">₹{Math.floor(p.amount || 0)}</td>
                                         <td className="px-6 py-4 text-center">
                                             <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase tracking-widest font-medium ${p.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>
                                                 {p.status}
