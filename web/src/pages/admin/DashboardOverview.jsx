@@ -61,7 +61,8 @@ const DashboardOverview = () => {
             let totalPendingJobs = 0;
             
             all.forEach(b => {
-                if (b.status === 'pending') totalPendingJobs++;
+                const isFinal = ['completed', 'cancelled', 'rejected'].includes(b.status);
+                if (!isFinal) totalPendingJobs++;
                 if (b.status === 'completed') {
                     const rawPrice = b.proposedPrice || b.price || b.amount || 0;
                     const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
@@ -216,7 +217,7 @@ const DashboardOverview = () => {
                 });
             });
 
-            // 3. Inject 5 "Perfect" Live Jobs for Demo
+            // 3. Inject 6 "Perfect" Live Jobs for Demo
             const seedJobs = [
                 {
                     service: 'Plumbing (Tap Fix, Pipe Leak)',
@@ -229,10 +230,10 @@ const DashboardOverview = () => {
                     address: 'Flat 402, Satellite, Ahmedabad'
                 },
                 {
-                    service: 'Cleaning (Bathroom Deep Clean, Kitchen Deep Clean)',
+                    service: 'Cleaning (Full Home Deep Clean)',
                     customer: 'Meera Patel',
-                    provider: 'Anjali Premium Beauty',
-                    price: 1248, 
+                    provider: 'Priya Home Care', 
+                    price: 1499, 
                     status: 'completed',
                     date: new Date().toISOString().split('T')[0],
                     slot: '02:00 - 05:00 PM',
@@ -249,24 +250,34 @@ const DashboardOverview = () => {
                     address: 'S-Sector, SG Highway, Ahmedabad'
                 },
                 {
-                    service: 'Salon for Men (Haircut, Shave)',
+                    service: 'Salon for Men (Haircut & Shave)',
                     customer: 'Vikram Singh',
                     provider: 'Rajesh Grooming Studio',
                     price: 348, 
                     status: 'completed',
                     date: new Date().toISOString().split('T')[0],
-                    slot: '06:00 - 07:00 PM',
+                    slot: '09:00 - 10:00 AM',
                     address: 'Garden View, Prahlad Nagar'
                 },
                 {
-                    service: 'Carpentry (Hinge/Handle Repair, Furniture Assembly)',
+                    service: 'Salon for Women (Henna & Pedicure)',
                     customer: 'Sanya Mirza',
-                    provider: 'Sanjay Services',
-                    price: 598, 
+                    provider: 'Anjali Premium Beauty',
+                    price: 798, 
                     status: 'completed',
                     date: new Date().toISOString().split('T')[0],
-                    slot: '09:00 - 11:00 AM',
+                    slot: '01:00 - 03:00 PM',
                     address: 'New Paldi, Ahmedabad'
+                },
+                {
+                    service: 'Carpentry (Hinge/Handle Repair, Furniture Assembly)',
+                    customer: 'Rahul Khanna',
+                    provider: 'Sanjay Services',
+                    price: 598, 
+                    status: 'negotiating', // This will show as 1 Pending Job
+                    date: new Date().toISOString().split('T')[0],
+                    slot: '05:00 - 06:00 PM',
+                    address: 'M-Block, Satellite, Ahmedabad'
                 }
             ];
 
@@ -281,7 +292,7 @@ const DashboardOverview = () => {
             }
 
             await batch.commit();
-            alert("Database Resetted. 5 Perfect UC-style jobs injected.");
+            alert("Database Resetted. 6 Perfect UC-style jobs injected (5 Completed, 1 Pending). ALL provider names and services are now perfectly matched! 🏁🛡️");
             window.location.reload();
         } catch (err) {
             console.error("Hard Reset Error:", err);
