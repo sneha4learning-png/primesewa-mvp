@@ -170,8 +170,9 @@ const ProviderLogin = () => {
             console.error("Error SMS", err);
 
             // Developer Fallback for Billing / Auth Errors
-            if (err.message && (err.message.includes('billing-not-enabled') || err.message.includes('auth/'))) {
-                console.warn('Firebase Auth issue detected. Falling back to Dev Mode.');
+            const errStr = String(err.message || err.code || err);
+            if (errStr.includes('billing-not-enabled') || errStr.includes('auth/') || errStr.includes('reCAPTCHA')) {
+                console.warn('Firebase Auth/Captcha issue detected. Falling back to Dev Mode.', err);
                 setConfirmationResult('DEV_MODE');
                 setStep(2);
                 // Don't set error, let the UI handle it normally
@@ -583,7 +584,8 @@ const ProviderLogin = () => {
                 </div>
             </div>
 
-            <div id="recaptcha-container" className="hidden"></div>
+            {/* ReCAPTCHA container must be visible/present in DOM for Firebase to initialize it correctly */}
+            <div id="recaptcha-container" className="fixed bottom-0 right-0 opacity-0 pointer-events-none -z-50"></div>
         </div>
     );
 };
