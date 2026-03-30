@@ -710,7 +710,7 @@ const ProviderDashboard = () => {
                                         </span>
                                     </div>
                                     <div className="text-sm font-medium text-slate-500 mb-1">
-                                        ₹{job.proposedPrice || job.price || job.amount}
+                                        ₹{job.price || job.proposedPrice || job.amount}
                                     </div>
                                     <div className="text-xs text-slate-500 font-medium mb-2 border-t border-slate-50 pt-2 flex flex-col gap-1">
                                         <div className="flex items-start gap-1">
@@ -727,7 +727,7 @@ const ProviderDashboard = () => {
                                         </div>
                                     </div>
                                     <div className="text-xs text-slate-400 flex items-center gap-1">
-                                        <Calendar className="w-3.5 h-3.5" /> {job.date} • {formatTime(job.time)}
+                                        <Calendar className="w-3.5 h-3.5" /> {job.date} • {job.slot || formatTime(job.time)}
                                     </div>
                                 </div>
                             ))}
