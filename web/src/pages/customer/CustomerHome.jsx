@@ -548,8 +548,8 @@ const CustomerHome = () => {
                 return tB - tA;
             });
 
-            setActiveBookings(sortedAll.filter(b => !['completed', 'rejected', 'cancelled'].includes(b.status)));
-            const pBookings = sortedAll.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status));
+            setActiveBookings(allMyBookings.filter(b => !['completed', 'rejected', 'cancelled'].includes(b.status)).slice(0, 5));
+            const pBookings = allMyBookings.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status)).slice(0, 5);
             setPastBookings(pBookings);
 
             const categoryCounts = {};

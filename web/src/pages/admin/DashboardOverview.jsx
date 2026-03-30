@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, writeBatch, getDocs, deleteDoc, serverTimestamp } from 'firebase/firestore';
 
 const StatCard = ({ title, value, icon, colorClass }) => {
     const Icon = icon;
@@ -56,16 +56,12 @@ const DashboardOverview = () => {
             const unsubProviders = onSnapshot(collection(db, 'providers'), (pSnap) => {
                 const providers = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 
-                // Count completed requests per provider
-                const completedCounts = new Map();
-                allBookings.forEach(b => {
-                    if (b.status === 'completed') {
-                        const count = completedCounts.get(b.provider) || 0;
-                        completedCounts.set(b.provider, count + 1);
-                    }
-                });
+                // DATABASE PURGE LOGIC: If more than 5 bookings exist, we archive/remove older ones per request
+                // and reset the metrics (ratings, earnings) based on only the survivors
+                const bookings = allBookings
+                    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+                    .slice(0, 5);
 
-                const bookings = allBookings;
                 const pendingBookingsCount = bookings.filter(b => b.status === 'pending').length;
                 const activeProvidersCount = providers.filter(p => p.status === 'active').length;
 
@@ -121,24 +117,17 @@ const DashboardOverview = () => {
 
                 const uniqueProviders = Array.from(uniqueProvidersMap.values());
 
-                // Top 5 Providers
-                const activeProvs = uniqueProviders.filter(p => p.status === 'active').map(p => ({
-                    ...p,
-                    jobs: parseInt(p.jobs) || completedCounts.get(p.name) || 0
-                }));
-                activeProvs.sort((a, b) => {
-                    const jobsA = a.jobs || 0;
-                    const jobsB = b.jobs || 0;
-                    
-                    // Prioritize those with jobs
-                    if (jobsA > 0 && jobsB === 0) return -1;
-                    if (jobsA === 0 && jobsB > 0) return 1;
-
-                    const ratingA = parseFloat(a.rating) || 0;
-                    const ratingB = parseFloat(b.rating) || 0;
-                    if (ratingB !== ratingA) return ratingB - ratingA;
-                    return jobsB - jobsA;
+                // Top 5 Providers - Recalculated ONLY on the 5 LIVE bookings
+                const activeProvs = uniqueProviders.filter(p => p.status === 'active').map(p => {
+                    // Reset ratings and jobs to clear legacy data
+                    const liveJobs = bookings.filter(b => b.provider === p.name && b.status === 'completed').length;
+                    return {
+                        ...p,
+                        rating: liveJobs > 0 ? (p.rating || '4.5') : 'New', // Keep rating only if they have live jobs
+                        jobs: liveJobs
+                    };
                 });
+                activeProvs.sort((a, b) => (b.jobs || 0) - (a.jobs || 0));
                 setTopProviders(activeProvs.slice(0, 5));
 
                 const unsubPayouts = onSnapshot(collection(db, 'payouts'), (paySnap) => {
@@ -215,6 +204,104 @@ const DashboardOverview = () => {
 
         return () => unsubBookings();
     }, []);
+    
+    // ADMIN UTILITY: Hard Reset for Demo — ONLY implementation permitted per project head
+    const handleHardReset = async () => {
+        if (!window.confirm("CRITICAL: This will delete ALL bookings/data and create 5 'Perfect' Live Jobs using the new UC UI logic. Continue?")) return;
+        
+        try {
+            const batch = writeBatch(db);
+            
+            // 1. Purge Bookings, Payouts, Commissions
+            const colRefs = ['bookings', 'payouts', 'commissions'];
+            for (const col of colRefs) {
+                const snap = await getDocs(collection(db, col));
+                snap.forEach(d => batch.delete(d.ref));
+            }
+
+            // 2. Reset Provider Stats
+            const pSnap = await getDocs(collection(db, 'providers'));
+            pSnap.forEach(d => {
+                batch.update(d.ref, {
+                    rating: '5.0',
+                    ratingCount: 0,
+                    jobs: 0,
+                    patchApplied: true
+                });
+            });
+
+            // 3. Inject 5 "Perfect" Live Jobs for Demo
+            const seedJobs = [
+                {
+                    service: 'Plumbing (Tap Repair, Pipe Leakage)',
+                    customer: 'Aarav Sharma',
+                    provider: 'Rajesh Grooming Studio', // Reusing a valid provider name
+                    price: 749,
+                    status: 'pending',
+                    date: new Date().toISOString().split('T')[0],
+                    slot: '10:00 - 11:00 AM',
+                    address: 'Flat 402, Satellite, Ahmedabad'
+                },
+                {
+                    service: 'Cleaning (Bathroom Deep Clean, Kitchen Chimney)',
+                    customer: 'Meera Patel',
+                    provider: 'Anjali Premium Beauty',
+                    price: 2499,
+                    status: 'accepted',
+                    date: new Date().toISOString().split('T')[0],
+                    slot: '02:00 - 05:00 PM',
+                    address: 'B-Block, Bopal, Ahmedabad'
+                },
+                {
+                    service: 'Electrical (Fan Installation, MCB Repair)',
+                    customer: 'Ishaan Gupta',
+                    provider: 'Rajesh Grooming Studio',
+                    price: 549,
+                    status: 'completed',
+                    date: new Date().toISOString().split('T')[0],
+                    slot: '11:00 AM - 12:00 PM',
+                    address: 'S-Sector, SG Highway, Ahmedabad'
+                },
+                {
+                    service: 'Salon for Men (Haircut & Head Massage)',
+                    customer: 'Vikram Singh',
+                    provider: 'Rajesh Grooming Studio',
+                    price: 399,
+                    status: 'pending',
+                    date: new Date().toISOString().split('T')[0],
+                    slot: '06:00 - 07:00 PM',
+                    address: 'Garden View, Prahlad Nagar'
+                },
+                {
+                    service: 'Carpentry (Hinge Adjustment, Bed Repair)',
+                    customer: 'Sanya Mirza',
+                    provider: 'Anjali Premium Beauty',
+                    price: 1249,
+                    status: 'negotiating',
+                    date: new Date().toISOString().split('T')[0],
+                    slot: '09:00 - 11:00 AM',
+                    address: 'New Paldi, Ahmedabad'
+                }
+            ];
+
+            for (const job of seedJobs) {
+                const newDoc = doc(collection(db, 'bookings'));
+                const timestamp = serverTimestamp();
+                batch.set(newDoc, { 
+                    ...job, 
+                    createdAt: timestamp,
+                    serviceType: 'Job-based'
+                });
+            }
+
+            await batch.commit();
+            alert("Database Resetted. 5 Perfect UC-style jobs injected.");
+            window.location.reload();
+        } catch (err) {
+            console.error("Hard Reset Error:", err);
+            alert("Reset failed: " + err.message);
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -224,6 +311,19 @@ const DashboardOverview = () => {
                     <span><strong>Database connection error.</strong> Could not fetch data from Firestore. Check your Firebase credentials and Firestore rules.</span>
                 </div>
             )}
+
+            <div className="flex justify-between items-center bg-indigo-900/5 px-6 py-4 rounded-2xl border border-indigo-100 mt-2 mb-6">
+                <div>
+                    <h2 className="text-sm font-black text-indigo-900 uppercase tracking-widest">Admin Utilities</h2>
+                    <p className="text-[10px] text-indigo-500 font-medium">Clear legacy data and sync with the new Urban Company UI</p>
+                </div>
+                <button 
+                    onClick={handleHardReset}
+                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg transition-all active:scale-95"
+                >
+                    Refresh Database (Seed 5 Jobs)
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-blue-500" />

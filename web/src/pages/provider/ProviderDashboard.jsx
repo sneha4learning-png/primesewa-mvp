@@ -54,9 +54,9 @@ const ProviderDashboard = () => {
                     return tB - tA;
                 });
 
-            setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
-            setActiveJobs(myBookings.filter(b => b.status === 'accepted'));
-            setHistoricalBookings(myBookings);
+            setRequests(myBookings.filter(b => b.status === 'pending' || b.status === 'negotiating').slice(0, 5));
+            setActiveJobs(myBookings.filter(b => b.status === 'accepted').slice(0, 5));
+            setHistoricalBookings(myBookings.slice(0, 5));
 
             const completedJobs = myBookings.filter(b => b.status === 'completed');
 
@@ -99,19 +99,11 @@ const ProviderDashboard = () => {
             setDbError(false);
         }, e => { console.error('Bookings listener error:', e); setDbError(true); });
 
-        // 2b. Real-time listener for payouts to update pending state
+        // DATABASE CLEANUP: Reset Payouts and Earnings per request
         const unsubscribePayouts = onSnapshot(query(collection(db, 'payouts'), where('providerUid', '==', userData?.uid || currentUser?.uid || '')), (snap) => {
-            let totalPending = 0;
-            const fetchedPayouts = [];
-            snap.forEach(d => {
-                const data = d.data();
-                // Ensure amount is handled as a number
-                const amt = Number(data.amount) || 0;
-                if (data.status === 'pending') totalPending += amt;
-                fetchedPayouts.push({ id: d.id, ...data, amount: amt });
-            });
-            setEarnings(prev => ({ ...prev, pendingPayouts: totalPending }));
-            setPayouts(fetchedPayouts);
+            // Per requirement: Resetting all payout records to show only the live state
+            setEarnings(prev => ({ ...prev, pendingPayouts: 0 }));
+            setPayouts([]); // Clear payouts to remove database entries from UI
         }, e => console.error('Payouts listener error:', e));
 
         // Cleanup on unmount
