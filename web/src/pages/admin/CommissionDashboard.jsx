@@ -65,7 +65,8 @@ const CommissionDashboard = () => {
                 }
 
                 // Sort by timestamp descending — newest record at top
-                const sorted = [...filtered].sort((a, b) => b._ts - a._ts);
+                // USER REQUEST: ONLY 5 BOOKINGS FOR DEMO PURPOSES
+                const sorted = [...filtered].sort((a, b) => b._ts - a._ts).slice(0, 5);
                 setCommissions(sorted);
                 setTotalCommission(sorted.reduce((acc, curr) => acc + (curr.commission || 0), 0));
 
@@ -95,7 +96,8 @@ const CommissionDashboard = () => {
 
         const unsubscribePayouts = onSnapshot(collection(db, 'payouts'), (paySnap) => {
             const allPay = paySnap.docs.map(d => ({ id: d.id, ...d.data() }))
-                .sort((a, b) => (b.scheduledFor?.toMillis?.() || 0) - (a.scheduledFor?.toMillis?.() || 0));
+                .sort((a, b) => (b.scheduledFor?.toMillis?.() || 0) - (a.scheduledFor?.toMillis?.() || 0))
+                .slice(0, 5); // USER REQUEST: LIMIT TO 5
             setPayouts(allPay);
         });
 
