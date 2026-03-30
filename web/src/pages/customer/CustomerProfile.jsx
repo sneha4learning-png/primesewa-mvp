@@ -21,7 +21,7 @@ const CustomerProfile = () => {
         try {
             if (!userData?.uid?.includes('mock-')) {
                 const userRef = doc(db, 'users', userData.uid);
-                await updateDoc(userRef, { name });
+                await updateDoc(userRef, { name, photoURL: userData.photoURL || '' });
             }
             setUserData(prev => ({ ...prev, name }));
             setShowSuccess(true);
@@ -32,6 +32,27 @@ const CustomerProfile = () => {
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const handlePhotoUpdate = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            try {
+                if (!userData?.uid?.includes('mock-')) {
+                    const userRef = doc(db, 'users', userData.uid);
+                    await updateDoc(userRef, { photoURL: reader.result });
+                }
+                setUserData(prev => ({ ...prev, photoURL: reader.result }));
+                setShowSuccess(true);
+                setTimeout(() => setShowSuccess(false), 3000);
+            } catch (err) {
+                console.error("Error updating customer photo:", err);
+            }
+        };
+        reader.readAsDataURL(file);
     };
 
     const initial = name ? name.charAt(0).toUpperCase() : 'U';
@@ -66,8 +87,16 @@ const CustomerProfile = () => {
                     {/* Avatar + Name */}
                     <div className="bg-white px-8 pb-10">
                         <div className="flex flex-col sm:flex-row sm:items-end gap-6 -mt-10 relative z-10">
-                            <div className="w-28 h-28 rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-5xl font-black text-white border-[6px] border-white shadow-2xl shadow-indigo-600/40 shrink-0 transform transition-transform hover:scale-105 duration-300">
-                                {initial}
+                             <div className="relative group/avatar">
+                                <div className="w-28 h-28 rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-5xl font-black text-white border-[6px] border-white shadow-2xl shadow-indigo-600/40 shrink-0 transform transition-transform group-hover/avatar:scale-105 duration-300 overflow-hidden">
+                                     {userData?.photoURL ? (
+                                         <img src={userData.photoURL} alt="" className="w-full h-full object-cover" />
+                                     ) : initial}
+                                </div>
+                                <label htmlFor="c-profile-photo" className="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center text-indigo-600 shadow-xl border-2 border-slate-50 cursor-pointer hover:bg-indigo-50 transition-colors z-20">
+                                    <Zap className="w-5 h-5" />
+                                </label>
+                                <input type="file" id="c-profile-photo" className="hidden" accept="image/*" onChange={handlePhotoUpdate} />
                             </div>
                             <div className="pb-2 pt-6 sm:ml-4 flex-1">
                                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">{name || 'Your Name'}</h2>

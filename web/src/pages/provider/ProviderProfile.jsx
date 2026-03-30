@@ -110,16 +110,20 @@ const ProviderProfile = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="bg-indigo-900 px-8 py-10 text-center flex flex-col items-center relative">
                     <div className="relative group/avatar cursor-pointer">
-                        <div className={`w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-indigo-600 shadow-lg border-4 border-indigo-200 overflow-hidden relative ${isUpdating ? 'animate-pulse' : ''}`}>
+                        <div className={`w-28 h-28 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-indigo-600 shadow-2xl border-4 border-indigo-200 overflow-hidden relative transition-all duration-500 group-hover/avatar:ring-4 group-hover/avatar:ring-white/50 ${isUpdating ? 'animate-pulse' : ''}`}>
                             {profile.photoURL ? (
                                 <img src={profile.photoURL} alt="" className="w-full h-full object-cover" />
                             ) : (
                                 profile.name?.charAt(0) || 'P'
                             )}
                         </div>
-                        <label htmlFor="p-profile-photo" className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                            <UploadCloud className="w-8 h-8 text-white" />
+                        {/* PERSISTENT CAMERA ICON FOR BETTER PROVISION VISIBILITY */}
+                        <label htmlFor="p-profile-photo" className="absolute bottom-0 right-0 w-10 h-10 bg-indigo-600 rounded-full border-4 border-white flex items-center justify-center shadow-lg cursor-pointer transform transition-all group-hover/avatar:scale-110 active:scale-95 z-20">
+                            <UploadCloud className="w-5 h-5 text-white" />
                         </label>
+                        <div className="absolute inset-0 bg-black/20 rounded-full opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                            <span className="text-[10px] text-white font-black uppercase tracking-widest">Update Photo</span>
+                        </div>
                         <input 
                             type="file" 
                             id="p-profile-photo" 
