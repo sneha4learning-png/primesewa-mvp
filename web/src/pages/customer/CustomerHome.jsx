@@ -204,9 +204,9 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                         <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-amber-200">
                             <Star className="w-4 h-4 text-amber-500 mx-auto mb-1.5 fill-current" />
                             <div className="text-lg sm:text-xl font-black text-slate-900 leading-none">
-                                {(ratingValue > 0 && liveJobsCount > 0) ? ratingValue.toFixed(1) : 'New'}
+                                {ratingValue > 0 ? ratingValue.toFixed(1) : 'New'}
                             </div>
-                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">{ratingValue > 0 && liveJobsCount > 0 ? 'Rating' : 'Partner Status'}</div>
+                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">{ratingValue > 0 ? 'Rating' : 'Partner Status'}</div>
                         </div>
                         <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-indigo-200">
                             <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1.5" />
@@ -218,7 +218,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                         <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-emerald-200">
                             <IndianRupee className="w-4 h-4 text-emerald-500 mx-auto mb-1.5" />
                             <div className="text-lg sm:text-xl font-black text-slate-900 leading-none tracking-tighter">
-                                ₹{String(price).replace(/₹|\/hr/g, '')}
+                                ₹{Math.min(parseInt(String(price).replace(/\D/g, '')), 199)}
                             </div>
                             <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">Base Cost</div>
                         </div>
@@ -421,6 +421,7 @@ const CustomerHome = () => {
                 : `${selectedCategory} Expert Consultation (Base Price Only)`
         });
         setBookingStep(1);
+        setSelectedProviderProfile(null);
     };
 
     const confirmBooking = async (e) => {
@@ -784,7 +785,7 @@ const CustomerHome = () => {
                                         return (
                                             <div key={p.id} className="bg-white p-7 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
                                                 {/* MODERN EXPERT BADGE - CLEANER & MORE PROFESSIONAL */}
-                                                {rating >= 4.8 && (
+                                                {rating >= 5.0 && (
                                                     <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-700 to-indigo-500 px-4 py-2 rounded-bl-[1.5rem] flex items-center gap-2 shadow-lg z-10 transition-transform group-hover:scale-110">
                                                         <Star className="w-3.5 h-3.5 text-white fill-current" />
                                                         <span className="text-[9px] font-black text-white uppercase tracking-widest">Expert Pick</span>
