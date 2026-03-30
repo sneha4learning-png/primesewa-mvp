@@ -540,12 +540,14 @@ const CustomerHome = () => {
                                             setSelectedSubServices(newSelection);
                                             
                                             // UPDATE LIVE PRICE IN PENDING DATA
-                                            const providerBase = parseFloat(String(pendingBookingData?.price || 150)) - selectedSubServices.reduce((a,b) => a + b.price, 0);
+                                            const providerBase = Math.min(parseInt(String(p.price || 149).replace(/\D/g, '')), 199);
                                             const newTotal = providerBase + newSelection.reduce((a,b) => a + b.price, 0);
                                             setPendingBookingData(prev => ({ 
                                                 ...prev, 
                                                 price: newTotal,
-                                                service: `${selectedCategory} (${newSelection.map(x => x.name).join(', ')})`
+                                                service: newSelection.length > 0 
+                                                    ? `${selectedCategory} (${newSelection.map(x => x.name).join(', ')})`
+                                                    : `${selectedCategory} Expert Consultation (Base Price Only)`
                                             }));
                                         }} className={`p-4 border-2 rounded-[1.5rem] text-left transition-all group ${isSelected ? 'bg-indigo-50 border-indigo-600' : 'bg-white border-slate-100 hover:border-indigo-200'}`}>
                                             <p className={`text-[10px] font-black uppercase mb-1 tracking-tighter ${isSelected ? 'text-indigo-600' : 'text-slate-900'}`}>{s.name}</p>
