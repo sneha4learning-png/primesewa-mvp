@@ -389,24 +389,53 @@ const CustomerHome = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-8 md:py-12 animate-fade-in">
-            <div className={`mb-8 relative overflow-hidden rounded-3xl shadow-xl transition-all duration-700 ${!userData?.uid ? 'bg-slate-900 p-10 md:p-24' : 'bg-white border border-slate-100 p-6 md:p-10'}`}>
-                <div className="relative z-10 max-w-3xl">
-                    <h1 className={`text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-[1] mb-2 ${!userData?.uid ? 'text-white' : 'text-slate-950'}`}>
-                        {userData?.name ? `Welcome Back, ${userData.name}` : 'Premium Home Services'}
+            <div className={`mb-12 relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-slate-950 p-12 md:p-32' : 'bg-white border border-slate-100 p-8 md:p-14'}`}>
+                <div className="relative z-10 max-w-4xl mx-auto text-center">
+                    <h1 className={`text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.9] mb-6 ${!userData?.uid ? 'text-white' : 'text-slate-900 font-medium'}`}>
+                        {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Platform for Prime Services'}
                     </h1>
-                    <p className="text-slate-400 mt-2">Expert professionals at your doorstep</p>
+                    <p className={`${!userData?.uid ? 'text-slate-400' : 'text-slate-500'} text-lg md:text-xl font-medium mb-10 max-w-2xl mx-auto`}>Trustworthy professionals for every household needs</p>
+                    
+                    {/* PROFESSIONAL SEARCH BAR */}
+                    <div className="relative max-w-2xl mx-auto group">
+                        <div className="absolute inset-0 bg-indigo-600/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-full"></div>
+                        <div className="relative flex items-center bg-white shadow-2xl rounded-[2rem] border border-slate-100 p-2 transition-all group-focus-within:ring-4 group-focus-within:ring-indigo-500/10">
+                            <div className="flex-1 flex items-center gap-4 px-6">
+                                <Search className="w-6 h-6 text-indigo-600" />
+                                <input 
+                                    type="text" 
+                                    placeholder="Search for 'Plumbing', 'Cleaning', or 'Salon'..." 
+                                    className="w-full py-4 text-slate-800 font-bold placeholder-slate-400 outline-none"
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        // If search has text, don't necessarily deselect category, but allow filter to work
+                                    }}
+                                />
+                            </div>
+                            <button className="hidden md:block px-10 py-4 bg-indigo-600 hover:bg-slate-950 text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all">Search</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-5 sm:grid-cols-10 gap-4 mb-16 px-2">
-                {categories.map(cat => (
-                    <button key={cat.id} onClick={() => { setSelectedCategory(cat.name); setSelectedSubServices([]); }} className={`flex flex-col items-center gap-3 transition-transform hover:scale-110 active:scale-95 group ${selectedCategory === cat.name ? 'scale-110' : ''}`}>
-                        <div className={`w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-white border flex items-center justify-center transition-all ${selectedCategory === cat.name ? 'border-indigo-600 bg-indigo-50 ring-4 ring-indigo-500/10' : 'border-slate-100'}`}>
-                            <cat.icon className={`w-6 h-6 md:w-7 md:h-7 ${selectedCategory === cat.name ? 'text-indigo-600' : cat.iconColor}`} />
-                        </div>
-                        <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-[0.1em] text-center ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500'}`}>{cat.name}</span>
-                    </button>
-                ))}
+            <div className="mb-16">
+                <div className="flex items-end justify-between mb-8 px-4">
+                    <div>
+                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600 mb-2">Categories</h3>
+                        <h2 className="text-3xl font-black tracking-tighter text-slate-900">Choose a Service</h2>
+                    </div>
+                </div>
+                <div className="grid grid-cols-5 sm:grid-cols-10 gap-x-2 gap-y-8 px-2 overflow-x-auto hide-scrollbar pb-4">
+                    {categories.map(cat => (
+                        <button key={cat.id} onClick={() => { setSelectedCategory(cat.name); setSelectedSubServices([]); }} className={`flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-2 group shrink-0 ${selectedCategory === cat.name ? 'scale-105' : 'opacity-80 hover:opacity-100'}`}>
+                            <div className={`w-14 h-14 md:w-20 md:h-20 rounded-[2rem] flex items-center justify-center transition-all duration-500 ${selectedCategory === cat.name ? 'bg-indigo-600 shadow-xl shadow-indigo-600/30' : 'bg-white border border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-lg'}`}>
+                                <cat.icon className={`w-6 h-6 md:w-8 md:h-8 transition-colors duration-500 ${selectedCategory === cat.name ? 'text-white' : cat.iconColor}`} />
+                            </div>
+                            <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-widest text-center transition-colors ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500 group-hover:text-indigo-400'}`}>{cat.name}</span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {bookingStep === 1 ? (
@@ -493,51 +522,74 @@ const CustomerHome = () => {
                                 </div>
                             </div>
                         )}
+                                            {/* PROFESSIONALS LISTING - NOW SHOWS RECOMMENDED BY DEFAULT IF NO CATEGORY IS SELECTED */}
+                        <div className="space-y-6" ref={catalogRef} id="service-catalog">
+                            <div className="flex items-end justify-between">
+                                <h2 className="text-3xl font-black tracking-tighter">
+                                    {selectedCategory ? `Top ${selectedCategory} Experts` : 'Recommended for You'}
+                                </h2>
+                                {!selectedCategory && <button onClick={() => setSelectedCategory('Plumbing')} className="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b-2 border-indigo-100 hover:border-indigo-600 pb-1 flex items-center gap-1 transition-all">Explore All <PlusIcon className="w-3 h-3" /></button>}
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {displayedProviders.length > 0 ? displayedProviders.map(p => {
+                                    // Default list shows everyone, so we filter to 'Popular' names if no category selected for a cleaner 'Home' view
+                                    if (!selectedCategory && !['Prime Cleaning Expert', 'Prime Plumbing Expert', 'Quick Electrical Solutions'].includes(p.name)) return null;
 
-                        {selectedCategory && (
-                            <div className="space-y-6" ref={catalogRef} id="service-catalog">
-                                <h2 className="text-3xl font-black tracking-tighter">Top {selectedCategory} Professionals</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {displayedProviders.map(p => {
-                                        const rating = parseFloat(p.rating || 0).toFixed(1);
-                                        const initial = (p.name || 'P').charAt(0).toUpperCase();
-                                        const price = selectedSubServices.reduce((s, x) => s + (p.subServiceRates?.[x.name] || x.price), 0);
-                                        return (
-                                            <div key={p.id} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
-                                                <div className="flex items-center gap-6 mb-6">
-                                                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl font-bold text-slate-300 overflow-hidden">
-                                                        {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : initial}
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">{p.name}</h4>
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <Star className="w-3 h-3 text-amber-500 fill-current" />
-                                                            <span className="text-xs font-bold text-slate-900">{rating === '0.0' ? '5.0' : rating}</span>
-                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-2">Verified</span>
-                                                        </div>
-                                                    </div>
+                                    const rating = parseFloat(p.rating || 0).toFixed(1);
+                                    const initial = (p.name || 'P').charAt(0).toUpperCase();
+                                    const price = selectedSubServices.reduce((sum, x) => sum + (p.subServiceRates?.[x.name] || x.price), 0);
+                                    return (
+                                        <div key={p.id} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+                                            {/* EXPERT BADGE */}
+                                            {rating >= 4.8 && (
+                                                <div className="absolute top-4 right-4 bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 z-10">
+                                                    <Star className="w-3 h-3 text-white fill-current" />
+                                                    <span className="text-[8px] font-black text-white uppercase tracking-widest">Expert Choice</span>
                                                 </div>
-                                                <div className="flex items-center justify-between pt-6 border-t border-slate-50">
-                                                    <div>
-                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{selectedSubServices.length > 0 ? 'Expert Quote' : 'Starts at'}</p>
-                                                        <p className="text-2xl font-black text-slate-900">
-                                                            {/* ROBUST PRICE LOGIC: Force removal of '/hr' and consolidated Expert Quote calculation */}
-                                                            ₹{selectedSubServices.length > 0 
-                                                                ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
-                                                                : (String(p.price || 499).replace(/₹|\/hr/g, ''))}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button onClick={() => setSelectedProviderProfile(p)} className="px-4 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 text-[9px] font-black uppercase tracking-widest rounded-2xl border border-slate-200 transition-all">Profile</button>
-                                                        <button onClick={() => handleBook(p)} className="px-8 py-4 bg-indigo-600 hover:bg-black text-white font-bold uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-indigo-600/20">Book Now</button>
+                                            )}
+                                            
+                                            <div className="flex items-center gap-6 mb-6">
+                                                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl font-bold text-slate-300 overflow-hidden shadow-inner group-hover:scale-105 transition-transform duration-500">
+                                                    {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : initial}
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{p.name}</h4>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <Star className="w-3 h-3 text-amber-500 fill-current" />
+                                                        {/* AUTHENTIC RATING LOGIC: Only show genuine ratings, otherwise 'New' */}
+                                                        <span className="text-xs font-bold text-slate-900">{rating > 0 && rating !== '0.0' ? rating : 'New'}</span>
+                                                        <div className="w-1 h-1 bg-slate-300 rounded-full mx-1"></div>
+                                                        <span className="text-[9px] font-normal text-slate-400 capitalize">{p.category || 'Professional'} Expert</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        );
-                                    })}
-                                </div>
+                                            <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                                                <div>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{selectedSubServices.length > 0 ? 'Expert Quote' : 'Base Rate'}</p>
+                                                    <p className="text-2xl font-black text-slate-900">
+                                                        {/* ROBUST PRICE LOGIC: Force removal of '/hr' and consolidated Expert Quote calculation */}
+                                                        ₹{selectedSubServices.length > 0 
+                                                            ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
+                                                            : (String(p.price || 499).replace(/₹|\/hr/g, ''))}
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => setSelectedProviderProfile(p)} className="px-4 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 text-[9px] font-black uppercase tracking-widest rounded-2xl border border-slate-200 transition-all">View Info</button>
+                                                    <button onClick={() => handleBook(p)} className="px-8 py-4 bg-indigo-600 hover:bg-black text-white font-bold uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Book Now</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }).filter(Boolean) : (
+                                    <div className="md:col-span-2 py-20 text-center bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
+                                        <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                                        <p className="text-slate-500 font-bold">No professionals found matching your filters.</p>
+                                        <button onClick={() => { setSearchQuery(''); setSelectedCategory(null); }} className="mt-4 text-indigo-600 font-black text-[10px] uppercase tracking-widest hover:underline">Clear all filters</button>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
                     </div>
 
                     <div className="space-y-8">
