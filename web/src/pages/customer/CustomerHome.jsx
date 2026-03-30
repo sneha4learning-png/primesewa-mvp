@@ -315,7 +315,9 @@ const CustomerHome = () => {
 
     const handleBook = (provider) => {
         if (selectedSubServices.length === 0) {
-            alert("Please select at least one service before booking.");
+            // AUTO-GUIDE USER IF NO SERVICE SELECTED
+            setSelectedCategory(p.category || 'Professional Service');
+            catalogRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
         const total = selectedSubServices.reduce((sum, s) => sum + (provider.subServiceRates?.[s.name] || s.price), 0);
@@ -540,43 +542,48 @@ const CustomerHome = () => {
                                     const initial = (p.name || 'P').charAt(0).toUpperCase();
                                     const price = selectedSubServices.reduce((sum, x) => sum + (p.subServiceRates?.[x.name] || x.price), 0);
                                     return (
-                                        <div key={p.id} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
-                                            {/* EXPERT BADGE */}
+                                        <div key={p.id} className="bg-white p-7 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
+                                            {/* MODERN EXPERT BADGE - CLEANER & MORE PROFESSIONAL */}
                                             {rating >= 4.8 && (
-                                                <div className="absolute top-4 right-4 bg-indigo-600 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 z-10">
-                                                    <Star className="w-3 h-3 text-white fill-current" />
-                                                    <span className="text-[8px] font-black text-white uppercase tracking-widest">Expert Choice</span>
+                                                <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-700 to-indigo-500 px-4 py-2 rounded-bl-[1.5rem] flex items-center gap-2 shadow-lg z-10 transition-transform group-hover:scale-110">
+                                                    <Star className="w-3.5 h-3.5 text-white fill-current" />
+                                                    <span className="text-[9px] font-black text-white uppercase tracking-widest">Expert Pick</span>
                                                 </div>
                                             )}
                                             
-                                            <div className="flex items-center gap-6 mb-6">
-                                                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl font-bold text-slate-300 overflow-hidden shadow-inner group-hover:scale-105 transition-transform duration-500">
+                                            <div className="flex items-center gap-6 mb-8">
+                                                <div className="w-20 h-20 bg-slate-50 rounded-[1.75rem] flex items-center justify-center text-3xl font-black text-slate-200 overflow-hidden shadow-inner group-hover:rotate-3 transition-all duration-500 border border-slate-100">
                                                     {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : initial}
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{p.name}</h4>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <Star className="w-3 h-3 text-amber-500 fill-current" />
-                                                        {/* AUTHENTIC RATING LOGIC: Only show genuine ratings, otherwise 'New' */}
-                                                        <span className="text-xs font-bold text-slate-900">{rating > 0 && rating !== '0.0' ? rating : 'New'}</span>
-                                                        <div className="w-1 h-1 bg-slate-300 rounded-full mx-1"></div>
-                                                        <span className="text-[9px] font-normal text-slate-400 capitalize">{p.category || 'Professional'} Expert</span>
+                                                    <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-2">{p.name}</h4>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex bg-amber-50 px-2 py-1 rounded-lg items-center gap-1">
+                                                            <Star className="w-3 h-3 text-amber-500 fill-current" />
+                                                            <span className="text-[11px] font-black text-amber-600 uppercase">
+                                                                {rating > 0 && rating !== '0.0' ? rating : 'New'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+                                                        <span className="text-[10px] font-bold text-slate-400 capitalize">{p.category || 'Prime'} Professional</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                                            
+                                            <div className="flex items-center justify-between pt-7 border-t border-slate-50">
                                                 <div>
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{selectedSubServices.length > 0 ? 'Expert Quote' : 'Base Rate'}</p>
-                                                    <p className="text-2xl font-black text-slate-900">
-                                                        {/* ROBUST PRICE LOGIC: Force removal of '/hr' and consolidated Expert Quote calculation */}
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 opacity-60">
+                                                        {selectedSubServices.length > 0 ? 'Expert Quote' : 'Base Rate'}
+                                                    </p>
+                                                    <p className="text-3xl font-black text-slate-950 tracking-tighter">
                                                         ₹{selectedSubServices.length > 0 
                                                             ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
                                                             : (String(p.price || 499).replace(/₹|\/hr/g, ''))}
                                                     </p>
                                                 </div>
-                                                <div className="flex gap-2">
-                                                    <button onClick={() => setSelectedProviderProfile(p)} className="px-4 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 text-[9px] font-black uppercase tracking-widest rounded-2xl border border-slate-200 transition-all">View Info</button>
-                                                    <button onClick={() => handleBook(p)} className="px-8 py-4 bg-indigo-600 hover:bg-black text-white font-bold uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Book Now</button>
+                                                <div className="flex gap-3">
+                                                    <button onClick={() => setSelectedProviderProfile(p)} className="h-14 px-5 bg-slate-50 hover:bg-white text-slate-400 hover:text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-slate-100 transition-all shadow-sm hover:shadow-md">Info</button>
+                                                    <button onClick={() => handleBook(p)} className="h-14 px-10 bg-indigo-600 hover:bg-slate-950 text-white font-black uppercase text-[11px] tracking-[0.1em] rounded-2xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Book Now</button>
                                                 </div>
                                             </div>
                                         </div>
