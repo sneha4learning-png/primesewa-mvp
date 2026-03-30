@@ -63,9 +63,9 @@ const ProviderDashboard = () => {
             const calcEarnings = (fromDate) => completedJobs
                 .filter(job => new Date(job.date || job.completedAt?.toDate?.() || 0) >= fromDate)
                 .reduce((sum, job) => {
-                    const rawPrice = job.proposedPrice || job.price || job.amount || 0;
+                    const rawPrice = job.price || job.proposedPrice || job.amount || 0;
                     const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
-                    return sum + (amt * 0.85);
+                    return sum + Math.floor(amt * 0.85);
                 }, 0);
 
             const now = new Date();
@@ -89,9 +89,9 @@ const ProviderDashboard = () => {
                 if (jDateStr) {
                     const dayObj = last7Days.find(d => d.date === jDateStr);
                     if (dayObj) {
-                        const rawPrice = job.proposedPrice || job.price || job.amount || 0;
+                        const rawPrice = job.price || job.proposedPrice || job.amount || 0;
                         const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                        dayObj.earnings = (dayObj.earnings || 0) + (Number(amt) * 0.85);
+                        dayObj.earnings = (dayObj.earnings || 0) + Math.floor(Number(amt) * 0.85);
                     }
                 }
             });

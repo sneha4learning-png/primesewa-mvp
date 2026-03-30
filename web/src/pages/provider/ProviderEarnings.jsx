@@ -26,12 +26,15 @@ const ProviderEarnings = () => {
 
                 bookSnap.forEach(doc => {
                     const b = { id: doc.id, ...doc.data() };
-                    const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                    // Prioritize price (final adjustment) over proposedPrice (initial quote)
+                    const rawPrice = b.price || b.proposedPrice || b.amount || 0;
                     const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
 
                     const dateStr = b.completedAt?.toDate ? b.completedAt.toDate().toISOString() : (b.date || new Date().toISOString());
-                    const commission = Number((amount * 0.15).toFixed(2));
-                    const providerEarning = Number((amount * 0.85).toFixed(2));
+                    
+                    // Standardize calculation to match payouts precisely (Math.floor for provider share)
+                    const providerEarning = Math.floor(amount * 0.85);
+                    const commission = amount - providerEarning; // Platform fee is the remainder (ceil)
 
                     myCommissions.push({
                         id: b.id,
@@ -119,10 +122,10 @@ const ProviderEarnings = () => {
                                             ₹{log.amount}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-rose-600 text-right">
-                                            -₹{log.commission.toFixed(0)}
+                                            -₹{log.commission}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 flex justify-end items-center gap-1">
-                                            <ArrowUpRight className="w-4 h-4" /> ₹{(log.providerEarning || (log.amount - log.commission)).toFixed(0)}
+                                            <ArrowUpRight className="w-4 h-4" /> ₹{log.providerEarning || (log.amount - log.commission)}
                                         </td>
                                     </tr>
                                 ))}
