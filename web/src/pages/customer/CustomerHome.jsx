@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
 class ErrorBoundary extends Component {
@@ -298,6 +298,23 @@ const CustomerHome = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSubServices, setSelectedSubServices] = useState([]);
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
+    const [isLocating, setIsLocating] = useState(false);
+
+    const handleMyLocation = () => {
+        if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
+        setIsLocating(true);
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const { latitude, longitude } = pos.coords;
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                const data = await res.json();
+                if (data.display_name) {
+                    setBookingArea(data.display_name.split(',')[0] + ', ' + (data.address.suburb || data.address.neighbourhood || ''));
+                }
+            } catch (e) { console.error(e); }
+            setIsLocating(false);
+        }, () => setIsLocating(false));
+    };
 
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
@@ -462,32 +479,116 @@ const CustomerHome = () => {
             </div>
 
             {bookingStep === 1 ? (
-                <div className="max-w-3xl bg-white rounded-[3rem] shadow-2xl p-10 md:p-14 mx-auto animate-fade-in">
-                    <div className="flex justify-between items-start mb-12">
-                        <h2 className="text-4xl font-medium text-slate-900">Confirm Booking</h2>
-                        <button onClick={() => setBookingStep(0)}><XCircle className="w-8 h-8 text-slate-300" /></button>
+                <div className="max-w-4xl bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 mx-auto animate-fade-in border border-slate-100">
+                    <div className="flex justify-between items-start mb-10">
+                        <div>
+                            <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Confirm Booking</h2>
+                            <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-1">Review your details & professional schedule</p>
+                        </div>
+                        <button onClick={() => setBookingStep(0)} className="p-2 hover:bg-slate-50 rounded-full transition-colors"><XCircle className="w-8 h-8 text-slate-300 hover:text-rose-500" /></button>
                     </div>
-                    <form onSubmit={confirmBooking} className="space-y-10">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Date</label>
-                                <input required type="date" value={bookingDate} min={getTodayStr()} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-5 bg-slate-50 border rounded-2xl outline-none focus:border-indigo-500" />
-                            </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Time Slot</label>
-                                <div className="grid grid-cols-1 gap-2">
-                                    {availableSlots.map(s => (
-                                        <button key={s.id} type="button" onClick={() => setBookingSlot(s.id)} className={`p-4 border rounded-2xl text-xs transition-all ${bookingSlot === s.id ? 'bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white text-slate-600'}`}>{s.label}</button>
-                                    ))}
+
+                    <form onSubmit={confirmBooking} className="space-y-12">
+                        {/* SERVICE REVIEW & PRICE SECTION */}
+                        <div className="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-10 -mt-10 blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
+                            <div className="relative z-10">
+                                <p className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-4">You have selected</p>
+                                <h3 className="text-xl font-medium text-slate-100 mb-2 leading-tight uppercase tracking-tight">{pendingBookingData?.service}</h3>
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                    <p className="text-[11px] font-bold text-slate-400 capitalize">Expert: {pendingBookingData?.name || 'Professional'}</p>
+                                </div>
+                                <div className="flex items-end justify-between pt-6 border-t border-white/10">
+                                    <div>
+                                        <p className="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">Total Payable Amount</p>
+                                        <p className="text-4xl font-black text-white tracking-tighter">₹{pendingBookingData?.price}</p>
+                                    </div>
+                                    <Sparkles className="w-8 h-8 text-indigo-400 opacity-20" />
                                 </div>
                             </div>
                         </div>
+
+                        {/* DYNAMIC SERVICE SELECTION AT CHECKOUT */}
                         <div className="space-y-4">
-                            <input required placeholder="House No/Flat No" value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-4 bg-slate-50 border rounded-2xl" />
-                            <input required placeholder="Area/Locality" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-4 bg-slate-50 border rounded-2xl" />
-                            <textarea required placeholder="Description" value={bookingDesc} onChange={e => setBookingDesc(e.target.value)} className="w-full p-4 bg-slate-50 border rounded-2xl min-h-[100px]" />
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <PlusIcon className="w-3.5 h-3.5 text-indigo-500" /> Adjust Services
+                            </label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {(categories.find(c => c.name === selectedCategory)?.subServices || []).map(s => {
+                                    const isSelected = selectedSubServices.some(x => x.name === s.name);
+                                    return (
+                                        <button key={s.name} type="button" onClick={() => {
+                                            const newSelection = isSelected 
+                                                ? selectedSubServices.filter(x => x.name !== s.name)
+                                                : [...selectedSubServices, s];
+                                            setSelectedSubServices(newSelection);
+                                            
+                                            // UPDATE LIVE PRICE IN PENDING DATA
+                                            const providerBase = parseFloat(String(pendingBookingData?.price || 150)) - selectedSubServices.reduce((a,b) => a + b.price, 0);
+                                            const newTotal = providerBase + newSelection.reduce((a,b) => a + b.price, 0);
+                                            setPendingBookingData(prev => ({ 
+                                                ...prev, 
+                                                price: newTotal,
+                                                service: `${selectedCategory} (${newSelection.map(x => x.name).join(', ')})`
+                                            }));
+                                        }} className={`p-4 border-2 rounded-[1.5rem] text-left transition-all group ${isSelected ? 'bg-indigo-50 border-indigo-600' : 'bg-white border-slate-100 hover:border-indigo-200'}`}>
+                                            <p className={`text-[10px] font-black uppercase mb-1 tracking-tighter ${isSelected ? 'text-indigo-600' : 'text-slate-900'}`}>{s.name}</p>
+                                            <p className="text-[10px] font-bold text-slate-400">₹{s.price}</p>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                        <button type="submit" disabled={isSubmitting} className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl">{isSubmitting ? 'Processing...' : 'Confirm Request'}</button>
+
+                        <div className="space-y-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-4">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <Calendar className="w-3.5 h-3.5 text-indigo-500" /> Choose Date
+                                    </label>
+                                    <input required type="date" value={bookingDate} min={getTodayStr()} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-bold text-slate-700 shadow-inner" />
+                                </div>
+                                <div className="space-y-4">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <ClockIcon className="w-3.5 h-3.5 text-indigo-500" /> Select Time Slot
+                                    </label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {availableSlots.map(s => (
+                                            <button key={s.id} type="button" onClick={() => setBookingSlot(s.id)} className={`py-4 px-3 border-2 rounded-2xl text-[9px] font-black uppercase tracking-tighter transition-all duration-300 ${bookingSlot === s.id ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-white border-slate-50 text-slate-400 hover:border-indigo-200'}`}>{s.label}</button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <MapPin className="w-3.5 h-3.5 text-indigo-500" /> Service Location
+                                    </label>
+                                    <button type="button" onClick={handleMyLocation} disabled={isLocating} className="text-[9px] font-black text-indigo-600 uppercase tracking-widest hover:text-slate-900 transition-colors flex items-center gap-2 px-3 py-1.5 bg-indigo-50 rounded-lg">
+                                        {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <MapPin className="w-3 h-3" />}
+                                        Use My Location
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase ml-2">House/Apt</p>
+                                        <input required placeholder="eg. 402, Sunshine Villa" value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase ml-2">Locality / Landmark</p>
+                                        <input required placeholder="eg. Near City Mall" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner" />
+                                    </div>
+                                </div>
+                                <textarea required placeholder="Any specific instructions for the expert? (Optional)" value={bookingDesc} onChange={e => setBookingDesc(e.target.value)} className="w-full p-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:border-indigo-500 font-medium text-slate-700 shadow-inner min-h-[120px]" />
+                            </div>
+                        </div>
+
+                        <button type="submit" disabled={isSubmitting} className="w-full py-6 bg-indigo-600 hover:bg-slate-950 text-white rounded-3xl font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-indigo-600/40 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3">
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+                            {isSubmitting ? 'Finalizing Your Request...' : 'Confirm & Proceed to Booking'}
+                        </button>
                     </form>
                 </div>
             ) : bookingStep === 2 ? (
