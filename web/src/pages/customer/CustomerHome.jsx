@@ -180,15 +180,12 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                     </div>
                     <div className="absolute -bottom-10 left-10 z-20">
                         <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-3xl flex items-center justify-center text-3xl sm:text-4xl font-black text-indigo-600 border-[6px] border-white shadow-2xl shadow-indigo-600/20 overflow-hidden group/modal-avatar">
-                            {p.photoURL ? (
-                                <img src={p.photoURL} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover/modal-avatar:scale-110" />
-                            ) : (
-                                <div className="w-full h-full bg-slate-50 flex items-center justify-center relative">
-                                    <span className="relative z-10">{initial}</span>
-                                    {/* ADDING A SUBTLE BACKGROUND ICON AS REQUESTED FOR AVATAR FEEL */}
-                                    <UserCircle className="absolute w-full h-full text-indigo-100 opacity-50 scale-150" />
-                                </div>
-                            )}
+                            {(() => {
+                                const fallbackImg = p.gender === 'female' || category.toLowerCase() === 'salon' 
+                                    ? 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_female_indian_pro_1774869328081.png'
+                                    : 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_male_indian_pro_1774869304643.png';
+                                return <img src={p.photoURL || fallbackImg} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover/modal-avatar:scale-110" />;
+                            })()}
                         </div>
                     </div>
                 </div>
@@ -697,15 +694,13 @@ const CustomerHome = () => {
                                                 )}
                                                 
                                                 <div className="flex items-center gap-6 mb-8">
-                                                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-3xl font-black text-indigo-600 border border-slate-100 shadow-inner group-hover:scale-105 transition-all relative overflow-hidden">
-                                                        {p.photoURL ? (
-                                                            <img src={p.photoURL} alt="" className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <div className="w-full h-full bg-slate-50 flex items-center justify-center relative">
-                                                                <span className="relative z-10">{initial}</span>
-                                                                <UserCircle className="absolute w-full h-full text-indigo-100 opacity-50 scale-150" />
-                                                            </div>
-                                                        )}
+                                                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-3xl font-black text-indigo-600 border border-slate-100 shadow-inner group-hover:scale-105 transition-all relative overflow-hidden bg-slate-50">
+                                                        {(() => {
+                                                            const fallbackImg = p.gender === 'female' || p.category?.toLowerCase() === 'salon' 
+                                                                ? 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_female_indian_pro_1774869328081.png'
+                                                                : 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_male_indian_pro_1774869304643.png';
+                                                            return <img src={p.photoURL || fallbackImg} alt="" className="w-full h-full object-cover" />;
+                                                        })()}
                                                     </div>
                                                     <div>
                                                         <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-2">{p.name}</h4>
