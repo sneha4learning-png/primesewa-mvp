@@ -540,7 +540,8 @@ const CustomerHome = () => {
                                             setSelectedSubServices(newSelection);
                                             
                                             // UPDATE LIVE PRICE IN PENDING DATA
-                                            const providerBase = Math.min(parseInt(String(p.price || 149).replace(/\D/g, '')), 199);
+                                            const providerObj = onlineProviders.find(op => op.name === pendingBookingData?.provider);
+                                            const providerBase = Math.min(parseInt(String(providerObj?.price || 149).replace(/\D/g, '')), 199);
                                             const newTotal = providerBase + newSelection.reduce((a,b) => a + b.price, 0);
                                             setPendingBookingData(prev => ({ 
                                                 ...prev, 
