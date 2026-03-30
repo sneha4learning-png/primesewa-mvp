@@ -337,7 +337,7 @@ const CommissionDashboard = () => {
                 <div className="space-y-6 animate-in fade-in duration-500">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                            <p className="text-xs text-slate-400 uppercase tracking-widest mb-1.5">Pending Disbursements</p>
+                            <p className="text-xs text-slate-400 uppercase tracking-widest mb-1.5">Pending Payouts</p>
                             <p className="text-3xl font-normal text-amber-600">₹{Math.floor(payouts.filter(p => p.status === 'pending').reduce((a, c) => a + (c.amount || 0), 0))}</p>
                         </div>
                         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
