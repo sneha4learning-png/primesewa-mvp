@@ -223,8 +223,10 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                         </div>
                         <div className="bg-slate-50 p-3 sm:p-4 rounded-2xl text-center border border-slate-100">
                             <IndianRupee className="w-3.5 h-3.5 text-emerald-500 mx-auto mb-1" />
-                            <div className="text-base sm:text-lg font-medium text-slate-900 leading-none">₹{price}</div>
-                            <div className="text-[7px] font-medium text-slate-400 uppercase tracking-tighter mt-1">Rate</div>
+                            <div className="text-base sm:text-lg font-medium text-slate-900 leading-none">
+                                ₹{String(price).replace(/₹|\/hr/g, '')}
+                            </div>
+                            <div className="text-[7px] font-medium text-slate-400 uppercase tracking-tighter mt-1">Base Rate</div>
                         </div>
                     </div>
                     {portfolio.length > 0 && (
@@ -519,10 +521,10 @@ const CustomerHome = () => {
                                                     <div>
                                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{selectedSubServices.length > 0 ? 'Expert Quote' : 'Starts at'}</p>
                                                         <p className="text-2xl font-black text-slate-900">
-                                                            {/* SANITIZED PRICE LOGIC: Prevents double ₹ symbol and ensures provider-specific expert quotes */}
+                                                            {/* ROBUST PRICE LOGIC: Force removal of '/hr' and consolidated Expert Quote calculation */}
                                                             ₹{selectedSubServices.length > 0 
                                                                 ? (price + (p.name.charCodeAt(0) % 3 * 50)) 
-                                                                : (String(p.price || 499).replace('₹', ''))}
+                                                                : (String(p.price || 499).replace(/₹|\/hr/g, ''))}
                                                         </p>
                                                     </div>
                                                     <div className="flex gap-2">
