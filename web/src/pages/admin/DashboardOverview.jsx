@@ -243,19 +243,42 @@ const DashboardOverview = () => {
                 }, { merge: true });
             }
 
-            // Also patch existing non-golden providers to avoid taxonomy junk
+            // 2.7 ALSO SYNC AND DIVERSIFY RATES FOR ALL OTHER PROVIDERS
             for (const p of existingProviders) {
-                if (!goldenFleet.some(g => g.name === p.name)) {
-                    let cat = p.category;
-                    const cName = String(p.name || '').toUpperCase();
-                    const cCat = String(p.category || '').toUpperCase();
+                const isGolden = goldenFleet.some(g => g.name === p.name);
+                let cat = p.category;
+                const cName = String(p.name || '').toUpperCase();
+                const cCat = String(p.category || '').toUpperCase();
 
-                    if (cCat === 'SALON & BEAUTY' || cCat === 'BEAUTY' || cName.includes('ANJALI') || cName.includes('PRIME SALON')) {
-                        cat = 'Salon for Women';
-                    } else if (cName.includes('RAJESH') || cName.includes('GROOMING')) {
-                        cat = 'Salon for Men';
-                    }
-                    
+                // Taxonomy Fixes
+                if (cCat === 'SALON & BEAUTY' || cCat === 'BEAUTY' || cName.includes('ANJALI') || cName.includes('PRIME SALON')) {
+                    cat = 'Salon for Women';
+                } else if (cName.includes('RAJESH') || cName.includes('GROOMING')) {
+                    cat = 'Salon for Men';
+                }
+
+                if (!isGolden) {
+                    // Inject Unique Rates for Comparison Demo
+                    const multiplier = 0.85 + (Math.random() * 0.3); // 0.85x to 1.15x
+                    const customRates = {};
+                    const basePrices = [
+                        {n: 'Tap Fix', p: 149}, {n: 'Pipe Leak', p: 299}, {n: 'Drain Block', p: 449}, {n: 'Tank Clean', p: 899},
+                        {n: 'Switch Fix', p: 99}, {n: 'Fan Fix', p: 249}, {n: 'MCB Fix', p: 349}, {n: 'Wiring Check', p: 999},
+                        {n: 'Haircut', p: 199}, {n: 'Shave', p: 149}, {n: 'Facial', p: 599}, {n: 'Threading', p: 49}
+                    ];
+                    basePrices.forEach(x => {
+                        customRates[x.n] = Math.round(x.p * multiplier);
+                    });
+
+                    batch.update(doc(db, 'providers', p.id), { 
+                        category: cat, 
+                        status: 'active', 
+                        isOnline: true,
+                        subServiceRates: customRates,
+                        patchApplied: true
+                    });
+                } else {
+                    // Update only taxonomy/status for golden ones (rates handled in golden loop)
                     batch.update(doc(db, 'providers', p.id), { category: cat, status: 'active', isOnline: true });
                 }
             }
