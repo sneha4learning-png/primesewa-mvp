@@ -312,18 +312,7 @@ const DashboardOverview = () => {
                 </div>
             )}
 
-            <div className="flex justify-between items-center bg-indigo-900/5 px-6 py-4 rounded-2xl border border-indigo-100 mt-2 mb-6">
-                <div>
-                    <h2 className="text-sm font-black text-indigo-900 uppercase tracking-widest">Admin Utilities</h2>
-                    <p className="text-[10px] text-indigo-500 font-medium">Clear legacy data and sync with the new Urban Company UI</p>
-                </div>
-                <button 
-                    onClick={handleHardReset}
-                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg transition-all active:scale-95"
-                >
-                    Refresh Database (Seed 5 Jobs)
-                </button>
-            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-blue-500" />
