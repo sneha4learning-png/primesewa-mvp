@@ -366,11 +366,21 @@ const DashboardOverview = () => {
             }
 
             await batch.commit();
-            alert("Database Resetted. 6 Perfect UC-style jobs injected (5 Completed, 1 Pending). ALL provider names and services are now perfectly matched! 🏁🛡️");
+            const summary = `
+✅ SUCCESS: Hard Reset Complete!
+--------------------------------
+👥 Providers Synced: ${goldenFleet.length} (Anjali, Rajesh, Sanjay, Priya, Vikram)
+💼 Live Jobs Injected: ${seedJobs.length} (5 Completed, 1 Pending)
+💰 Financial Entries: ${seedJobs.filter(j=>j.status==='completed').length * 2} (Payouts & Commissions)
+🛡️ Status: ALL Experts are now ONLINE and categorized.
+
+Please verify the 'Provider Fleet' and 'Booking Monitor' now. 🏁
+            `;
+            alert(summary);
             window.location.reload();
         } catch (err) {
             console.error("Hard Reset Error:", err);
-            alert("Reset failed: " + err.message);
+            alert("❌ CRITICAL RESET FAILURE: " + err.message);
         }
     };
 
