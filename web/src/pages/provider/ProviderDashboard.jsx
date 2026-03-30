@@ -33,9 +33,9 @@ const ProviderDashboard = () => {
     const [requestPage, setRequestPage] = useState(1);
     const [historyPage, setHistoryPage] = useState(1);
     const itemsPerPage = 3;
+    const providerName = userData?.name || currentUser?.displayName;
 
     useEffect(() => {
-        const providerName = userData?.name || currentUser?.displayName;
         if (!providerName) return;
 
         // 1. Real-time listener for this provider's approval status
@@ -45,8 +45,6 @@ const ProviderDashboard = () => {
             unsubscribeProvider = onSnapshot(providerQuery, (snap) => {
                 if (!snap.empty) setProviderStatus(snap.docs[0].data().status);
             }, e => console.error(e));
-        } else if (userData?.status && providerStatus !== userData.status) {
-            setProviderStatus(userData.status);
         }
 
         // 2. Real-time listener for ALL bookings assigned to this provider
@@ -127,7 +125,14 @@ const ProviderDashboard = () => {
             unsubscribeBookings();
             unsubscribePayouts();
         };
-    }, [userData, currentUser]);
+    }, [userData, currentUser, providerName]);
+
+    // Update status when userData updates but listener isn't active
+    useEffect(() => {
+        if (!userData?.uid && userData?.status) {
+            setProviderStatus(userData.status);
+        }
+    }, [userData?.status]);
 
     const formatTime = (timeStr) => {
         if (!timeStr) return 'N/A';

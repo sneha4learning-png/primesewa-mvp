@@ -269,6 +269,12 @@ const CustomerHome = () => {
     const [_dbError, setDbError] = useState(false);
     const [_loadingData, setLoadingData] = useState(true);
     const [locationCoords, setLocationCoords] = useState(null);
+    const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+    const [addressSuggestions, setAddressSuggestions] = useState([]);
+    const [addressSearchTimeout, setAddressSearchTimeout] = useState(null);
+    const [chartData, setChartData] = useState([]);
+    const [slotError, setSlotError] = useState('');
+    const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const serviceImages = [
@@ -1504,7 +1510,8 @@ const CustomerHome = () => {
                                                                     const catObj = categories.find(c => pCats.includes(c.name.toLowerCase()));
                                                                     const defaultUnit = catObj?.type === 'Hourly-based' ? 'hr' : 'job';
                                                                     
-                                                                    const hasUnitInPrice = rawPrice.includes('/') || rawPrice.toLowerCase().includes('job') || rawPrice.toLowerCase().includes('hr');
+                                                                                                                                         // Unused var removed
+
                                                                     const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
                                                                     
                                                                     // Force unit based on category type regardless of price string to preserve data integrity
