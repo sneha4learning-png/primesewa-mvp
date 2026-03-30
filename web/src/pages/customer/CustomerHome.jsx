@@ -32,13 +32,13 @@ class ErrorBoundary extends Component {
 const categories = [
     { id: '1', name: 'Plumbing', icon: Droplets, color: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-500', type: 'Job-based', subtitle: 'Pipes & Taps' },
     { id: '2', name: 'Electrical', icon: Zap, color: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-500', type: 'Job-based', subtitle: 'Wiring & Fixes' },
-    { id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500', type: 'Hourly-based', subtitle: 'Deep Clean' },
+    { id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500', type: 'Job-based', subtitle: 'Deep Clean' },
     { id: '4', name: 'Carpentry', icon: Wrench, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500', type: 'Job-based', subtitle: 'Furniture' },
     { id: '5', name: 'Painting', icon: Sparkles, color: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-500', type: 'Job-based', subtitle: 'Home Wall' },
     { id: '6', name: 'AC Repair', icon: Wrench, color: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-500', type: 'Job-based', subtitle: 'Cooling' },
     { id: '7', name: 'Appliance Repair', icon: Zap, color: 'from-rose-500/10 to-rose-600/5', iconColor: 'text-rose-500', type: 'Job-based', subtitle: 'Fridge & TV' },
-    { id: '10', name: 'Salon for Men', icon: Sparkles, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500', type: 'Hourly-based', subtitle: 'Haircare' },
-    { id: '12', name: 'Salon for Women', icon: Sparkles, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500', type: 'Hourly-based', subtitle: 'Beauty' },
+    { id: '10', name: 'Salon for Men', icon: Sparkles, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500', type: 'Job-based', subtitle: 'Haircare' },
+    { id: '12', name: 'Salon for Women', icon: Sparkles, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500', type: 'Job-based', subtitle: 'Beauty' },
     { id: '9', name: 'Pest Control', icon: ShieldCheck, color: 'from-red-500/10 to-red-600/5', iconColor: 'text-red-500', type: 'Job-based', subtitle: 'Protection' },
 ];
 
