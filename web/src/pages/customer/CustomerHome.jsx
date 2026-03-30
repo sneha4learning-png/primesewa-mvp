@@ -782,8 +782,8 @@ const CustomerHome = () => {
                                                 <div className="flex items-center gap-6 mb-8">
                                                     <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center border border-slate-100 shadow-inner group-hover:scale-105 transition-all relative overflow-hidden bg-slate-50">
                                                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-indigo-100/50"></div>
-                                                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg relative z-10 transition-transform group-hover:rotate-12">
-                                                            {initial}
+                                                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg relative z-10 transition-transform group-hover:rotate-12">
+                                                            <UserCircle className="w-8 h-8" />
                                                         </div>
                                                         <UserCircle className="absolute w-full h-full text-indigo-100/50 -bottom-4 -right-4 opacity-50" />
                                                     </div>
