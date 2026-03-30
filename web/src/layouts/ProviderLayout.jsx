@@ -64,7 +64,7 @@ const ProviderLayout = () => {
             ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20'
             : 'text-slate-400 hover:bg-white/5 hover:text-white'}`;
 
-    const SidebarInner = () => (
+    const renderSidebarInner = () => (
         <>
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
@@ -112,7 +112,7 @@ const ProviderLayout = () => {
         <div className="flex h-screen bg-[#F8FAFC]">
             {/* Desktop Sidebar */}
             <aside className="hidden lg:flex w-72 bg-[#0F172A] border-r border-[#1E293B] flex-col relative overflow-hidden">
-                <SidebarInner />
+                {renderSidebarInner()}
             </aside>
 
             {/* Mobile Sidebar Overlay */}
@@ -120,7 +120,7 @@ const ProviderLayout = () => {
                 <div className="lg:hidden fixed inset-0 z-50 flex">
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
                     <aside className="relative w-72 bg-[#0F172A] flex flex-col overflow-hidden z-10">
-                        <SidebarInner />
+                        {renderSidebarInner()}
                     </aside>
                 </div>
             )}

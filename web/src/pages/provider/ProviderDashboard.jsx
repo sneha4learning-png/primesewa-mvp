@@ -24,7 +24,6 @@ const ProviderDashboard = () => {
     const [historicalBookings, setHistoricalBookings] = useState([]);
     const [historyFilter, setHistoryFilter] = useState('All');
     const [dbError, setDbError] = useState(false);
-    const [providerStatus, setProviderStatus] = useState('pending');
     const [negotiatedPrice, setNegotiatedPrice] = useState('');
     const [negotiatingId, setNegotiatingId] = useState(null);
 
@@ -38,14 +37,8 @@ const ProviderDashboard = () => {
     useEffect(() => {
         if (!providerName) return;
 
-        // 1. Real-time listener for this provider's approval status
-        let unsubscribeProvider = () => { };
-        if (userData?.uid) {
-            const providerQuery = query(collection(db, 'providers'), where('uid', '==', userData.uid));
-            unsubscribeProvider = onSnapshot(providerQuery, (snap) => {
-                if (!snap.empty) setProviderStatus(snap.docs[0].data().status);
-            }, e => console.error(e));
-        }
+        // 1. Provider status is handled by ProviderLayout (the parent).
+        let unsubscribeProvider = () => {};
 
         // 2. Real-time listener for ALL bookings assigned to this provider
         const unsubscribeBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
@@ -98,11 +91,11 @@ const ProviderDashboard = () => {
                     if (dayObj) {
                         const rawPrice = job.proposedPrice || job.price || job.amount || 0;
                         const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                        dayObj.earnings += amt * 0.85;
+                        dayObj.earnings = (dayObj.earnings || 0) + (Number(amt) * 0.85);
                     }
                 }
             });
-            setChartData(last7Days);
+            setChartData([...last7Days]); // Ensure new reference for re-render
             setDbError(false);
         }, e => { console.error('Bookings listener error:', e); setDbError(true); });
 
@@ -112,12 +105,14 @@ const ProviderDashboard = () => {
             const fetchedPayouts = [];
             snap.forEach(d => {
                 const data = d.data();
-                if (data.status === 'pending') totalPending += (data.amount || 0);
-                fetchedPayouts.push({ id: d.id, ...data });
+                // Ensure amount is handled as a number
+                const amt = Number(data.amount) || 0;
+                if (data.status === 'pending') totalPending += amt;
+                fetchedPayouts.push({ id: d.id, ...data, amount: amt });
             });
             setEarnings(prev => ({ ...prev, pendingPayouts: totalPending }));
             setPayouts(fetchedPayouts);
-        });
+        }, e => console.error('Payouts listener error:', e));
 
         // Cleanup on unmount
         return () => {
@@ -128,11 +123,8 @@ const ProviderDashboard = () => {
     }, [userData, currentUser, providerName]);
 
     // Update status when userData updates but listener isn't active
-    useEffect(() => {
-        if (!userData?.uid && userData?.status) {
-            setProviderStatus(userData.status);
-        }
-    }, [userData?.status]);
+    // Remove sync from local component as Layout handles actual status overlays
+    // This fixed a linting error and potential render cycle issue
 
     const formatTime = (timeStr) => {
         if (!timeStr) return 'N/A';

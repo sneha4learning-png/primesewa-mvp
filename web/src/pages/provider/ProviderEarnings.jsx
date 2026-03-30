@@ -30,18 +30,20 @@ const ProviderEarnings = () => {
                     const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
 
                     const dateStr = b.completedAt?.toDate ? b.completedAt.toDate().toISOString() : (b.date || new Date().toISOString());
+                    const commission = Number((amount * 0.15).toFixed(2));
+                    const providerEarning = Number((amount * 0.85).toFixed(2));
 
                     myCommissions.push({
                         id: b.id,
                         customer: b.customer || b.userName || 'Unknown Customer',
                         provider: b.provider,
-                        amount: amount,
-                        commission: parseFloat((amount * 0.15).toFixed(2)),
-                        providerEarning: parseFloat((amount * 0.85).toFixed(2)),
+                        amount: Number(amount),
+                        commission: commission,
+                        providerEarning: providerEarning,
                         date: dateStr
                     });
-                    totalGross += amount;
-                    totalNet += amount * 0.85;
+                    totalGross += Number(amount);
+                    totalNet += providerEarning;
                 });
 
                 // Sort newest first

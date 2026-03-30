@@ -306,40 +306,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Safety Banner */}
-            <section className="py-12 px-4 bg-indigo-900 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-                <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
-                    <div className="max-w-xl text-center md:text-left">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-indigo-200 text-[10px] font-black uppercase tracking-widest mb-6 border border-white/10">
-                            <ShieldCheck className="w-3.5 h-3.5" /> Safety First Protocol
-                        </div>
-                        <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight mb-6">Your safety is our <br /> highest priority.</h2>
-                        <p className="text-indigo-100/60 text-lg font-medium leading-relaxed">We've implemented industry-leading safety standards to ensure every service is secure, sanitized, and professional.</p>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full md:w-auto">
-                        <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 flex items-center gap-4 hover:bg-white/10 transition-colors group">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                <ShieldCheck className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h4 className="text-white font-black text-sm uppercase tracking-widest">Insurance Cover</h4>
-                                <p className="text-indigo-200/50 text-[10px] font-medium mt-0.5">Protection for every booking</p>
-                            </div>
-                        </div>
-                        <div className="bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/10 flex items-center gap-4 hover:bg-white/10 transition-colors group">
-                            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                <Zap className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h4 className="text-white font-black text-sm uppercase tracking-widest">Sanitized Tools</h4>
-                                <p className="text-indigo-200/50 text-[10px] font-medium mt-0.5">Strict hygiene protocols</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* How it Works */}
             <section className="py-12 px-4 bg-white relative overflow-hidden">
@@ -427,7 +393,6 @@ const LandingPage = () => {
                                 <li><Link to="/dashboard" className="hover:text-white transition-colors">Book a Service</Link></li>
                                 <li><Link to="/dashboard" className="hover:text-white transition-colors">Coverage Areas</Link></li>
                                 <li><Link to="/login" className="hover:text-white transition-colors">Customer Portal</Link></li>
-                                <li><Link to="/safety" className="hover:text-white transition-colors">Safety Protocols</Link></li>
                             </ul>
                         </div>
                         <div>
