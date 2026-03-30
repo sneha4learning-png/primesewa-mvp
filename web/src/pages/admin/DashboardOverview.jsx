@@ -182,19 +182,21 @@ const DashboardOverview = () => {
                 if (name.includes('Rajesh')) { cat = 'Salon for Men'; }
                 if (name.includes('Sanjay')) { cat = 'Electrical'; }
 
-                let resetRating = '4.9'; 
+                let resetRating = '4.8'; 
+                let isExpert = false;
                 if (name.includes('Anjali') || name.includes('Painting') || name.includes('Sparkle')) {
                     resetRating = '5.0'; 
+                    isExpert = true;
                 }
-                if (name.includes('Rajesh')) {
-                    resetRating = '4.8';
-                }
-                if (name.includes('Sanjay')) {
-                    resetRating = '4.9';
-                }
+                if (name.includes('Rajesh')) { resetRating = '4.7'; }
+                if (name.includes('Sanjay')) { resetRating = '4.9'; }
+                if (name.includes('Priya')) { resetRating = '4.8'; }
+                if (name.includes('Vikram')) { resetRating = '4.7'; }
+                if (name.includes('Neha')) { resetRating = '4.6'; }
                 
                 batch.update(d.ref, {
                     rating: resetRating,
+                    isExpert: isExpert,
                     ratingCount: 15,
                     jobs: 15,
                     status: 'active',

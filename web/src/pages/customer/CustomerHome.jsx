@@ -784,8 +784,8 @@ const CustomerHome = () => {
                                         const price = selectedSubServices.reduce((sum, x) => sum + (p.subServiceRates?.[x.name] || x.price), 0);
                                         return (
                                             <div key={p.id} className="bg-white p-7 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
-                                                {/* MODERN EXPERT BADGE - CLEANER & MORE PROFESSIONAL */}
-                                                {rating >= 5.0 && (
+                                                {/* PERMANENT SOLUTION: USE EXPLICIT EXPERT FLAG FROM DATABASE */}
+                                                {p.isExpert && (
                                                     <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-700 to-indigo-500 px-4 py-2 rounded-bl-[1.5rem] flex items-center gap-2 shadow-lg z-10 transition-transform group-hover:scale-110">
                                                         <Star className="w-3.5 h-3.5 text-white fill-current" />
                                                         <span className="text-[9px] font-black text-white uppercase tracking-widest">Expert Pick</span>
