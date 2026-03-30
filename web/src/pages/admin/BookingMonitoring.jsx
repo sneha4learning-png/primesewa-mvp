@@ -179,12 +179,12 @@ const BookingMonitoring = () => {
                                     <td className="px-3 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{booking.service}</div>
                                         <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                                            <Calendar className="w-3 h-3" /> {booking.date} {booking.time && `at ${formatTime(booking.time)}`}
+                                            <Calendar className="w-3 h-3" /> {booking.date} • {booking.slot || (booking.time && formatTime(booking.time))}
                                         </div>
                                     </td>
                                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.customer || 'Unknown'}</td>
                                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.provider || 'Unassigned'}</td>
-                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{booking.proposedPrice || booking.price || booking.amount}</td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{booking.price || booking.proposedPrice || booking.amount}</td>
                                     <td className="px-3 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-md border text-xs font-semibold capitalize ${getStatusColor(booking.status)}`}>
                                             {booking.status}
@@ -216,7 +216,7 @@ const BookingMonitoring = () => {
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <div className="text-sm font-bold text-gray-900">{booking.service}</div>
-                                        <div className="text-xs text-gray-500">{booking.date} at {formatTime(booking.time)} • ₹{booking.proposedPrice || booking.price}</div>
+                                        <div className="text-xs text-gray-500">{booking.date} • {booking.slot || formatTime(booking.time)} • ₹{booking.price || booking.proposedPrice || booking.amount}</div>
                                     </div>
                                     <button
                                         onClick={() => setTimelineBooking(booking)}

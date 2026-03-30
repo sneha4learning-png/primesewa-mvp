@@ -406,7 +406,7 @@ const ProviderDashboard = () => {
                                         <p className="text-slate-400 font-normal text-sm tracking-wider mt-1">#{job.id}</p>
                                     </div>
                                     <span className="px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl font-medium text-sm border border-indigo-100">
-                                        ₹{job.proposedPrice || job.price}
+                                        ₹{job.price || job.proposedPrice || job.amount}
                                     </span>
                                 </div>
                                 <div className="space-y-3 text-sm font-medium text-slate-600 mb-6 bg-slate-50 p-4 rounded-2xl">
@@ -451,7 +451,7 @@ const ProviderDashboard = () => {
                                         </a>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{formatTime(job.time)}</span>
+                                        <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{job.slot || formatTime(job.time)}</span>
                                     </div>
                                 </div>
                                 {/* Live Tracker Status Buttons */}
@@ -591,7 +591,7 @@ const ProviderDashboard = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{formatTime(req.time)}</span>
+                                            <Clock className="w-4 h-4 text-slate-400 shrink-0" /> <span className="font-normal text-slate-700">{req.slot || formatTime(req.time)}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Phone className="w-4 h-4 text-slate-400 shrink-0" />
