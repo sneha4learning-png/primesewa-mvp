@@ -180,12 +180,10 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                     </div>
                     <div className="absolute -bottom-10 left-10 z-20">
                         <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-3xl flex items-center justify-center text-3xl sm:text-4xl font-black text-indigo-600 border-[6px] border-white shadow-2xl shadow-indigo-600/20 overflow-hidden group/modal-avatar">
-                            {(() => {
-                                const fallbackImg = p.gender === 'female' || category.toLowerCase() === 'salon' 
-                                    ? '/avatars/female_pro.png'
-                                    : '/avatars/male_pro.png';
-                                return <img src={p.photoURL || fallbackImg} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover/modal-avatar:scale-110" />;
-                            })()}
+                            <div className="w-full h-full bg-slate-50 flex items-center justify-center relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-indigo-700 opacity-20"></div>
+                                <UserCircle className="w-16 h-16 text-indigo-600 relative z-10" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -510,13 +508,17 @@ const CustomerHome = () => {
                                     <p className="text-[11px] font-bold text-slate-400 capitalize">Expert: {pendingBookingData?.provider || 'Professional'}</p>
                                 </div>
                                 <div className="flex items-end justify-between pt-6 border-t border-white/10">
-                                    <div>
+                                    <div className="flex-1">
                                         <p className="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">Total Payable Amount</p>
                                         <p className="text-4xl font-black text-white tracking-tighter">₹{pendingBookingData?.price}</p>
                                         {selectedSubServices.length === 0 && (
-                                            <p className="text-[8px] font-bold text-indigo-400 uppercase tracking-widest mt-2 animate-pulse flex items-center gap-1">
-                                                <AlertCircle className="w-3 h-3" /> Expert Visiting Fee Applied
-                                            </p>
+                                            <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3 animate-pulse">
+                                                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+                                                <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest leading-normal">
+                                                    Expert Visiting Fee Applied <br/>
+                                                    <span className="text-[8px] text-amber-200/40 font-medium normal-case tracking-normal">As no additional sub-services are selected, the base professional visiting fee of ₹199 is being applied for the expert's inspection & consultation.</span>
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
                                     <Sparkles className="w-8 h-8 text-indigo-400 opacity-20" />
@@ -694,13 +696,12 @@ const CustomerHome = () => {
                                                 )}
                                                 
                                                 <div className="flex items-center gap-6 mb-8">
-                                                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-3xl font-black text-indigo-600 border border-slate-100 shadow-inner group-hover:scale-105 transition-all relative overflow-hidden bg-slate-50">
-                                                        {(() => {
-                                                            const fallbackImg = p.gender === 'female' || p.category?.toLowerCase() === 'salon' 
-                                                                ? '/avatars/female_pro.png'
-                                                                : '/avatars/male_pro.png';
-                                                            return <img src={p.photoURL || fallbackImg} alt="" className="w-full h-full object-cover" />;
-                                                        })()}
+                                                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center border border-slate-100 shadow-inner group-hover:scale-105 transition-all relative overflow-hidden bg-slate-50">
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-indigo-100/50"></div>
+                                                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg relative z-10 transition-transform group-hover:rotate-12">
+                                                            {initial}
+                                                        </div>
+                                                        <UserCircle className="absolute w-full h-full text-indigo-100/50 -bottom-4 -right-4 opacity-50" />
                                                     </div>
                                                     <div>
                                                         <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-2">{p.name}</h4>
