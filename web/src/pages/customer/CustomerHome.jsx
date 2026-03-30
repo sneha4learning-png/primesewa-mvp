@@ -412,7 +412,10 @@ const CustomerHome = () => {
 
     const confirmBooking = async (e) => {
         e.preventDefault();
-        if (!bookingSlot) return;
+        if (!bookingSlot) {
+            alert("Please select a time slot for your appointment.");
+            return;
+        }
         setIsSubmitting(true);
         try {
             const booking = {
@@ -433,6 +436,9 @@ const CustomerHome = () => {
             await addDoc(collection(db, 'bookings'), booking);
             setBookingStep(2);
             setTimeout(() => setBookingStep(0), 3000);
+        } catch (err) {
+            console.error("Booking Error:", err);
+            alert("Could not process booking: " + err.message);
         } finally { setIsSubmitting(false); }
     };
 
