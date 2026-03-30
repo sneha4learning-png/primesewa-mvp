@@ -31,31 +31,16 @@ class ErrorBoundary extends Component {
 
 const categories = [
     { 
-        id: '1', name: 'Plumbing', icon: Droplets, color: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-500', type: 'Job-based', subtitle: 'Pipes & Taps',
-        subServices: [
-            { name: 'Drilling & Hanging (up to 4)', price: 149 },
-            { name: 'Tap Repair/Installation', price: 199 },
-            { name: 'Toilet Flush Repair', price: 349 },
-            { name: 'Water Tank Cleaning', price: 999 }
-        ]
+        id: '1', name: 'Plumbing', icon: Droplets, color: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-500', type: 'Hourly-based', subtitle: 'Pipes & Taps',
+        subServices: [] // Hourly services don't strictly require sub-categories
     },
     { 
-        id: '2', name: 'Electrical', icon: Zap, color: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-500', type: 'Job-based', subtitle: 'Wiring & Fixes',
-        subServices: [
-            { name: 'Switch/Socket Repair', price: 99 },
-            { name: 'Fan Repair/Installation', price: 299 },
-            { name: 'MCB/Fuse Check-up', price: 249 },
-            { name: 'Complete Home Wiring Check', price: 1499 }
-        ]
+        id: '2', name: 'Electrical', icon: Zap, color: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-500', type: 'Hourly-based', subtitle: 'Wiring & Fixes',
+        subServices: []
     },
     { 
-        id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500', type: 'Job-based', subtitle: 'Deep Clean',
-        subServices: [
-            { name: 'Bathroom Deep Cleaning', price: 499 },
-            { name: 'Kitchen Deep Cleaning', price: 899 },
-            { name: 'Sofa/Carpet Cleaning', price: 749 },
-            { name: 'Full Home Cleaning (1BHK)', price: 1999 }
-        ]
+        id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500', type: 'Hourly-based', subtitle: 'Deep Clean',
+        subServices: []
     },
     { 
         id: '4', name: 'Carpentry', icon: Wrench, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500', type: 'Job-based', subtitle: 'Furniture',
@@ -779,8 +764,8 @@ const CustomerHome = () => {
     const handleBook = (provider) => {
         const categoryData = categories.find(c => c.name === (Array.isArray(provider.category) ? provider.category[0] : provider.category));
         
-        // If the category has sub-services but none is selected, alert the user
-        if (categoryData?.subServices && !selectedSubService) {
+        // Only require sub-service selection if the category is Job-based and has options
+        if (categoryData?.type === 'Job-based' && categoryData?.subServices?.length > 0 && !selectedSubService) {
             alert(`Please select a specific ${selectedCategory} service first.`);
             window.scrollTo({ top: catalogRef.current?.offsetTop - 150, behavior: 'smooth' });
             return;
@@ -1508,8 +1493,8 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        {/* Service Selection UI (Urban Company Style) */}
-                        {selectedCategory && (
+                        {/* Service Selection UI (Urban Company Style) - ONLY FOR JOB-BASED */}
+                        {selectedCategory && categories.find(c => c.name === selectedCategory)?.type === 'Job-based' && (
                             <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
                                 <h3 className="text-xl font-medium text-slate-800 mb-6 flex items-center gap-3">
                                     <Sparkles className="w-5 h-4 text-indigo-500" />
