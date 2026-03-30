@@ -30,16 +30,96 @@ class ErrorBoundary extends Component {
 }
 
 const categories = [
-    { id: '1', name: 'Plumbing', icon: Droplets, color: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-500', type: 'Job-based', subtitle: 'Pipes & Taps' },
-    { id: '2', name: 'Electrical', icon: Zap, color: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-500', type: 'Job-based', subtitle: 'Wiring & Fixes' },
-    { id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500', type: 'Job-based', subtitle: 'Deep Clean' },
-    { id: '4', name: 'Carpentry', icon: Wrench, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500', type: 'Job-based', subtitle: 'Furniture' },
-    { id: '5', name: 'Painting', icon: Sparkles, color: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-500', type: 'Job-based', subtitle: 'Home Wall' },
-    { id: '6', name: 'AC Repair', icon: Wrench, color: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-500', type: 'Job-based', subtitle: 'Cooling' },
-    { id: '7', name: 'Appliance Repair', icon: Zap, color: 'from-rose-500/10 to-rose-600/5', iconColor: 'text-rose-500', type: 'Job-based', subtitle: 'Fridge & TV' },
-    { id: '10', name: 'Salon for Men', icon: Sparkles, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500', type: 'Job-based', subtitle: 'Haircare' },
-    { id: '12', name: 'Salon for Women', icon: Sparkles, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500', type: 'Job-based', subtitle: 'Beauty' },
-    { id: '9', name: 'Pest Control', icon: ShieldCheck, color: 'from-red-500/10 to-red-600/5', iconColor: 'text-red-500', type: 'Job-based', subtitle: 'Protection' },
+    { 
+        id: '1', name: 'Plumbing', icon: Droplets, color: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-500', type: 'Job-based', subtitle: 'Pipes & Taps',
+        subServices: [
+            { name: 'Drilling & Hanging (up to 4)', price: 149 },
+            { name: 'Tap Repair/Installation', price: 199 },
+            { name: 'Toilet Flush Repair', price: 349 },
+            { name: 'Water Tank Cleaning', price: 999 }
+        ]
+    },
+    { 
+        id: '2', name: 'Electrical', icon: Zap, color: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-500', type: 'Job-based', subtitle: 'Wiring & Fixes',
+        subServices: [
+            { name: 'Switch/Socket Repair', price: 99 },
+            { name: 'Fan Repair/Installation', price: 299 },
+            { name: 'MCB/Fuse Check-up', price: 249 },
+            { name: 'Complete Home Wiring Check', price: 1499 }
+        ]
+    },
+    { 
+        id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500', type: 'Job-based', subtitle: 'Deep Clean',
+        subServices: [
+            { name: 'Bathroom Deep Cleaning', price: 499 },
+            { name: 'Kitchen Deep Cleaning', price: 899 },
+            { name: 'Sofa/Carpet Cleaning', price: 749 },
+            { name: 'Full Home Cleaning (1BHK)', price: 1999 }
+        ]
+    },
+    { 
+        id: '4', name: 'Carpentry', icon: Wrench, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500', type: 'Job-based', subtitle: 'Furniture',
+        subServices: [
+            { name: 'Hinge/Handle Repair', price: 99 },
+            { name: 'Furniture Assembly', price: 499 },
+            { name: 'Door Repair/Polishing', price: 399 },
+            { name: 'New Wardrobe/Cabinet', price: 2499 }
+        ]
+    },
+    { 
+        id: '5', name: 'Painting', icon: Sparkles, color: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-500', type: 'Job-based', subtitle: 'Home Wall',
+        subServices: [
+            { name: 'Single Wall Painting', price: 399 },
+            { name: 'Kitchen Damp Treatment', price: 899 },
+            { name: 'Wall Putty/Texture', price: 599 },
+            { name: 'Full Home Painting Consultation', price: 0 }
+        ]
+    },
+    { 
+        id: '6', name: 'AC Repair', icon: Wrench, color: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-500', type: 'Job-based', subtitle: 'Cooling',
+        subServices: [
+            { name: 'AC Servicing (Split)', price: 499 },
+            { name: 'Gas Charging', price: 1899 },
+            { name: 'PCB Repair', price: 1299 },
+            { name: 'AC Installation', price: 999 }
+        ]
+    },
+    { 
+        id: '7', name: 'Appliance Repair', icon: Zap, color: 'from-rose-500/10 to-rose-600/5', iconColor: 'text-rose-500', type: 'Job-based', subtitle: 'Fridge & TV',
+        subServices: [
+            { name: 'Washing Machine Repair', price: 399 },
+            { name: 'Refrigerator Repair', price: 449 },
+            { name: 'Microwave/Oven Repair', price: 299 },
+            { name: 'TV/LED Panel Fix', price: 799 }
+        ]
+    },
+    { 
+        id: '10', name: 'Salon for Men', icon: Sparkles, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500', type: 'Job-based', subtitle: 'Haircare',
+        subServices: [
+            { name: 'Haircut + Styling', price: 199 },
+            { name: 'Beard Trimming/Shave', price: 149 },
+            { name: 'Hair Color/Dye', price: 499 },
+            { name: 'Men\'s Facial/Clean-up', price: 699 }
+        ]
+    },
+    { 
+        id: '12', name: 'Salon for Women', icon: Sparkles, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500', type: 'Job-based', subtitle: 'Beauty',
+        subServices: [
+            { name: 'Threading/Waxing', price: 99 },
+            { name: 'Hair Cut & Blow Dry', price: 599 },
+            { name: 'Facial & Bleach', price: 1199 },
+            { name: 'Manicure/Pedicure', price: 799 }
+        ]
+    },
+    { 
+        id: '9', name: 'Pest Control', icon: ShieldCheck, color: 'from-red-500/10 to-red-600/5', iconColor: 'text-red-500', type: 'Job-based', subtitle: 'Protection',
+        subServices: [
+            { name: 'General Pest Control', price: 699 },
+            { name: 'Cockroach Management', price: 899 },
+            { name: 'Termite Protection', price: 1499 },
+            { name: 'Bed Bug Treatment', price: 1199 }
+        ]
+    },
 ];
 
 const availableSlots = [
@@ -274,6 +354,7 @@ const CustomerHome = () => {
     const [addressSearchTimeout, setAddressSearchTimeout] = useState(null);
     const [chartData, setChartData] = useState([]);
     const [slotError, setSlotError] = useState('');
+    const [selectedSubService, setSelectedSubService] = useState(null);
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -696,21 +777,24 @@ const CustomerHome = () => {
     };
 
     const handleBook = (provider) => {
-        // Safely parse price whether it's a string (e.g. '₹500/hr') or a number
-        const rawPrice = provider.price;
-        const parsedPrice = typeof rawPrice === 'number'
-            ? rawPrice
-            : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
-
         const categoryData = categories.find(c => c.name === (Array.isArray(provider.category) ? provider.category[0] : provider.category));
+        
+        // If the category has sub-services but none is selected, alert the user
+        if (categoryData?.subServices && !selectedSubService) {
+            alert(`Please select a specific ${selectedCategory} service first.`);
+            window.scrollTo({ top: catalogRef.current?.offsetTop - 150, behavior: 'smooth' });
+            return;
+        }
+
+        const finalServiceName = selectedSubService ? `${selectedCategory} - ${selectedSubService.name}` : (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Plumbing';
+        const finalPrice = selectedSubService ? selectedSubService.price : (typeof provider.price === 'number' ? provider.price : parseInt((provider.price || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500);
 
         const newBooking = {
             id: `B${Math.floor(Math.random() * 10000)}`,
-            service: (Array.isArray(provider.category) ? provider.category.join(', ') : provider.category) || selectedCategory || 'Plumbing',
+            service: finalServiceName,
             serviceType: categoryData?.type || 'Job-based',
             status: 'pending',
             provider: provider.name || 'Provider',
-            // Prioritize the ID if it looks like a real Auth UID, otherwise use .uid field
             providerUid: (provider.id && provider.id.length >= 20 && !provider.id.includes('-')) 
                 ? provider.id 
                 : (provider.uid && !provider.uid.startsWith('mock-') ? provider.uid : provider.id),
@@ -718,7 +802,7 @@ const CustomerHome = () => {
             previousWorkSample: provider.previousWorkSample,
             portfolio: provider.portfolio || [],
             customer: userData?.uid === 'mock-cust' ? 'Guest User' : (userData?.name || 'Customer'),
-            price: parsedPrice
+            price: finalPrice
         };
 
         setPendingBookingData(newBooking);
@@ -1027,7 +1111,7 @@ const CustomerHome = () => {
                 {categories.map(cat => (
                     <button 
                         key={cat.id} 
-                        onClick={() => { setSelectedCategory(cat.name); window.scrollTo({ top: catalogRef.current?.offsetTop - 100, behavior: 'smooth' }); }}
+                        onClick={() => { setSelectedCategory(cat.name); setSelectedSubService(null); window.scrollTo({ top: catalogRef.current?.offsetTop - 100, behavior: 'smooth' }); }}
                         className="flex flex-col items-center gap-3 transition-transform hover:scale-110 active:scale-95 group"
                     >
                         <div className={`w-14 h-14 md:w-16 md:h-16 rounded-[1.25rem] bg-white border border-slate-100 shadow-sm flex items-center justify-center transition-all group-hover:shadow-indigo-500/10 group-hover:border-indigo-100 ${selectedCategory === cat.name ? 'border-indigo-600 bg-indigo-50/50 ring-4 ring-indigo-500/10' : ''}`}>
@@ -1424,6 +1508,41 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
+                        {/* Service Selection UI (Urban Company Style) */}
+                        {selectedCategory && (
+                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
+                                <h3 className="text-xl font-medium text-slate-800 mb-6 flex items-center gap-3">
+                                    <Sparkles className="w-5 h-4 text-indigo-500" />
+                                    Select your {selectedCategory} requirement:
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => (
+                                        <button
+                                            key={sub.name}
+                                            onClick={() => setSelectedSubService(sub)}
+                                            className={`p-6 rounded-[2rem] border text-left transition-all relative overflow-hidden group ${selectedSubService?.name === sub.name ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'bg-slate-50 border-slate-100 text-slate-700 hover:border-indigo-200 hover:bg-white hover:shadow-lg'}`}
+                                        >
+                                            <div className="relative z-10">
+                                                <div className={`text-[8px] font-black uppercase tracking-widest mb-3 ${selectedSubService?.name === sub.name ? 'text-indigo-100' : 'text-slate-400'}`}>Recommended</div>
+                                                <div className="text-xs font-bold mb-5 leading-relaxed h-10 line-clamp-2">{sub.name}</div>
+                                                <div className="flex items-center justify-between mt-auto">
+                                                    <span className="text-lg font-black tracking-tighter">₹{sub.price}</span>
+                                                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${selectedSubService?.name === sub.name ? 'bg-white/20 text-white' : 'bg-white text-indigo-600 shadow-sm border border-slate-200'}`}>
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {selectedSubService?.name === sub.name && (
+                                                <div className="absolute top-0 right-0 p-4">
+                                                    <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                                                </div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Top Providers with Filters */}
                         <div className="space-y-8" ref={catalogRef} id="service-catalog">
                             <div className="flex items-end justify-between">
@@ -1501,33 +1620,31 @@ const CustomerHome = () => {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="flex flex-col items-end whitespace-nowrap">
+                                                                                    <div className="flex flex-col items-end whitespace-nowrap">
                                                             <div className="flex items-baseline gap-0.5">
                                                                 {(() => {
                                                                     const rawPrice = String(p.price || '499');
                                                                     const pCats = (Array.isArray(p.category) ? p.category : [p.category || '']).map(c => String(c).toLowerCase().trim());
                                                                     const catObj = categories.find(c => pCats.includes(c.name.toLowerCase()));
                                                                     const defaultUnit = catObj?.type === 'Hourly-based' ? 'hr' : 'job';
-                                                                    
-                                                                                                                                         // Unused var removed
-
                                                                     const pricePart = rawPrice.replace('₹', '').split('/')[0].trim();
-                                                                    
-                                                                    // Force unit based on category type regardless of price string to preserve data integrity
                                                                     const unitPart = defaultUnit; 
                                                                     
                                                                     return (
                                                                         <>
                                                                             <span className="text-xs font-medium text-slate-950">₹</span>
-                                                                            <span className="text-xl font-medium text-slate-950 tracking-tighter">{pricePart}</span>
+                                                                            <span className="text-xl font-medium text-slate-950 tracking-tighter">
+                                                                                {selectedSubService ? selectedSubService.price : pricePart}
+                                                                            </span>
                                                                             <span className="text-slate-400 text-[9px] font-normal">/{unitPart}</span>
                                                                         </>
                                                                     );
                                                                 })()}
                                                             </div>
-                                                            <p className="text-[7px] font-medium text-slate-300 uppercase tracking-widest leading-none">Starting Rate</p>
-                                                        </div>
+                                                            <p className="text-[7px] font-medium text-slate-300 uppercase tracking-widest leading-none">
+                                                                {selectedSubService ? 'Service Rate' : 'Starting Rate'}
+                                                            </p>
+                                                        </div>                                  </div>
                                                     </div>
 
                                                     <div className="flex items-center gap-6 mb-6 border-t border-slate-50 pt-6">
