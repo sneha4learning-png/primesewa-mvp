@@ -365,14 +365,17 @@ const CustomerHome = () => {
             return;
         }
 
-        // CORRECT LOGIC: BASE RATE + SUM OF SERVICES
-        const baseRate = parseFloat(String(provider.price || 150).replace(/₹|\/hr/g, '')) || 150;
-        const servicesTotal = selectedSubServices.reduce((sum, s) => sum + (provider.subServiceRates?.[s.name] || s.price), 0);
+        // CORRECT LOGIC: BASE RATE (Capped at 199) + SUM OF SERVICES
+        const baseRate = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
+        const servicesTotal = selectedSubServices.reduce((sum, s) => sum + (s.price || 0), 0);
         const finalTotal = baseRate + servicesTotal;
         
         setPendingBookingData({ 
-            ...provider, 
+            provider: provider.name,
+            providerUid: provider.id || provider.uid,
+            providerPhone: provider.phone || '',
             price: finalTotal, 
+            category: selectedCategory,
             service: `${selectedCategory} (${selectedSubServices.map(s => s.name).join(', ')})` 
         });
         setBookingStep(1);
@@ -512,12 +515,17 @@ const CustomerHome = () => {
                                 <h3 className="text-xl font-medium text-slate-100 mb-2 leading-tight uppercase tracking-tight">{pendingBookingData?.service}</h3>
                                 <div className="flex items-center gap-2 mb-6">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                    <p className="text-[11px] font-bold text-slate-400 capitalize">Expert: {pendingBookingData?.name || 'Professional'}</p>
+                                    <p className="text-[11px] font-bold text-slate-400 capitalize">Expert: {pendingBookingData?.provider || 'Professional'}</p>
                                 </div>
                                 <div className="flex items-end justify-between pt-6 border-t border-white/10">
                                     <div>
                                         <p className="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">Total Payable Amount</p>
                                         <p className="text-4xl font-black text-white tracking-tighter">₹{pendingBookingData?.price}</p>
+                                        {selectedSubServices.length === 0 && (
+                                            <p className="text-[8px] font-bold text-indigo-400 uppercase tracking-widest mt-2 animate-pulse flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" /> Expert Visiting Fee Applied
+                                            </p>
+                                        )}
                                     </div>
                                     <Sparkles className="w-8 h-8 text-indigo-400 opacity-20" />
                                 </div>
@@ -720,7 +728,8 @@ const CustomerHome = () => {
                                                         <p className="text-3xl font-black text-slate-950 tracking-tighter">
                                                             ₹{(() => {
                                                                 const base = Math.min(parseInt(String(p.price || 149).replace(/\D/g, '')), 199);
-                                                                return selectedSubServices.length > 0 ? (price + base) : base;
+                                                                const subTotal = selectedSubServices.reduce((a,b) => a + (b.price || 0), 0);
+                                                                return subTotal + base;
                                                             })()}
                                                         </p>
                                                     </div>
