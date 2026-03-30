@@ -525,6 +525,25 @@ The system is now a clean slate for fresh testing! 🏁
                     </div>
                 </div>
             )}
+            
+            {/* DANGER ZONE: CLEAN SLATE UTILITY */}
+            <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col items-center">
+                <p className="text-xs text-gray-400 uppercase tracking-widest mb-4 font-black">Platform Management Area</p>
+                <div className="flex gap-4">
+                    <button 
+                        onClick={handleHardReset}
+                        className="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 font-black text-[10px] uppercase tracking-widest rounded-xl border border-rose-100 shadow-sm transition-all hover:scale-105 active:scale-95"
+                    >
+                        🔴 Hard Reset: Wipe All Mock Data
+                    </button>
+                    <button 
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="px-8 py-3 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95"
+                    >
+                        Back to Top
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
