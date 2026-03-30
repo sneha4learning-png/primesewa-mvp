@@ -208,7 +208,8 @@ const DashboardOverview = () => {
                 batch.update(d.ref, {
                     rating: resetRating,
                     isExpert: isExpert,
-                    subServiceRates: customRates, // DYNAMIC PRICING PER PROVIDER
+                    isOnline: true, // CRITICAL FIX: ENSURES CUSTOMERS CAN SEE THEM
+                    subServiceRates: customRates,
                     ratingCount: 15,
                     jobs: 15,
                     status: 'active',
