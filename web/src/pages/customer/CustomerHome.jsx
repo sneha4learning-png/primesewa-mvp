@@ -182,8 +182,8 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                         <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-3xl flex items-center justify-center text-3xl sm:text-4xl font-black text-indigo-600 border-[6px] border-white shadow-2xl shadow-indigo-600/20 overflow-hidden group/modal-avatar">
                             {(() => {
                                 const fallbackImg = p.gender === 'female' || category.toLowerCase() === 'salon' 
-                                    ? 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_female_indian_pro_1774869328081.png'
-                                    : 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_male_indian_pro_1774869304643.png';
+                                    ? '/avatars/female_pro.png'
+                                    : '/avatars/male_pro.png';
                                 return <img src={p.photoURL || fallbackImg} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover/modal-avatar:scale-110" />;
                             })()}
                         </div>
@@ -697,8 +697,8 @@ const CustomerHome = () => {
                                                     <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-3xl font-black text-indigo-600 border border-slate-100 shadow-inner group-hover:scale-105 transition-all relative overflow-hidden bg-slate-50">
                                                         {(() => {
                                                             const fallbackImg = p.gender === 'female' || p.category?.toLowerCase() === 'salon' 
-                                                                ? 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_female_indian_pro_1774869328081.png'
-                                                                : 'C:/Users/indianic/.gemini/antigravity/brain/fb9e4e7f-1659-408c-978e-e42dee30f677/provider_avatar_male_indian_pro_1774869304643.png';
+                                                                ? '/avatars/female_pro.png'
+                                                                : '/avatars/male_pro.png';
                                                             return <img src={p.photoURL || fallbackImg} alt="" className="w-full h-full object-cover" />;
                                                         })()}
                                                     </div>
