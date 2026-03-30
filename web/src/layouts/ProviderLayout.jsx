@@ -61,7 +61,7 @@ const ProviderLayout = () => {
 
     const navLinkClass = ({ isActive }) =>
         `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive
-            ? 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-400 shadow-inner border border-indigo-500/20'
+            ? 'bg-gradient-to-r from-indigo-600/20 to-violet-600/20 text-indigo-400 shadow-inner border border-indigo-500/20'
             : 'text-slate-400 hover:bg-white/5 hover:text-white'}`;
 
     const renderSidebarInner = () => (
@@ -111,7 +111,7 @@ const ProviderLayout = () => {
     return (
         <div className="flex h-screen bg-[#F8FAFC]">
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-72 bg-[#0F172A] border-r border-[#1E293B] flex-col relative overflow-hidden">
+            <aside className="hidden lg:flex w-72 bg-gradient-to-br from-indigo-950 to-violet-950 border-r border-white/10 flex-col relative overflow-hidden">
                 {renderSidebarInner()}
             </aside>
 
@@ -119,7 +119,7 @@ const ProviderLayout = () => {
             {sidebarOpen && (
                 <div className="lg:hidden fixed inset-0 z-50 flex">
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-                    <aside className="relative w-72 bg-[#0F172A] flex flex-col overflow-hidden z-10">
+                    <aside className="relative w-72 bg-gradient-to-br from-indigo-950 to-violet-950 flex flex-col overflow-hidden z-10">
                         {renderSidebarInner()}
                     </aside>
                 </div>

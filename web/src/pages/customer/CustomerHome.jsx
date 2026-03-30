@@ -237,7 +237,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                             </div>
                         </div>
                     )}
-                    <div className="bg-slate-900 rounded-3xl p-5 flex items-center justify-between border border-white/10">
+                    <div className="bg-slate-900 rounded-3xl p-5 flex items-center justify-between border border-white/10 mb-4">
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center"><ShieldCheck className="w-5 h-5 text-indigo-400" /></div>
                             <div>
@@ -246,6 +246,18 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                             </div>
                         </div>
                         <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div className="p-5 bg-indigo-50/50 rounded-3xl border border-indigo-100/50">
+                        <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0"><Star className="w-4 h-4 text-indigo-600 fill-current" /></div>
+                            <div>
+                                <h4 className="text-[10px] font-black text-slate-900 mb-1 leading-none uppercase tracking-widest">Expert Pick & Ratings</h4>
+                                <p className="text-[9px] text-slate-500 leading-relaxed font-medium">
+                                    <strong>Expert Pick:</strong> Algorithms badge for pros with 4.8+ rating and consistent success.<br/>
+                                    <strong>Rating:</strong> Average score from direct verified customer feedback.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -483,7 +495,7 @@ const CustomerHome = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-8 md:py-12 animate-fade-in">
-            <div className={`mb-12 relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-slate-950 p-12 md:p-32' : 'bg-white border border-slate-100 p-8 md:p-14'}`}>
+            <div className={`mb-12 relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-gradient-to-br from-indigo-950 via-indigo-900 to-violet-950 p-12 md:p-32 text-white' : 'bg-gradient-to-br from-white via-white to-indigo-50/30 border border-slate-100 p-8 md:p-14'}`}>
                 <div className="relative z-10 max-w-4xl mx-auto text-center">
                     <h1 className={`text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.9] mb-6 ${!userData?.uid ? 'text-white' : 'text-slate-900 font-medium'}`}>
                         {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Platform for Prime Services'}
@@ -689,7 +701,7 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        <button type="submit" disabled={isSubmitting} className="w-full py-6 bg-indigo-600 hover:bg-slate-950 text-white rounded-3xl font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-indigo-600/40 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3">
+                        <button type="submit" disabled={isSubmitting} className="w-full py-6 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-3xl font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-indigo-600/40 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3">
                             {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
                             {isSubmitting ? 'Finalizing Your Request...' : 'Confirm & Proceed to Booking'}
                         </button>
