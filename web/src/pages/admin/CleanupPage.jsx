@@ -148,68 +148,43 @@ const CleanupPage = () => {
                     <button
                         onClick={async () => {
                             setLoading(true);
-                            setStatus('📱 Fixing Provider Numbers...');
+                            setStatus('🧼 Zeroing All Metrics...');
                             try {
-                                const snapshot = await getDocs(collection(db, 'providers'));
-                                const batch = writeBatch(db);
-                                let count = 0;
-                                let index = 0;
-                                snapshot.forEach(d => {
-                                    const data = d.data();
-                                    // Identify the "wrong" numbers from the screenshot (+91 91000 00000 or variations)
-                                    const raw = (data.phone || '').replace(/\D/g, '');
-                                    if (raw === '919100000000' || raw === '9100000000' || raw.includes('91000')) {
-                                        // Base number provided by user: 7777777777
-                                        // To make it unique, we'll use 77777777 & then a 2-digit index
-                                        const newPhone = `+91 77777777${String(index).padStart(2, '0')}`;
-                                        batch.update(doc(db, 'providers', d.id), { phone: newPhone });
-                                        count++;
-                                        index++;
-                                    }
-                                });
-                                await batch.commit();
-                                setStatus(`✅ SUCCESS! Corrected ${count} provider numbers to the 777- series.`);
-                            } catch (err) {
-                                setStatus(`❌ ERROR: ${err.message}`);
-                            } finally {
-                                setLoading(false);
-                            }
-                        }}
-                        disabled={loading}
-                        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 active:scale-95'}`}
-                    >
-                        Correct Provider Numbers (7777777777)
-                    </button>
-
-                    <button
-                        onClick={async () => {
-                            setLoading(true);
-                            setStatus('📊 Syncing Job Counts...');
-                            try {
-                                const bookingsSnap = await getDocs(collection(db, 'bookings'));
                                 const providersSnap = await getDocs(collection(db, 'providers'));
+                                const bookingsSnap = await getDocs(collection(db, 'bookings'));
                                 const batch = writeBatch(db);
                                 
-                                const counts = new Map();
+                                // 1. Map actual counts and ratings from EVERYTHING current
+                                const jobCounts = new Map();
+                                const ratingsSum = new Map();
+                                const ratingsCount = new Map();
+
                                 bookingsSnap.forEach(d => {
                                     const b = d.data();
                                     if (b.status === 'completed' && b.provider) {
-                                        counts.set(b.provider, (counts.get(b.provider) || 0) + 1);
+                                        jobCounts.set(b.provider, (jobCounts.get(b.provider) || 0) + 1);
+                                        if (b.rating && b.rating > 0) {
+                                            ratingsSum.set(b.provider, (ratingsSum.get(b.provider) || 0) + b.rating);
+                                            ratingsCount.set(b.provider, (ratingsCount.get(b.provider) || 0) + 1);
+                                        }
                                     }
                                 });
 
                                 let updated = 0;
                                 providersSnap.forEach(d => {
                                     const p = d.data();
-                                    const actual = counts.get(p.name) || 0;
-                                    if (p.jobs !== actual) {
-                                        batch.update(doc(db, 'providers', d.id), { jobs: actual });
-                                        updated++;
-                                    }
+                                    const actualJobs = jobCounts.get(p.name) || 0;
+                                    const avgRating = ratingsCount.get(p.name) ? (ratingsSum.get(p.name) / ratingsCount.get(p.name)).toFixed(1) : 0;
+                                    
+                                    batch.update(doc(db, 'providers', d.id), { 
+                                        jobs: actualJobs,
+                                        rating: parseFloat(avgRating) 
+                                    });
+                                    updated++;
                                 });
 
                                 await batch.commit();
-                                setStatus(`✅ SUCCESS! Synchronized job counts for ${updated} providers.`);
+                                setStatus(`✅ SUCCESS! Recalculated ${updated} profiles from current bookings.`);
                             } catch (err) {
                                 setStatus(`❌ ERROR: ${err.message}`);
                             } finally {
@@ -217,11 +192,10 @@ const CleanupPage = () => {
                             }
                         }}
                         disabled={loading}
-                        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 active:scale-95'}`}
+                        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 active:scale-95'}`}
                     >
-                        Sync Global Job Counts (Profiles ↔ Bookings)
+                        Sync Profiles (Ratings & Jobs ↔ Bookings)
                     </button>
-
                     <button
                         onClick={unblockAll}
                         disabled={loading}
