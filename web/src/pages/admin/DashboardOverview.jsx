@@ -62,18 +62,20 @@ const DashboardOverview = () => {
                     .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
                     .slice(0, 5);
 
-                const pendingBookingsCount = bookings.filter(b => b.status === 'pending').length;
                 const activeProvidersCount = providers.filter(p => p.status === 'active').length;
 
                 let totalCommission = 0;
                 let totalRevenue = 0;
+                let totalPendingJobs = 0;
 
-                const completedBookings = bookings.filter(b => b.status === 'completed');
-                completedBookings.forEach(b => {
-                    const rawPrice = b.proposedPrice || b.price || b.amount || 0;
-                    const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
-                    totalRevenue += amount;
-                    totalCommission += amount * 0.15;
+                allBookings.forEach(b => {
+                    if (b.status === 'pending') totalPendingJobs++;
+                    if (b.status === 'completed') {
+                        const rawPrice = b.proposedPrice || b.price || b.amount || 0;
+                        const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                        totalRevenue += amount;
+                        totalCommission += amount * 0.15;
+                    }
                 });
 
                 // Generate Chart Data (Last 7 Days)
@@ -83,7 +85,7 @@ const DashboardOverview = () => {
                     return { date: d.toISOString().split('T')[0], label: d.toLocaleDateString('en-US', { weekday: 'short' }), bookings: 0, revenue: 0 };
                 });
 
-                bookings.forEach(b => {
+                allBookings.forEach(b => {
                     const bDateStr = b.date || (b.createdAt?.toDate ? b.createdAt.toDate().toISOString().split('T')[0] : null);
                     if (bDateStr) {
                         const dayObj = last7Days.find(d => d.date === bDateStr);
@@ -136,12 +138,12 @@ const DashboardOverview = () => {
                     
                     setStats(prev => ({
                         ...prev,
-                        totalBookings: Math.min(bookings.length, 5), // Forced 5 for Demo Fresh Start
-                        pendingBookings: Math.min(pendingBookingsCount, 5),
+                        totalBookings: allBookings.length, 
+                        pendingBookings: totalPendingJobs,
                         totalRevenue: totalRevenue,
                         commissionEarned: totalCommission,
                         activeProviders: activeProvidersCount,
-                        pendingPayouts: Math.min(pendingPayoutsTotal, 1000) // Caps for demo cleanup
+                        pendingPayouts: Math.floor(pendingPayoutsTotal)
                     }));
                 }, (err) => {
                     console.error('Payouts Listener Error:', err);
