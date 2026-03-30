@@ -171,32 +171,43 @@ const DashboardOverview = () => {
                 snap.forEach(d => batch.delete(d.ref));
             }
 
-            // 2. Reset Provider Stats & Categories for Consistency
+            // 2. Reset Provider Stats, Categories & DYNAMIC PRICING
             const pSnap = await getDocs(collection(db, 'providers'));
             pSnap.forEach(d => {
                 const pData = d.data();
                 const name = pData.name || '';
                 let cat = pData.category;
                 
+                // ENSURE CATEGORIES FOR THE DEMO PARTNERS
                 if (name.includes('Anjali')) { cat = 'Salon for Women'; }
                 if (name.includes('Rajesh')) { cat = 'Salon for Men'; }
                 if (name.includes('Sanjay')) { cat = 'Electrical'; }
 
                 let resetRating = '4.8'; 
                 let isExpert = false;
-                if (name.includes('Anjali') || name.includes('Painting') || name.includes('Sparkle')) {
-                    resetRating = '5.0'; 
-                    isExpert = true;
-                }
-                if (name.includes('Rajesh')) { resetRating = '4.7'; }
-                if (name.includes('Sanjay')) { resetRating = '4.9'; }
-                if (name.includes('Priya')) { resetRating = '4.8'; }
-                if (name.includes('Vikram')) { resetRating = '4.7'; }
-                if (name.includes('Neha')) { resetRating = '4.6'; }
+                let multiplier = 1.0;
+
+                if (name.includes('Anjali')) { resetRating = '5.0'; isExpert = true; multiplier = 1.25; }
+                if (name.includes('Rajesh')) { resetRating = '4.7'; multiplier = 0.9; }
+                if (name.includes('Sanjay')) { resetRating = '4.9'; multiplier = 1.05; }
+                if (name.includes('Priya')) { resetRating = '4.8'; multiplier = 1.1; }
+                if (name.includes('Vikram')) { resetRating = '4.7'; multiplier = 1.0; }
+
+                // BUILD DYNAMIC RATES
+                const customRates = {};
+                const basePrices = [
+                    {n: 'Tap Fix', p: 149}, {n: 'Pipe Leak', p: 299}, {n: 'Drain Block', p: 449}, {n: 'Tank Clean', p: 899},
+                    {n: 'Switch Fix', p: 99}, {n: 'Fan Fix', p: 249}, {n: 'MCB Fix', p: 349}, {n: 'Wiring Check', p: 999},
+                    {n: 'Haircut', p: 199}, {n: 'Shave', p: 149}, {n: 'Facial', p: 599}, {n: 'Threading', p: 49}
+                ];
+                basePrices.forEach(x => {
+                    customRates[x.n] = Math.round(x.p * multiplier);
+                });
                 
                 batch.update(d.ref, {
                     rating: resetRating,
                     isExpert: isExpert,
+                    subServiceRates: customRates, // DYNAMIC PRICING PER PROVIDER
                     ratingCount: 15,
                     jobs: 15,
                     status: 'active',
