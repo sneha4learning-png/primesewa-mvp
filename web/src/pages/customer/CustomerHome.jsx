@@ -920,8 +920,7 @@ const CustomerHome = () => {
                 </div>
             )}
 
-            </div>
-            
+
             {/* RECENT HISTORY & CATEGORIES SECTION - SINGLE COLUMN FLOW */}
             <div className="space-y-16">
                 {/* UPGRADED RECENT HISTORY - NOW AT TOP & MORE READABLE */}
@@ -996,6 +995,7 @@ const CustomerHome = () => {
                         ))}
                     </div>
                 </div>
+            </div>
 
             {bookingStep === 1 ? (
                 <div className="max-w-4xl bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 mx-auto animate-fade-in border border-slate-100">
