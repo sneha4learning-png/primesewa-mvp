@@ -133,7 +133,7 @@ const DashboardOverview = () => {
             const top = [...fetched]
                 .filter(p => {
                     const isMock = p.id.startsWith('dev-prov-') || ["Test Provider", "Ace Service Partner", "New provider", "Anjali Premium Beauty", "Rajesh Grooming Studio"].includes(p.name);
-                    return p.status === 'active' && !isMock;
+                    return p.status === 'active' && !isMock && parseInt(p.jobs || 0) > 0; // ONLY SHOW IF JOBS > 0
                 })
                 .sort((a, b) => (parseInt(b.jobs || 0) - parseInt(a.jobs || 0)))
                 .slice(0, 5);
@@ -453,24 +453,6 @@ The system is now ready for production-level testing! 🏁
                 </div>
             )}
             
-            {/* DANGER ZONE: CLEAN SLATE UTILITY */}
-            <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col items-center">
-                <p className="text-xs text-gray-400 uppercase tracking-widest mb-4 font-black">Platform Management Area</p>
-                <div className="flex gap-4">
-                    <button 
-                        onClick={handleHardReset}
-                        className="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 font-black text-[10px] uppercase tracking-widest rounded-xl border border-rose-100 shadow-sm transition-all hover:scale-105 active:scale-95"
-                    >
-                        🔴 Platform Cleanup: Remove All Mock Data
-                    </button>
-                    <button 
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="px-8 py-3 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95"
-                    >
-                        Back to Top
-                    </button>
-                </div>
-            </div>
         </div>
     );
 };
