@@ -84,7 +84,7 @@ const ProviderDashboardContent = () => {
             // Ensure no duplicate IDs enter state (SAFETY CRITICAL)
             const uniqueMap = new Map();
             myBookings.filter(b => b.provider === providerName).forEach(b => uniqueMap.set(b.id, b));
-            const myLiveBookings = Array.from(uniqueMap.values()).slice(0, 5);
+            const myLiveBookings = Array.from(uniqueMap.values()); // REMOVED .slice(0, 5) to allow seeing all relevant jobs
 
             setRequests(myLiveBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
             setActiveJobs(myLiveBookings.filter(b => b.status === 'accepted'));
@@ -152,11 +152,17 @@ const ProviderDashboardContent = () => {
 
     const formatTime = (timeStr) => {
         if (!timeStr) return 'N/A';
+        if (timeStr.includes('-')) return timeStr;
         const [hours, minutes] = timeStr.split(':');
         let hour = parseInt(hours);
         const ampm = hour >= 12 ? 'PM' : 'AM';
-        hour = hour % 12 || 12;
-        return `${hour}:${minutes} ${ampm}`;
+        const displayHour = hour % 12 || 12;
+
+        let endHour = (hour + 1);
+        const endAmpm = endHour >= 24 ? 'AM' : endHour >= 12 ? 'PM' : 'AM';
+        endHour = endHour % 12 || 12;
+
+        return `${displayHour}:${minutes} ${ampm} - ${endHour}:${minutes} ${endAmpm}`;
     };
 
     // Pagination logic
@@ -460,9 +466,28 @@ const ProviderDashboardContent = () => {
                                                 <span className="text-white font-bold text-[8px] uppercase tracking-widest">{job.trackingStatus || 'Active Job'}</span>
                                             </div>
                                             <h3 className="text-2xl font-medium text-white tracking-tight leading-tight">{job.service}</h3>
-                                            <div className="flex items-center gap-2 text-white/40 text-xs mt-2">
-                                                <MapPin className="w-3.5 h-3.5" />
-                                                <span className="truncate max-w-[200px]">{job.address}</span>
+                                            <div className="flex flex-col gap-2 mt-4">
+                                                <div className="flex items-center gap-2 text-white/40 text-xs">
+                                                    <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                                                    <span className="font-bold">{job.date} • {formatTime(job.slot)}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-white/40 text-xs">
+                                                    <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                                                    <span className="truncate max-w-[200px]">{job.houseNo ? `${job.houseNo}, ${job.area}` : (job.address || 'Address registered')}</span>
+                                                </div>
+                                            </div>
+                                            {/* LIVE OSM/GOOGLE TRACKER VIEW */}
+                                            <div className="w-full h-32 rounded-[1.5rem] overflow-hidden border border-white/10 bg-indigo-900/50 mt-4 shadow-inner">
+                                                <iframe 
+                                                   width="100%" 
+                                                   height="100%" 
+                                                   frameBorder="0" 
+                                                   scrolling="no" 
+                                                   marginHeight="0" 
+                                                   marginWidth="0" 
+                                                   src={`https://maps.google.com/maps?width=100%25&height=150&hl=en&q=${encodeURIComponent(job.houseNo ? `${job.houseNo}, ${job.area}` : job.address)}&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
+                                                   style={{ filter: 'invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%)' }}
+                                                ></iframe>
                                             </div>
                                         </div>
                                         <div className="text-right">
