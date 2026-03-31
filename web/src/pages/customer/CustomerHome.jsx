@@ -405,6 +405,11 @@ const CustomerHome = () => {
     }, [userData]);
 
     const handleBook = (provider) => {
+        if (!userData) {
+            alert("Please sign in or register to book a service with our experts.");
+            return;
+        }
+
         // FINAL DYNAMIC PRICE: CUSTOMER SPECIFIC PROVIDER RATE + Sub-Services with unique provider factor
         const baseRate = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
         // Apply a unique experience multiplier based on provider ID (0.94x to 1.14x) for diversity
@@ -431,17 +436,24 @@ const CustomerHome = () => {
 
     const confirmBooking = async (e) => {
         e.preventDefault();
+        
+        if (!userData) {
+            alert("Session expired or you are not signed in. Please sign in to complete your booking.");
+            return;
+        }
+
         if (!bookingSlot) {
             alert("Please select a time slot for your appointment.");
             return;
         }
+        
         setIsSubmitting(true);
         try {
             const booking = {
-                service: pendingBookingData.service,
+                service: pendingBookingData?.service || 'PrimeSewa Service',
                 status: 'pending',
-                provider: pendingBookingData.name,
-                providerUid: pendingBookingData.uid || pendingBookingData.id,
+                provider: pendingBookingData?.name || 'Unassigned',
+                providerUid: pendingBookingData?.uid || pendingBookingData?.id || '',
                 customer: userData.name,
                 customerUid: userData.uid,
                 customerPhone: userData.phone,
