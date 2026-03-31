@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../firebase/config';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { ChevronLeft, Calendar, Clock, MapPin, IndianRupee, ShieldCheck, Phone, CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function BookingDetails() {

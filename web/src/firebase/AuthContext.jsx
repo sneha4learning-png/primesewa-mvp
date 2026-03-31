@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from './config';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -92,8 +93,9 @@ export const AuthProvider = ({ children }) => {
                         localStorage.removeItem('ps_user');
                         localStorage.removeItem('ps_userData');
                     }
-                } catch (e) {
+                } catch (err) {
                     // If parsing fails, just clear everything to be safe
+                    console.error("Auth hydration error:", err);
                     setCurrentUser(null);
                     setUserData(null);
                     localStorage.removeItem('ps_user');

@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useMemo, useRef, Component } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate, useLocation } from 'react-router-dom';
+
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
@@ -131,7 +131,7 @@ const categories = [
     }
 ];
 
-import { useNotifications } from '../../context/NotificationContext';
+
 
 const getServiceImage = (category = '') => {
     const cat = String(category).toLowerCase();
@@ -170,10 +170,8 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
     if (!p) return null;
 
     const name = String(p.name || 'Service Specialist');
-    const initial = name.charAt(0).toUpperCase();
     const category = Array.isArray(p.category) ? String(p.category[0] || 'General') : String(p.category || 'General specialist');
     const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(String(p.rating || 0));
-    const jobs = String(liveJobsCount);
     const price = String(p.price || '499');
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
 
@@ -433,9 +431,7 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
 };
 
 const CustomerHome = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { userData, logout } = useAuth();
+    const { userData } = useAuth();
     const { sendNotification } = useNotifications();
 
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -444,8 +440,8 @@ const CustomerHome = () => {
     const [activeBookings, setActiveBookings] = useState([]);
     const [pastBookings, setPastBookings] = useState([]);
     const [pendingBookingData, setPendingBookingData] = useState(null);
-    const [sortBy, setSortBy] = useState('rating');
-    const [ratingFilter, setRatingFilter] = useState('0');
+    const [sortBy] = useState('rating');
+    const [ratingFilter] = useState('0');
     const [selectedProviderProfile, setSelectedProviderProfile] = useState(null);
     const catalogRef = useRef(null);
     const [bookingDate, setBookingDate] = useState('');
@@ -453,7 +449,7 @@ const CustomerHome = () => {
     const [bookingDesc, setBookingDesc] = useState('');
     const [bookingHouseNo, setBookingHouseNo] = useState('');
     const [bookingArea, setBookingArea] = useState('');
-    const [bookingCity, setBookingCity] = useState('Ahmedabad');
+    const [bookingCity] = useState('Ahmedabad');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLocating, setIsLocating] = useState(false);
@@ -1013,9 +1009,6 @@ const CustomerHome = () => {
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {displayedProviders.length > 0 ? displayedProviders.map(p => {
-                                        const rating = parseFloat(p.rating || 0).toFixed(1);
-                                        const initial = (p.name || 'P').charAt(0).toUpperCase();
-                                        const price = selectedSubServices.reduce((sum, x) => sum + (p.subServiceRates?.[x.name] || x.price), 0);
                                         return (
                                             <div key={p.id} className="bg-white p-7 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
                                                 {/* PERMANENT SOLUTION: USE EXPLICIT EXPERT FLAG FROM DATABASE */}

@@ -186,7 +186,6 @@ const CleanupPage = () => {
                                     }
                                 });
 
-                                let updated = 0;
                                 providersSnap.forEach(d => {
                                     const p = d.data();
                                     const actualJobs = jobCounts.get(p.name) || 0;
@@ -196,7 +195,6 @@ const CleanupPage = () => {
                                         jobs: actualJobs,
                                         rating: parseFloat(avgRating) 
                                     });
-                                    updated++;
                                 });
 
                                 // REPAIR BROKEN BOOKINGS (Unassigned/Blank Recovery)

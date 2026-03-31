@@ -42,7 +42,7 @@ const ProviderDashboardContent = () => {
     const { sendNotification } = useNotifications();
     const [requests, setRequests] = useState([]);
     const [activeJobs, setActiveJobs] = useState([]);
-    const [payouts, setPayouts] = useState([]);
+    const [, setPayouts] = useState([]);
     const [earnings, setEarnings] = useState({ today: 0, week: 0, month: 0, pendingPayouts: 0 });
     const [confirmingJobId, setConfirmingJobId] = useState(null);
     const [finalAmountAdjust, setFinalAmountAdjust] = useState('');
@@ -130,7 +130,7 @@ const ProviderDashboardContent = () => {
         }, e => { console.error('Bookings listener error:', e); setDbError(true); });
 
         // DATABASE CLEANUP: Reset Payouts and Earnings per request
-        const unsubscribePayouts = onSnapshot(query(collection(db, 'payouts'), where('providerUid', '==', userData?.uid || currentUser?.uid || '')), (snap) => {
+        const unsubscribePayouts = onSnapshot(query(collection(db, 'payouts'), where('providerUid', '==', userData?.uid || currentUser?.uid || '')), () => {
             // Per requirement: Resetting all payout records to show only the live state
             setEarnings(prev => ({ ...prev, pendingPayouts: 0 }));
             setPayouts([]); // Clear payouts to remove database entries from UI
@@ -617,22 +617,47 @@ const ProviderDashboardContent = () => {
                                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[200px]">{req.address || 'Ahmedabad Location'}</span>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="flex gap-4">
-                                    <button 
-                                        onClick={() => acceptRequest(req)}
-                                        className="flex-[2.5] bg-slate-950 text-white h-16 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-primary transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
-                                    >
-                                        Accept Request <CheckCircle2 className="w-4 h-4" />
-                                    </button>
-                                    <button 
-                                        onClick={() => setNegotiatingId(req.id)}
-                                        className="flex-1 bg-white border-2 border-slate-100 text-slate-500 h-16 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:border-indigo-100 hover:text-indigo-600 transition-all active:scale-95"
-                                    >
-                                        Quote
-                                    </button>
-                                </div>
+                                                <div className="flex gap-4">
+                                        <button 
+                                            onClick={() => acceptRequest(req)}
+                                            className="flex-[2.5] bg-slate-950 text-white h-16 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-primary transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
+                                        >
+                                            Accept Request <CheckCircle2 className="w-4 h-4" />
+                                        </button>
+                                        <button 
+                                            onClick={() => setNegotiatingId(negotiatingId === req.id ? null : req.id)}
+                                            className={`flex-1 ${negotiatingId === req.id ? 'bg-indigo-600 text-white' : 'bg-white border-2 border-slate-100 text-slate-500'} h-16 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:border-indigo-100 transition-all active:scale-95`}
+                                        >
+                                            Quote
+                                        </button>
+                                        <button 
+                                            onClick={() => rejectRequest(req.id)}
+                                            className="w-16 bg-white border-2 border-slate-100 text-slate-300 hover:text-rose-500 hover:border-rose-100 h-16 rounded-2xl flex items-center justify-center transition-all active:scale-95"
+                                        >
+                                            <XCircle className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                    
+                                    {negotiatingId === req.id && (
+                                        <div className="mt-8 pt-8 border-t border-slate-50 animate-in slide-in-from-top-4 duration-500">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Propose Your Net Value (₹)</p>
+                                            <div className="flex gap-4">
+                                                <input 
+                                                    type="number" 
+                                                    placeholder="eg. 899"
+                                                    value={negotiatedPrice}
+                                                    onChange={(e) => setNegotiatedPrice(e.target.value)}
+                                                    className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-2 ring-indigo-500 font-bold text-slate-900"
+                                                />
+                                                <button 
+                                                    onClick={() => proposePrice(req)}
+                                                    className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95"
+                                                >
+                                                    Send Proposal
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}                        </div>
                             </div>
                         ))}
                         {totalRequestPages > 1 && (

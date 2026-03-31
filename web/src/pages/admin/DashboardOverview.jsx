@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc, writeBatch, getDocs, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, writeBatch, getDocs } from 'firebase/firestore';
 
 const StatCard = ({ title, value, icon, colorClass }) => {
     const Icon = icon;
@@ -452,6 +452,20 @@ The system is now ready for production-level testing! 🏁
                     </div>
                 </div>
             )}
+
+            {/* Hygene & Maintenance Ops (Only for root admin) */}
+            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 mt-12 flex items-center justify-between">
+                <div>
+                    <h4 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-1">System Hygiene</h4>
+                    <p className="text-xs text-slate-500">Perform a fresh start by purging all test data and resetting provider stats.</p>
+                </div>
+                <button 
+                    onClick={handleHardReset}
+                    className="px-6 py-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 rounded-lg text-xs font-black uppercase tracking-widest transition-all"
+                >
+                    Hard Reset Database
+                </button>
+            </div>
             
         </div>
     );

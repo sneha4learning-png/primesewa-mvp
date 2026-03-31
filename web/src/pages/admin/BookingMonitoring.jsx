@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, doc, getDocs, writeBatch } from 'firebase/firestore';
 import TimelineModal from '../../components/TimelineModal';
 
 // BUG-6: Review Timeline Modal
