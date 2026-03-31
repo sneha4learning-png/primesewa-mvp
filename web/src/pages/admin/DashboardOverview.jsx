@@ -124,7 +124,10 @@ const DashboardOverview = () => {
             setStats(prev => ({ ...prev, activeProviders: activeCount }));
             
             const top = [...fetched]
-                .filter(p => p.status === 'active')
+                .filter(p => {
+                    const isMock = p.id.startsWith('dev-prov-') || ["Test Provider", "Ace Service Partner", "New provider", "Anjali Premium Beauty", "Rajesh Grooming Studio"].includes(p.name);
+                    return p.status === 'active' && !isMock;
+                })
                 .sort((a, b) => (parseInt(b.jobs || 0) - parseInt(a.jobs || 0)))
                 .slice(0, 5);
             setTopProviders(top);
@@ -191,15 +194,18 @@ const DashboardOverview = () => {
                 snap.forEach(d => batch.delete(d.ref));
             }
 
-            // 2. Identify & Remove Mock Providers (IDs starting with dev-prov- or missing core fields)
+            // 2. Identify & Remove Mock Providers (IDs starting with dev-prov- or known test patterns)
             const pSnap = await getDocs(collection(db, 'providers'));
+            const mockNames = ["test provider", "ace service partner", "new provider", "anjali premium beauty", "rajesh grooming studio", "sanjay services", "priya home care", "vikram painting expert"].map(n => n.toLowerCase());
+            
             pSnap.forEach(d => {
                 const p = d.data();
-                const isMock = d.id.startsWith('dev-prov-') || !p.phone || ["Test Provider", "Ace Service Partner", "New provider"].includes(p.name);
+                const pName = (p.name || '').toLowerCase().trim();
+                const isMock = d.id.startsWith('dev-prov-') || !p.phone || mockNames.includes(pName);
                 if (isMock) {
                     batch.delete(d.ref);
                 } else {
-                    // Reset stats for real providers
+                    // Reset stats for real providers (Jobs & Ratings)
                     batch.update(d.ref, {
                         jobs: 0,
                         rating: 0,

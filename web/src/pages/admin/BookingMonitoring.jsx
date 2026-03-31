@@ -120,6 +120,36 @@ const BookingMonitoring = () => {
                         <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
                     <button
+                        onClick={async () => {
+                            if (!window.confirm("⚠️ DANGER: Delete ALL booking records? This cannot be undone.")) return;
+                            try {
+                                const snap = await getDocs(collection(db, 'bookings'));
+                                const batch = writeBatch(db);
+                                snap.forEach(d => batch.delete(d.ref));
+                                await batch.commit();
+                                alert("✅ All bookings cleared successfully.");
+                            } catch (e) { alert("❌ Error: " + e.message); }
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-medium transition-colors"
+                    >
+                        <X className="w-4 h-4" /> Wipe All
+                    </button>
+                    <button
+                        onClick={async () => {
+                            if (!window.confirm("⚠️ DANGER: Delete ALL booking records? This cannot be undone.")) return;
+                            try {
+                                const snap = await getDocs(collection(db, 'bookings'));
+                                const batch = writeBatch(db);
+                                snap.forEach(d => batch.delete(d.ref));
+                                await batch.commit();
+                                alert("✅ All bookings cleared successfully.");
+                            } catch (e) { alert("❌ Error: " + e.message); }
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-medium transition-colors"
+                    >
+                        <X className="w-4 h-4" /> Wipe All
+                    </button>
+                    <button
                         onClick={() => setShowAdvanced(!showAdvanced)}
                         className={`flex items-center gap-2 px-4 py-2 border rounded-lg font-medium transition-colors ${showAdvanced ? 'bg-blue-50 border-blue-200 text-blue-700' : 'border-gray-300 bg-white hover:bg-gray-50 text-gray-700'}`}
                     >
