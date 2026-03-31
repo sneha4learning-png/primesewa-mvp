@@ -485,7 +485,7 @@ const ProviderDashboardContent = () => {
                                                    scrolling="no" 
                                                    marginHeight="0" 
                                                    marginWidth="0" 
-                                                   src={`https://maps.google.com/maps?width=100%25&height=150&hl=en&q=${encodeURIComponent(job.houseNo ? `${job.houseNo}, ${job.area}` : job.address)}&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
+                                                   src={`https://maps.google.com/maps?width=100%25&height=150&hl=en&q=${encodeURIComponent((job.houseNo ? `${job.houseNo}, ${job.area}` : job.address) + ', Ahmedabad, India')}&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
                                                    style={{ filter: 'invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%)' }}
                                                 ></iframe>
                                             </div>
