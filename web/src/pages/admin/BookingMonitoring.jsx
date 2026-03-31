@@ -26,8 +26,15 @@ const BookingMonitoring = () => {
         const unsubscribe = onSnapshot(collection(db, 'bookings'), (snapshot) => {
             const allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+            // ENFORCE PRODUCTION FILTRATION: Automatically hide bookings from mock providers (Anjali, Rajesh, etc.)
+            const mockProviderNames = ["anjali premium beauty", "rajesh grooming studio", "test provider", "ace service partner", "new provider"].map(n => n.toLowerCase());
+            const filteredAll = allBookings.filter(b => {
+                const pName = (b.provider || '').toLowerCase().trim();
+                return !mockProviderNames.includes(pName);
+            });
+
             // Sort by createdAt timestamp descending — newest booking appears first
-            const sorted = allBookings.sort((a, b) => {
+            const sorted = filteredAll.sort((a, b) => {
                 const tsA = a.createdAt?.toMillis?.() || (a.createdAt?.seconds ?? 0) * 1000 || new Date(a.date || 0).getTime();
                 const tsB = b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000 || new Date(b.date || 0).getTime();
                 return tsB - tsA; // descending: newest first
@@ -90,7 +97,7 @@ const BookingMonitoring = () => {
             case 'pending': return 'bg-amber-100 text-amber-800 border-amber-200';
             case 'cancelled': return 'bg-orange-100 text-orange-800 border-orange-200';
             case 'rejected': return 'bg-rose-100 text-rose-800 border-rose-200';
-            case 'negotiating': return 'bg-purple-100 text-purple-800 border-purple-200';
+            case 'negotiating': return 'bg-purple-100 text-purple-700 border-purple-200'; // Fixed purple color consistency
             default: return 'bg-gray-100 text-gray-800 border-gray-200';
         }
     };
@@ -119,21 +126,6 @@ const BookingMonitoring = () => {
                         </select>
                         <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
-                    <button
-                        onClick={async () => {
-                            if (!window.confirm("⚠️ DANGER: Delete ALL booking records? This cannot be undone.")) return;
-                            try {
-                                const snap = await getDocs(collection(db, 'bookings'));
-                                const batch = writeBatch(db);
-                                snap.forEach(d => batch.delete(d.ref));
-                                await batch.commit();
-                                alert("✅ All bookings cleared successfully.");
-                            } catch (e) { alert("❌ Error: " + e.message); }
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-medium transition-colors"
-                    >
-                        <X className="w-4 h-4" /> Wipe All
-                    </button>
                     <button
                         onClick={async () => {
                             if (!window.confirm("⚠️ DANGER: Delete ALL booking records? This cannot be undone.")) return;
