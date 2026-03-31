@@ -371,12 +371,15 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                             <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Assigned Specialist</h3>
                             <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group transition-all hover:bg-white hover:shadow-xl">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl font-black text-slate-200 shadow-inner group-hover:rotate-3 transition-transform overflow-hidden border border-slate-100">
-                                        {(() => {
-                                            const pName = booking.provider || booking.providerName || booking.expert || booking.providerUId; 
-                                            const hasProviderName = pName && String(pName).toLowerCase() !== 'unassigned';
-                                            return hasProviderName ? pName.charAt(0).toUpperCase() : (booking.providerUid ? 'E' : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />);
-                                        })()}
+                                    <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl font-black text-indigo-600 shadow-inner group-hover:rotate-3 transition-transform overflow-hidden border border-indigo-100 relative">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
+                                        <span className="relative z-10">
+                                            {(() => {
+                                                const pName = booking.provider || booking.providerName || booking.expert || booking.providerUId; 
+                                                const hasProviderName = pName && String(pName).toLowerCase() !== 'unassigned';
+                                                return hasProviderName ? pName.charAt(0).toUpperCase() : (booking.providerUid ? 'E' : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />);
+                                            })()}
+                                        </span>
                                     </div>
                                     <div>
                                         <p className="text-lg font-black text-slate-900 uppercase tracking-tight">
