@@ -188,9 +188,9 @@ const ProviderManagement = () => {
                                 </td>
                                 <td className="px-3 py-4 whitespace-nowrap text-[12px] font-medium text-gray-600">{provider.phone}</td>
                                 <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-600 text-center font-normal">{provider.jobs || 0}</td>
-                                <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
+                                 <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
                                     <div className="flex items-center justify-center gap-1 font-medium text-amber-500">
-                                        {provider.rating > 0 ? (
+                                        {(provider.jobs > 0 && provider.rating > 0) ? (
                                             <>
                                                 <Star className="w-3.5 h-3.5 fill-current" />
                                                 {Number(provider.rating).toFixed(1)}
@@ -275,9 +275,9 @@ const ProviderManagement = () => {
                             <div className="flex items-center gap-3 text-xs text-gray-600 flex-wrap">
                                 <span className="px-2 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">{provider.category || 'No Category'}</span>
                                 <span>{provider.jobs || 0} jobs</span>
-                                <span className={`font-normal flex items-center gap-1 ${provider.rating > 0 ? 'text-amber-500' : 'text-slate-400'}`}>
-                                    <Star className={`w-3 h-3 ${provider.rating > 0 ? 'fill-current' : ''}`} />
-                                    {provider.rating > 0 ? Number(provider.rating).toFixed(1) : 'New'}
+                                <span className={`font-normal flex items-center gap-1 ${(provider.jobs > 0 && provider.rating > 0) ? 'text-amber-500' : 'text-slate-400'}`}>
+                                    <Star className={`w-3 h-3 ${(provider.jobs > 0 && provider.rating > 0) ? 'fill-current' : ''}`} />
+                                    {(provider.jobs > 0 && provider.rating > 0) ? Number(provider.rating).toFixed(1) : 'New'}
                                 </span>
                                 <span className="text-emerald-600 font-normal">₹{Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199)}</span>
                                 <span>{provider.phone}</span>

@@ -139,7 +139,7 @@ const DashboardOverview = () => {
             setStats(prev => ({ ...prev, pendingPayouts: Math.floor(total) }));
         }, (err) => console.error("Payouts Listener Error:", err));
 
-        // 4. Data Hygiene Patcher (Legacy Cleanup & Taxonomy Unification)
+        // 4. Data Hygiene Patcher (Legacy Cleanup & Taxonomy Unification — ENFORCING PRODUCTION STANDARDS)
         const unsubPatch = onSnapshot(collection(db, 'providers'), async (snap) => {
             const neighborhoods = [
                 ['Vastrapur', 'Satellite', 'Bopal'], ['SG Highway', 'Prahlad Nagar', 'Ghatlodia'],
@@ -150,7 +150,7 @@ const DashboardOverview = () => {
                 let needsUpdate = false;
                 const updatePayload = {};
 
-                // Fix Location/Areas
+                // Fix Location/Areas for unlocalized records
                 if (!p.serviceAreas || p.serviceAreas.length === 0 || p.location === 'Ahmedabad') {
                     const idx = d.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % neighborhoods.length;
                     updatePayload.serviceAreas = neighborhoods[idx];
@@ -158,14 +158,12 @@ const DashboardOverview = () => {
                     needsUpdate = true;
                 }
 
-                // Fix Taxonomy Contradictions (Aggressive Normalization)
+                // Production Taxonomy Normalization (Generic only)
                 const currentCat = String(p.category || '').toUpperCase();
-                const currentName = String(p.name || '').toUpperCase();
-                
-                if (currentCat === 'SALON & BEAUTY' || currentCat === 'BEAUTY' || currentCat === 'SALON' || currentName.includes('ANJALI') || currentName.includes('PRIME SALON')) {
+                if (currentCat === 'SALON & BEAUTY' || currentCat === 'BEAUTY' || currentCat === 'SALON') {
                     updatePayload.category = 'Salon for Women';
                     needsUpdate = true;
-                } else if (currentCat === 'SALON FOR MEN' || currentName.includes('RAJESH') || currentName.includes('GROOMING')) {
+                } else if (currentCat === 'SALON FOR MEN' || currentCat === 'GROOMING') {
                     updatePayload.category = 'Salon for Men';
                     needsUpdate = true;
                 }
@@ -179,9 +177,9 @@ const DashboardOverview = () => {
         return () => { unsubBookings(); unsubProviders(); unsubPayouts(); unsubPatch(); };
     }, []);
     
-    // ADMIN UTILITY: Hard Reset for Demo — ONLY implementation permitted per project head
+    // ADMIN UTILITY: Database Hygiene — ONLY implementation permitted per project head
     const handleHardReset = async () => {
-        if (!window.confirm("CRITICAL: This will delete ALL bookings/data and create 5 'Perfect' Live Jobs using the new UC UI logic. Continue?")) return;
+        if (!window.confirm("CRITICAL: This will delete ALL bookings, payouts, and commissions records to ensure a fresh production environment. Continue?")) return;
         
         try {
             const batch = writeBatch(db);
@@ -193,122 +191,38 @@ const DashboardOverview = () => {
                 snap.forEach(d => batch.delete(d.ref));
             }
 
-            // 2. ENSURE CORE PROVIDERS EXIST (AUTO-ONBOARDING)
-            const goldenFleet = [
-                { name: 'Anjali Premium Beauty', category: 'Salon for Women', rating: '5.0', multiplier: 1.25, isExpert: true },
-                { name: 'Rajesh Grooming Studio', category: 'Salon for Men', rating: '4.7', multiplier: 0.9, isExpert: false },
-                { name: 'Sanjay Services', category: 'Electrical', rating: '4.9', multiplier: 1.05, isExpert: false },
-                { name: 'Priya Home Care', category: 'Cleaning', rating: '4.8', multiplier: 1.1, isExpert: false },
-                { name: 'Vikram Painting Expert', category: 'Painting', rating: '4.7', multiplier: 1.0, isExpert: false }
-            ];
-
+            // 2. Identify & Remove Mock Providers (IDs starting with dev-prov- or missing core fields)
             const pSnap = await getDocs(collection(db, 'providers'));
-            const existingProviders = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            for (const gold of goldenFleet) {
-                let pRef;
-                const match = existingProviders.find(p => p.name === gold.name);
-                
-                if (match) {
-                    pRef = doc(db, 'providers', match.id);
+            pSnap.forEach(d => {
+                const p = d.data();
+                const isMock = d.id.startsWith('dev-prov-') || !p.phone || ["Test Provider", "Ace Service Partner", "New provider"].includes(p.name);
+                if (isMock) {
+                    batch.delete(d.ref);
                 } else {
-                    pRef = doc(collection(db, 'providers'));
-                }
-
-                // BUILD DYNAMIC RATES
-                const customRates = {};
-                const basePrices = [
-                    {n: 'Tap Fix', p: 149}, {n: 'Pipe Leak', p: 299}, {n: 'Drain Block', p: 449}, {n: 'Tank Clean', p: 899},
-                    {n: 'Switch Fix', p: 99}, {n: 'Fan Fix', p: 249}, {n: 'MCB Fix', p: 349}, {n: 'Wiring Check', p: 999},
-                    {n: 'Haircut', p: 199}, {n: 'Shave', p: 149}, {n: 'Facial', p: 599}, {n: 'Threading', p: 49}
-                ];
-                basePrices.forEach(x => {
-                    customRates[x.n] = Math.round(x.p * gold.multiplier);
-                });
-
-                batch.set(pRef, {
-                    name: gold.name,
-                    category: gold.category,
-                    rating: 0, // CLEAN SLATE: NO RATINGS YET
-                    isExpert: gold.isExpert,
-                    isOnline: true,
-                    isApproved: true,
-                    isVerified: true,
-                    phone: '91'+Math.floor(Math.random()*1000000000),
-                    subServiceRates: customRates,
-                    ratingCount: 0,
-                    jobs: 0,
-                    status: 'active',
-                    patchApplied: true
-                }, { merge: true });
-            }
-
-            // 2.7 ALSO SYNC AND DIVERSIFY RATES FOR ALL OTHER PROVIDERS
-            for (const p of existingProviders) {
-                const normName = String(p.name || '').toLowerCase().trim();
-                const isGolden = goldenFleet.some(g => String(g.name).toLowerCase().trim() === normName);
-                
-                let cat = p.category;
-                const cName = String(p.name || '').toUpperCase();
-                const cCat = String(p.category || '').toUpperCase();
-
-                // Taxonomy Normalization
-                if (cCat === 'SALON & BEAUTY' || cCat === 'BEAUTY' || cName.includes('ANJALI') || cName.includes('PRIME SALON')) {
-                    cat = 'Salon for Women';
-                } else if (cName.includes('RAJESH') || cName.includes('GROOMING')) {
-                    cat = 'Salon for Men';
-                }
-
-                if (!isGolden) {
-                    // Force Diversified Pricing for Comparison
-                    const multiplier = 0.82 + (Math.random() * 0.35); // Diversification: 0.82x to 1.17x
-                    const customRates = {};
-                    const basePrices = [
-                        {n: 'Tap Fix', p: 149}, {n: 'Pipe Leak', p: 299}, {n: 'Drain Block', p: 449}, {n: 'Tank Clean', p: 899},
-                        {n: 'Switch Fix', p: 99}, {n: 'Fan Fix', p: 249}, {n: 'MCB Fix', p: 349}, {n: 'Wiring Check', p: 999},
-                        {n: 'Haircut', p: 199}, {n: 'Shave', p: 149}, {n: 'Facial', p: 599}, {n: 'Threading', p: 49}
-                    ];
-                    basePrices.forEach(x => {
-                        customRates[x.n] = Math.round(x.p * multiplier);
-                    });
-
-                    batch.update(doc(db, 'providers', p.id), { 
-                        category: cat, 
-                        status: 'active', 
-                        isOnline: true,
-                        subServiceRates: customRates,
-                        rating: 0,
-                        ratingCount: 0,
+                    // Reset stats for real providers
+                    batch.update(d.ref, {
                         jobs: 0,
-                        patchApplied: true
-                    });
-                } else {
-                    batch.update(doc(db, 'providers', p.id), { 
-                        category: cat, 
-                        status: 'active', 
-                        isOnline: true,
                         rating: 0,
-                        ratingCount: 0,
-                        jobs: 0
+                        ratingCount: 0
                     });
                 }
-            }
+            });
 
             await batch.commit();
             const summary = `
 ✅ SUCCESS: Database Cleaned!
 --------------------------------
-👥 Providers Ready: ${goldenFleet.length + existingProviders.length} (Categorized & Rates Diversified)
-🧹 Bookings Purged: ALL (Live Monitor is now empty)
-💰 Financials Purged: ALL (Commission & Payouts at ₹0)
+🧹 All dynamic records purged.
+👤 Mock providers removed.
+📈 Dashboard is now a clean slate.
 
-The system is now a clean slate for fresh testing! 🏁
+The system is now ready for production-level testing! 🏁
             `;
             alert(summary);
             window.location.reload();
         } catch (err) {
-            console.error("Hard Reset Error:", err);
-            alert("❌ CRITICAL RESET FAILURE: " + err.message);
+            console.error("Database Cleanup Error:", err);
+            alert("❌ CRITICAL CLEANUP FAILURE: " + err.message);
         }
     };
 
@@ -411,8 +325,8 @@ The system is now a clean slate for fresh testing! 🏁
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className={`flex items-center justify-end gap-1 ${p.rating > 0 ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} px-2 py-0.5 rounded text-sm font-normal border mb-1`}>
-                                        {p.rating > 0 ? (
+                                    <div className={`flex items-center justify-end gap-1 ${(p.jobs > 0 && p.rating > 0) ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} px-2 py-0.5 rounded text-sm font-normal border mb-1`}>
+                                        {(p.jobs > 0 && p.rating > 0) ? (
                                             <>
                                                 <Star className="w-3.5 h-3.5 fill-current" /> {Number(p.rating).toFixed(1)}
                                             </>
@@ -534,7 +448,7 @@ The system is now a clean slate for fresh testing! 🏁
                         onClick={handleHardReset}
                         className="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 font-black text-[10px] uppercase tracking-widest rounded-xl border border-rose-100 shadow-sm transition-all hover:scale-105 active:scale-95"
                     >
-                        🔴 Hard Reset: Wipe All Mock Data
+                        🔴 Platform Cleanup: Remove All Mock Data
                     </button>
                     <button 
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
