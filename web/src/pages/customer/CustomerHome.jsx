@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck } from 'lucide-react';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
 class ErrorBoundary extends Component {
@@ -119,6 +119,15 @@ const categories = [
             { name: 'Bed Bug Treatment', price: 1199 }
         ]
     },
+    { 
+        id: '11', name: 'Packers & Movers', icon: Truck, color: 'from-blue-600/10 to-blue-700/5', iconColor: 'text-blue-600', type: 'Job-based', subtitle: 'Safe Move',
+        subServices: [
+            { name: 'Packing & Shifting', price: 2999 },
+            { name: 'Local Shifting', price: 1499 },
+            { name: 'Office Shifting', price: 8999 },
+            { name: 'Packing Services', price: 999 }
+        ]
+    }
 ];
 
 import { useNotifications } from '../../context/NotificationContext';
