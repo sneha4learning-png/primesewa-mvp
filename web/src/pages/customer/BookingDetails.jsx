@@ -120,18 +120,22 @@ export default function BookingDetails() {
                             <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group transition-all hover:bg-white hover:shadow-xl">
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl font-black text-slate-200 shadow-inner group-hover:rotate-3 transition-transform overflow-hidden border border-slate-100">
-                                        {booking.provider && booking.provider.toLowerCase() !== 'unassigned' 
-                                            ? booking.provider.charAt(0).toUpperCase() 
-                                            : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />}
+                                        {(() => {
+                                            const pName = booking.provider || booking.providerName;
+                                            const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
+                                            return hasProvider ? pName.charAt(0).toUpperCase() : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />;
+                                        })()}
                                     </div>
                                     <div>
                                         <p className="text-lg font-black text-slate-900 uppercase tracking-tight">
-                                            {booking.provider && booking.provider.toLowerCase() !== 'unassigned' 
-                                                ? booking.provider 
-                                                : 'Assigning Expert...'}
+                                            {(() => {
+                                                const pName = booking.provider || booking.providerName;
+                                                const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
+                                                return hasProvider ? pName : (booking.providerUid ? `Expert #${booking.providerUid.slice(-4).toUpperCase()}` : 'Assigning Expert...');
+                                            })()}
                                         </p>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
-                                            {booking.provider && booking.provider.toLowerCase() !== 'unassigned' 
+                                            {((booking.provider || booking.providerName) && (booking.provider || booking.providerName).toLowerCase() !== 'unassigned') 
                                                 ? 'Verified Expert' 
                                                 : 'Searching for your professional'}
                                         </p>

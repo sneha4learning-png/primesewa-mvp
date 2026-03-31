@@ -442,6 +442,12 @@ const CustomerHome = () => {
             return;
         }
 
+        if (!pendingBookingData) {
+            alert("Booking session lost. Please select your service and expert again.");
+            setBookingStep(0);
+            return;
+        }
+
         if (!bookingSlot) {
             alert("Please select a time slot for your appointment.");
             return;
@@ -449,11 +455,12 @@ const CustomerHome = () => {
         
         setIsSubmitting(true);
         try {
+            const providerName = pendingBookingData.name || pendingBookingData.provider || 'Unassigned';
             const booking = {
-                service: pendingBookingData?.service || 'PrimeSewa Service',
+                service: pendingBookingData.service || 'PrimeSewa Service',
                 status: 'pending',
-                provider: pendingBookingData?.name || 'Unassigned',
-                providerUid: pendingBookingData?.uid || pendingBookingData?.id || '',
+                provider: providerName,
+                providerUid: pendingBookingData.uid || pendingBookingData.id || '',
                 customer: userData.name,
                 customerUid: userData.uid,
                 customerPhone: userData.phone,
