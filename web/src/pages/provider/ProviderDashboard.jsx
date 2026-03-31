@@ -10,7 +10,34 @@ import {
 } from 'firebase/firestore';
 import { useNotifications } from '../../context/NotificationContext';
 
-const ProviderDashboard = () => {
+import { Component } from 'react';
+
+// Prevents any crash inside ProviderDashboard from showing a completely blank page
+class ErrorBoundary extends Component {
+    constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+    static getDerivedStateFromError(error) { return { hasError: true, error }; }
+    componentDidCatch(error) { console.error('ProviderDashboard Error:', error); }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-rose-100 shadow-xl shadow-rose-900/5 max-w-2xl mx-auto my-12">
+                    <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <AlertTriangle className="w-10 h-10 text-rose-500" />
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Something went wrong</h2>
+                    <p className="text-slate-500 text-sm mb-8 leading-relaxed max-w-sm mx-auto">
+                        We encountered an error while loading your dashboard contents. Our team has been notified.
+                        <br/><span className="text-[10px] text-rose-400 font-mono mt-2 block">{this.state.error?.message}</span>
+                    </p>
+                    <button onClick={() => window.location.reload()} className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Reload Dashboard</button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
+const ProviderDashboardContent = () => {
     const { currentUser, userData } = useAuth();
     const { sendNotification } = useNotifications();
     const [requests, setRequests] = useState([]);
@@ -706,5 +733,11 @@ const ProviderDashboard = () => {
         </div>
     );
 };
+
+const ProviderDashboard = () => (
+    <ErrorBoundary>
+        <ProviderDashboardContent />
+    </ErrorBoundary>
+);
 
 export default ProviderDashboard;

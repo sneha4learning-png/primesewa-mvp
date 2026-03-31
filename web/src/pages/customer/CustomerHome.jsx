@@ -6,6 +6,7 @@ import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck } from 'lucide-react';
+import { useNotifications } from '../../context/NotificationContext';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
 class ErrorBoundary extends Component {
@@ -659,6 +660,20 @@ const CustomerHome = () => {
                 createdAt: serverTimestamp()
             };
             await addDoc(collection(db, 'bookings'), booking);
+            
+            // NOTIFY ADMIN & PROVIDER
+            const customerName = userData.name || userData.displayName || 'A new customer';
+            
+            // 1. Notify Admin
+            if (typeof sendNotification === 'function') {
+                sendNotification('admin', 'New Booking Created', `${customerName} booked ${booking.service} with ${nameToSave}.`, 'info');
+            }
+
+            // 2. Notify Provider (using their UID if we have it)
+            if (uidToSave && typeof sendNotification === 'function') {
+                sendNotification(uidToSave, 'New Job Request', `You have a new request for ${booking.service} from ${customerName}.`, 'success');
+            }
+
             setBookingStep(2);
             setTimeout(() => setBookingStep(0), 3000);
         } catch (err) {
