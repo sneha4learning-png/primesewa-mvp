@@ -1188,22 +1188,53 @@ const CustomerHome = () => {
                     </div>
 
                     <div className="space-y-8">
-                        <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
-                            <h2 className="text-xl font-black mb-6">Recent History</h2>
-                            <div className="space-y-4">
-                                {pastBookings.map(b => (
-                                    <div key={b.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <p className="text-[9px] font-bold text-indigo-600 uppercase mb-1">{b.service}</p>
-                                        <h4 className="text-xs font-bold">{b.provider}</h4>
-                                        <p className="text-[10px] text-slate-400 mt-2">₹{b.price} • {b.status}</p>
-                                        {b.status === 'completed' && !b.rated && (
-                                            <div className="flex gap-1 mt-3">
-                                                {[1, 2, 3, 4, 5].map(s => <Star key={s} onClick={() => setRatingState({ bookingId: b.id, rating: s })} className={`w-4 h-4 cursor-pointer ${s <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200'}`} />)}
-                                                {ratingState.bookingId === b.id && <button onClick={() => submitRating(b)} className="ml-auto text-[8px] font-bold text-indigo-600 uppercase">Submit</button>}
-                                            </div>
-                                        )}
+                        <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden group">
+                            <div className="bg-gradient-to-br from-indigo-950 to-indigo-900 p-8 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                                <h2 className="text-xl font-black text-white relative z-10 uppercase tracking-tighter italic">Recent History</h2>
+                                <p className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mt-1 relative z-10">Your previous premium services</p>
+                            </div>
+                            <div className="p-6 space-y-4">
+                                {pastBookings.length > 0 ? pastBookings.map(b => (
+                                    <div key={b.id} className="group/item p-6 bg-slate-50 hover:bg-white rounded-[2rem] border border-slate-100 hover:border-indigo-100 transition-all duration-500 hover:shadow-xl hover:shadow-indigo-500/5">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <p className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em]">{b.service}</p>
+                                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">#{b.id.slice(-4).toUpperCase()}</span>
+                                        </div>
+                                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight mb-3 decoration-indigo-500/30 group-hover/item:underline underline-offset-4">{b.provider}</h4>
+                                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200/50">
+                                            <p className="text-[10px] font-bold text-slate-400">₹{b.price} • <span className="text-indigo-400 capitalize">{b.status}</span></p>
+                                            {b.status === 'completed' && !b.rated && (
+                                                <div className="flex gap-1">
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <Star 
+                                                            key={s} 
+                                                            onClick={() => setRatingState({ bookingId: b.id, rating: s })} 
+                                                            className={`w-3.5 h-3.5 cursor-pointer transition-all hover:scale-125 ${s <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200 hover:text-amber-200'}`} 
+                                                        />
+                                                    ))}
+                                                    {ratingState.bookingId === b.id && (
+                                                        <button onClick={() => submitRating(b)} className="ml-2 py-1 px-3 bg-indigo-600 text-white text-[8px] font-black uppercase rounded-lg shadow-lg shadow-indigo-600/20 active:scale-90 transition-all">Submit</button>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {b.rated && (
+                                                <div className="flex gap-0.5">
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <Star key={s} className={`w-3 h-3 ${s <= (b.ratingGiven || 5) ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                ))}
+                                )) : (
+                                    <div className="py-12 text-center">
+                                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                            <Search className="w-8 h-8 text-slate-200" />
+                                        </div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-loose">No history found.<br/>Your completed jobs will appear here.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

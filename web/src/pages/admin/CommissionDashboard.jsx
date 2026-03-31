@@ -40,6 +40,9 @@ const CommissionDashboard = () => {
                             || b.createdAt?.toMillis?.() || (b.createdAt?.seconds ?? 0) * 1000
                             || new Date(b.date || 0).getTime();
 
+                        const commission = Math.ceil(amount * 0.15);
+                        const providerEarning = amount - commission;
+
                         allRecords.push({
                             id: b.id,
                             bookingId: b.id,
@@ -47,8 +50,8 @@ const CommissionDashboard = () => {
                             service: b.service || '—',
                             customer: b.customer || '—',
                             amount: amount,
-                            commission: parseFloat((amount * 0.15).toFixed(2)),
-                            providerEarning: parseFloat((amount * 0.85).toFixed(2)),
+                            commission: commission,
+                            providerEarning: providerEarning,
                             date: dateStr,
                             _ts: ts  // used for sorting only
                         });
@@ -205,7 +208,7 @@ const CommissionDashboard = () => {
                         </div>
                         <h3 className="text-lg font-medium text-emerald-50">Total Revenue (15%)</h3>
                     </div>
-                    <p className="text-4xl font-normal tracking-tight">₹{Math.floor(totalCommission)}</p>
+                    <p className="text-4xl font-normal tracking-tight">₹{totalCommission}</p>
                     <p className="text-emerald-100 mt-2 text-sm">For the selected period</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
@@ -215,7 +218,7 @@ const CommissionDashboard = () => {
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                     <p className="text-sm font-normal text-gray-500 mb-2">Total Job Value</p>
                     <p className="text-3xl font-normal text-gray-900">
-                        ₹{Math.floor(commissions.reduce((a, c) => a + (c.amount || 0), 0))}
+                        ₹{commissions.reduce((a, c) => a + (c.amount || 0), 0)}
                     </p>
                 </div>
             </div>
