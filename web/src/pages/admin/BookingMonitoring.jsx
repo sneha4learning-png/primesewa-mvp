@@ -128,6 +128,43 @@ const BookingMonitoring = () => {
                     </div>
                     <button
                         onClick={async () => {
+                            if (!window.confirm("⚠️ SMARK REPAIR: Attempting to recover missing specialist names for 'Unassigned' bookings?")) return;
+                            setIsLoading(true);
+                            try {
+                                const providersSnap = await getDocs(collection(db, 'providers'));
+                                const bookingsSnap = await getDocs(collection(db, 'bookings'));
+                                const batch = writeBatch(db);
+                                
+                                let repaired = 0;
+                                bookingsSnap.forEach(d => {
+                                    const b = d.data();
+                                    const currentName = b.provider || b.providerName || '';
+                                    if (!currentName || currentName.toLowerCase() === 'unassigned') {
+                                        // Find best match by category
+                                        const match = providersSnap.docs.find(pd => pd.data().category === b.category);
+                                        if (match) {
+                                            const m = match.data();
+                                            batch.update(doc(db, 'bookings', d.id), {
+                                                provider: m.name,
+                                                providerName: m.name,
+                                                providerUid: match.id,
+                                                providerPhone: m.phone || ''
+                                            });
+                                            repaired++;
+                                        }
+                                    }
+                                });
+                                await batch.commit();
+                                alert(`✅ REPAIR COMPLETE! Restored details for ${repaired} bookings.`);
+                            } catch (e) { alert("❌ Error: " + e.message); }
+                            finally { setIsLoading(false); }
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg font-medium transition-colors"
+                    >
+                        <Clock className="w-4 h-4" /> Smart Repair
+                    </button>
+                    <button
+                        onClick={async () => {
                             if (!window.confirm("⚠️ DANGER: Delete ALL booking records? This cannot be undone.")) return;
                             try {
                                 const snap = await getDocs(collection(db, 'bookings'));
@@ -206,8 +243,8 @@ const BookingMonitoring = () => {
                                         </div>
                                     </td>
                                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.customer || 'Unknown'}</td>
-                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.provider || 'Unassigned'}</td>
-                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{booking.price || booking.proposedPrice || booking.amount}</td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-700">{booking.provider || booking.providerName || booking.expert || 'Unassigned'}</td>
+                                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{booking.price || booking.proposedPrice || booking.amount || '0'}</td>
                                     <td className="px-3 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-md border text-xs font-semibold capitalize ${getStatusColor(booking.status)}`}>
                                             {booking.status}
@@ -250,7 +287,7 @@ const BookingMonitoring = () => {
                                 </div>
                                 <div className="flex gap-4 text-xs text-gray-500 pt-2 border-t border-gray-50">
                                     <div>Cust: <span className="font-semibold text-gray-800">{booking.customer || 'N/A'}</span></div>
-                                    <div>Pro: <span className="font-semibold text-gray-800">{booking.provider || 'Unassigned'}</span></div>
+                                    <div>Pro: <span className="font-semibold text-gray-800">{booking.provider || booking.providerName || 'Unassigned'}</span></div>
                                 </div>
                             </div>
                         ))}
