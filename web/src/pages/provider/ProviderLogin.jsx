@@ -110,10 +110,11 @@ const ProviderLogin = () => {
 
         const targetPhone = isSignup ? signupData.phone : phoneNumber;
 
-        // For signup: validate manual phone input length
-        // For login: phone comes from dropdown (already formatted), just check it's not empty
-        if (!targetPhone || targetPhone.length !== 10) {
-            setError('Please enter a valid 10-digit phone number');
+        // Normalize to last 10 digits to handle cases where users enter country code or spaces
+        const cleanPhone = targetPhone.replace(/\D/g, '').slice(-10);
+
+        if (!cleanPhone || cleanPhone.length !== 10) {
+            setError('Please enter a valid 10-digit mobile number');
             setIsLoading(false);
             return;
         }
@@ -161,7 +162,7 @@ const ProviderLogin = () => {
 
         setIsLoading(true);
         try {
-            const formattedPhone = `+91${targetPhone}`;
+            const formattedPhone = `+91${cleanPhone}`;
             const appVerifier = window.recaptchaVerifier;
             const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
             window.confirmationResult = confirmation;
@@ -377,7 +378,7 @@ const ProviderLogin = () => {
                                     <label className="block text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Business Mobile</label>
                                     <div className="relative">
                                         <span className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/50 font-medium text-sm">+91</span>
-                                        <input required type="tel" maxLength={10} className="w-full pl-14 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-normal text-slate-900 placeholder-slate-300 outline-none" value={signupData.phone} onChange={e => setSignupData({ ...signupData, phone: e.target.value.replace(/\D/g, '') })} placeholder="Phone number" />
+                                        <input required type="tel" className="w-full pl-14 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-normal text-slate-900 placeholder-slate-300 outline-none" value={signupData.phone} onChange={e => setSignupData({ ...signupData, phone: e.target.value.replace(/\D/g, '') })} placeholder="Phone number" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
@@ -532,7 +533,6 @@ const ProviderLogin = () => {
                                     <input
                                         required
                                         type="tel"
-                                        maxLength={10}
                                         className="w-full pl-24 pr-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium text-slate-900 text-2xl tracking-[0.2em] outline-none"
                                         placeholder="000 000 0000"
                                         value={phoneNumber}
