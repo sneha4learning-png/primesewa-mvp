@@ -3,11 +3,13 @@ import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2 
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, getDocs, writeBatch } from 'firebase/firestore';
 import TimelineModal from '../../components/TimelineModal';
+import { useNotifications } from '../../context/NotificationContext';
 
 // BUG-6: Review Timeline Modal
 
 
 const BookingMonitoring = () => {
+    const { sendNotification } = useNotifications();
     const [bookings, setBookings] = useState([]);
     const [filterStatus, setFilterStatus] = useState('All');
     const [filterDate, setFilterDate] = useState('All');
@@ -150,6 +152,15 @@ const BookingMonitoring = () => {
                                                 providerUid: match.id,
                                                 providerPhone: m.phone || ''
                                             });
+
+                                            // NOTIFY: NEWLY ASSIGNED PROVIDER
+                                            if (typeof sendNotification === 'function') {
+                                                sendNotification(match.id, 'New Assignment (Repair)', `Admin has assigned you to a pending ${b.service} request.`, 'success');
+                                                // Also notify customer if we have their UID
+                                                if (b.customerUid) {
+                                                    sendNotification(b.customerUid, 'Expert Assigned', `Admin has matched you with ${m.name} for your ${b.service} request.`, 'info');
+                                                }
+                                            }
                                             repaired++;
                                         }
                                     }
