@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, AlertCircle, Calendar, Star, Zap } from 'lucide-react';
+import { CheckCircle, CheckCircle2, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, AlertCircle, Calendar, Star, Zap } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
