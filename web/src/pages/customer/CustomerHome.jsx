@@ -333,13 +333,13 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full -ml-20 -mb-20 blur-2xl"></div>
                     
-                    <div className="p-8 sm:p-10 relative z-10">
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 sm:items-center">
+                    <div className="p-8 sm:p-12 relative z-10">
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 sm:items-center pr-12">
                             <div>
                                 <p className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.3em] mb-2 leading-none">Booking Summary</p>
                                 <h1 className="text-3xl font-black text-white tracking-tighter leading-none">{booking.service}</h1>
                             </div>
-                            <div className={`px-5 py-2.5 rounded-full border-2 text-[10px] font-black uppercase tracking-widest backdrop-blur-md ${getStatusColor(booking.status)}`}>
+                            <div className={`px-5 py-2.5 rounded-full border-2 text-[10px] font-black uppercase tracking-widest backdrop-blur-md whitespace-nowrap ${getStatusColor(booking.status)}`}>
                                 {booking.status}
                             </div>
                         </div>
@@ -379,6 +379,37 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* LIVE JOURNEY TRACKING - CUSTOMER SIDE POPUP */}
+                        {['accepted', 'arrived', 'enroute', 'inprogress', 'completed'].includes(String(booking.status).toLowerCase()) && (
+                           <div className="p-8 bg-white rounded-[2.5rem] border border-slate-100 relative overflow-hidden group shadow-sm">
+                               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                               <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8 text-center relative z-10">Live Journey Tracking</h4>
+                               <div className="relative flex justify-between max-w-sm mx-auto px-4">
+                                   <div className="absolute top-6 left-10 right-10 h-0.5 bg-slate-100 z-0"></div>
+                                   {[
+                                       { key: 'enroute', label: 'On Way', icon: Truck },
+                                       { key: 'arrived', label: 'At Door', icon: MapPin },
+                                       { key: 'inprogress', label: 'Working', icon: Zap }
+                                   ].map((s, idx) => {
+                                       const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
+                                       const currentLevel = booking.trackingStatus ? (statusOrder[booking.trackingStatus] || 0) : (booking.status === 'completed' ? 3 : 0);
+                                       const thisLevel = statusOrder[s.key];
+                                       const isDone = currentLevel >= thisLevel;
+                                       const isCurrent = booking.trackingStatus === s.key;
+
+                                       return (
+                                           <div key={s.key} className="relative z-10 flex flex-col items-center gap-3">
+                                               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 shadow-sm ${isDone ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200 rotate-3' : 'bg-white border-slate-100 text-slate-200'}`}>
+                                                   <s.icon className={`w-5 h-5 ${isCurrent ? 'animate-bounce' : ''}`} />
+                                               </div>
+                                               <span className={`text-[8px] font-black uppercase tracking-widest ${isDone ? 'text-indigo-600' : 'text-slate-400'}`}>{s.label}</span>
+                                           </div>
+                                       );
+                                   })}
+                               </div>
+                           </div>
+                        )}
 
                         {/* LIVE TRACKER MAP */}
                         <div className="space-y-4 pt-4">
