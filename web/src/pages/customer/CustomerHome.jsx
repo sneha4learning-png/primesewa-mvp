@@ -6,7 +6,7 @@ import OSMMap from '../../components/OSMMap';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight } from 'lucide-react';
 import { useNotifications } from '../../context/NotificationContext';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
@@ -578,16 +578,26 @@ const CustomerHome = () => {
         });
 
         if (userData?.uid) {
-            const unsubscribeBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
+            // OPTIMIZED: Filter by UID directly in the query for performance & reliability
+            const q = query(
+                collection(db, 'bookings'), 
+                where('customerUid', '==', userData.uid)
+            );
+            
+            const unsubscribeBookings = onSnapshot(q, (snapshot) => {
                 const allMyBookings = [];
                 snapshot.forEach(d => {
-                    const b = { id: d.id, ...d.data() };
-                    if (b.customerUid === userData.uid || b.customerPhone === userData.phone) allMyBookings.push(b);
+                    allMyBookings.push({ id: d.id, ...d.data() });
                 });
-                const sorted = allMyBookings.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-                // LIMITED TO 5 PER USER REQUEST
-                setActiveBookings(sorted.filter(b => !['completed', 'rejected', 'cancelled'].includes(b.status)).slice(0, 5));
-                setPastBookings(sorted.filter(b => ['completed', 'rejected', 'cancelled'].includes(b.status)).slice(0, 5));
+                
+                const sorted = allMyBookings.sort((a, b) => {
+                    const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                    const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                    return timeB - timeA;
+                });
+
+                setActiveBookings(sorted.filter(b => !['completed', 'rejected', 'cancelled'].includes(String(b.status).toLowerCase())));
+                setPastBookings(sorted.filter(b => ['completed', 'rejected', 'cancelled'].includes(String(b.status).toLowerCase())).slice(0, 10));
             });
             return () => { unsubscribeProviders(); unsubscribeBookings(); };
         }
@@ -776,6 +786,47 @@ const CustomerHome = () => {
                     </div>
                 </div>
             </div>
+
+            {/* LIVE BOOKINGS - MOVED TO TOP FOR IMMEDIATE VISIBILITY */}
+            {activeBookings.length > 0 && bookingStep === 0 && (
+                <div className="mb-16 animate-fade-in">
+                    <div className="flex items-center justify-between mb-8 px-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
+                            <h2 className="text-2xl font-black tracking-tighter text-slate-900 uppercase">Your Active Services</h2>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
+                        {activeBookings.map(b => (
+                            <div key={b.id} className="group relative bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-bl-[3rem] -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                                <div className="relative z-10">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                                            ['accepted', 'confirmed'].includes(String(b.status).toLowerCase()) ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 
+                                            ['inprogress', 'enroute', 'arrived'].includes(String(b.status).toLowerCase()) ? 'bg-emerald-50 text-emerald-600 border-emerald-100 animate-pulse' : 
+                                            'bg-slate-50 text-slate-400 border-slate-100'
+                                        }`}>
+                                            {b.status === 'enroute' ? 'Expert On Way' : b.status}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
+                                    </div>
+                                    <h3 className="text-lg font-black text-slate-900 tracking-tight mb-2 uppercase">{b.service}</h3>
+                                    <p className="text-[11px] font-bold text-slate-400 flex items-center gap-2 mb-8">
+                                        <Calendar className="w-3.5 h-3.5" /> {b.date} • {b.slot}
+                                    </p>
+                                    <button 
+                                        onClick={() => setSelectedBooking(b.id)} 
+                                        className="w-full py-4 bg-slate-900 hover:bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-2"
+                                    >
+                                        Track Live Journey <ArrowRight className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="mb-16">
                 <div className="flex items-end justify-between mb-8 px-4">
@@ -976,23 +1027,6 @@ const CustomerHome = () => {
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     <div className="lg:col-span-3 space-y-8">
-                        {activeBookings.length > 0 && (
-                            <div className="bg-slate-900 p-8 rounded-[3rem] border border-white/10">
-                                <h2 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div> Live Bookings
-                                </h2>
-                                <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
-                                    {activeBookings.map(b => (
-                                        <div key={b.id} className="shrink-0 w-80 bg-white/5 p-6 rounded-3xl border border-white/10">
-                                            <h3 className="text-white font-bold text-sm mb-2">{b.service}</h3>
-                                            <p className="text-white/40 text-[10px] uppercase tracking-widest mb-4">Status: {b.status}</p>
-                                            <button onClick={() => setSelectedBooking(b.id)} className="w-full py-3 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-colors">View Details</button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
                         {selectedCategory && (
                             <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100">
                                 <h3 className="text-2xl font-black mb-6">Select {selectedCategory} Services</h3>
