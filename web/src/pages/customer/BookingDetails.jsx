@@ -169,6 +169,37 @@ export default function BookingDetails() {
                             </div>
                         </div>
 
+                        {/* LIVE JOURNEY TRACKING - CUSTOMER SIDE */}
+                        {['accepted', 'arrived', 'enroute', 'inprogress', 'completed'].includes(String(booking.status).toLowerCase()) && (
+                           <div className="mt-8 p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 relative overflow-hidden group">
+                               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                               <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-8 text-center relative z-10">Live Journey Tracking</h4>
+                               <div className="relative flex justify-between max-w-sm mx-auto">
+                                   <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-200 z-0"></div>
+                                   {[
+                                       { key: 'enroute', label: 'On Way', icon: Truck },
+                                       { key: 'arrived', label: 'At Door', icon: MapPin },
+                                       { key: 'inprogress', label: 'Working', icon: Zap }
+                                   ].map((s, idx) => {
+                                       const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
+                                       const currentLevel = booking.trackingStatus ? (statusOrder[booking.trackingStatus] || 0) : (booking.status === 'completed' ? 3 : 0);
+                                       const thisLevel = statusOrder[s.key];
+                                       const isDone = currentLevel >= thisLevel;
+                                       const isCurrent = booking.trackingStatus === s.key;
+
+                                       return (
+                                           <div key={s.key} className="relative z-10 flex flex-col items-center gap-3">
+                                               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 shadow-sm ${isDone ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200 rotate-3' : 'bg-white border-slate-100 text-slate-300'}`}>
+                                                   <s.icon className={`w-5 h-5 ${isCurrent ? 'animate-bounce' : ''}`} />
+                                               </div>
+                                               <span className={`text-[9px] font-black uppercase tracking-widest ${isDone ? 'text-indigo-600' : 'text-slate-400'}`}>{s.label}</span>
+                                           </div>
+                                       );
+                                   })}
+                               </div>
+                           </div>
+                        )}
+
                         {/* DESCRIPTION */}
                         {booking.description && (
                             <div className="space-y-3 border-t border-slate-100 pt-12">
