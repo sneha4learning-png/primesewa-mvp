@@ -42,19 +42,35 @@ const OSMMap = ({ houseNo, area, address, latitude, longitude, height = "100%", 
 
     const markerLat = osmBbox.split('%2C')[1];
     const markerLon = osmBbox.split('%2C')[0];
+    const mapUrl = `https://www.openstreetmap.org/?mlat=${markerLat}&mlon=${markerLon}#map=17/${markerLat}/${markerLon}`;
 
     return (
-        <iframe 
-            width={width} 
-            height={height} 
-            frameBorder="0" 
-            scrolling="no" 
-            marginHeight="0" 
-            marginWidth="0" 
-            src={`https://www.openstreetmap.org/export/embed.html?bbox=${osmBbox}&layer=mapnik&marker=${markerLat}%2C${markerLon}`}
-            className="w-full h-full border-none contrast-[1.1] grayscale-[0.2]"
-            title="OpenStreetMap"
-        ></iframe>
+        <div className="relative w-full h-full">
+            <iframe 
+                width={width} 
+                height={height} 
+                frameBorder="0" 
+                scrolling="no" 
+                marginHeight="0" 
+                marginWidth="0" 
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${osmBbox}&layer=mapnik&marker=${markerLat}%2C${markerLon}`}
+                className="w-full h-full border-none contrast-[1.1] grayscale-[0.2]"
+                title="OpenStreetMap"
+            ></iframe>
+            <a 
+                href={mapUrl} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="absolute inset-0 z-20 cursor-pointer"
+                title="Open in OpenStreetMap for directions"
+            ></a>
+            <div className="absolute bottom-2 right-2 z-30 pointer-events-none">
+                <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md border border-slate-200 shadow-sm flex items-center gap-1.5 opacity-80">
+                    <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                    <span className="text-[7px] font-black uppercase text-slate-600 tracking-widest">Click to Expand</span>
+                </div>
+            </div>
+        </div>
     );
 };
 
