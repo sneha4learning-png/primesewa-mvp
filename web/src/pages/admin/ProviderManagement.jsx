@@ -203,9 +203,9 @@ const ProviderManagement = () => {
                                 <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-emerald-600">₹{Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199)}</td>
                                 <td className="px-3 py-4 whitespace-nowrap">
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider border
-                    ${provider.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
-                                            provider.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                                'bg-red-50 text-red-700 border-red-200'}`}>
+                    ${(provider.status || 'pending').toLowerCase() === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
+                        (provider.status || 'pending').toLowerCase() === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                            'bg-red-50 text-red-700 border-red-200'}`}>
                                         {provider.status || 'pending'}
                                     </span>
                                 </td>
@@ -214,7 +214,7 @@ const ProviderManagement = () => {
                                         <button onClick={() => handleViewHistory(provider)} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors shadow-sm border border-blue-100" title="View Full Details & Booking History">
                                             <Search className="w-4 h-4" />
                                         </button>
-                                        {provider.status === 'pending' && (
+                                        {(provider.status || 'pending').toLowerCase() === 'pending' && (
                                             <>
                                                 <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors shadow-sm border border-green-100" title="Approve This Partner">
                                                     <CheckCircle className="w-4 h-4" />
@@ -222,22 +222,19 @@ const ProviderManagement = () => {
                                                 <button onClick={() => handleStatusChange(provider.id, 'rejected')} className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shadow-sm border border-red-100" title="Reject Application">
                                                     <XCircle className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend Account Access">
-                                                    <ShieldOff className="w-4 h-4" />
-                                                </button>
                                             </>
                                         )}
-                                        {provider.status === 'active' && (
+                                        {(provider.status || 'pending').toLowerCase() === 'active' && (
                                             <button onClick={() => handleStatusChange(provider.id, 'suspended')} className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shadow-sm border border-amber-100" title="Suspend This Active Partner">
                                                 <ShieldOff className="w-4 h-4" />
                                             </button>
                                         )}
-                                        {provider.status === 'suspended' && (
+                                        {(provider.status || 'pending').toLowerCase() === 'suspended' && (
                                             <button onClick={() => handleStatusChange(provider.id, 'active')} className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm border border-emerald-100" title="Reactivate This Partner">
                                                 <CheckCircle className="w-4 h-4" />
                                             </button>
                                         )}
-                                        {provider.status === 'rejected' && (
+                                        {(provider.status || 'pending').toLowerCase() === 'rejected' && (
                                             <button onClick={() => handleStatusChange(provider.id, 'pending')} className="p-2 text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors shadow-sm border border-slate-100" title="Move Back to Review Status">
                                                 <MoreVertical className="w-4 h-4" />
                                             </button>

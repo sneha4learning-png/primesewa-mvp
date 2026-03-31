@@ -20,52 +20,40 @@ const CleanupPage = () => {
             providerSnapshot.forEach(d => providers.push({ id: d.id, ...d.data() }));
             userSnapshot.forEach(d => users.push({ id: d.id, ...d.data() }));
 
-            const seen = new Map();
+            const combinedProviders = new Map();
             const toDelete = [];
 
             // 1. Normalize Providers and Resolve Conflicts
             providers.forEach((p, idx) => {
-                const rawName = p.name || 'Unknown';
-                const nameKey = rawName.toLowerCase().replace(/servicies/g, 'services').replace(/\s+/g, ' ').trim();
-                const isSneha = nameKey.includes('sneha');
-                const isNewProv = nameKey.includes('new provider') || nameKey.includes('test provider');
-                const hasConflictingNumber = p.phone === '+911111111111' || p.phone === '1111111111';
+                const rawPhone = p.phone || '';
+                const normalized = rawPhone.replace(/\D/g, '').replace(/^91/, '').slice(-10);
+                const phoneKey = normalized || `DUMMY-${idx}`;
                 
-                // CRITICAL: Providers must NOT have 1111111111 (Reserved for Sneha Customer)
-                let normalizedPhone = p.phone || `+9199999${10000 + idx}`;
+                const rawName = p.name || 'Professional Partner';
                 
-                // DATA RECOVERY: If number has 11+ digits after +91, it's likely a mock artifact with an extra zero
-                const digitsOnly = normalizedPhone.replace(/\D/g, '');
-                if (digitsOnly.length > 10) {
-                    if (digitsOnly.startsWith('91') && digitsOnly.length > 12) {
-                        normalizedPhone = `+91${digitsOnly.slice(2, 12)}`; // Keep first 10 after country code
-                    } else if (!digitsOnly.startsWith('91') && digitsOnly.length > 10) {
-                        normalizedPhone = `+91${digitsOnly.slice(0, 10)}`;
-                    }
-                }
-
-                if (hasConflictingNumber || isNewProv || isSneha) {
-                    // Assign a unique 10-digit dummy number for test providers (987654... format)
-                    normalizedPhone = `+91987654${1000 + idx}`;
-                }
-
                 const updates = {
-                    name: isSneha ? 'Sneha Services' : (isNewProv ? (nameKey.includes('test') ? 'Test Provider' : 'New Provider') : rawName.trim()),
-                    phone: normalizedPhone,
-                    status: 'active', // Force active for sanitized records
+                    name: rawName.trim(),
+                    phone: rawPhone.includes('+91') ? rawPhone : `+91${rawPhone}`,
+                    status: 'active', // Force active for all during cleanup
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
-                    category: isSneha ? 'Carpentry' : (p.category || 'Professional Service'),
-                    // ENSURING BASE RATE IS UNDER ₹200 AS REQUESTED
-                    // ENFORCING GLOBAL CAP: Any rate over 200 is reset to standard 149 for demo consistency
-                    price: (isSneha || isNewProv) 
-                        ? (isSneha ? '₹150' : '₹199') 
-                        : (parseInt(String(p.price || 0).replace(/\D/g, '')) > 200 ? '₹149' : (String(p.price || '₹149').replace(/₹|\/hr/g, '')))
+                    category: p.category || 'Professional Service',
+                    price: (parseInt(String(p.price || 0).replace(/\D/g, '')) > 200) ? '₹149' : (String(p.price || '₹149').replace(/₹|\/hr/g, ''))
                 };
 
-                if (seen.has(nameKey)) {
-                    toDelete.push(p.id);
+                if (combinedProviders.has(phoneKey)) {
+                    const existing = combinedProviders.get(phoneKey);
+                    // Keep the one with MORE data or dev-prov ID
+                    const preferCurrent = p.id.startsWith('dev-') || (!existing.id.startsWith('dev-') && Object.keys(p).length > Object.keys(existing).length);
+                    
+                    if (preferCurrent) {
+                        toDelete.push(existing.id);
+                        combinedProviders.set(phoneKey, { id: p.id, ...updates });
+                        batch.update(doc(db, 'providers', p.id), updates);
+                    } else {
+                        toDelete.push(p.id);
+                    }
                 } else {
-                    seen.set(nameKey, { ...p, ...updates });
+                    combinedProviders.set(phoneKey, { id: p.id, ...updates });
                     batch.update(doc(db, 'providers', p.id), updates);
                 }
             });
@@ -73,33 +61,30 @@ const CleanupPage = () => {
             // 2. Normalize Users (Customers) and Handle Duplicates
             const seenUsers = new Map();
             users.forEach(u => {
-                const rawName = u.name || 'Unknown';
-                const nameKey = rawName.toLowerCase().replace(/\s+/g, ' ').trim();
-                const phoneKey = (u.phone || u.phoneNumber || '').replace(/\D/g, '').slice(-10);
-                const uniqueKey = `${nameKey}-${phoneKey}`;
-                
-                const isSneha = nameKey.includes('sneha');
+                const phoneKey = (u.phone || u.phoneNumber || '').replace(/\D/g, '').replace(/^91/, '').slice(-10);
+                const uniqueKey = phoneKey || u.id;
                 
                 const updates = {
-                    name: isSneha ? 'Sneha Customer' : rawName.trim(),
-                    phone: isSneha ? '+911111111111' : (u.phone || u.phoneNumber || ''),
                     role: 'customer',
-                    status: 'active' // Ensuring all processed users start as active
+                    status: 'active'
                 };
 
                 if (seenUsers.has(uniqueKey)) {
-                    // Keep the one with more data/bookings or specific ID (testing preference)
                     toDelete.push(u.id);
                 } else {
-                    seenUsers.set(uniqueKey, { ...u, ...updates });
+                    seenUsers.set(uniqueKey, { id: u.id, ...updates });
                     batch.update(doc(db, 'users', u.id), updates);
                 }
             });
 
-            toDelete.forEach(id => batch.delete(doc(db, 'providers', id)));
+            // 3. Execution Phase
+            toDelete.forEach(id => {
+                batch.delete(doc(db, 'providers', id));
+                batch.delete(doc(db, 'users', id));
+            });
 
             await batch.commit();
-            setStatus(`✅ SUCCESS! Cleaned ${toDelete.length} duplicates. Reassigned phone numbers for consistency.`);
+            setStatus(`✅ SUCCESS! Merged duplicates & mass-approved ${combinedProviders.size} providers.`);
         } catch (err) {
             console.error(err);
             setStatus(`❌ FAILED: ${err.message}`);
