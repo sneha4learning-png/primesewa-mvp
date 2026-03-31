@@ -266,6 +266,156 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
     );
 };
 
+const BookingDetailsModal = ({ bookingId, onClose }) => {
+    const [booking, setBooking] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!bookingId) return;
+        const unsub = onSnapshot(doc(db, 'bookings', bookingId), (docSnap) => {
+            if (docSnap.exists()) {
+                setBooking({ id: docSnap.id, ...docSnap.data() });
+            }
+            setLoading(false);
+        });
+        return () => unsub();
+    }, [bookingId]);
+
+    const formatTime = (timeStr) => {
+        if (!timeStr) return '';
+        if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
+    const getStatusColor = (status) => {
+        switch (String(status).toLowerCase()) {
+            case 'pending': return 'bg-amber-100 text-amber-600 border-amber-200';
+            case 'confirmed': return 'bg-blue-100 text-blue-600 border-blue-200';
+            case 'completed': return 'bg-emerald-100 text-emerald-600 border-emerald-200';
+            case 'rejected':
+            case 'cancelled': return 'bg-rose-100 text-rose-600 border-rose-200';
+            default: return 'bg-slate-100 text-slate-600 border-slate-200';
+        }
+    };
+
+    if (loading || !booking) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
+            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md" onClick={onClose} />
+            <div className="relative w-full max-w-2xl bg-slate-50 rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto hide-scrollbar border border-white/10">
+                <button onClick={onClose} className="absolute top-8 right-8 z-10 p-3 bg-white/80 backdrop-blur hover:bg-rose-500 hover:text-white rounded-2xl shadow-xl transition-all group active:scale-95">
+                    <XCircle className="w-6 h-6" />
+                </button>
+
+                <div className="bg-white rounded-b-[3rem] shadow-2xl shadow-indigo-900/5 border-b border-slate-100 overflow-hidden">
+                    <div className="p-10 sm:p-14 bg-slate-50/50">
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 sm:items-center">
+                            <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 leading-none">Booking Summary</p>
+                                <h1 className="text-3xl font-black text-slate-900 tracking-tighter leading-none">{booking.service}</h1>
+                            </div>
+                            <div className={`px-5 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${getStatusColor(booking.status)}`}>
+                                {booking.status}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-10 sm:p-14 space-y-12">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <Calendar className="w-3.5 h-3.5 text-indigo-500" /> Date & Time
+                                    </label>
+                                    <p className="text-sm font-bold text-slate-700">{booking.date} at {formatTime(booking.slot)}</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <MapPin className="w-3.5 h-3.5 text-rose-500" /> Service Location
+                                    </label>
+                                    <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                                        {(booking.houseNo && booking.area) 
+                                            ? `${booking.houseNo}, ${booking.area}` 
+                                            : (booking.address || 'Address registered')}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-indigo-600 uppercase tracking-widest leading-none">Total Payment</label>
+                                    <p className="text-4xl font-black text-slate-900 tracking-tighter">₹{booking.price}</p>
+                                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
+                                        <CheckCircle2 className="w-3 h-3" /> Pay After Service
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6 border-t border-slate-100 pt-12">
+                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Assigned Specialist</h3>
+                            <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group transition-all hover:bg-white hover:shadow-xl">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl font-black text-slate-200 shadow-inner group-hover:rotate-3 transition-transform overflow-hidden border border-slate-100">
+                                        {(() => {
+                                            const pName = booking.provider || booking.providerName;
+                                            const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
+                                            return hasProvider ? pName.charAt(0).toUpperCase() : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />;
+                                        })()}
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-slate-900 uppercase tracking-tight">
+                                            {(() => {
+                                                const pName = booking.provider || booking.providerName;
+                                                const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
+                                                return hasProvider ? pName : (booking.providerUid ? `Expert #${booking.providerUid.slice(-4).toUpperCase()}` : 'Assigning Expert...');
+                                            })()}
+                                        </p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
+                                            {((booking.provider || booking.providerName) && (booking.provider || booking.providerName).toLowerCase() !== 'unassigned') 
+                                                ? 'Verified Expert' 
+                                                : 'Searching for your professional'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={() => { if (booking.providerPhone) window.location.href = `tel:${booking.providerPhone}`; else alert('Phone number not available'); }}
+                                        className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:shadow-lg transition-all border border-slate-100 hover:border-indigo-100"
+                                    >
+                                        <Phone className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {booking.description && (
+                            <div className="space-y-3 border-t border-slate-100 pt-12">
+                                <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Specific Instructions</h3>
+                                <p className="text-sm font-medium text-slate-500 leading-relaxed italic bg-indigo-50/20 p-6 rounded-2xl border border-indigo-50">
+                                    "{booking.description}"
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="pt-8 text-center border-t border-slate-100">
+                            <div className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 rounded-2xl">
+                                <ShieldCheck className="w-4 h-4 text-indigo-400" />
+                                <p className="text-[9px] font-black text-white uppercase tracking-widest">PrimeSewa Security Covered</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+};
+
 const CustomerHome = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -296,6 +446,7 @@ const CustomerHome = () => {
     const addressSearchTimeout = useRef(null);
     const [selectedSubServices, setSelectedSubServices] = useState([]);
     const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
+    const [selectedBooking, setSelectedBooking] = useState(null);
 
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
@@ -761,7 +912,7 @@ const CustomerHome = () => {
                                         <div key={b.id} className="shrink-0 w-80 bg-white/5 p-6 rounded-3xl border border-white/10">
                                             <h3 className="text-white font-bold text-sm mb-2">{b.service}</h3>
                                             <p className="text-white/40 text-[10px] uppercase tracking-widest mb-4">Status: {b.status}</p>
-                                            <button onClick={() => navigate(`/booking-details/${b.id}`)} className="w-full py-3 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-colors">View Details</button>
+                                            <button onClick={() => setSelectedBooking(b.id)} className="w-full py-3 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-colors">View Details</button>
                                         </div>
                                     ))}
                                 </div>
@@ -920,6 +1071,7 @@ const CustomerHome = () => {
                 </div>
             )}
             {selectedProviderProfile && <ProviderProfileModal p={selectedProviderProfile} onClose={() => setSelectedProviderProfile(null)} handleBook={handleBook} />}
+            {selectedBooking && <BookingDetailsModal bookingId={selectedBooking} onClose={() => setSelectedBooking(null)} />}
         </div>
     );
 };
