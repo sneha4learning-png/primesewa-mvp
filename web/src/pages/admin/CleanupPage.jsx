@@ -20,32 +20,34 @@ const CleanupPage = () => {
             providerSnapshot.forEach(d => providers.push({ id: d.id, ...d.data() }));
             userSnapshot.forEach(d => users.push({ id: d.id, ...d.data() }));
 
-            const combinedProviders = new Map();
-            const toDelete = [];
-
             // 1. Normalize Providers and Resolve Conflicts
+            const combinedProviders = new Map();
             providers.forEach((p, idx) => {
                 const rawPhone = p.phone || '';
-                const normalized = rawPhone.replace(/\D/g, '').replace(/^91/, '').slice(-10);
+                // EXTREME NORMALIZATION: Strip all, remove 91, take FIRST 10 (handles extra zero at end)
+                const normalized = rawPhone.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
                 const phoneKey = normalized || `DUMMY-${idx}`;
                 
                 const rawName = p.name || 'Professional Partner';
+                const currentCategory = (p.category || '').toUpperCase();
                 
                 const updates = {
                     name: rawName.trim(),
-                    phone: rawPhone.includes('+91') ? rawPhone : `+91${rawPhone}`,
-                    status: 'active', // Force active for all during cleanup
+                    phone: `+91${normalized}`, // Normalize to clean 10-digit format
+                    status: 'active',
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
-                    category: p.category || 'Professional Service',
+                    // Auto-Correct: 'SERVICE' -> 'PLUMBING' per user request
+                    category: (currentCategory === 'SERVICE' || currentCategory === 'PROFESSIONAL SERVICE' || !currentCategory) ? 'Plumbing' : p.category,
                     price: (parseInt(String(p.price || 0).replace(/\D/g, '')) > 200) ? '₹149' : (String(p.price || '₹149').replace(/₹|\/hr/g, ''))
                 };
 
                 if (combinedProviders.has(phoneKey)) {
                     const existing = combinedProviders.get(phoneKey);
-                    // Keep the one with MORE data or dev-prov ID
-                    const preferCurrent = p.id.startsWith('dev-') || (!existing.id.startsWith('dev-') && Object.keys(p).length > Object.keys(existing).length);
-                    
-                    if (preferCurrent) {
+                    // PRIORITIZATION: Prefer dev-prov- (real signup) over mock-prov- (dummy data)
+                    const isNewRealSignup = p.id.startsWith('dev-');
+                    const isExistingRealSignup = existing.id.startsWith('dev-');
+
+                    if (isNewRealSignup && !isExistingRealSignup) {
                         toDelete.push(existing.id);
                         combinedProviders.set(phoneKey, { id: p.id, ...updates });
                         batch.update(doc(db, 'providers', p.id), updates);
