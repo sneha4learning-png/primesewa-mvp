@@ -81,8 +81,10 @@ const ProviderDashboardContent = () => {
                     return tB - tA;
                 });
 
-            // USER REQUEST: ONLY 5 BOOKINGS FOR DEMO PURPOSES
-            const myLiveBookings = myBookings.slice(0, 5);
+            // Ensure no duplicate IDs enter state (SAFETY CRITICAL)
+            const uniqueMap = new Map();
+            myBookings.filter(b => b.provider === providerName).forEach(b => uniqueMap.set(b.id, b));
+            const myLiveBookings = Array.from(uniqueMap.values()).slice(0, 5);
 
             setRequests(myLiveBookings.filter(b => b.status === 'pending' || b.status === 'negotiating'));
             setActiveJobs(myLiveBookings.filter(b => b.status === 'accepted'));
@@ -181,9 +183,8 @@ const ProviderDashboardContent = () => {
                 status: 'accepted',
                 providerUid: userData.uid // Sync UID for future notifications
             });
-            setRequests(prev => prev.filter(r => r.id !== req.id));
-            setActiveJobs(prev => [{ ...req, status: 'accepted', providerUid: userData.uid }, ...prev]);
-            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'accepted', providerUid: userData.uid } : r));
+            
+            // REMOVED manual state updates (setRequests, setActiveJobs) as onSnapshot handles it automatically.
             
             // Notify Customer
             if (req.customerUid) {
@@ -203,10 +204,10 @@ const ProviderDashboardContent = () => {
                 proposedPrice: parseInt(negotiatedPrice),
                 providerUid: userData.uid // Claim this booking with UID
             });
-            setRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice), providerUid: userData.uid } : r));
-            setHistoricalBookings(prev => prev.map(r => r.id === req.id ? { ...r, status: 'negotiating', proposedPrice: parseInt(negotiatedPrice), providerUid: userData.uid } : r));
             setNegotiatingId(null);
             setNegotiatedPrice('');
+            
+            // REMOVED manual state updates (setRequests, setHistoricalBookings) as onSnapshot handles it automatically.
 
             // Notify Customer
             if (req.customerUid) {
@@ -221,12 +222,8 @@ const ProviderDashboardContent = () => {
         try {
             await updateDoc(doc(db, 'bookings', id), { status: 'rejected' });
 
-            // Update requests and history state
+            // REMOVED manual state updates (setRequests, setHistoricalBookings) as onSnapshot handles it automatically.
             const req = requests.find(r => r.id === id);
-            if (req) {
-                setRequests(prev => prev.filter(r => r.id !== id));
-            }
-            setHistoricalBookings(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
 
             // Notify Customer
             if (req && req.customerUid) {
