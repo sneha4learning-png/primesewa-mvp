@@ -54,8 +54,15 @@ const DashboardOverview = () => {
 
         // 1. Bookings & Revenue Listener (Drives Stats & Charts)
         const unsubBookings = onSnapshot(collection(db, 'bookings'), (snapshot) => {
-            const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const rawAll = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
             
+            // ENFORCE PRODUCTION FILTRATION (ANALYTICS): Automatically hide mock data from analytics
+            const mockNames = ["anjali premium beauty", "rajesh grooming studio", "test provider", "ace service partner", "new provider"].map(n => n.toLowerCase());
+            const all = rawAll.filter(b => {
+                const pName = (b.provider || '').toLowerCase().trim();
+                return !mockNames.includes(pName);
+            });
+
             let totalCommission = 0;
             let totalRevenue = 0;
             let totalPendingJobs = 0;

@@ -24,6 +24,12 @@ const CommissionDashboard = () => {
 
                 bookSnap.docs.forEach(d => {
                     const b = { id: d.id, ...d.data() };
+                    
+                    // ENFORCE PRODUCTION FILTRATION: Skip mock provider bookings
+                    const mockNames = ["anjali premium beauty", "rajesh grooming studio", "test provider", "ace service partner", "new provider"].map(n => n.toLowerCase());
+                    const pName = (b.provider || '').toLowerCase().trim();
+                    if (mockNames.includes(pName)) return;
+
                     if (b.status === 'completed') {
                         const rawPrice = b.proposedPrice || b.price || b.amount || 0;
                         const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
@@ -95,7 +101,9 @@ const CommissionDashboard = () => {
         });
 
         const unsubscribePayouts = onSnapshot(collection(db, 'payouts'), (paySnap) => {
+            const mockNames = ["anjali premium beauty", "rajesh grooming studio", "test provider", "ace service partner", "new provider"].map(n => n.toLowerCase());
             const allPay = paySnap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .filter(p => !mockNames.includes((p.providerName || '').toLowerCase().trim())) // Filter mock payouts
                 .sort((a, b) => (b.scheduledFor?.toMillis?.() || 0) - (a.scheduledFor?.toMillis?.() || 0))
                 .slice(0, 5); // USER REQUEST: LIMIT TO 5
             setPayouts(allPay);
