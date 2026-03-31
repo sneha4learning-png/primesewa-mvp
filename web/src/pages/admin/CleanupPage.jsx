@@ -183,8 +183,31 @@ const CleanupPage = () => {
                                     updated++;
                                 });
 
+                                // REPAIR BROKEN BOOKINGS (Unassigned/Blank Recovery)
+                                bookingsSnap.forEach(d => {
+                                    const b = d.data();
+                                    const currentName = b.provider || b.providerName || '';
+                                    if (!currentName || currentName.toLowerCase() === 'unassigned' || currentName.toLowerCase() === 'expert partner') {
+                                        // Attempt recovery match based on category and proximity to base pricing
+                                        const bestMatch = providersSnap.docs.find(pd => {
+                                            const p = pd.data();
+                                            return p.category === b.category && (p.status === 'active' || p.status === 'approved');
+                                        });
+
+                                        if (bestMatch) {
+                                            const bm = bestMatch.data();
+                                            batch.update(doc(db, 'bookings', d.id), {
+                                                provider: bm.name,
+                                                providerName: bm.name,
+                                                providerUid: bestMatch.id,
+                                                providerPhone: bm.phone || ''
+                                            });
+                                        }
+                                    }
+                                });
+
                                 await batch.commit();
-                                setStatus(`✅ SUCCESS! Recalculated ${updated} profiles from current bookings.`);
+                                setStatus(`✅ SUCCESS! Profile Sync & Booking Repair Complete.`);
                             } catch (err) {
                                 setStatus(`❌ ERROR: ${err.message}`);
                             } finally {

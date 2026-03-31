@@ -574,10 +574,14 @@ const CustomerHome = () => {
         }, 0);
         const finalTotal = baseRate + servicesTotal;
         
+        const pName = provider.name || provider.providerName || provider.expert || 'Expert Partner';
+        const pUid = provider.id || provider.uid || '';
+        const pPhone = provider.phone || '';
+
         setPendingBookingData({ 
-            provider: provider.name,
-            providerUid: provider.id || provider.uid,
-            providerPhone: provider.phone || '',
+            provider: pName,
+            providerUid: pUid,
+            providerPhone: pPhone,
             price: finalTotal, 
             category: selectedCategory,
             service: selectedSubServices.length > 0 
@@ -610,7 +614,14 @@ const CustomerHome = () => {
         setIsSubmitting(true);
         try {
             // EXPLICIT DATA EXTRACTION FOR MAXIMUM PERSISTENCE
-            const nameToSave = pendingBookingData.provider || pendingBookingData.name || 'Unassigned';
+            const nameToSave = pendingBookingData.provider || pendingBookingData.name || '';
+            
+            if (!nameToSave || nameToSave.toLowerCase() === 'unassigned') {
+                alert("Expert assignment error. Please re-select your preferred provider from the catalog.");
+                setIsSubmitting(false);
+                return;
+            }
+
             const priceToSave = pendingBookingData.price || 0;
             const uidToSave = pendingBookingData.providerUid || pendingBookingData.uid || '';
             const phoneToSave = pendingBookingData.providerPhone || '';
