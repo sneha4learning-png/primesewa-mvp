@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../firebase/config';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { ChevronLeft, Calendar, Clock, MapPin, IndianRupee, ShieldCheck, Phone, CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { ChevronLeft, Calendar, Clock, MapPin, IndianRupee, ShieldCheck, Phone, CheckCircle2, XCircle, AlertCircle, Loader2, Truck, Zap } from 'lucide-react';
 
 export default function BookingDetails() {
     const { id } = useParams();
@@ -101,6 +101,17 @@ export default function BookingDetails() {
                                             ? `${booking.houseNo}, ${booking.area}` 
                                             : (booking.address || 'Address details being retrieved...')}
                                     </p>
+                                    {/* VISUAL MAP: ADDED PER REQUEST */}
+                                    <div className="mt-4 w-full h-32 rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 relative group">
+                                        <div className="absolute inset-0 bg-indigo-500/5 group-hover:bg-transparent transition-colors z-10"></div>
+                                        <iframe 
+                                            width="100%" 
+                                            height="100%" 
+                                            style={{ filter: 'grayscale(0.5) opacity(0.8)', border: 0 }}
+                                            src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_FIREBASE_API_KEY || ''}&q=${encodeURIComponent(booking.address || 'Ahmedabad')}`} 
+                                            allowFullScreen
+                                        ></iframe>
+                                    </div>
                                 </div>
                             </div>
                             <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
@@ -109,6 +120,12 @@ export default function BookingDetails() {
                                     <p className="text-4xl font-black text-slate-900 tracking-tighter">₹{booking.price}</p>
                                     <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
                                         <CheckCircle2 className="w-3 h-3" /> Pay After Service
+                                    </p>
+                                </div>
+                                <div className="space-y-1 pt-4 border-t border-slate-200/50">
+                                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Expected Duration</span>
+                                    <p className="text-xs font-bold text-slate-600 flex items-center gap-2">
+                                        <Clock className="w-3 h-3 text-indigo-500" /> 45 - 60 Minutes
                                     </p>
                                 </div>
                             </div>

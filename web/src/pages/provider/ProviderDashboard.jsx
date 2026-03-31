@@ -474,30 +474,34 @@ const ProviderDashboardContent = () => {
                                         </div>
                                     </div>
 
-                                    {/* Action Tracking Bar */}
-                                    <div className="grid grid-cols-3 gap-2 mb-8">
-                                        {[
-                                            { key: 'enroute', label: 'En-Route', icon: Navigation },
-                                            { key: 'arrived', label: 'Arrived', icon: MapPin },
-                                            { key: 'inprogress', label: 'Working', icon: Zap },
-                                        ].map((s) => {
-                                            const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
-                                            const currentStatusLevel = job.trackingStatus ? statusOrder[job.trackingStatus] || 0 : 0;
-                                            const thisStatusLevel = statusOrder[s.key];
-                                            const isPastOrCurrent = currentStatusLevel >= thisStatusLevel;
-                                            
-                                            return (
-                                                <button
-                                                    key={s.key}
-                                                    onClick={() => updateTrackingStatus(job, s.key)}
-                                                    disabled={isPastOrCurrent}
-                                                    className={`py-3 px-2 rounded-2xl flex flex-col items-center gap-1.5 transition-all border ${isPastOrCurrent ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10'}`}
-                                                >
-                                                    <s.icon className="w-4 h-4" />
-                                                    <span className="text-[8px] font-black uppercase tracking-widest">{s.label}</span>
-                                                </button>
-                                            );
-                                        })}
+                                    {/* Action Tracking Bar - REFINED FOR VISIBILITY */}
+                                    <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-6 mb-8 border border-white/10">
+                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-4 text-center">Track Your Progress</p>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {[
+                                                { key: 'enroute', label: 'En-Route', icon: Navigation, activeColor: 'bg-indigo-500 text-white border-indigo-400' },
+                                                { key: 'arrived', label: 'Arrived', icon: MapPin, activeColor: 'bg-rose-500 text-white border-rose-400' },
+                                                { key: 'inprogress', label: 'Working', icon: Zap, activeColor: 'bg-emerald-500 text-white border-emerald-400' },
+                                            ].map((s) => {
+                                                const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
+                                                const currentStatusLevel = job.trackingStatus ? statusOrder[job.trackingStatus] || 0 : 0;
+                                                const thisStatusLevel = statusOrder[s.key];
+                                                const isPastOrCurrent = currentStatusLevel >= thisStatusLevel;
+                                                const isCurrent = job.trackingStatus === s.key;
+                                                
+                                                return (
+                                                    <button
+                                                        key={s.key}
+                                                        onClick={() => updateTrackingStatus(job, s.key)}
+                                                        disabled={isPastOrCurrent}
+                                                        className={`py-4 px-2 rounded-2xl flex flex-col items-center gap-2 transition-all border shadow-lg ${isCurrent ? s.activeColor : (isPastOrCurrent ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 opacity-50' : 'bg-white/10 border-white/10 text-white/60 hover:bg-white hover:text-indigo-950')}`}
+                                                    >
+                                                        <s.icon className={`w-5 h-5 ${isCurrent ? 'animate-bounce' : ''}`} />
+                                                        <span className="text-[9px] font-black uppercase tracking-widest">{s.label}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
 
                                     <div className="pt-6 border-t border-white/10 flex items-center justify-between">
@@ -593,7 +597,7 @@ const ProviderDashboardContent = () => {
                                 <div className="bg-slate-50/50 rounded-[2.5rem] p-8 mb-8 border border-slate-100 relative overflow-hidden group-hover:bg-white transition-colors duration-500">
                                     <div className="flex flex-wrap items-center gap-2 mb-6">
                                         {((req.service || '').includes('(') ? (req.service.split('(')[1].replace(')', '').split(', ')) : [req.service]).map((s, i) => (
-                                            <span key={i} className="px-4 py-2 bg-white text-slate-600 rounded-xl text-[10px] font-bold border border-slate-100 shadow-sm">{s}</span>
+                                            <span key={i} className="px-5 py-2.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] shadow-lg shadow-indigo-200 border-2 border-white/10">{s}</span>
                                         ))}
                                     </div>
                                     
@@ -608,7 +612,10 @@ const ProviderDashboardContent = () => {
                                             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm">
                                                 <Clock className="w-4 h-4 text-indigo-500" />
                                             </div>
-                                            <span className="text-xs font-black uppercase tracking-widest">{req.slot || formatTime(req.time)}</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Time & Duration</span>
+                                                <span className="text-xs font-black uppercase tracking-widest">{formatTime(req.slot || req.time)} • <span className="text-indigo-600">45-60 Mins</span></span>
+                                            </div>
                                         </div>
                                         <div className="flex items-center gap-4 text-slate-600">
                                             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm">
