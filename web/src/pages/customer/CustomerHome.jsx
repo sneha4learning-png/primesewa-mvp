@@ -821,6 +821,64 @@ const CustomerHome = () => {
                 </div>
             </div>
 
+            {/* DASHBOARD STATS & INSIGHTS - MAKING IT MORE INFORMATIVE */}
+            {userData?.uid && bookingStep === 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 animate-fade-in px-2">
+                    <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+                                <Briefcase className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">My Services</p>
+                                <h3 className="text-xl font-black text-slate-900 tracking-tighter">{(activeBookings.length + pastBookings.length) || 0} Total Requests</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+                                <ShieldCheck className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Prime Safety</p>
+                                <h3 className="text-xl font-black text-slate-900 tracking-tighter">100% Insured Care</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+                                <Star className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Member Status</p>
+                                <h3 className="text-xl font-black text-slate-900 tracking-tighter">Prime Tier</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* TRUST BANNER - QUALITY ASSURANCE */}
+            {bookingStep === 0 && (
+                <div className="mb-16 group px-2">
+                   <div className="relative overflow-hidden bg-slate-950 rounded-[3rem] p-8 md:p-12 text-white shadow-2xl">
+                       <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700"></div>
+                       <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                           <div className="max-w-xl text-center md:text-left">
+                               <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300 mb-6 border border-indigo-500/30">
+                                   <Zap className="w-3.5 h-3.5" /> PrimeSewa Quality Shield
+                               </span>
+                               <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-none mb-4">Every service is backed by a ₹5,000 Guarantee.</h2>
+                               <p className="text-indigo-200/60 text-[8px] font-medium leading-relaxed uppercase tracking-widest">Standard safety protocol for every verified home visit.</p>
+                           </div>
+                           <button className="px-10 py-5 bg-white text-slate-950 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all shadow-xl shadow-white/10 active:scale-95 whitespace-nowrap">Learn More</button>
+                       </div>
+                   </div>
+                </div>
+            )}
+
             {/* LIVE BOOKINGS - MOVED TO TOP FOR IMMEDIATE VISIBILITY */}
             {activeBookings.length > 0 && bookingStep === 0 && (
                 <div className="mb-16 animate-fade-in">
