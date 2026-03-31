@@ -23,9 +23,13 @@ const CleanupPage = () => {
             // 1. Normalize Providers and Resolve Conflicts
             const combinedProviders = new Map();
             providers.forEach((p, idx) => {
-                const rawPhone = p.phone || '';
-                // EXTREME NORMALIZATION: Strip all, remove 91, take FIRST 10 (handles extra zero at end)
-                const normalized = rawPhone.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+                let rawPhone = (p.phone || '').replace(/\D/g, '');
+                
+                // INTELLIGENT 10-DIGIT EXTRACTION
+                if (rawPhone.startsWith('91') && rawPhone.length > 10) {
+                    rawPhone = rawPhone.slice(2);
+                }
+                const normalized = rawPhone.slice(0, 10);
                 const phoneKey = normalized || `DUMMY-${idx}`;
                 
                 const rawName = p.name || 'Professional Partner';
@@ -33,26 +37,35 @@ const CleanupPage = () => {
                 
                 const updates = {
                     name: rawName.trim(),
-                    phone: `+91${normalized}`, // Normalize to clean 10-digit format
+                    phone: `+91${normalized}`, // Standard 10-digit format
                     status: 'active',
                     isOnline: p.isOnline === true || String(p.isOnline) === 'true',
-                    // Auto-Correct: 'SERVICE' -> 'PLUMBING' per user request
+                    // Auto-Correct: 'SERVICE' -> 'Plumbing'
                     category: (currentCategory === 'SERVICE' || currentCategory === 'PROFESSIONAL SERVICE' || !currentCategory) ? 'Plumbing' : p.category,
                     price: (parseInt(String(p.price || 0).replace(/\D/g, '')) > 200) ? '₹149' : (String(p.price || '₹149').replace(/₹|\/hr/g, ''))
                 };
 
                 if (combinedProviders.has(phoneKey)) {
                     const existing = combinedProviders.get(phoneKey);
-                    // PRIORITIZATION: Prefer dev-prov- (real signup) over mock-prov- (dummy data)
-                    const isNewRealSignup = p.id.startsWith('dev-');
-                    const isExistingRealSignup = existing.id.startsWith('dev-');
+                    // PRIORITIZATION: Prefer dev-prov- (real signup)
+                    const pIsReal = p.id.startsWith('dev-');
+                    const eIsReal = existing.id.startsWith('dev-');
 
-                    if (isNewRealSignup && !isExistingRealSignup) {
+                    if (pIsReal && !eIsReal) {
                         toDelete.push(existing.id);
                         combinedProviders.set(phoneKey, { id: p.id, ...updates });
                         batch.update(doc(db, 'providers', p.id), updates);
-                    } else {
+                    } else if (!pIsReal && eIsReal) {
                         toDelete.push(p.id);
+                    } else {
+                        // Both same priority, keep the one with more data
+                        if (Object.keys(p).length > Object.keys(existing).length) {
+                             toDelete.push(existing.id);
+                             combinedProviders.set(phoneKey, { id: p.id, ...updates });
+                             batch.update(doc(db, 'providers', p.id), updates);
+                        } else {
+                             toDelete.push(p.id);
+                        }
                     }
                 } else {
                     combinedProviders.set(phoneKey, { id: p.id, ...updates });
