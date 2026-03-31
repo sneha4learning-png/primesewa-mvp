@@ -5,7 +5,7 @@ import OSMMap from '../../components/OSMMap';
 
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
-import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot, or } from 'firebase/firestore';
 import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight } from 'lucide-react';
 import { useNotifications } from '../../context/NotificationContext';
 
@@ -578,10 +578,13 @@ const CustomerHome = () => {
         });
 
         if (userData?.uid) {
-            // OPTIMIZED: Filter by UID directly in the query for performance & reliability
+            // BROADER QUERY: Match by UID OR Phone for maximum historical consistency
             const q = query(
                 collection(db, 'bookings'), 
-                where('customerUid', '==', userData.uid)
+                or(
+                    where('customerUid', '==', userData.uid),
+                    where('customerPhone', '==', userData.phone || '')
+                )
             );
             
             const unsubscribeBookings = onSnapshot(q, (snapshot) => {
