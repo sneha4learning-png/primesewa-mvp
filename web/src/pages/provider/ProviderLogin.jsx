@@ -209,11 +209,9 @@ const ProviderLogin = () => {
             } else {
                 // For login, find the provider in the list fetched during mount
                 const selectedProv = providers.find(p => {
-                    const cleanP = (p.phone || '').replace(/\D/g, '').replace(/^91/, '');
-                    const cleanI = phoneNumber.replace(/\D/g, '').replace(/^91/, '');
-                    // Match if first 10 digits are same (handles extra digit at end) 
-                    // OR if they match exactly
-                    return cleanP.startsWith(cleanI) || cleanI.startsWith(cleanP) || cleanP === cleanI;
+                    const cleanP = (p.phone || '').replace(/\D/g, '').slice(-10);
+                    const cleanI = phoneNumber.replace(/\D/g, '').slice(-10);
+                    return cleanP === cleanI && cleanP.length === 10;
                 });
 
                 if (!selectedProv) {
@@ -230,7 +228,7 @@ const ProviderLogin = () => {
             let providerData = {
                 uid: user.uid,
                 name: providerName,
-                phone: `+91${user.phoneNumber ? user.phoneNumber.replace('+91', '') : (isSignup ? signupData.phone : phoneNumber)}`,
+                phone: `+91${(user.phoneNumber ? user.phoneNumber.replace(/\D/g, '') : (isSignup ? signupData.phone : phoneNumber).replace(/\D/g, '')).slice(-10)}`,
                 role: 'provider',
                 createdAt: serverTimestamp()
             };
