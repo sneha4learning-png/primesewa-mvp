@@ -204,9 +204,9 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                         <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-amber-200">
                             <Star className="w-4 h-4 text-amber-500 mx-auto mb-1.5 fill-current" />
                             <div className="text-lg sm:text-xl font-black text-slate-900 leading-none">
-                                {ratingValue > 0 ? ratingValue.toFixed(1) : 'New'}
+                                {(liveJobsCount > 0 && ratingValue > 0) ? ratingValue.toFixed(1) : 'New'}
                             </div>
-                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">{ratingValue > 0 ? 'Rating' : 'Partner Status'}</div>
+                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">{(liveJobsCount > 0 && ratingValue > 0) ? 'Rating' : 'Partner Status'}</div>
                         </div>
                         <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-indigo-200">
                             <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1.5" />
@@ -819,7 +819,7 @@ const CustomerHome = () => {
                                                             <div className="flex bg-amber-50 px-2 py-1 rounded-lg items-center gap-1">
                                                                 <Star className="w-3 h-3 text-amber-500 fill-current" />
                                                                 <span className="text-[11px] font-black text-amber-600 uppercase">
-                                                                    {rating > 0 && rating !== '0.0' ? rating : 'New'}
+                                                                    {(p.jobs > 0 && p.rating > 0) ? parseFloat(p.rating).toFixed(1) : 'New'}
                                                                 </span>
                                                             </div>
                                                             <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
