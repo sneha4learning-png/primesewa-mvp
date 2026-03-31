@@ -405,9 +405,14 @@ const CustomerHome = () => {
     }, [userData]);
 
     const handleBook = (provider) => {
-        // FINAL DYNAMIC PRICE: CUSTOMER SPECIFIC PROVIDER RATE + Visiting Fee (Capped @ 199)
-        const baseRate = Math.min(parseInt(String(provider.price || 199).replace(/\D/g, '')), 199);
-        const servicesTotal = selectedSubServices.reduce((sum, s) => sum + (provider.subServiceRates?.[s.name] || s.price || 0), 0);
+        // FINAL DYNAMIC PRICE: CUSTOMER SPECIFIC PROVIDER RATE + Sub-Services with unique provider factor
+        const baseRate = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
+        // Apply a unique experience multiplier based on provider ID (0.94x to 1.14x) for diversity
+        const pFactor = 0.94 + ((provider.id || '').split('').reduce((a,c) => a + c.charCodeAt(0), 0) % 20) / 100;
+        const servicesTotal = selectedSubServices.reduce((sum, s) => {
+            const rate = provider.subServiceRates?.[s.name] || Math.round(s.price * pFactor);
+            return sum + rate;
+        }, 0);
         const finalTotal = baseRate + servicesTotal;
         
         setPendingBookingData({ 
@@ -600,10 +605,14 @@ const CustomerHome = () => {
                                                 : [...selectedSubServices, s];
                                             setSelectedSubServices(newSelection);
                                             
-                                            // UPDATE LIVE PRICE IN PENDING DATA
+                                            // UPDATE LIVE PRICE IN PENDING DATA WITH PROVIDER FACTOR
                                             const providerObj = onlineProviders.find(op => op.name === pendingBookingData?.provider);
                                             const providerBase = Math.min(parseInt(String(providerObj?.price || 149).replace(/\D/g, '')), 199);
-                                            const newTotal = providerBase + newSelection.reduce((a,b) => a + b.price, 0);
+                                            const pFactor = 0.94 + ((providerObj?.id || '').split('').reduce((a,c) => a + c.charCodeAt(0), 0) % 20) / 100;
+                                            const newTotal = providerBase + newSelection.reduce((a,b) => {
+                                                const rate = providerObj?.subServiceRates?.[b.name] || Math.round(b.price * pFactor);
+                                                return a + rate;
+                                            }, 0);
                                             setPendingBookingData(prev => ({ 
                                                 ...prev, 
                                                 price: newTotal,
@@ -613,7 +622,11 @@ const CustomerHome = () => {
                                             }));
                                         }} className={`p-4 border-2 rounded-[1.5rem] text-left transition-all group ${isSelected ? 'bg-indigo-50 border-indigo-600' : 'bg-white border-slate-100 hover:border-indigo-200'}`}>
                                             <p className={`text-[10px] font-black uppercase mb-1 tracking-tighter ${isSelected ? 'text-indigo-600' : 'text-slate-900'}`}>{s.name}</p>
-                                            <p className="text-[10px] font-bold text-slate-400">₹{s.price}</p>
+                                            <p className="text-[10px] font-bold text-slate-400">₹{(() => {
+                                                const providerObj = onlineProviders.find(op => op.name === pendingBookingData?.provider);
+                                                const pFactor = 0.94 + ((providerObj?.id || '').split('').reduce((a,c) => a + c.charCodeAt(0), 0) % 20) / 100;
+                                                return providerObj?.subServiceRates?.[s.name] || Math.round(s.price * pFactor);
+                                            })()}</p>
                                         </button>
                                     );
                                 })}
@@ -823,7 +836,12 @@ const CustomerHome = () => {
                                                         <p className="text-3xl font-black text-indigo-600 tracking-tighter">
                                                             ₹{(() => {
                                                                 const base = Math.min(parseInt(String(p.price || 149).replace(/\D/g, '')), 199);
-                                                                const subTotal = selectedSubServices.reduce((a,s) => a + (p.subServiceRates?.[s.name] || s.price || 0), 0);
+                                                                // Apply same pFactor logic for visual consistency in the catalog
+                                                                const pFactor = 0.94 + ((p.id || '').split('').reduce((a,c) => a + (c.charCodeAt(0) || 0), 0) % 20) / 100;
+                                                                const subTotal = selectedSubServices.reduce((a,s) => {
+                                                                    const rate = p.subServiceRates?.[s.name] || Math.round(s.price * pFactor);
+                                                                    return a + rate;
+                                                                }, 0);
                                                                 return subTotal + base;
                                                             })()}
                                                         </p>
