@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../firebase/config';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { ChevronLeft, Calendar, Clock, MapPin, IndianRupee, ShieldCheck, Phone, CheckCircle2, XCircle, AlertCircle, Loader2, Truck, Zap } from 'lucide-react';
+import OSMMap from '../../components/OSMMap';
 
 export default function BookingDetails() {
     const { id } = useParams();
@@ -103,14 +104,14 @@ export default function BookingDetails() {
                                     </p>
                                     {/* VISUAL MAP: ADDED PER REQUEST */}
                                     <div className="mt-4 w-full h-32 rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 relative group">
-                                        <div className="absolute inset-0 bg-indigo-500/5 group-hover:bg-transparent transition-colors z-10"></div>
-                                        <iframe 
-                                            width="100%" 
-                                            height="100%" 
-                                            style={{ filter: 'grayscale(0.5) opacity(0.8)', border: 0 }}
-                                            src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_FIREBASE_API_KEY || ''}&q=${encodeURIComponent(booking.address || 'Ahmedabad')}`} 
-                                            allowFullScreen
-                                        ></iframe>
+                                        <div className="absolute inset-0 bg-indigo-500/5 group-hover:bg-transparent transition-colors z-10 pointer-events-none"></div>
+                                        <OSMMap 
+                                            houseNo={booking.houseNo} 
+                                            area={booking.area} 
+                                            address={booking.address} 
+                                            latitude={booking.latitude} 
+                                            longitude={booking.longitude} 
+                                        />
                                     </div>
                                 </div>
                             </div>

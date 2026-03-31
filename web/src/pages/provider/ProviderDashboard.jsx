@@ -3,6 +3,7 @@ import { CheckCircle, CheckCircle2, XCircle, MapPin, Phone, IndianRupee, Clock, 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
+import OSMMap from '../../components/OSMMap';
 import { 
     collection, doc, updateDoc, query, where, 
     serverTimestamp, onSnapshot, increment, getDocs, 
@@ -477,17 +478,14 @@ const ProviderDashboardContent = () => {
                                                 </div>
                                             </div>
                                             {/* LIVE OSM/GOOGLE TRACKER VIEW */}
-                                            <div className="w-full h-32 rounded-[1.5rem] overflow-hidden border border-white/10 bg-indigo-900/50 mt-4 shadow-inner">
-                                                <iframe 
-                                                   width="100%" 
-                                                   height="100%" 
-                                                   frameBorder="0" 
-                                                   scrolling="no" 
-                                                   marginHeight="0" 
-                                                   marginWidth="0" 
-                                                   src={`https://maps.google.com/maps?width=100%25&height=150&hl=en&q=${encodeURIComponent((job.houseNo ? `${job.houseNo}, ${job.area}` : job.address) + ', Ahmedabad, India')}&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
-                                                   style={{ filter: 'invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%)' }}
-                                                ></iframe>
+                                            <div className="w-full h-32 rounded-[1.5rem] overflow-hidden border border-white/10 bg-indigo-900/50 mt-4 shadow-inner relative group">
+                                                <OSMMap 
+                                                    houseNo={job.houseNo} 
+                                                    area={job.area} 
+                                                    address={job.address} 
+                                                    latitude={job.latitude} 
+                                                    longitude={job.longitude} 
+                                                />
                                             </div>
                                         </div>
                                         <div className="text-right">

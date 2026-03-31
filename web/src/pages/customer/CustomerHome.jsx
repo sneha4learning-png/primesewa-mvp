@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useMemo, useRef, Component } from 'react';
 import { createPortal } from 'react-dom';
+import OSMMap from '../../components/OSMMap';
 
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
@@ -278,25 +279,12 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const [osmBbox, setOsmBbox] = useState('');
-
     useEffect(() => {
         if (!bookingId) return;
         const unsub = onSnapshot(doc(db, 'bookings', bookingId), (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 setBooking({ id: docSnap.id, ...data });
-                
-                // FETCH OSM BBOX FOR PRECISION
-                const qStr = data.houseNo ? `${data.houseNo}, ${data.area}, Ahmedabad, India` : `${data.address}, Ahmedabad, India`;
-                fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(qStr)}&format=json&limit=1`)
-                    .then(r => r.json())
-                    .then(d => {
-                        if (d && d[0] && d[0].boundingbox) {
-                            const [s, n, w, e] = d[0].boundingbox;
-                            setOsmBbox(`${w}%2C${s}%2C${e}%2C${n}`);
-                        }
-                    }).catch(err => console.error("OSM BBOX Fetch Error:", err));
             }
             setLoading(false);
         });
@@ -395,32 +383,16 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                         {/* LIVE TRACKER MAP */}
                         <div className="space-y-4 pt-4">
                             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <MapPin className="w-3.5 h-3.5 text-indigo-500" /> Live Tracker
+                                <MapPin className="w-3.5 h-3.5 text-indigo-500" /> Live Tracker (OSM)
                             </h3>
                             <div className="w-full h-40 rounded-[2rem] overflow-hidden border border-slate-100 bg-slate-50 relative group">
-                                {osmBbox ? (
-                                    <iframe 
-                                        width="100%" 
-                                        height="100%" 
-                                        frameBorder="0" 
-                                        scrolling="no" 
-                                        marginHeight="0" 
-                                        marginWidth="0" 
-                                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${osmBbox}&layer=mapnik&marker=${osmBbox.split('%2C')[1]}%2C${osmBbox.split('%2C')[0]}`}
-                                        className="contrast-[1.1] grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
-                                    ></iframe>
-                                ) : (
-                                    <iframe 
-                                        width="100%" 
-                                        height="100%" 
-                                        frameBorder="0" 
-                                        scrolling="no" 
-                                        marginHeight="0" 
-                                        marginWidth="0" 
-                                        src={`https://maps.google.com/maps?width=100%25&height=160&hl=en&q=${encodeURIComponent((booking.houseNo ? `${booking.houseNo}, ${booking.area}` : booking.address) + ', Ahmedabad, India')}&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
-                                        className="grayscale-[0.1] contrast-[0.9] brightness-[1.02] group-hover:grayscale-0 transition-all duration-700"
-                                    ></iframe>
-                                )}
+                                <OSMMap 
+                                    houseNo={booking.houseNo} 
+                                    area={booking.area} 
+                                    address={booking.address} 
+                                    latitude={booking.latitude} 
+                                    longitude={booking.longitude} 
+                                />
                                 <div className="absolute top-4 right-4 px-3 py-1.5 bg-white/90 backdrop-blur rounded-full shadow-lg border border-slate-100 flex items-center gap-2 animate-bounce">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                                     <span className="text-[8px] font-black uppercase text-slate-900 tracking-widest">Tracking Live (OSM)</span>
@@ -503,6 +475,7 @@ const CustomerHome = () => {
     const [bookingHouseNo, setBookingHouseNo] = useState('');
     const [bookingArea, setBookingArea] = useState('');
     const [bookingCity] = useState('Ahmedabad');
+    const [bookingCoords, setBookingCoords] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLocating, setIsLocating] = useState(false);
@@ -558,6 +531,7 @@ const CustomerHome = () => {
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
                 const data = await res.json();
                 if (data.display_name) {
+                    setBookingCoords({ lat: latitude, lon: longitude });
                     const primary = data.display_name.split(',')[0].trim();
                     const secondary = (data.address.suburb || data.address.neighbourhood || '').trim();
                     if (primary === secondary || !secondary) {
@@ -705,6 +679,8 @@ const CustomerHome = () => {
                 houseNo: bookingHouseNo,
                 area: bookingArea,
                 city: bookingCity,
+                latitude: bookingCoords?.lat || null,
+                longitude: bookingCoords?.lon || null,
                 address: `${bookingHouseNo}, ${bookingArea}, ${bookingCity}`,
                 createdAt: serverTimestamp()
             };
@@ -966,6 +942,7 @@ const CustomerHome = () => {
                                                         type="button"
                                                         onClick={() => {
                                                             setBookingArea(s.display_name.split(',')[0] + (s.display_name.split(',')[1] ? ', ' + s.display_name.split(',')[1] : ''));
+                                                            setBookingCoords({ lat: s.lat, lon: s.lon });
                                                             setAddressSuggestions([]);
                                                         }}
                                                         className="w-full p-4 text-left hover:bg-slate-50 border-b border-slate-50 last:border-none flex items-start gap-3 transition-colors"
