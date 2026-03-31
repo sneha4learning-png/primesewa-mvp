@@ -39,6 +39,16 @@ export default function BookingDetails() {
         </div>
     );
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return '';
+        if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
+    };
+
     const getStatusColor = (status) => {
         switch (String(status).toLowerCase()) {
             case 'pending': return 'bg-amber-100 text-amber-600 border-amber-200';
@@ -80,14 +90,16 @@ export default function BookingDetails() {
                                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                         <Calendar className="w-3.5 h-3.5 text-indigo-500" /> Date & Time
                                     </label>
-                                    <p className="text-sm font-bold text-slate-700">{booking.date} at {booking.slot}</p>
+                                    <p className="text-sm font-bold text-slate-700">{booking.date} at {formatTime(booking.slot)}</p>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                         <MapPin className="w-3.5 h-3.5 text-rose-500" /> Service Location
                                     </label>
                                     <p className="text-sm font-medium text-slate-600 leading-relaxed">
-                                        {booking.houseNo}, {booking.area}
+                                        {(booking.houseNo && booking.area) 
+                                            ? `${booking.houseNo}, ${booking.area}` 
+                                            : (booking.address || 'Address details being retrieved...')}
                                     </p>
                                 </div>
                             </div>
@@ -104,15 +116,25 @@ export default function BookingDetails() {
 
                         {/* PROVIDER INFO */}
                         <div className="space-y-6 border-t border-slate-100 pt-12">
-                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Assigned Expert</h3>
+                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Assigned Specialist</h3>
                             <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group transition-all hover:bg-white hover:shadow-xl">
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl font-black text-slate-200 shadow-inner group-hover:rotate-3 transition-transform overflow-hidden border border-slate-100">
-                                        {booking.provider?.charAt(0) || 'P'}
+                                        {booking.provider && booking.provider.toLowerCase() !== 'unassigned' 
+                                            ? booking.provider.charAt(0).toUpperCase() 
+                                            : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />}
                                     </div>
                                     <div>
-                                        <p className="text-lg font-black text-slate-900 uppercase tracking-tight">{booking.provider || 'Professional'}</p>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Verified Expert</p>
+                                        <p className="text-lg font-black text-slate-900 uppercase tracking-tight">
+                                            {booking.provider && booking.provider.toLowerCase() !== 'unassigned' 
+                                                ? booking.provider 
+                                                : 'Assigning Expert...'}
+                                        </p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
+                                            {booking.provider && booking.provider.toLowerCase() !== 'unassigned' 
+                                                ? 'Verified Expert' 
+                                                : 'Searching for your professional'}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">

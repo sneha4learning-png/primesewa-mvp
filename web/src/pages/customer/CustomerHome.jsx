@@ -461,6 +461,9 @@ const CustomerHome = () => {
                 date: bookingDate,
                 slot: bookingSlot,
                 description: bookingDesc,
+                houseNo: bookingHouseNo,
+                area: bookingArea,
+                city: bookingCity,
                 address: `${bookingHouseNo}, ${bookingArea}, ${bookingCity}`,
                 createdAt: serverTimestamp()
             };
