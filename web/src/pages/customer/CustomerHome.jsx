@@ -642,9 +642,9 @@ const CustomerHome = () => {
                 providerName: nameToSave, // Save both to be safe
                 providerUid: uidToSave,
                 providerPhone: phoneToSave,
-                customer: userData.name,
+                customer: userData.name || userData.displayName || 'Prime Customer',
                 customerUid: userData.uid,
-                customerPhone: userData.phone,
+                customerPhone: userData.phone || userData.phoneNumber || '',
                 price: priceToSave,
                 date: bookingDate,
                 slot: bookingSlot,
