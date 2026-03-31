@@ -34,8 +34,8 @@ const CleanupPage = () => {
                 // CRITICAL: Providers must NOT have 1111111111 (Reserved for Sneha Customer)
                 let normalizedPhone = p.phone || `+9199999${10000 + idx}`;
                 if (hasConflictingNumber || isNewProv || isSneha) {
-                    // Assign a unique dummy number for test providers that doesn't conflict with customer
-                    normalizedPhone = `+9198765${20000 + idx}`;
+                    // Assign a unique 10-digit dummy number for test providers (987654... format)
+                    normalizedPhone = `+91987654${1000 + idx}`;
                 }
 
                 const updates = {

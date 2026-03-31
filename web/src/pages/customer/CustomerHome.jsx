@@ -348,7 +348,7 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                             <div className="space-y-6 bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-black text-indigo-600 uppercase tracking-widest leading-none">Total Payment</label>
-                                    <p className="text-4xl font-black text-slate-900 tracking-tighter">₹{booking.price}</p>
+                                    <p className="text-4xl font-black text-slate-900 tracking-tighter">₹{booking.price || '0'}</p>
                                     <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
                                         <CheckCircle2 className="w-3 h-3" /> Pay After Service
                                     </p>
@@ -362,7 +362,7 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl font-black text-slate-200 shadow-inner group-hover:rotate-3 transition-transform overflow-hidden border border-slate-100">
                                         {(() => {
-                                            const pName = booking.provider || booking.providerName;
+                                            const pName = booking.provider || booking.providerName || booking.expert;
                                             const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
                                             return hasProvider ? pName.charAt(0).toUpperCase() : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />;
                                         })()}
@@ -370,13 +370,13 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                     <div>
                                         <p className="text-lg font-black text-slate-900 uppercase tracking-tight">
                                             {(() => {
-                                                const pName = booking.provider || booking.providerName;
+                                                const pName = booking.provider || booking.providerName || booking.expert;
                                                 const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
-                                                return hasProvider ? pName : (booking.providerUid ? `Expert #${booking.providerUid.slice(-4).toUpperCase()}` : 'Assigning Expert...');
+                                                return hasProvider ? pName : (booking.providerUid ? `Expert #${String(booking.providerUid).slice(-4).toUpperCase()}` : 'Assigning Expert...');
                                             })()}
                                         </p>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
-                                            {((booking.provider || booking.providerName) && (booking.provider || booking.providerName).toLowerCase() !== 'unassigned') 
+                                            {((booking.provider || booking.providerName || booking.expert) && (booking.provider || booking.providerName || booking.expert).toLowerCase() !== 'unassigned') 
                                                 ? 'Verified Expert' 
                                                 : 'Searching for your professional'}
                                         </p>
@@ -611,11 +611,12 @@ const CustomerHome = () => {
                 service: pendingBookingData.service || 'PrimeSewa Service',
                 status: 'pending',
                 provider: providerName,
-                providerUid: pendingBookingData.uid || pendingBookingData.id || '',
+                providerUid: pendingBookingData.providerUid || '',
+                providerPhone: pendingBookingData.providerPhone || '',
                 customer: userData.name,
                 customerUid: userData.uid,
                 customerPhone: userData.phone,
-                price: pendingBookingData.price,
+                price: pendingBookingData.price || 0,
                 date: bookingDate,
                 slot: bookingSlot,
                 description: bookingDesc,
