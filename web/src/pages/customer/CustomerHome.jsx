@@ -274,7 +274,9 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
         if (!bookingId) return;
         const unsub = onSnapshot(doc(db, 'bookings', bookingId), (docSnap) => {
             if (docSnap.exists()) {
-                setBooking({ id: docSnap.id, ...docSnap.data() });
+                const data = docSnap.data();
+                console.log("DEBUG: LIVE BOOKING DATA RECIEVED", data);
+                setBooking({ id: docSnap.id, ...data });
             }
             setLoading(false);
         });
@@ -362,23 +364,24 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                 <div className="flex items-center gap-5">
                                     <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl font-black text-slate-200 shadow-inner group-hover:rotate-3 transition-transform overflow-hidden border border-slate-100">
                                         {(() => {
-                                            const pName = booking.provider || booking.providerName || booking.expert;
-                                            const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
-                                            return hasProvider ? pName.charAt(0).toUpperCase() : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />;
+                                            const pName = booking.provider || booking.providerName || booking.expert || booking.providerUId; 
+                                            const hasProviderName = pName && String(pName).toLowerCase() !== 'unassigned';
+                                            return hasProviderName ? pName.charAt(0).toUpperCase() : (booking.providerUid ? 'E' : <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />);
                                         })()}
                                     </div>
                                     <div>
                                         <p className="text-lg font-black text-slate-900 uppercase tracking-tight">
                                             {(() => {
                                                 const pName = booking.provider || booking.providerName || booking.expert;
-                                                const hasProvider = pName && pName.toLowerCase() !== 'unassigned';
-                                                return hasProvider ? pName : (booking.providerUid ? `Expert #${String(booking.providerUid).slice(-4).toUpperCase()}` : 'Assigning Expert...');
+                                                const hasProviderName = pName && String(pName).toLowerCase() !== 'unassigned';
+                                                
+                                                if (hasProviderName) return pName;
+                                                if (booking.providerUid) return `Expert #${String(booking.providerUid).slice(-4).toUpperCase()}`;
+                                                return 'Assigning Expert...';
                                             })()}
                                         </p>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
-                                            {((booking.provider || booking.providerName || booking.expert) && (booking.provider || booking.providerName || booking.expert).toLowerCase() !== 'unassigned') 
-                                                ? 'Verified Expert' 
-                                                : 'Searching for your professional'}
+                                            {(booking.provider || booking.providerName || booking.expert) ? 'Verified Expert' : 'Searching for your professional'}
                                         </p>
                                     </div>
                                 </div>
@@ -606,17 +609,23 @@ const CustomerHome = () => {
         
         setIsSubmitting(true);
         try {
-            const providerName = pendingBookingData.name || pendingBookingData.provider || 'Unassigned';
+            // EXPLICIT DATA EXTRACTION FOR MAXIMUM PERSISTENCE
+            const nameToSave = pendingBookingData.provider || pendingBookingData.name || 'Unassigned';
+            const priceToSave = pendingBookingData.price || 0;
+            const uidToSave = pendingBookingData.providerUid || pendingBookingData.uid || '';
+            const phoneToSave = pendingBookingData.providerPhone || '';
+
             const booking = {
                 service: pendingBookingData.service || 'PrimeSewa Service',
                 status: 'pending',
-                provider: providerName,
-                providerUid: pendingBookingData.providerUid || '',
-                providerPhone: pendingBookingData.providerPhone || '',
+                provider: nameToSave,
+                providerName: nameToSave, // Save both to be safe
+                providerUid: uidToSave,
+                providerPhone: phoneToSave,
                 customer: userData.name,
                 customerUid: userData.uid,
                 customerPhone: userData.phone,
-                price: pendingBookingData.price || 0,
+                price: priceToSave,
                 date: bookingDate,
                 slot: bookingSlot,
                 description: bookingDesc,
