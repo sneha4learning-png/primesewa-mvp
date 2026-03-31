@@ -16,6 +16,7 @@ const CleanupPage = () => {
 
             const providers = [];
             const users = [];
+            const toDelete = [];
 
             providerSnapshot.forEach(d => providers.push({ id: d.id, ...d.data() }));
             userSnapshot.forEach(d => users.push({ id: d.id, ...d.data() }));

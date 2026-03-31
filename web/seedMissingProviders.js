@@ -127,7 +127,7 @@ const seedMissingProviders = async () => {
             isOnline: true,
             rating: 5.0,
             jobs: 1,
-            phone: "+91 91000 00000",
+            phone: `+91 91000 00${String(categories.indexOf(catObj) + 1).padStart(3, '0')}`,
             price: catObj.price,
             role: 'provider',
             serviceAreas: ["Vastrapur", "Prahlad Nagar", "Navrangpura", "Satellite"],
