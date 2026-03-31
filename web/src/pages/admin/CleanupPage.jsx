@@ -33,6 +33,17 @@ const CleanupPage = () => {
                 
                 // CRITICAL: Providers must NOT have 1111111111 (Reserved for Sneha Customer)
                 let normalizedPhone = p.phone || `+9199999${10000 + idx}`;
+                
+                // DATA RECOVERY: If number has 11+ digits after +91, it's likely a mock artifact with an extra zero
+                const digitsOnly = normalizedPhone.replace(/\D/g, '');
+                if (digitsOnly.length > 10) {
+                    if (digitsOnly.startsWith('91') && digitsOnly.length > 12) {
+                        normalizedPhone = `+91${digitsOnly.slice(2, 12)}`; // Keep first 10 after country code
+                    } else if (!digitsOnly.startsWith('91') && digitsOnly.length > 10) {
+                        normalizedPhone = `+91${digitsOnly.slice(0, 10)}`;
+                    }
+                }
+
                 if (hasConflictingNumber || isNewProv || isSneha) {
                     // Assign a unique 10-digit dummy number for test providers (987654... format)
                     normalizedPhone = `+91987654${1000 + idx}`;

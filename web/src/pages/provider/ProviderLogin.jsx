@@ -208,10 +208,11 @@ const ProviderLogin = () => {
             } else {
                 // For login, find the provider in the list fetched during mount
                 const selectedProv = providers.find(p => {
-                    const cleanP = (p.phone || '').replace(/\D/g, '');
-                    const cleanI = phoneNumber.replace(/\D/g, '');
-                    // Match if last 10 digits are same, or if they match exactly (handling 11-digit artifacts)
-                    return cleanP.slice(-10) === cleanI.slice(-10) || cleanP === cleanI;
+                    const cleanP = (p.phone || '').replace(/\D/g, '').replace(/^91/, '');
+                    const cleanI = phoneNumber.replace(/\D/g, '').replace(/^91/, '');
+                    // Match if first 10 digits are same (handles extra digit at end) 
+                    // OR if they match exactly
+                    return cleanP.startsWith(cleanI) || cleanI.startsWith(cleanP) || cleanP === cleanI;
                 });
 
                 if (!selectedProv) {
