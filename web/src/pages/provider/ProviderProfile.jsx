@@ -216,7 +216,7 @@ const ProviderProfile = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500 font-medium">Customer Rating</p>
-                                        {profile.rating > 0 ? (
+                                        {(profile.rating > 0 && (profile.ratingCount || 0) > 0) ? (
                                             <div className="flex items-center gap-2">
                                                 <p className="font-bold text-gray-900">{Number(profile.rating).toFixed(1)} / 5.0</p>
                                                 <div className="flex">
@@ -234,7 +234,7 @@ const ProviderProfile = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <p className="text-sm font-bold text-slate-400 mt-1">New Partner (No ratings)</p>
+                                            <p className="text-sm font-bold text-slate-400 mt-1">New Partner (No ratings yet)</p>
                                         )}
                                     </div>
                                 </div>
