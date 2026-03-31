@@ -920,24 +920,82 @@ const CustomerHome = () => {
                 </div>
             )}
 
-            <div className="mb-16">
-                <div className="flex items-end justify-between mb-8 px-4">
-                    <div>
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600 mb-2">Categories</h3>
-                        <h2 className="text-3xl font-black tracking-tighter text-slate-900">Choose a Service</h2>
+            </div>
+            
+            {/* RECENT HISTORY & CATEGORIES SECTION - SINGLE COLUMN FLOW */}
+            <div className="space-y-16">
+                {/* UPGRADED RECENT HISTORY - NOW AT TOP & MORE READABLE */}
+                {pastBookings.length > 0 && bookingStep === 0 && (
+                    <div className="mb-16 animate-fade-in px-2">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-3">
+                                <PieChartIcon className="w-5 h-5 text-indigo-600" />
+                                <h2 className="text-2xl font-black tracking-tighter text-slate-900 uppercase">Recent Activity</h2>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {pastBookings.map(b => (
+                                <div key={b.id} className="group/item bg-white rounded-[2.5rem] border border-slate-100 p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="px-5 py-2 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${b.status === 'completed' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{b.status}</span>
+                                        </div>
+                                        <span className="text-[11px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
+                                    </div>
+                                    <p className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-2">{b.service}</p>
+                                    <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-8 leading-none">{b.provider}</h4>
+                                    
+                                    <div className="flex items-center justify-between pt-8 border-t border-slate-50">
+                                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Amount: <span className="text-slate-950 font-black">₹{b.price}</span></p>
+                                        
+                                        {b.status === 'completed' && (
+                                            <div className="flex gap-1.5 items-center">
+                                                {!b.rated ? (
+                                                    <>
+                                                        {[1, 2, 3, 4, 5].map(s => (
+                                                            <Star 
+                                                                key={s} 
+                                                                onClick={() => setRatingState({ bookingId: b.id, rating: s })} 
+                                                                className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200'}`} 
+                                                            />
+                                                        ))}
+                                                        {ratingState.bookingId === b.id && (
+                                                            <button onClick={() => submitRating(b)} className="ml-3 px-4 py-2 bg-slate-950 text-white text-[10px] font-black uppercase rounded-xl shadow-lg active:scale-95 transition-all">Submit</button>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <div className="flex">
+                                                        {[1, 2, 3, 4, 5].map(s => <Star key={s} className={`w-4 h-4 ${s <= (b.ratingGiven || 5) ? 'text-amber-400 fill-current' : 'text-slate-100'}`} />)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <div className="mb-16">
+                    <div className="flex items-end justify-between mb-8 px-4">
+                        <div>
+                            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600 mb-2">Service Fleet</h3>
+                            <h2 className="text-4xl font-black tracking-tighter text-slate-900">Choose a Category</h2>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-5 sm:grid-cols-10 gap-x-2 gap-y-8 px-2 overflow-x-auto hide-scrollbar pb-4">
+                        {categories.map(cat => (
+                            <button key={cat.id} onClick={() => { setSelectedCategory(cat.name); setSelectedSubServices([]); }} className={`flex flex-col items-center gap-4 transition-all duration-300 hover:-translate-y-2 group shrink-0 ${selectedCategory === cat.name ? 'scale-105' : 'opacity-80 hover:opacity-100'}`}>
+                                <div className={`w-16 h-16 md:w-24 md:h-24 rounded-[2.5rem] flex items-center justify-center transition-all duration-500 ${selectedCategory === cat.name ? 'bg-indigo-600 shadow-2xl shadow-indigo-600/30' : 'bg-white border border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-lg'}`}>
+                                    <cat.icon className={`w-7 h-7 md:w-10 md:h-10 transition-colors duration-500 ${selectedCategory === cat.name ? 'text-white' : cat.iconColor}`} />
+                                </div>
+                                <span className={`text-[10px] md:text-[11px] font-black uppercase tracking-widest text-center transition-colors ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500 group-hover:text-indigo-400'}`}>{cat.name}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
-                <div className="grid grid-cols-5 sm:grid-cols-10 gap-x-2 gap-y-8 px-2 overflow-x-auto hide-scrollbar pb-4">
-                    {categories.map(cat => (
-                        <button key={cat.id} onClick={() => { setSelectedCategory(cat.name); setSelectedSubServices([]); }} className={`flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-2 group shrink-0 ${selectedCategory === cat.name ? 'scale-105' : 'opacity-80 hover:opacity-100'}`}>
-                            <div className={`w-14 h-14 md:w-20 md:h-20 rounded-[2rem] flex items-center justify-center transition-all duration-500 ${selectedCategory === cat.name ? 'bg-indigo-600 shadow-xl shadow-indigo-600/30' : 'bg-white border border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-lg'}`}>
-                                <cat.icon className={`w-6 h-6 md:w-8 md:h-8 transition-colors duration-500 ${selectedCategory === cat.name ? 'text-white' : cat.iconColor}`} />
-                            </div>
-                            <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-widest text-center transition-colors ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500 group-hover:text-indigo-400'}`}>{cat.name}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
 
             {bookingStep === 1 ? (
                 <div className="max-w-4xl bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 mx-auto animate-fade-in border border-slate-100">
@@ -1117,8 +1175,8 @@ const CustomerHome = () => {
                     <h2 className="text-4xl font-medium">Confirmed!</h2>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    <div className="lg:col-span-3 space-y-8">
+                <div className="space-y-20">
+                    <div className="space-y-16">
                         {selectedCategory && (
                             <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100">
                                 <h3 className="text-2xl font-black mb-6">Select {selectedCategory} Services</h3>
@@ -1243,58 +1301,6 @@ const CustomerHome = () => {
                                 </p>
                             </div>
                         )}
-                    </div>
-
-                    <div className="space-y-8">
-                        <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden group">
-                            <div className="bg-gradient-to-br from-indigo-950 to-indigo-900 p-8 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-                                <h2 className="text-xl font-black text-white relative z-10 uppercase tracking-tighter italic">Recent History</h2>
-                                <p className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mt-1 relative z-10">Your previous premium services</p>
-                            </div>
-                            <div className="p-6 space-y-4">
-                                {pastBookings.length > 0 ? pastBookings.map(b => (
-                                    <div key={b.id} className="group/item p-6 bg-slate-50 hover:bg-white rounded-[2rem] border border-slate-100 hover:border-indigo-100 transition-all duration-500 hover:shadow-xl hover:shadow-indigo-500/5">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <p className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em]">{b.service}</p>
-                                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">#{b.id.slice(-4).toUpperCase()}</span>
-                                        </div>
-                                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight mb-3 decoration-indigo-500/30 group-hover/item:underline underline-offset-4">{b.provider}</h4>
-                                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200/50">
-                                            <p className="text-[10px] font-bold text-slate-400">₹{b.price} • <span className="text-indigo-400 capitalize">{b.status}</span></p>
-                                            {b.status === 'completed' && !b.rated && (
-                                                <div className="flex gap-1">
-                                                    {[1, 2, 3, 4, 5].map(s => (
-                                                        <Star 
-                                                            key={s} 
-                                                            onClick={() => setRatingState({ bookingId: b.id, rating: s })} 
-                                                            className={`w-3.5 h-3.5 cursor-pointer transition-all hover:scale-125 ${s <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200 hover:text-amber-200'}`} 
-                                                        />
-                                                    ))}
-                                                    {ratingState.bookingId === b.id && (
-                                                        <button onClick={() => submitRating(b)} className="ml-2 py-1 px-3 bg-indigo-600 text-white text-[8px] font-black uppercase rounded-lg shadow-lg shadow-indigo-600/20 active:scale-90 transition-all">Submit</button>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {b.rated && (
-                                                <div className="flex gap-0.5">
-                                                    {[1, 2, 3, 4, 5].map(s => (
-                                                        <Star key={s} className={`w-3 h-3 ${s <= (b.ratingGiven || 5) ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <div className="py-12 text-center">
-                                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                                            <Search className="w-8 h-8 text-slate-200" />
-                                        </div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-loose">No history found.<br/>Your completed jobs will appear here.</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
                     </div>
                 </div>
             )}
