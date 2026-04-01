@@ -95,11 +95,14 @@ const ProviderDashboardContent = () => {
             const completedJobs = myLiveBookings.filter(b => b.status === 'completed');
 
             const calcEarnings = (fromDate) => completedJobs
-                .filter(job => new Date(job.date || job.completedAt?.toDate?.() || 0) >= fromDate)
+                .filter(job => {
+                    const jobDate = new Date(job.date || (job.completedAt?.toDate ? job.completedAt.toDate() : 0));
+                    return jobDate >= fromDate;
+                })
                 .reduce((sum, job) => {
                     const rawPrice = job.price || job.proposedPrice || job.amount || 0;
-                    const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 500;
-                    return sum + Math.floor(amt * 0.85);
+                    const amt = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                    return sum + Math.floor(Number(amt) * 0.85);
                 }, 0);
 
             const now = new Date();

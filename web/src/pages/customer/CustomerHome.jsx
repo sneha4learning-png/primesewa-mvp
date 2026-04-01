@@ -276,7 +276,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
     );
 };
 
-const BookingDetailsModal = ({ bookingId, onClose }) => {
+const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -309,9 +309,12 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
     };
 
     const getStatusColor = (status) => {
-        switch (String(status).toLowerCase()) {
+        const s = String(status || '').toLowerCase();
+        switch (s) {
             case 'pending': return 'bg-amber-100 text-amber-600 border-amber-200';
-            case 'confirmed': return 'bg-blue-100 text-blue-600 border-blue-200';
+            case 'negotiating': return 'bg-violet-100 text-violet-600 border-violet-200 animate-pulse';
+            case 'confirmed':
+            case 'accepted': return 'bg-blue-100 text-blue-600 border-blue-200';
             case 'completed': return 'bg-emerald-100 text-emerald-600 border-emerald-200';
             case 'rejected':
             case 'cancelled': return 'bg-rose-100 text-rose-600 border-rose-200';
@@ -341,9 +344,22 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                 <h1 className="text-3xl font-black text-white tracking-tighter leading-none">{booking.service}</h1>
                             </div>
                             <div className={`px-5 py-2.5 rounded-full border-2 text-[10px] font-black uppercase tracking-widest backdrop-blur-md whitespace-nowrap ${getStatusColor(booking.status)}`}>
-                                {booking.status}
+                                {booking.status === 'negotiating' ? 'Action Required: New Quote' : booking.status}
                             </div>
                         </div>
+                        {booking.status === 'negotiating' && (
+                            <div className="mt-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-[2rem] animate-pulse">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                        <IndianRupee className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">New Pricing Proposal</p>
+                                        <p className="text-sm font-bold text-amber-900 leading-tight">The expert has proposed a revised quote for your service. Please review and respond below.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -371,8 +387,10 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-125"></div>
                                 <div className="relative z-10 flex flex-col h-full justify-between">
                                     <div>
-                                        <label className="text-[9px] font-black text-indigo-100 uppercase tracking-widest leading-none">Total Payment</label>
-                                        <p className="text-4xl font-black tracking-tighter mt-1">₹{booking.price || '0'}</p>
+                                        <label className="text-[9px] font-black text-indigo-100 uppercase tracking-widest leading-none">
+                                            {booking.status === 'negotiating' ? 'Proposed Price' : 'Total Payment'}
+                                        </label>
+                                        <p className="text-4xl font-black tracking-tighter mt-1">₹{booking.proposedPrice || booking.price || '0'}</p>
                                     </div>
                                     <p className="text-[9px] font-bold text-emerald-300 uppercase tracking-widest flex items-center gap-1 mt-3">
                                         <CheckCircle2 className="w-3 h-3" /> Pay After Service
@@ -471,6 +489,46 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                 <p className="text-xs font-medium text-slate-500 leading-relaxed italic bg-indigo-50/30 p-5 rounded-2xl border border-indigo-50">
                                     "{booking.description}"
                                 </p>
+                            </div>
+                        )}
+
+                        {String(booking.status).toLowerCase() === 'negotiating' && (
+                            <div className="grid grid-cols-2 gap-4 pt-4">
+                                <button 
+                                    onClick={async () => {
+                                        try {
+                                            await updateDoc(doc(db, 'bookings', booking.id), { 
+                                                status: 'accepted',
+                                                price: booking.proposedPrice,
+                                                proposedPrice: null 
+                                            });
+                                            // Notify Admin
+                                            sendNotification('admin', 'Customer Accepted Quote', `Customer accepted the proposal of ₹${booking.proposedPrice} for ${booking.service}.`, 'success');
+                                            // Notify Provider
+                                            if (booking.providerUid) {
+                                                sendNotification(booking.providerUid, 'Quote Accepted', `Your proposal of ₹${booking.proposedPrice} was accepted! Reach the location soon.`, 'success');
+                                            }
+                                        } catch (e) { console.error(e); }
+                                    }}
+                                    className="py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    <CheckCircle2 className="w-4 h-4" /> Accept Quote
+                                </button>
+                                <button 
+                                    onClick={async () => {
+                                        try {
+                                            await updateDoc(doc(db, 'bookings', booking.id), { status: 'rejected' });
+                                            // Notify Admin & Provider
+                                            sendNotification('admin', 'Customer Rejected Quote', `Customer declined the proposal of ₹${booking.proposedPrice} for ${booking.service}.`, 'error');
+                                            if (booking.providerUid) {
+                                                sendNotification(booking.providerUid, 'Quote Rejected', `Your proposal of ₹${booking.proposedPrice} was declined by the customer.`, 'error');
+                                            }
+                                        } catch (e) { console.error(e); }
+                                    }}
+                                    className="py-5 bg-white border-2 border-rose-100 hover:border-rose-500 text-rose-500 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    <XCircle className="w-4 h-4" /> Decline
+                                </button>
                             </div>
                         )}
 
@@ -981,6 +1039,7 @@ const CustomerHome = () => {
             )}
 
             {/* NEW: ALL SERVICES BANNER - FULL WIDTH BREAKOUT */}
+            {/* NEW: ALL SERVICES BANNER - FULL WIDTH BREAKOUT */}
             {bookingStep === 0 && (
                 <div className="mb-16 -mx-4 sm:-mx-6 lg:-mx-8">
                     <div className="bg-indigo-600 shadow-2xl sm:rounded-[3rem] p-1">
@@ -1025,160 +1084,151 @@ const CustomerHome = () => {
                     </div>
                 </div>
             )}
-
-            {/* LIVE BOOKINGS - MOVED TO TOP FOR IMMEDIATE VISIBILITY */}
-            {activeBookings.length > 0 && bookingStep === 0 && (
-                <div className="mb-16 animate-fade-in">
-                    <div className="flex items-center justify-between mb-8 px-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
-                            <h2 className="text-2xl font-black tracking-tighter text-slate-900 uppercase">Your Active Services</h2>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
-                        {activeBookings.map(b => (
-                            <div key={b.id} className="group relative bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-bl-[3rem] -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-                                <div className="relative z-10">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
-                                            ['accepted', 'confirmed'].includes(String(b.status).toLowerCase()) ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 
-                                            ['inprogress', 'enroute', 'arrived'].includes(String(b.status).toLowerCase()) ? 'bg-emerald-50 text-emerald-600 border-emerald-100 animate-pulse' : 
-                                            'bg-slate-50 text-slate-400 border-slate-100'
-                                        }`}>
-                                            {b.status === 'enroute' ? 'Expert On Way' : b.status}
-                                        </div>
-                                        <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
-                                    </div>
-                                    <h3 className="text-lg font-black text-slate-900 tracking-tight mb-2 uppercase">{b.service}</h3>
-                                    <p className="text-[11px] font-bold text-slate-400 flex items-center gap-2 mb-8">
-                                        <Calendar className="w-3.5 h-3.5" /> {b.date} • {b.slot}
-                                    </p>
-                                    <button 
-                                        onClick={() => setSelectedBooking(b.id)} 
-                                        className="w-full py-4 bg-slate-900 hover:bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-2"
-                                    >
-                                        Track Live Journey <ArrowRight className="w-3.5 h-3.5" />
-                                    </button>
-                                </div>
+                  {/* UNIFIED ACTIVITY DASHBOARD - SIDE BY SIDE ON LG SCREENS */}
+            {(activeBookings.length > 0 || pastBookings.length > 0) && bookingStep === 0 && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-in px-2">
+                    {/* LIVE ACTIVITY COLUMN */}
+                    {activeBookings.length > 0 && (
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 px-4">
+                                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
+                                <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase">Live Activity</h2>
                             </div>
-                        ))}
-                    </div>
+                            <div className="space-y-4">
+                                {activeBookings.map(b => (
+                                    <div key={b.id} className="group relative bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-bl-[3rem] -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                                        <div className="relative z-10">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                                                    ['accepted', 'confirmed'].includes(String(b.status).toLowerCase()) ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 
+                                                    ['inprogress', 'enroute', 'arrived'].includes(String(b.status).toLowerCase()) ? 'bg-emerald-50 text-emerald-600 border-emerald-100 animate-pulse' : 
+                                                    'bg-slate-50 text-slate-400 border-slate-100'
+                                                }`}>
+                                                    {b.status === 'enroute' ? 'Expert On Way' : b.status}
+                                                </div>
+                                                <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
+                                            </div>
+                                            <h3 className="text-lg font-black text-slate-900 tracking-tight mb-1 uppercase">{b.service}</h3>
+                                            <p className="text-[10px] font-bold text-slate-400 flex items-center gap-2 mb-6">
+                                                <Calendar className="w-3 h-3" /> {b.date} • {b.slot}
+                                            </p>
+                                            <button 
+                                                onClick={() => setSelectedBooking(b.id)} 
+                                                className="w-full py-3.5 bg-slate-900 hover:bg-indigo-600 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-2"
+                                            >
+                                                Track Journey <ArrowRight className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* RECENT HISTORY COLUMN */}
+                    {pastBookings.length > 0 && (
+                        <div className={`space-y-6 ${activeBookings.length === 0 ? 'lg:col-span-2' : ''}`}>
+                            <div className="flex items-center gap-3 px-4">
+                                <PieChartIcon className="w-5 h-5 text-indigo-600" />
+                                <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase">Recent History</h2>
+                            </div>
+                            <div className="space-y-4">
+                                {pastBookings.map(b => (
+                                    <div key={b.id} className="group/item bg-white rounded-[2.5rem] border border-slate-100 p-6 hover:shadow-xl transition-all duration-500 relative overflow-hidden">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-2">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'completed' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{b.status}</span>
+                                            </div>
+                                            <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
+                                        </div>
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <p className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">{b.service}</p>
+                                                <h4 className="text-base font-black text-slate-900 uppercase tracking-tight leading-none">{b.provider}</h4>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Amount</p>
+                                                <p className="text-lg font-black text-slate-950">₹{b.price}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        {b.status === 'completed' && !b.rated && (
+                                            <div className="mt-4 pt-4 border-t border-slate-50">
+                                                {ratingState.bookingId === b.id ? (
+                                                    <div className="flex flex-col gap-3 animate-in slide-in-from-top duration-300">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Rate Story</span>
+                                                            <div className="flex gap-1">
+                                                                {[1, 2, 3, 4, 5].map(s => (
+                                                                    <Star 
+                                                                        key={s} 
+                                                                        onClick={(e) => { e.stopPropagation(); setRatingState(prev => ({ ...prev, rating: s })); }} 
+                                                                        className={`w-4 h-4 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`} 
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <textarea 
+                                                            placeholder="Share your experience (Indian faces & feedback system test)"
+                                                            value={ratingState.testimonial}
+                                                            onChange={(e) => setRatingState(prev => ({ ...prev, testimonial: e.target.value }))}
+                                                            className="w-full p-3 bg-slate-100 border border-slate-200 rounded-xl text-[10px] font-medium outline-none focus:border-indigo-500 min-h-[60px]"
+                                                        />
+                                                        <div className="flex gap-2">
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); submitRating(b); }} 
+                                                                disabled={ratingState.rating === 0}
+                                                                className="flex-1 py-2 bg-indigo-600 text-white text-[9px] font-black uppercase rounded-xl transition-all active:scale-95 disabled:opacity-50"
+                                                            >
+                                                                Submit
+                                                            </button>
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: null, rating: 0, testimonial: '' }); }} 
+                                                                className="px-4 py-2 bg-slate-100 text-slate-500 text-[9px] font-black uppercase rounded-xl"
+                                                            >
+                                                                Skip
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <button 
+                                                        onClick={() => setRatingState({ bookingId: b.id, rating: 0, testimonial: '' })}
+                                                        className="w-full py-2 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 text-[9px] font-black uppercase rounded-xl transition-all border border-indigo-100/50"
+                                                    >
+                                                        Review Professional
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
-
-            {/* RECENT HISTORY & CATEGORIES SECTION - SINGLE COLUMN FLOW */}
-            <div className="space-y-16">
-                {/* UPGRADED RECENT HISTORY - NOW AT TOP & MORE READABLE */}
-                {pastBookings.length > 0 && bookingStep === 0 && (
-                    <div className="mb-16 animate-fade-in px-2">
-                        <div className="flex items-center justify-between mb-8">
-                            <div className="flex items-center gap-3">
-                                <PieChartIcon className="w-5 h-5 text-indigo-600" />
-                                <h2 className="text-2xl font-black tracking-tighter text-slate-900 uppercase">Recent Activity</h2>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {pastBookings.map(b => (
-                                <div key={b.id} className="group/item bg-gradient-to-br from-white to-slate-50 rounded-[2.5rem] border-2 border-slate-200 p-8 hover:shadow-2xl hover:border-indigo-200 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-bl-full translate-x-10 -translate-y-10 group-hover/item:scale-110 transition-transform"></div>
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="px-5 py-2 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${b.status === 'completed' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{b.status}</span>
-                                        </div>
-                                        <span className="text-[11px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
-                                    </div>
-                                    <p className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-2">{b.service}</p>
-                                    <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-8 leading-none">{b.provider}</h4>
-                                    
-                                        <div className="flex items-center justify-between pt-8 border-t border-slate-100">
-                                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Amount: <span className="text-slate-950 font-black">₹{b.price}</span></p>
-                                            
-                                            {b.status === 'completed' && (
-                                                <div className="flex gap-2 items-center">
-                                                    {!b.rated ? (
-                                                        <div className="flex items-center gap-2">
-                                                            {ratingState.bookingId === b.id ? (
-                                                                <div className="flex flex-col gap-4 animate-in slide-in-from-right duration-300 bg-white p-6 rounded-3xl border border-indigo-100 shadow-xl min-w-[280px]">
-                                                                    <div className="flex items-center justify-between">
-                                                                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Rate Experience</span>
-                                                                        <div className="flex gap-1">
-                                                                            {[1, 2, 3, 4, 5].map(s => (
-                                                                                <Star 
-                                                                                    key={s} 
-                                                                                    onClick={(e) => { e.stopPropagation(); setRatingState(prev => ({ ...prev, rating: s })); }} 
-                                                                                    className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'text-slate-200 hover:text-amber-200'}`} 
-                                                                                />
-                                                                            ))}
-                                                                        </div>
-                                                                    </div>
-                                                                    <textarea 
-                                                                        placeholder="Share your experience (optional)..."
-                                                                        className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-[11px] font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none min-h-[80px]"
-                                                                        value={ratingState.testimonial}
-                                                                        onChange={(e) => setRatingState(prev => ({ ...prev, testimonial: e.target.value }))}
-                                                                        onClick={(e) => e.stopPropagation()}
-                                                                    />
-                                                                    <div className="flex gap-2">
-                                                                        <button 
-                                                                            onClick={(e) => { e.stopPropagation(); submitRating(b); }} 
-                                                                            disabled={ratingState.rating === 0}
-                                                                            className="flex-1 py-3 bg-indigo-600 hover:bg-slate-900 text-white text-[9px] font-black uppercase rounded-xl shadow-lg disabled:opacity-50 transition-all active:scale-95"
-                                                                        >
-                                                                            Submit Feedback
-                                                                        </button>
-                                                                        <button 
-                                                                            onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: null, rating: 0, testimonial: '' }); }} 
-                                                                            className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 text-[9px] font-black uppercase rounded-xl transition-all"
-                                                                        >
-                                                                            Cancel
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                <button 
-                                                                    onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: b.id, rating: 0, testimonial: '' }); }} 
-                                                                    className="px-5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[9px] font-black uppercase rounded-xl transition-all border border-indigo-100"
-                                                                >
-                                                                    Rate Service
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex gap-1 items-center bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100">
-                                                            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                                                            <span className="text-[10px] font-black text-amber-700">{b.ratingGiven || 5.0}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                <div className="mb-16">
-                    <div className="flex items-end justify-between mb-8 px-4">
-                        <div>
-                            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600 mb-2">Service Fleet</h3>
-                            <h2 className="text-4xl font-black tracking-tighter text-slate-900">Choose a Category</h2>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-5 sm:grid-cols-10 gap-x-2 gap-y-8 px-2 overflow-x-auto hide-scrollbar pb-4">
-                        {categories.map(cat => (
-                            <button key={cat.id} onClick={() => { setSelectedCategory(cat.name); setSelectedSubServices([]); }} className={`flex flex-col items-center gap-4 transition-all duration-300 hover:-translate-y-2 group shrink-0 ${selectedCategory === cat.name ? 'scale-105' : 'opacity-80 hover:opacity-100'}`}>
-                                <div className={`w-16 h-16 md:w-24 md:h-24 rounded-[2.5rem] flex items-center justify-center transition-all duration-500 ${selectedCategory === cat.name ? 'bg-indigo-600 shadow-2xl shadow-indigo-600/30' : 'bg-white border border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-lg'}`}>
-                                    <cat.icon className={`w-7 h-7 md:w-10 md:h-10 transition-colors duration-500 ${selectedCategory === cat.name ? 'text-white' : cat.iconColor}`} />
-                                </div>
-                                <span className={`text-[10px] md:text-[11px] font-black uppercase tracking-widest text-center transition-colors ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500 group-hover:text-indigo-400'}`}>{cat.name}</span>
-                            </button>
-                        ))}
+            {/* SERVICE FLEET SELECTION */}
+            <div className="mb-16">
+                <div className="flex items-end justify-between mb-8 px-4">
+                    <div>
+                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-indigo-600 mb-2">Service Fleet</h3>
+                        <h2 className="text-4xl font-black tracking-tighter text-slate-900">Choose a Category</h2>
                     </div>
                 </div>
+                <div className="grid grid-cols-5 sm:grid-cols-10 gap-x-2 gap-y-8 px-2 overflow-x-auto hide-scrollbar pb-4">
+                    {categories.map(cat => (
+                        <button key={cat.id} onClick={() => { setSelectedCategory(cat.name); setSelectedSubServices([]); }} className={`flex flex-col items-center gap-4 transition-all duration-300 hover:-translate-y-2 group shrink-0 ${selectedCategory === cat.name ? 'scale-105' : 'opacity-80 hover:opacity-100'}`}>
+                            <div className={`w-16 h-16 md:w-24 md:h-24 rounded-[2.5rem] flex items-center justify-center transition-all duration-500 ${selectedCategory === cat.name ? 'bg-indigo-600 shadow-2xl shadow-indigo-600/30' : 'bg-white border border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-lg'}`}>
+                                <cat.icon className={`w-7 h-7 md:w-10 md:h-10 transition-colors duration-500 ${selectedCategory === cat.name ? 'text-white' : cat.iconColor}`} />
+                            </div>
+                            <span className={`text-[10px] md:text-[11px] font-black uppercase tracking-widest text-center transition-colors ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500 group-hover:text-indigo-400'}`}>{cat.name}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             {bookingStep === 1 ? (
                 <div className="max-w-4xl bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 mx-auto animate-fade-in border border-slate-100">
@@ -1390,7 +1440,8 @@ const CustomerHome = () => {
                                 </div>
                             </div>
                         )}
-                                            {/* PROFESSIONALS LISTING - NOW SHOWS RECOMMENDED BY DEFAULT IF NO CATEGORY IS SELECTED */}
+
+                        {/* PROFESSIONALS LISTING - NOW SHOWS RECOMMENDED BY DEFAULT IF NO CATEGORY IS SELECTED */}
                         {selectedCategory ? (
                             <div className="space-y-6 animate-fade-in" ref={catalogRef} id="service-catalog">
                                 <div className="flex items-end justify-between">
@@ -1408,7 +1459,6 @@ const CustomerHome = () => {
                                     {displayedProviders.length > 0 ? displayedProviders.map(p => {
                                         return (
                                             <div key={p.id} className="bg-white p-7 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group overflow-hidden relative">
-                                                {/* PERMANENT SOLUTION: USE EXPLICIT EXPERT FLAG FROM DATABASE */}
                                                 {p.isExpert && (
                                                     <div className="absolute top-0 right-0 bg-gradient-to-l from-indigo-700 to-indigo-500 px-4 py-2 rounded-bl-[1.5rem] flex items-center gap-2 shadow-lg z-10 transition-transform group-hover:scale-110">
                                                         <Star className="w-3.5 h-3.5 text-white fill-current" />
@@ -1427,12 +1477,16 @@ const CustomerHome = () => {
                                                     <div>
                                                         <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none mb-2">{p.name}</h4>
                                                         <div className="flex items-center gap-2">
-                                                            {(p.jobs > 0 && p.rating > 0 && (p.ratingCount || 0) > 0) && (
+                                                            {(p.jobs > 0 && p.rating > 0 && (p.ratingCount || 0) > 0) ? (
                                                                 <div className="flex bg-amber-50 px-2 py-1 rounded-lg items-center gap-1">
                                                                     <Star className="w-3 h-3 text-amber-500 fill-current" />
                                                                     <span className="text-[11px] font-black text-amber-600 uppercase">
                                                                         {parseFloat(p.rating).toFixed(1)}
                                                                     </span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="bg-indigo-50 px-2 py-1 rounded-lg">
+                                                                    <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">New Specialist</span>
                                                                 </div>
                                                             )}
                                                             <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
@@ -1449,7 +1503,6 @@ const CustomerHome = () => {
                                                         <p className="text-3xl font-black text-indigo-600 tracking-tighter">
                                                             ₹{(() => {
                                                                 const base = Math.min(parseInt(String(p.price || 149).replace(/\D/g, '')), 199);
-                                                                // Apply same pFactor logic for visual consistency in the catalog
                                                                 const pFactor = 0.94 + ((p.id || '').split('').reduce((a,c) => a + (c.charCodeAt(0) || 0), 0) % 20) / 100;
                                                                 const subTotal = selectedSubServices.reduce((a,s) => {
                                                                     const rate = p.subServiceRates?.[s.name] || Math.round(s.price * pFactor);
@@ -1490,8 +1543,7 @@ const CustomerHome = () => {
                 </div>
             )}
             {selectedProviderProfile && <ProviderProfileModal p={selectedProviderProfile} onClose={() => setSelectedProviderProfile(null)} handleBook={handleBook} />}
-            {selectedBooking && <BookingDetailsModal bookingId={selectedBooking} onClose={() => setSelectedBooking(null)} />}
-            </div>
+            {selectedBooking && <BookingDetailsModal bookingId={selectedBooking} onClose={() => setSelectedBooking(null)} sendNotification={sendNotification} />}
         </div>
     );
 }

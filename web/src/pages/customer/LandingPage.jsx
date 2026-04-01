@@ -11,24 +11,28 @@ const LandingPage = () => {
     const [latestTestimonials, setLatestTestimonials] = useState([]);
 
     useEffect(() => {
-        // Fetch latest 3 completed bookings with testimonials
+        // Fetch latest 3 completed bookings with testimonials and ratingGiven
         const q = query(
             collection(db, 'bookings'),
             where('status', '==', 'completed'),
             orderBy('createdAt', 'desc'),
-            limit(10) // Fetch more to filter those with testimonials
+            limit(20) // Fetch more to ensure we find ones with content
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const feedbacks = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
-                if (data.testimonial && data.ratingGiven) {
+                // Check multiple possible fields for testimonial content
+                const content = data.testimonial || data.feedback || data.comment;
+                const rating = data.ratingGiven || data.rating || 5;
+                
+                if (content && content.length > 5) {
                     feedbacks.push({
-                        name: data.customer || 'Prime User',
+                        name: data.customerName || data.customer || 'Elite User',
                         role: 'Verified Client',
-                        text: data.testimonial,
-                        rating: data.ratingGiven,
+                        text: content,
+                        rating: rating,
                         img: `https://images.unsplash.com/photo-${['1589156280159-27698a70f29e', '1633332755192-727a05c4013d', '1614283233556-f35b0c801ef1', '1566753323558-f4e0952af115'][feedbacks.length % 4]}?q=80&w=150&auto=format&fit=crop`
                     });
                 }
@@ -296,18 +300,21 @@ const LandingPage = () => {
                             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Loved by Ahmedabad</h2>
                         </div>
                         <div className="flex gap-4">
-                            <div className="flex -space-x-3">
+                            <div className="flex -space-x-4">
                                 {[
-                                    "https://images.unsplash.com/photo-1589156280159-27698a70f29e", // Indian woman
-                                    "https://images.unsplash.com/photo-1633332755192-727a05c4013d", // Indian man
-                                    "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1", // Indian woman
-                                    "https://images.unsplash.com/photo-1566753323558-f4e0952af115"  // Indian man
-                                ].map((url, i) => (
-                                    <div key={i} className={`w-12 h-12 rounded-2xl border-4 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black overflow-hidden shadow-sm`}>
-                                        <img src={`${url}?q=80&w=150&auto=format&fit=crop`} alt="User" className="w-full h-full object-cover" />
+                                    "1604004527766-abc1b2024f0e", // Indian woman
+                                    "1552053831-71594a27632d", // Indian man
+                                    "1614283233556-f35b0c801ef1", // Indian woman
+                                    "1507003211169-0a1dd7228f2d"  // Indian man
+                                ].map((id, i) => (
+                                    <div 
+                                        key={i} 
+                                        className="w-14 h-14 rounded-full border-4 border-slate-900 overflow-hidden bg-slate-800 shadow-2xl transition-transform hover:scale-110 active:scale-90 cursor-pointer"
+                                        style={{ transitionDelay: `${i * 100}ms` }}
+                                    >
+                                        <img src={`https://images.unsplash.com/photo-${id}?q=80&w=150&auto=format&fit=crop`} alt="User" className="w-full h-full object-cover" />
                                     </div>
                                 ))}
-                                <div className="w-12 h-12 rounded-2xl border-4 border-white bg-slate-900 text-white flex items-center justify-center text-[10px] font-black">5k+</div>
                             </div>
                             <div className="text-right">
                                 <p className="text-sm font-black text-slate-900">4.8 / 5.0</p>
@@ -318,9 +325,27 @@ const LandingPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {(latestTestimonials.length > 0 ? latestTestimonials : [
-                            { name: "Anjali Sharma", img: "https://images.unsplash.com/photo-1589156280159-27698a70f29e", role: "Home Owner", text: "The plumbing service was exceptional. The partner arrived within 30 minutes and fixed everything with professional tools. Highly recommended!", rating: 5 },
-                            { name: "Vikram Patel", img: "https://images.unsplash.com/photo-1633332755192-727a05c4013d", role: "Business Owner", text: "Finally a reliable platform in Ahmedabad. I used PrimeSewa for my office deep cleaning, and the quality was comparable to top urban brands.", rating: 5 },
-                            { name: "Sneha Mehta", img: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1", role: "Working Professional", text: "The salon service at home is a game changer. Transparent pricing and expert beauticians. Five stars for the convenience!", rating: 5 }
+                            { 
+                                name: "Anjali Sharma", 
+                                role: "Verified Homeowner • Satellite", 
+                                text: "The expert was highly professional and arrived right on time. The service quality for deep cleaning was beyond my expectations!", 
+                                rating: 5, 
+                                img: "https://images.unsplash.com/photo-1604004527766-abc1b2024f0e?q=80&w=150&auto=format&fit=crop" 
+                            },
+                            { 
+                                name: "Vikram Patel", 
+                                role: "Verified Client • Maninagar", 
+                                text: "Extremely convenient booking process. The pricing was fair and the technician knew exactly what they were doing.", 
+                                rating: 5, 
+                                img: "https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=150&auto=format&fit=crop" 
+                            },
+                            { 
+                                name: "Sneha Mehta", 
+                                role: "Verified Resident • Ambawadi", 
+                                text: "Finally a reliable service in Ahmedabad! I've used them thrice now, and the consistency is impressive.", 
+                                rating: 5, 
+                                img: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?q=80&w=150&auto=format&fit=crop" 
+                            }
                         ]).map((t, i) => (
                             <div key={i} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group min-h-[320px] flex flex-col justify-between">
                                 <div>
