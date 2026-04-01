@@ -766,19 +766,38 @@ const CustomerHome = () => {
                         </div>
 
                         {selectedCategory ? (
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
+                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2">
                                 {displayedProviders.map(p => (
-                                    <div key={p.id} className="bg-white p-7 rounded-[3rem] border shadow-sm group">
-                                        <div className="flex items-center gap-6 mb-8">
-                                            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center border"><UserCircle className="w-12 h-12 text-indigo-400" /></div>
+                                    <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-10 group cursor-pointer hover:scale-[1.03] transition-all duration-500 relative overflow-hidden flex flex-col justify-between min-h-[340px]">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-bl-[8rem] pointer-events-none group-hover:bg-indigo-100/50 transition-colors"></div>
+                                        
+                                        <div className="flex items-center gap-6 mb-10 relative z-10">
+                                            <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center border shadow-lg group-hover:shadow-indigo-100 transition-all">
+                                                <div className="w-16 h-16 bg-indigo-50 rounded-[1.5rem] flex items-center justify-center text-indigo-600">
+                                                    <UserCircle className="w-10 h-10" />
+                                                </div>
+                                            </div>
                                             <div className="flex-1">
-                                                <h4 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 uppercase italic">{p.name}</h4>
-                                                <div className="flex items-center gap-2"><Star className="w-3 h-3 text-amber-500 fill-current" /><span className="text-[10px] font-black">{p.rating || 'New'}</span></div>
+                                                <h4 className="text-xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tight leading-tight mb-2 transition-colors">{p.name}</h4>
+                                                <div className="flex items-center gap-2">
+                                                    <Star className="w-4 h-4 text-amber-500 fill-current" />
+                                                    <span className="text-sm font-black text-slate-900">{p.rating || 'New'}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex justify-between items-center pt-6 border-t font-black">
-                                            <div><p className="text-[10px] text-slate-400 uppercase">Starting At</p><p className="text-2xl">₹{p.price}</p></div>
-                                            <button onClick={() => handleBook(p)} className="px-8 py-3 bg-slate-900 text-white rounded-xl text-[9px] uppercase shadow-xl active:scale-95">Book Now</button>
+
+                                        <div className="w-full h-px bg-slate-100 mb-8"></div>
+
+                                        <div className="flex justify-between items-center relative z-10">
+                                            <div>
+                                                <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5">STARTING AT</p>
+                                                <p className="text-3xl font-black text-slate-950 italic">
+                                                    ₹{p.price}<span className="text-sm font-bold text-slate-400 not-italic"> / hr</span>
+                                                </p>
+                                            </div>
+                                            <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="px-8 py-4 bg-slate-950 hover:bg-indigo-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95">
+                                                Book Now
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
