@@ -95,6 +95,26 @@
     scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
   }
 
+  .custom-scrollbar-indigo::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar-indigo::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 10px;
+  }
+  .custom-scrollbar-indigo::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+    border: 2px solid #f8fafc;
+  }
+  .custom-scrollbar-indigo::-webkit-scrollbar-thumb:hover {
+    background: #6366f1;
+  }
+  .custom-scrollbar-indigo {
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 #f8fafc;
+  }
+
   @keyframes marquee {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }

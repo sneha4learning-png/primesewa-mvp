@@ -1221,10 +1221,12 @@ const CustomerHome = () => {
                                 <PieChartIcon className="w-5 h-5 text-indigo-600" />
                                 <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase">Recent History</h2>
                             </div>
-                            <div className={`grid grid-cols-1 ${activeBookings.length === 0 ? 'md:grid-cols-2' : ''} gap-6`}>
-                                {pastBookings.map(b => (
-                                    <HistoryItem key={b.id} b={b} submitRating={submitRating} setRatingState={setRatingState} />
-                                ))}
+                            <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar-indigo">
+                                <div className={`grid grid-cols-1 ${activeBookings.length === 0 ? 'md:grid-cols-2' : ''} gap-6`}>
+                                    {pastBookings.map(b => (
+                                        <HistoryItem key={b.id} b={b} submitRating={submitRating} setRatingState={setRatingState} />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
