@@ -501,6 +501,7 @@ const CustomerHome = () => {
     const [onlineProviders, setOnlineProviders] = useState([]);
     const [activeBookings, setActiveBookings] = useState([]);
     const [pastBookings, setPastBookings] = useState([]);
+    const [allMyBookings, setAllMyBookings] = useState([]);
     const [pendingBookingData, setPendingBookingData] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('rating');
@@ -556,7 +557,6 @@ const CustomerHome = () => {
     // 3. ANALYTICS CALCULATION
     useEffect(() => {
         if (!userData?.uid) return;
-        const allSet = [...activeBookings, ...pastBookings];
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const last6 = Array.from({ length: 6 }, (_, i) => {
             const d = new Date();
@@ -564,25 +564,31 @@ const CustomerHome = () => {
             return { month: months[d.getMonth()], spend: 0 };
         });
 
-        allSet.forEach(b => {
+        allMyBookings.forEach(b => {
             if (String(b.status).toLowerCase() === 'completed') {
                 const bDateStr = b.date || (b.completedAt?.toDate ? b.completedAt.toDate().toISOString().split('T')[0] : null);
                 if (bDateStr) {
                     const bDate = new Date(bDateStr);
                     const monthLabel = months[bDate.getMonth()];
                     const dayObj = last6.find(m => m.month === monthLabel);
-                    if (dayObj) dayObj.spend += (parseInt(b.price) || 0);
+                    if (dayObj) {
+                        const rawPrice = b.proposedPrice || b.price || 0;
+                        const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
+                        dayObj.spend += amount;
+                    }
                 }
             }
         });
         
         const mix = {};
-        allSet.forEach(b => {
-            const cat = b.serviceCategory || b.service?.split(' ')[0] || 'Other';
-            mix[cat] = (mix[cat] || 0) + 1;
+        allMyBookings.forEach(b => {
+            if (String(b.status).toLowerCase() === 'completed') {
+                const cat = b.selectedCategory || b.service?.split(' ')[0] || 'Other';
+                mix[cat] = (mix[cat] || 0) + 1;
+            }
         });
         setAnalyticsData({ spendingTrend: last6, categoryMix: Object.entries(mix).map(([name, value]) => ({ name, value })) });
-    }, [activeBookings, pastBookings, userData?.uid]);
+    }, [allMyBookings, userData?.uid]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -657,9 +663,10 @@ const CustomerHome = () => {
         if (userData?.uid) {
             const q = query(collection(db, 'bookings'), or(where('customerUid', '==', userData.uid), where('customerPhone', '==', userData.phone || '')));
             const unsubscribeBookings = onSnapshot(q, (snapshot) => {
-                const allMyBookings = [];
-                snapshot.forEach(d => allMyBookings.push({ id: d.id, ...d.data() }));
-                const sorted = allMyBookings.sort((a, b) => (b.createdAt?.toMillis || 0) - (a.createdAt?.toMillis || 0));
+                const fetched = [];
+                snapshot.forEach(d => fetched.push({ id: d.id, ...d.data() }));
+                const sorted = fetched.sort((a, b) => (b.createdAt?.toMillis || 0) - (a.createdAt?.toMillis || 0));
+                setAllMyBookings(sorted);
                 setActiveBookings(sorted.filter(b => !['completed', 'rejected', 'cancelled'].includes(String(b.status).toLowerCase())));
                 setPastBookings(sorted.filter(b => ['completed', 'rejected', 'cancelled'].includes(String(b.status).toLowerCase())).slice(0, 10));
             });
