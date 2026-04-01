@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2 } from 'lucide-react';
+import { Filter, Search, Calendar, ChevronDown, X, Clock, CheckCircle2, Loader2, Star } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, getDocs, writeBatch } from 'firebase/firestore';
 import TimelineModal from '../../components/TimelineModal';
@@ -175,21 +175,6 @@ const BookingMonitoring = () => {
                         <Clock className="w-4 h-4" /> Smart Repair
                     </button>
                     <button
-                        onClick={async () => {
-                            if (!window.confirm("⚠️ DANGER: Delete ALL booking records? This cannot be undone.")) return;
-                            try {
-                                const snap = await getDocs(collection(db, 'bookings'));
-                                const batch = writeBatch(db);
-                                snap.forEach(d => batch.delete(d.ref));
-                                await batch.commit();
-                                alert("✅ All bookings cleared successfully.");
-                            } catch (e) { alert("❌ Error: " + e.message); }
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-medium transition-colors"
-                    >
-                        <X className="w-4 h-4" /> Wipe All
-                    </button>
-                    <button
                         onClick={() => setShowAdvanced(!showAdvanced)}
                         className={`flex items-center gap-2 px-4 py-2 border rounded-lg font-medium transition-colors ${showAdvanced ? 'bg-blue-50 border-blue-200 text-blue-700' : 'border-gray-300 bg-white hover:bg-gray-50 text-gray-700'}`}
                     >
@@ -241,6 +226,7 @@ const BookingMonitoring = () => {
                                 <th className="px-3 py-4 font-medium">Provider</th>
                                 <th className="px-3 py-4 font-medium">Amount</th>
                                 <th className="px-3 py-4 font-medium">Status</th>
+                                <th className="px-3 py-4 font-medium">Rating</th>
                                 <th className="px-3 py-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
@@ -260,6 +246,16 @@ const BookingMonitoring = () => {
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-md border text-xs font-semibold capitalize ${getStatusColor(booking.status)}`}>
                                             {booking.status}
                                         </span>
+                                    </td>
+                                    <td className="px-3 py-4 whitespace-nowrap">
+                                        {booking.ratingGiven ? (
+                                            <div className="flex items-center gap-1.5 text-amber-500 font-bold text-sm bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 w-fit">
+                                                <Star size={14} className="fill-current" />
+                                                {Number(booking.ratingGiven).toFixed(1)}
+                                            </div>
+                                        ) : (
+                                            <span className="text-xs text-gray-400 font-medium tracking-widest">—</span>
+                                        )}
                                     </td>
                                     <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
                                         <button
@@ -288,6 +284,11 @@ const BookingMonitoring = () => {
                                     <div>
                                         <div className="text-sm font-bold text-gray-900">{booking.service}</div>
                                         <div className="text-xs text-gray-500">{booking.date} • {booking.slot || formatTime(booking.time)} • ₹{booking.price || booking.proposedPrice || booking.amount}</div>
+                                        {booking.ratingGiven && (
+                                            <div className="flex items-center gap-1.5 text-amber-500 font-black text-[10px] mt-1.5">
+                                                <Star size={10} className="fill-current" /> {Number(booking.ratingGiven).toFixed(1)} RATING
+                                            </div>
+                                        )}
                                     </div>
                                     <button
                                         onClick={() => setTimelineBooking(booking)}

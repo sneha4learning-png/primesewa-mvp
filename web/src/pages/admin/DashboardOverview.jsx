@@ -377,7 +377,15 @@ The system is now ready for production-level testing! 🏁
                                         <p className="text-xs text-gray-500">{b.customer || 'Unknown'} • {b.provider || 'Unassigned'}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-normal text-gray-900">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
+                                        <div className="flex items-center justify-end gap-2 mb-1">
+                                            {b.ratingGiven && (
+                                                <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 italic">
+                                                    <Star size={10} className="fill-current" />
+                                                    <span className="text-[10px] font-black">{Number(b.ratingGiven).toFixed(1)}</span>
+                                                </div>
+                                            )}
+                                            <p className="font-normal text-gray-900">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
+                                        </div>
                                         <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-normal uppercase tracking-wider ${b.status === 'completed' ? 'bg-green-100 text-green-700' :
                                             b.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
                                                 b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' :
@@ -456,19 +464,6 @@ The system is now ready for production-level testing! 🏁
                 </div>
             )}
 
-            {/* Hygene & Maintenance Ops (Only for root admin) */}
-            <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 mt-12 flex items-center justify-between">
-                <div>
-                    <h4 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-1">System Hygiene</h4>
-                    <p className="text-xs text-slate-500">Perform a fresh start by purging all test data and resetting provider stats.</p>
-                </div>
-                <button 
-                    onClick={handleHardReset}
-                    className="px-6 py-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 rounded-lg text-xs font-black uppercase tracking-widest transition-all"
-                >
-                    Hard Reset Database
-                </button>
-            </div>
             
         </div>
     );

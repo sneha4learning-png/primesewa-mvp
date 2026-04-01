@@ -876,13 +876,29 @@ const CustomerHome = () => {
                                     </h2>
                                     <p className="text-indigo-100/70 text-base md:text-lg max-w-xl font-medium">From specialized cleaning to emergency repairs, explore our complete catalog of curated home solutions.</p>
                                 </div>
-                                <div className="flex gap-4 overflow-x-auto pb-4 max-w-full md:max-w-md hide-scrollbar snap-x">
-                                    {categories.map((cat, i) => (
-                                        <div key={i} className="flex-shrink-0 w-28 h-28 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex flex-col items-center justify-center gap-2 snap-center hover:bg-white/20 transition-all cursor-pointer group" onClick={() => setSelectedCategory(cat.name)}>
-                                            <cat.icon className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
-                                            <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">{cat.name.split(' ')[0]}</span>
-                                        </div>
-                                    ))}
+                                <div className="flex-1 overflow-hidden relative">
+                                    <div className="absolute inset-y-0 left-0 w-12 bg-linear-to-r from-indigo-700/50 to-transparent z-10"></div>
+                                    <div className="absolute inset-y-0 right-0 w-12 bg-linear-to-l from-indigo-700/50 to-transparent z-10"></div>
+                                    <div className="animate-marquee flex gap-6 py-4">
+                                        {[...categories, ...categories].map((cat, i) => (
+                                            <div 
+                                                key={i} 
+                                                className="flex-shrink-0 w-48 h-32 bg-slate-900 rounded-3xl border border-white/10 flex flex-col items-center justify-center gap-2 relative overflow-hidden group cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-xl"
+                                                onClick={() => setSelectedCategory(cat.name)}
+                                            >
+                                                <img 
+                                                    src={getServiceImage(cat.name)} 
+                                                    alt={cat.name} 
+                                                    className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" 
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                                                <div className="relative z-10 flex flex-col items-center">
+                                                    <cat.icon className="w-8 h-8 text-white group-hover:scale-110 transition-transform mb-2" />
+                                                    <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">{cat.name}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
