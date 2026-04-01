@@ -74,7 +74,10 @@ const DashboardOverview = () => {
                     const rawPrice = b.proposedPrice || b.price || b.amount || 0;
                     const amount = typeof rawPrice === 'number' ? rawPrice : parseInt((rawPrice || '').toString().replace(/[₹,/a-zA-Z\s]/g, '')) || 0;
                     totalRevenue += amount;
-                    totalCommission += amount * 0.15;
+                    // Standardize calculation to match precision in all dashboards (15% platform cut)
+                    const providerShare = Math.floor(amount * 0.85);
+                    const platformCut = amount - providerShare;
+                    totalCommission += platformCut;
                 }
             });
 

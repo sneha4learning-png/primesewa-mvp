@@ -104,12 +104,12 @@ const ProviderDashboardContent = () => {
             const now = new Date();
             const oneWeekAgo = new Date(); oneWeekAgo.setDate(now.getDate() - 7);
             const oneMonthAgo = new Date(); oneMonthAgo.setMonth(now.getMonth() - 1);
-            setEarnings({
+            setEarnings(prev => ({
+                ...prev,
                 today: calcEarnings(new Date(new Date().setHours(0, 0, 0, 0))),
                 week: calcEarnings(oneWeekAgo),
-                month: calcEarnings(oneMonthAgo),
-                pendingPayouts: 0 // Will be updated by payouts listener
-            });
+                month: calcEarnings(oneMonthAgo)
+            }));
 
             // Chart: last 7 days earnings
             const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -133,10 +133,13 @@ const ProviderDashboardContent = () => {
         }, e => { console.error('Bookings listener error:', e); setDbError(true); });
 
         // DATABASE CLEANUP: Reset Payouts and Earnings per request
-        const unsubscribePayouts = onSnapshot(query(collection(db, 'payouts'), where('providerUid', '==', userData?.uid || currentUser?.uid || '')), () => {
-            // Per requirement: Resetting all payout records to show only the live state
-            setEarnings(prev => ({ ...prev, pendingPayouts: 0 }));
-            setPayouts([]); // Clear payouts to remove database entries from UI
+        const unsubscribePayouts = onSnapshot(query(collection(db, 'payouts'), 
+            where('providerUid', '==', userData?.uid || currentUser?.uid || ''),
+            where('status', '==', 'pending')
+        ), (snapshot) => {
+            const totalPending = snapshot.docs.reduce((sum, d) => sum + (d.data().amount || 0), 0);
+            setEarnings(prev => ({ ...prev, pendingPayouts: totalPending }));
+            setPayouts(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
         }, e => console.error('Payouts listener error:', e));
 
         // Cleanup on unmount

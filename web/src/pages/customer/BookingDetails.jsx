@@ -181,7 +181,7 @@ export default function BookingDetails() {
                                        { key: 'enroute', label: 'On Way', icon: Truck },
                                        { key: 'arrived', label: 'At Door', icon: MapPin },
                                        { key: 'inprogress', label: 'Working', icon: Zap }
-                                   ].map((s, idx) => {
+                                   ].map((s) => {
                                        const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
                                        const currentLevel = booking.trackingStatus ? (statusOrder[booking.trackingStatus] || 0) : (booking.status === 'completed' ? 3 : 0);
                                        const thisLevel = statusOrder[s.key];

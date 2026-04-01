@@ -391,7 +391,7 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                        { key: 'enroute', label: 'On Way', icon: Truck },
                                        { key: 'arrived', label: 'At Door', icon: MapPin },
                                        { key: 'inprogress', label: 'Working', icon: Zap }
-                                   ].map((s, idx) => {
+                                   ].map((s) => {
                                        const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
                                        const currentLevel = booking.trackingStatus ? (statusOrder[booking.trackingStatus] || 0) : (booking.status === 'completed' ? 3 : 0);
                                        const thisLevel = statusOrder[s.key];
@@ -860,25 +860,6 @@ const CustomerHome = () => {
                 </div>
             )}
 
-            {/* TRUST BANNER - QUALITY ASSURANCE */}
-            {bookingStep === 0 && (
-                <div className="mb-16 group px-2">
-                   <div className="relative overflow-hidden bg-slate-950 rounded-[3rem] p-8 md:p-12 text-white shadow-2xl">
-                       <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700"></div>
-                       <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-                           <div className="max-w-xl text-center md:text-left">
-                               <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300 mb-6 border border-indigo-500/30">
-                                   <Zap className="w-3.5 h-3.5" /> PrimeSewa Quality Shield
-                               </span>
-                               <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-none mb-4">Every service is backed by a ₹5,000 Guarantee.</h2>
-                               <p className="text-indigo-200/60 text-[8px] font-medium leading-relaxed uppercase tracking-widest">Standard safety protocol for every verified home visit.</p>
-                           </div>
-                           <button className="px-10 py-5 bg-white text-slate-950 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all shadow-xl shadow-white/10 active:scale-95 whitespace-nowrap">Learn More</button>
-                       </div>
-                   </div>
-                </div>
-            )}
-
             {/* LIVE BOOKINGS - MOVED TO TOP FOR IMMEDIATE VISIBILITY */}
             {activeBookings.length > 0 && bookingStep === 0 && (
                 <div className="mb-16 animate-fade-in">
@@ -934,7 +915,7 @@ const CustomerHome = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {pastBookings.map(b => (
-                                <div key={b.id} className="group/item bg-white rounded-[2.5rem] border border-slate-100 p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                                <div key={b.id} className="group/item bg-white rounded-[2.5rem] border-2 border-slate-200 p-8 hover:shadow-2xl hover:border-indigo-200 transition-all duration-500 hover:-translate-y-1">
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="px-5 py-2 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-2">
                                             <div className={`w-2 h-2 rounded-full ${b.status === 'completed' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
@@ -945,27 +926,29 @@ const CustomerHome = () => {
                                     <p className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-2">{b.service}</p>
                                     <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-8 leading-none">{b.provider}</h4>
                                     
-                                    <div className="flex items-center justify-between pt-8 border-t border-slate-50">
+                                    <div className="flex items-center justify-between pt-8 border-t border-slate-100">
                                         <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Amount: <span className="text-slate-950 font-black">₹{b.price}</span></p>
                                         
                                         {b.status === 'completed' && (
                                             <div className="flex gap-1.5 items-center">
                                                 {!b.rated ? (
-                                                    <>
-                                                        {[1, 2, 3, 4, 5].map(s => (
-                                                            <Star 
-                                                                key={s} 
-                                                                onClick={() => setRatingState({ bookingId: b.id, rating: s })} 
-                                                                className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-current' : 'text-slate-200'}`} 
-                                                            />
-                                                        ))}
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex gap-1">
+                                                            {[1, 2, 3, 4, 5].map(s => (
+                                                                <Star 
+                                                                    key={s} 
+                                                                    onClick={() => setRatingState({ bookingId: b.id, rating: s })} 
+                                                                    className={`w-6 h-6 cursor-pointer transition-all hover:scale-125 ${s <= (ratingState.bookingId === b.id ? ratingState.rating : 0) ? 'text-amber-500 fill-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'text-slate-200 hover:text-amber-200'}`} 
+                                                                />
+                                                            ))}
+                                                        </div>
                                                         {ratingState.bookingId === b.id && (
-                                                            <button onClick={() => submitRating(b)} className="ml-3 px-4 py-2 bg-slate-950 text-white text-[10px] font-black uppercase rounded-xl shadow-lg active:scale-95 transition-all">Submit</button>
+                                                            <button onClick={() => submitRating(b)} className="ml-2 px-5 py-2.5 bg-indigo-600 hover:bg-slate-900 text-white text-[9px] font-black uppercase rounded-xl shadow-xl shadow-indigo-200 transition-all active:scale-95 animate-in zoom-in">Submit</button>
                                                         )}
-                                                    </>
+                                                    </div>
                                                 ) : (
-                                                    <div className="flex">
-                                                        {[1, 2, 3, 4, 5].map(s => <Star key={s} className={`w-4 h-4 ${s <= (b.ratingGiven || 5) ? 'text-amber-400 fill-current' : 'text-slate-100'}`} />)}
+                                                    <div className="flex gap-1">
+                                                        {[1, 2, 3, 4, 5].map(s => <Star key={s} className={`w-5 h-5 ${s <= (b.ratingGiven || 5) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} />)}
                                                     </div>
                                                 )}
                                             </div>
