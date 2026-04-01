@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, CheckCircle2, XCircle, MapPin, Phone, IndianRupee, Clock, Wallet, Navigation, AlertTriangle, AlertCircle, Calendar, Star, Zap } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import OSMMap from '../../components/OSMMap';
@@ -48,6 +48,7 @@ const ProviderDashboardContent = () => {
     const [confirmingJobId, setConfirmingJobId] = useState(null);
     const [finalAmountAdjust, setFinalAmountAdjust] = useState('');
     const [chartData, setChartData] = useState([]);
+    const [successRateData, setSuccessRateData] = useState([]);
 
     const [historicalBookings, setHistoricalBookings] = useState([]);
     const [historyFilter, setHistoryFilter] = useState('All');
@@ -129,6 +130,15 @@ const ProviderDashboardContent = () => {
                 }
             });
             setChartData([...last7Days]); // Ensure new reference for re-render
+            
+            // Success Rate Data
+            const completedCount = completedJobs.length;
+            const otherCount = myLiveBookings.length - completedCount;
+            setSuccessRateData([
+                { name: 'Completed', value: completedCount },
+                { name: 'Other', value: otherCount }
+            ]);
+
             setDbError(false);
         }, e => { console.error('Bookings listener error:', e); setDbError(true); });
 
@@ -428,22 +438,66 @@ const ProviderDashboardContent = () => {
                 </div>
             </div>
 
-            {/* Chart Container */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm shadow-slate-200/50 mb-8">
-                <h3 className="text-xl font-medium text-slate-800 mb-6">Earnings (Last 7 Days)</h3>
-                <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
-                            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                            <Tooltip
-                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
-                                cursor={{ fill: '#f8fafc' }}
-                            />
-                            <Bar dataKey="earnings" name="Earnings (₹)" fill="#6366f1" radius={[4, 4, 0, 0]} barSize={32} />
-                        </BarChart>
-                    </ResponsiveContainer>
+            {/* Chart Container - Professional Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Financial Growth</h3>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Earnings Trend (Net 85%)</p>
+                        </div>
+                    </div>
+                    <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ fill: '#f8fafc' }}
+                                />
+                                <Bar dataKey="earnings" name="Earnings" fill="#6366f1" radius={[8, 8, 0, 0]} barSize={24} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Efficiency</h3>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Success Rate Ratio</p>
+                        </div>
+                    </div>
+                    <div className="h-64 flex items-center justify-center relative">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={successRateData}
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    <Cell fill="#10b981" />
+                                    <Cell fill="#f1f5f9" />
+                                </Pie>
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="text-center">
+                                <p className="text-2xl font-black text-slate-900 leading-none">
+                                    {historicalBookings.length > 0 ? Math.round((successRateData[0]?.value / historicalBookings.length) * 100) : 0}%
+                                </p>
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Success</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

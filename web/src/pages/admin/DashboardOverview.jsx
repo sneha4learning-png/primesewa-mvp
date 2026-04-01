@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area, PieChart, Pie } from 'recharts';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc, writeBatch, getDocs } from 'firebase/firestore';
 
@@ -44,6 +44,7 @@ const DashboardOverview = () => {
     const [pendingProviders, setPendingProviders] = useState([]);
     const [dbError, setDbError] = useState(false);
     const [chartData, setChartData] = useState([]);
+    const [categoryMix, setCategoryMix] = useState([]);
     const [topProviders, setTopProviders] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -120,6 +121,15 @@ const DashboardOverview = () => {
                 }
             });
             setChartData(last7Days);
+
+            // Category Mix
+            const mix = {};
+            all.forEach(b => {
+                const cat = b.serviceCategory || b.service?.split(' ')[0] || 'Other';
+                mix[cat] = (mix[cat] || 0) + 1;
+            });
+            setCategoryMix(Object.entries(mix).map(([name, value]) => ({ name, value })));
+
             setIsLoading(false);
         }, (err) => {
             console.error("Bookings Listener Error:", err);
@@ -264,58 +274,92 @@ The system is now ready for production-level testing! 🏁
             </div>
 
             {/* Analytical Reports Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-normal text-gray-800 flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-indigo-500" /> Booking Trend (7 Days)
-                        </h3>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-lg transition-all">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                                <TrendingUp className="w-5 h-5 text-indigo-500" /> Booking Volume
+                            </h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Last 7 Days Activity</p>
+                        </div>
                     </div>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData}>
                                 <defs>
                                     <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
+                                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.15}/>
                                         <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} dy={10} />
+                                <YAxis hide />
                                 <Tooltip 
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
                                     itemStyle={{ fontWeight: 'bold', color: '#4f46e5' }}
                                 />
-                                <Area type="monotone" dataKey="bookings" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorBookings)" />
+                                <Area type="monotone" dataKey="bookings" stroke="#4f46e5" strokeWidth={4} fillOpacity={1} fill="url(#colorBookings)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-normal text-gray-800 flex items-center gap-2">
-                            <DollarSign className="w-5 h-5 text-emerald-500" /> Revenue Trend (7 Days)
-                        </h3>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-lg transition-all">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                                <DollarSign className="w-5 h-5 text-emerald-500" /> Revenue Stream
+                            </h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Daily Platform Earnings</p>
+                        </div>
                     </div>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} dy={10} />
+                                <YAxis hide />
                                 <Tooltip 
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
                                     itemStyle={{ fontWeight: 'bold', color: '#10b981' }}
                                     formatter={(value) => [`₹${value}`, 'Revenue']}
                                 />
-                                <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} barSize={30}>
-                                    {chartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={index === 6 ? '#059669' : '#10b981'} />
-                                    ))}
-                                </Bar>
+                                <Bar dataKey="revenue" fill="#10b981" radius={[6, 6, 0, 0]} barSize={24} />
                             </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-lg transition-all">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                                <PieChartIcon className="w-5 h-5 text-amber-500" /> Category Mix
+                            </h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Market Segment Breakdown</p>
+                        </div>
+                    </div>
+                    <div className="h-64 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={categoryMix}
+                                    innerRadius={50}
+                                    outerRadius={70}
+                                    paddingAngle={8}
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    {categoryMix.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ee4444', '#8b5cf6'][index % 5]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                />
+                            </PieChart>
                         </ResponsiveContainer>
                     </div>
                 </div>

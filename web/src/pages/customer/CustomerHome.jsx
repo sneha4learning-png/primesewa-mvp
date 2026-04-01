@@ -6,8 +6,9 @@ import OSMMap from '../../components/OSMMap';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot, or } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight, TrendingUp } from 'lucide-react';
 import { useNotifications } from '../../context/NotificationContext';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 
 // Prevents any crash inside CustomerHome from showing a completely blank page
 class ErrorBoundary extends Component {
@@ -490,6 +491,58 @@ const CustomerHome = () => {
     const { userData } = useAuth();
     const { sendNotification } = useNotifications();
 
+    const [analyticsData, setAnalyticsData] = useState({ spendingTrend: [], categoryMix: [] });
+
+    useEffect(() => {
+        if (!userData?.uid) return;
+        
+        const all = [...activeBookings, ...pastBookings];
+        
+        // 1. Spending Trend (Last 6 Months)
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const last6 = Array.from({ length: 6 }, (_, i) => {
+            const d = new Date();
+            d.setMonth(d.getMonth() - (5 - i));
+            return { month: months[d.getMonth()], spend: 0 };
+        });
+
+        all.forEach(b => {
+            if (b.status === 'completed') {
+                const bDate = new Date(b.date || (b.createdAt?.toDate ? b.createdAt.toDate() : 0));
+                const monthLabel = months[bDate.getMonth()];
+                const dayObj = last6.find(m => m.month === monthLabel);
+                if (dayObj) {
+                    dayObj.spend += (parseInt(b.price) || 0);
+                }
+            }
+        });
+        
+        // 2. Category Mix
+        const mix = {};
+        all.forEach(b => {
+            const cat = b.serviceCategory || b.service?.split(' ')[0] || 'Other';
+            mix[cat] = (mix[cat] || 0) + 1;
+        });
+        const pieData = Object.entries(mix).map(([name, value]) => ({ name, value }));
+
+        setAnalyticsData({ spendingTrend: last6, categoryMix: pieData });
+    }, [activeBookings, pastBookings, userData?.uid]);
+    const serviceImages = useMemo(() => [
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop", // Plumbing
+        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop", // Electrical
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop", // Cleaning
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop", // Carpentry
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop", // Salon
+        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070&auto=format&fit=crop"  // Appliance Repair
+    ], []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex(prev => (prev + 1) % serviceImages.length);
+        }, 8000);
+        return () => clearInterval(timer);
+    }, [serviceImages.length]);
+
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [bookingStep, setBookingStep] = useState(0); 
     const [onlineProviders, setOnlineProviders] = useState([]);
@@ -790,13 +843,34 @@ const CustomerHome = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-8 md:py-12 animate-fade-in">
-            <div className={`mb-12 relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-gradient-to-br from-indigo-950 via-indigo-900 to-violet-950 p-12 md:p-32 text-white' : 'bg-gradient-to-br from-white via-white to-indigo-50/30 border border-slate-100 p-8 md:p-14'}`}>
-                <div className="relative z-10 max-w-4xl mx-auto text-center">
-                    <h1 className={`text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.9] mb-6 ${!userData?.uid ? 'text-white' : 'text-slate-900 font-medium'}`}>
-                        {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Platform for Prime Services'}
-                    </h1>
-                    <p className={`${!userData?.uid ? 'text-slate-400' : 'text-slate-500'} text-lg md:text-xl font-medium mb-10 max-w-2xl mx-auto`}>Trustworthy professionals for every household needs</p>
+        <div className="min-h-screen relative overflow-x-hidden pt-6">
+            {/* PROFESSIONAL BACKGROUND SLIDER - MATCHING LOGIN PAGE */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                {serviceImages.map((img, idx) => (
+                    <div
+                        key={idx}
+                        className={`absolute inset-0 transition-opacity duration-[2000ms] ease-in-out ${idx === currentImageIndex ? 'opacity-20' : 'opacity-0'}`}
+                    >
+                        <img src={img} alt="Service" className="w-full h-full object-cover" />
+                    </div>
+                ))}
+                <div className="absolute inset-0 bg-linear-to-b from-slate-50 via-slate-100/30 to-slate-200/40"></div>
+                <div className="absolute inset-0 mesh-gradient opacity-10 mix-blend-soft-light"></div>
+            </div>
+
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 animate-fade-in flex flex-col gap-10">
+                <div className={`mb-12 relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-indigo-950 p-12 md:p-32 text-white' : 'glass-card p-10 md:p-16'}`}>
+                    <div className="relative z-10 max-w-4xl mx-auto text-center">
+                        <div className="flex flex-col items-center justify-center mb-10">
+                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl border border-slate-100 p-2.5 transition-transform hover:scale-110 duration-500">
+                                <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-full h-full object-contain" />
+                            </div>
+                            <h1 className={`text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] mb-4 ${!userData?.uid ? 'text-white' : 'text-slate-950 italic'}`}>
+                                {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Premier Service Platform'}
+                            </h1>
+                            <p className={`${!userData?.uid ? 'text-slate-400' : 'text-slate-400'} text-lg md:text-xl font-medium tracking-tight uppercase tracking-[0.1em]`}>Curated Household Professionals</p>
+                        </div>
+                    </div>
                     
                     {/* PROFESSIONAL SEARCH BAR */}
                     <div className="relative max-w-2xl mx-auto group">
@@ -846,25 +920,95 @@ const CustomerHome = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-gradient-to-br from-indigo-900 to-indigo-950 p-8 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-24 -mt-24 group-hover:scale-110 transition-transform"></div>
-                        <div className="relative z-10 flex items-center gap-4">
-                            <div className="w-14 h-14 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
-                                <Star className="w-6 h-6 fill-current" />
+                    <div className="bg-indigo-950 p-8 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-24 -mt-24 group-hover:scale-110 transition-transform blur-3xl"></div>
+                        <div className="flex items-center gap-6 relative z-10">
+                            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl group-hover:scale-105 transition-transform">
+                                <Star className="w-8 h-8 text-amber-400 fill-current" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none mb-1.5">Member Status</p>
-                                <h3 className="text-xl font-black text-white tracking-tighter">Prime Elite Tier</h3>
+                                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Account Status</p>
+                                <h3 className="text-white text-2xl font-black uppercase tracking-tight leading-none group-hover:text-amber-400 transition-colors italic">Verified Client</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* NEW: ALL SERVICES BANNER - ADDED PER REQUEST */}
+            {/* CUSTOMER PERSONAL ANALYTICS - NEW */}
+            {userData?.uid && bookingStep === 0 && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-in">
+                    <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden relative group hover:bg-white transition-all">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-125 transition-transform"></div>
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                                    <TrendingUp className="w-5 h-5 text-indigo-600" /> Spending Trend
+                                </h3>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Monthly Investment in Home Care</p>
+                            </div>
+                        </div>
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={analyticsData.spendingTrend}>
+                                    <defs>
+                                        <linearGradient id="colorSpend" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1}/>
+                                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} dy={10} />
+                                    <YAxis hide />
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                        formatter={(val) => [`₹${val}`, 'Spend']}
+                                    />
+                                    <Area type="monotone" dataKey="spend" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorSpend)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden relative group hover:bg-white transition-all">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-125 transition-transform"></div>
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                                    <PieChartIcon className="w-5 h-5 text-emerald-500" /> Services Mix
+                                </h3>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Your Most Requested Categories</p>
+                            </div>
+                        </div>
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={analyticsData.categoryMix}
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                        stroke="none"
+                                    >
+                                        {(analyticsData.categoryMix || []).map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* NEW: ALL SERVICES BANNER - FULL WIDTH BREAKOUT */}
             {bookingStep === 0 && (
-                <div className="mb-16 px-2">
-                    <div className="bg-gradient-to-r from-violet-600 via-indigo-600 to-indigo-700 rounded-[3rem] p-1 shadow-2xl">
+                <div className="mb-16 -mx-4 sm:-mx-6 lg:-mx-8">
+                    <div className="bg-indigo-600 shadow-2xl sm:rounded-[3rem] p-1">
                         <div className="bg-white/5 backdrop-blur-xl rounded-[2.8rem] p-8 md:p-12 relative overflow-hidden border border-white/10">
                             <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
                             <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/10 rounded-full -ml-32 -mb-32 blur-2xl"></div>
@@ -879,11 +1023,11 @@ const CustomerHome = () => {
                                 <div className="flex-1 overflow-hidden relative">
                                     <div className="absolute inset-y-0 left-0 w-12 bg-linear-to-r from-indigo-700/50 to-transparent z-10"></div>
                                     <div className="absolute inset-y-0 right-0 w-12 bg-linear-to-l from-indigo-700/50 to-transparent z-10"></div>
-                                    <div className="animate-marquee flex gap-6 py-4">
-                                        {[...categories, ...categories].map((cat, i) => (
+                                    <div className="animate-marquee flex gap-10 py-6">
+                                        {[...categories, ...categories, ...categories, ...categories].map((cat, i) => (
                                             <div 
                                                 key={i} 
-                                                className="flex-shrink-0 w-48 h-32 bg-slate-900 rounded-3xl border border-white/10 flex flex-col items-center justify-center gap-2 relative overflow-hidden group cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-xl"
+                                                className="flex-shrink-0 w-64 h-40 bg-slate-900 rounded-[2.5rem] border border-white/20 flex flex-col items-center justify-center gap-2 relative overflow-hidden group cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-2xl"
                                                 onClick={() => setSelectedCategory(cat.name)}
                                             >
                                                 <img 
@@ -891,10 +1035,11 @@ const CustomerHome = () => {
                                                     alt={cat.name} 
                                                     className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" 
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
                                                 <div className="relative z-10 flex flex-col items-center">
-                                                    <cat.icon className="w-8 h-8 text-white group-hover:scale-110 transition-transform mb-2" />
-                                                    <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">{cat.name}</span>
+                                                    <cat.icon className="w-10 h-10 text-white group-hover:scale-110 transition-transform mb-3" />
+                                                    <span className="text-[11px] font-black text-white uppercase tracking-[0.3em] leading-none mb-1">{cat.name}</span>
+                                                    <span className="text-[8px] font-medium text-indigo-300 uppercase tracking-widest">{cat.subtitle || 'Expert Care'}</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -1041,7 +1186,6 @@ const CustomerHome = () => {
                         ))}
                     </div>
                 </div>
-            </div>
 
             {bookingStep === 1 ? (
                 <div className="max-w-4xl bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 mx-auto animate-fade-in border border-slate-100">
@@ -1354,10 +1498,15 @@ const CustomerHome = () => {
             )}
             {selectedProviderProfile && <ProviderProfileModal p={selectedProviderProfile} onClose={() => setSelectedProviderProfile(null)} handleBook={handleBook} />}
             {selectedBooking && <BookingDetailsModal bookingId={selectedBooking} onClose={() => setSelectedBooking(null)} />}
+            </div>
         </div>
     );
-};
+}
 
 export default function CustomerHomeWithErrorBoundary() {
-    return <ErrorBoundary><CustomerHome /></ErrorBoundary>;
+    return (
+        <ErrorBoundary>
+            <CustomerHome />
+        </ErrorBoundary>
+    );
 }
