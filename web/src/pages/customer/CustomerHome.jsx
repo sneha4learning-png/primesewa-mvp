@@ -276,6 +276,92 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
     );
 };
 
+const HistoryItem = ({ b, submitRating }) => {
+    const [rating, setRating] = useState(0);
+    const [testimonial, setTestimonial] = useState('');
+    const [isSkipped, setIsSkipped] = useState(false);
+
+    if (isSkipped && !b.rated) return null;
+
+    return (
+        <div key={b.id} className="group/item bg-white rounded-[2rem] border border-slate-100 p-5 hover:shadow-xl transition-all duration-500 relative overflow-hidden flex flex-col justify-between">
+            <div className="flex justify-between items-start mb-4">
+                <div className="px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'completed' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{b.status}</span>
+                </div>
+                <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
+            </div>
+            <div className="flex justify-between items-end">
+                <div>
+                    <p className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">{b.service}</p>
+                    <h4 className="text-base font-black text-slate-900 uppercase tracking-tight leading-none">{b.provider}</h4>
+                </div>
+                <div className="text-right">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Amount</p>
+                    <p className="text-lg font-black text-slate-950">₹{b.price}</p>
+                </div>
+            </div>
+            
+            {b.status === 'completed' && !b.rated && (
+                <div className="mt-4 pt-4 border-t border-slate-50">
+                    <div className="flex flex-col gap-3 animate-in fade-in duration-500">
+                        <div className="flex items-center justify-between px-1">
+                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Rate Your Experience</span>
+                            <div className="flex gap-1.5">
+                                {[1, 2, 3, 4, 5].map(s => (
+                                    <Star 
+                                        key={s} 
+                                        onClick={(e) => { e.stopPropagation(); setRating(s); }} 
+                                        className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= rating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} 
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <textarea 
+                            placeholder="Describe your service experience..."
+                            value={testimonial}
+                            onChange={(e) => setTestimonial(e.target.value)}
+                            className="w-full p-4 bg-slate-100 border border-slate-200 rounded-2xl text-[11px] font-medium text-slate-700 outline-none focus:border-indigo-500 min-h-[60px] resize-none shadow-inner"
+                        />
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); submitRating(b, rating, testimonial); }} 
+                                disabled={rating === 0}
+                                className="flex-1 py-3 bg-slate-900 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 disabled:bg-slate-200 disabled:text-slate-400"
+                            >
+                                Submit Review
+                            </button>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setIsSkipped(true); }} 
+                                className="px-6 py-3 bg-slate-50 text-slate-500 text-[10px] font-black uppercase rounded-2xl border border-slate-100"
+                            >
+                                Skip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {b.status === 'completed' && b.rated && (
+                <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2 leading-none">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Service Rated
+                    </span>
+                    <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map(s => (
+                            <Star 
+                                key={s} 
+                                className={`w-4 h-4 ${s <= (b.ratingGiven || 0) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} 
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
 const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -670,91 +756,6 @@ const CustomerHome = () => {
         setIsLocating(true);
         navigator.geolocation.getCurrentPosition(async (pos) => {
             try {
-                const HistoryItem = ({ b, submitRating }) => {
-                    const [rating, setRating] = useState(0);
-                    const [testimonial, setTestimonial] = useState('');
-                    const [isSkipped, setIsSkipped] = useState(false);
-
-                    if (isSkipped && !b.rated) return null;
-
-                    return (
-                        <div key={b.id} className="group/item bg-white rounded-[2rem] border border-slate-100 p-5 hover:shadow-xl transition-all duration-500 relative overflow-hidden flex flex-col justify-between">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-2">
-                                    <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'completed' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
-                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{b.status}</span>
-                                </div>
-                                <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
-                            </div>
-                            <div className="flex justify-between items-end">
-                                <div>
-                                    <p className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">{b.service}</p>
-                                    <h4 className="text-base font-black text-slate-900 uppercase tracking-tight leading-none">{b.provider}</h4>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Amount</p>
-                                    <p className="text-lg font-black text-slate-950">₹{b.price}</p>
-                                </div>
-                            </div>
-                            
-                            {b.status === 'completed' && !b.rated && (
-                                <div className="mt-4 pt-4 border-t border-slate-50">
-                                    <div className="flex flex-col gap-3 animate-in fade-in duration-500">
-                                        <div className="flex items-center justify-between px-1">
-                                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Rate Your Experience</span>
-                                            <div className="flex gap-1.5">
-                                                {[1, 2, 3, 4, 5].map(s => (
-                                                    <Star 
-                                                        key={s} 
-                                                        onClick={(e) => { e.stopPropagation(); setRating(s); }} 
-                                                        className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= rating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} 
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <textarea 
-                                            placeholder="Describe your service experience..."
-                                            value={testimonial}
-                                            onChange={(e) => setTestimonial(e.target.value)}
-                                            className="w-full p-4 bg-slate-100 border border-slate-200 rounded-2xl text-[11px] font-medium text-slate-700 outline-none focus:border-indigo-500 min-h-[60px] resize-none shadow-inner"
-                                        />
-                                        <div className="flex gap-3">
-                                            <button 
-                                                onClick={(e) => { e.stopPropagation(); submitRating(b, rating, testimonial); }} 
-                                                disabled={rating === 0}
-                                                className="flex-1 py-3 bg-slate-900 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 disabled:bg-slate-200 disabled:text-slate-400"
-                                            >
-                                                Submit Review
-                                            </button>
-                                            <button 
-                                                onClick={(e) => { e.stopPropagation(); setIsSkipped(true); }} 
-                                                className="px-6 py-3 bg-slate-50 text-slate-500 text-[10px] font-black uppercase rounded-2xl border border-slate-100"
-                                            >
-                                                Skip
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {b.status === 'completed' && b.rated && (
-                                <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
-                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2 leading-none">
-                                        <CheckCircle2 className="w-3.5 h-3.5" /> Service Rated
-                                    </span>
-                                    <div className="flex gap-1">
-                                        {[1, 2, 3, 4, 5].map(s => (
-                                            <Star 
-                                                key={s} 
-                                                className={`w-4 h-4 ${s <= (b.ratingGiven || 0) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} 
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    );
-                };
                 const { latitude, longitude } = pos.coords;
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
                 const data = await res.json();
