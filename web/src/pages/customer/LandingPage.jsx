@@ -8,6 +8,37 @@ import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/f
 const LandingPage = () => {
     const { userData } = useAuth();
     const [providerDetails, setProviderDetails] = useState(null);
+    const [latestTestimonials, setLatestTestimonials] = useState([]);
+
+    useEffect(() => {
+        // Fetch latest 3 completed bookings with testimonials
+        const q = query(
+            collection(db, 'bookings'),
+            where('status', '==', 'completed'),
+            orderBy('createdAt', 'desc'),
+            limit(10) // Fetch more to filter those with testimonials
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const feedbacks = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.testimonial && data.ratingGiven) {
+                    feedbacks.push({
+                        name: data.customer || 'Prime User',
+                        role: 'Verified Client',
+                        text: data.testimonial,
+                        rating: data.ratingGiven,
+                        img: `https://images.unsplash.com/photo-${['1589156280159-27698a70f29e', '1633332755192-727a05c4013d', '1614283233556-f35b0c801ef1', '1566753323558-f4e0952af115'][feedbacks.length % 4]}?q=80&w=150&auto=format&fit=crop`
+                    });
+                }
+            });
+            setLatestTestimonials(feedbacks.slice(0, 3));
+        });
+
+        return () => unsubscribe();
+    }, []);
+
     const [activeBooking, setActiveBooking] = useState(null);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -286,19 +317,21 @@ const LandingPage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {[
+                        {(latestTestimonials.length > 0 ? latestTestimonials : [
                             { name: "Anjali Sharma", img: "https://images.unsplash.com/photo-1589156280159-27698a70f29e", role: "Home Owner", text: "The plumbing service was exceptional. The partner arrived within 30 minutes and fixed everything with professional tools. Highly recommended!", rating: 5 },
                             { name: "Vikram Patel", img: "https://images.unsplash.com/photo-1633332755192-727a05c4013d", role: "Business Owner", text: "Finally a reliable platform in Ahmedabad. I used PrimeSewa for my office deep cleaning, and the quality was comparable to top urban brands.", rating: 5 },
-                            { name: "Sneha Mehta", img: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1", role: "Working Professional", text: "The salon service at home is a game changer. Transparent pricing and expert beauticians. Five stars for the convenience!", rating: 4 }
-                        ].map((t, i) => (
-                            <div key={i} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group">
-                                <div className="flex gap-1 mb-6 text-amber-400">
-                                    {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                            { name: "Sneha Mehta", img: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1", role: "Working Professional", text: "The salon service at home is a game changer. Transparent pricing and expert beauticians. Five stars for the convenience!", rating: 5 }
+                        ]).map((t, i) => (
+                            <div key={i} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group min-h-[320px] flex flex-col justify-between">
+                                <div>
+                                    <div className="flex gap-1 mb-6 text-amber-400">
+                                        {[...Array(Math.floor(t.rating || 5))].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                    </div>
+                                    <p className="text-lg font-medium text-slate-700 leading-relaxed mb-10 italic">"{t.text}"</p>
                                 </div>
-                                <p className="text-lg font-medium text-slate-700 leading-relaxed mb-10 italic">"{t.text}"</p>
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black overflow-hidden shadow-md">
-                                        <img src={`${t.img}?q=80&w=150&auto=format&fit=crop`} alt={t.name} className="w-full h-full object-cover" />
+                                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black overflow-hidden shadow-md shrink-0">
+                                        <img src={t.img.includes('unsplash') ? t.img : `${t.img}?q=80&w=150&auto=format&fit=crop`} alt={t.name} className="w-full h-full object-cover" />
                                     </div>
                                     <div>
                                         <h4 className="font-black text-slate-900 text-sm">{t.name}</h4>
