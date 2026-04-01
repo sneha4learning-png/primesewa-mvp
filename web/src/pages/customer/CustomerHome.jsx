@@ -1135,9 +1135,9 @@ const CustomerHome = () => {
                                 <PieChartIcon className="w-5 h-5 text-indigo-600" />
                                 <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase">Recent History</h2>
                             </div>
-                            <div className="space-y-4">
+                            <div className={`grid grid-cols-1 ${activeBookings.length === 0 ? 'md:grid-cols-2' : ''} gap-6`}>
                                 {pastBookings.map(b => (
-                                    <div key={b.id} className="group/item bg-white rounded-[2.5rem] border border-slate-100 p-6 hover:shadow-xl transition-all duration-500 relative overflow-hidden">
+                                    <div key={b.id} className="group/item bg-white rounded-[2rem] border border-slate-100 p-5 hover:shadow-xl transition-all duration-500 relative overflow-hidden flex flex-col justify-between">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-2">
                                                 <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'completed' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
@@ -1157,38 +1157,38 @@ const CustomerHome = () => {
                                         </div>
                                         
                                         {b.status === 'completed' && !b.rated && (
-                                            <div className="mt-4 pt-4 border-t border-slate-50">
+                                            <div className="mt-3 pt-3 border-t border-slate-50">
                                                 {ratingState.bookingId === b.id ? (
-                                                    <div className="flex flex-col gap-3 animate-in slide-in-from-top duration-300">
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Rate Experience</span>
-                                                            <div className="flex gap-1">
+                                                    <div className="flex flex-col gap-2 animate-in slide-in-from-top duration-300">
+                                                        <div className="flex items-center justify-between px-1">
+                                                            <span className="text-[8px] font-black text-indigo-600 uppercase tracking-widest">Rate Story</span>
+                                                            <div className="flex gap-0.5">
                                                                 {[1, 2, 3, 4, 5].map(s => (
                                                                     <Star 
                                                                         key={s} 
                                                                         onClick={(e) => { e.stopPropagation(); setRatingState(prev => ({ ...prev, rating: s })); }} 
-                                                                        className={`w-4 h-4 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`} 
+                                                                        className={`w-3.5 h-3.5 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`} 
                                                                     />
                                                                 ))}
                                                             </div>
                                                         </div>
                                                         <textarea 
-                                                            placeholder="Share your experience (Indian faces & feedback system test)"
+                                                            placeholder="Your feedback..."
                                                             value={ratingState.testimonial}
                                                             onChange={(e) => setRatingState(prev => ({ ...prev, testimonial: e.target.value }))}
-                                                            className="w-full p-3 bg-slate-100 border border-slate-200 rounded-xl text-[10px] font-medium outline-none focus:border-indigo-500 min-h-[60px]"
+                                                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-[9px] font-medium outline-none focus:border-indigo-500 min-h-[50px] resize-none"
                                                         />
                                                         <div className="flex gap-2">
                                                             <button 
                                                                 onClick={(e) => { e.stopPropagation(); submitRating(b); }} 
                                                                 disabled={ratingState.rating === 0}
-                                                                className="flex-1 py-2 bg-indigo-600 text-white text-[9px] font-black uppercase rounded-xl transition-all active:scale-95 disabled:opacity-50"
+                                                                className="flex-1 py-2 bg-slate-900 hover:bg-indigo-600 text-white text-[8px] font-black uppercase rounded-xl transition-all active:scale-95 disabled:opacity-30"
                                                             >
                                                                 Submit
                                                             </button>
                                                             <button 
                                                                 onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: null, rating: 0, testimonial: '' }); }} 
-                                                                className="px-4 py-2 bg-slate-100 text-slate-500 text-[9px] font-black uppercase rounded-xl"
+                                                                className="px-3 py-2 bg-slate-100 text-slate-400 text-[8px] font-black uppercase rounded-xl"
                                                             >
                                                                 Skip
                                                             </button>
@@ -1197,24 +1197,25 @@ const CustomerHome = () => {
                                                 ) : (
                                                     <button 
                                                         onClick={() => setRatingState({ bookingId: b.id, rating: 0, testimonial: '' })}
-                                                        className="w-full py-2 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 text-[9px] font-black uppercase rounded-xl transition-all border border-indigo-100/50"
+                                                        className="w-full py-2.5 bg-slate-50 hover:bg-slate-900 group/btn rounded-2xl transition-all border border-slate-100/50 flex items-center justify-center gap-2"
                                                     >
-                                                        Review Professional
+                                                        <Star className="w-3 h-3 text-amber-500 group-hover/btn:rotate-12 transition-transform" />
+                                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 group-hover/btn:text-white">Review Professional</span>
                                                     </button>
                                                 )}
                                             </div>
                                         )}
 
                                         {b.status === 'completed' && b.rated && (
-                                            <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5">
-                                                    <CheckCircle2 className="w-3 h-3" /> Service Rated
+                                            <div className="mt-3 pt-3 border-t border-slate-50 flex items-center justify-between">
+                                                <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+                                                    <CheckCircle2 className="w-2.5 h-2.5" /> Rated
                                                 </span>
                                                 <div className="flex gap-0.5">
                                                     {[1, 2, 3, 4, 5].map(s => (
                                                         <Star 
                                                             key={s} 
-                                                            className={`w-3.5 h-3.5 ${s <= (b.ratingGiven || 0) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} 
+                                                            className={`w-3 h-3 ${s <= (b.ratingGiven || 0) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} 
                                                         />
                                                     ))}
                                                 </div>
