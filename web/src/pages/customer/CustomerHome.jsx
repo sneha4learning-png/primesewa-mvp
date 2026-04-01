@@ -279,9 +279,9 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
 const HistoryItem = ({ b, submitRating }) => {
     const [rating, setRating] = useState(0);
     const [testimonial, setTestimonial] = useState('');
-    const [isSkipped, setIsSkipped] = useState(false);
+    const [showForm, setShowForm] = useState(true);
 
-    if (isSkipped && !b.rated) return null;
+    // if (isSkipped && !b.rated) return null; // REMOVED: Card should never disappear
 
     return (
         <div key={b.id} className="group/item bg-white rounded-[2rem] border border-slate-100 p-5 hover:shadow-xl transition-all duration-500 relative overflow-hidden flex flex-col justify-between">
@@ -305,41 +305,51 @@ const HistoryItem = ({ b, submitRating }) => {
             
             {b.status === 'completed' && !b.rated && (
                 <div className="mt-4 pt-4 border-t border-slate-50">
-                    <div className="flex flex-col gap-3 animate-in fade-in duration-500">
-                        <div className="flex items-center justify-between px-1">
-                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Rate Your Experience</span>
-                            <div className="flex gap-1.5">
-                                {[1, 2, 3, 4, 5].map(s => (
-                                    <Star 
-                                        key={s} 
-                                        onClick={(e) => { e.stopPropagation(); setRating(s); }} 
-                                        className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= rating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} 
-                                    />
-                                ))}
+                    {showForm ? (
+                        <div className="flex flex-col gap-3 animate-in fade-in duration-500">
+                            <div className="flex items-center justify-between px-1">
+                                <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Rate Your Experience</span>
+                                <div className="flex gap-1.5">
+                                    {[1, 2, 3, 4, 5].map(s => (
+                                        <Star 
+                                            key={s} 
+                                            onClick={(e) => { e.stopPropagation(); setRating(s); }} 
+                                            className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= rating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} 
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                            <textarea 
+                                placeholder="Describe your service experience..."
+                                value={testimonial}
+                                onChange={(e) => setTestimonial(e.target.value)}
+                                className="w-full p-4 bg-slate-100 border border-slate-200 rounded-2xl text-[11px] font-medium text-slate-700 outline-none focus:border-indigo-500 min-h-[60px] resize-none shadow-inner"
+                            />
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); submitRating(b, rating, testimonial); }} 
+                                    disabled={rating === 0}
+                                    className="flex-1 py-3 bg-slate-900 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 disabled:bg-slate-200 disabled:text-slate-400"
+                                >
+                                    Submit Review
+                                </button>
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); setShowForm(false); }} 
+                                    className="px-6 py-3 bg-slate-50 text-slate-500 text-[10px] font-black uppercase rounded-2xl border border-slate-100"
+                                >
+                                    Skip
+                                </button>
                             </div>
                         </div>
-                        <textarea 
-                            placeholder="Describe your service experience..."
-                            value={testimonial}
-                            onChange={(e) => setTestimonial(e.target.value)}
-                            className="w-full p-4 bg-slate-100 border border-slate-200 rounded-2xl text-[11px] font-medium text-slate-700 outline-none focus:border-indigo-500 min-h-[60px] resize-none shadow-inner"
-                        />
-                        <div className="flex gap-3">
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); submitRating(b, rating, testimonial); }} 
-                                disabled={rating === 0}
-                                className="flex-1 py-3 bg-slate-900 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 disabled:bg-slate-200 disabled:text-slate-400"
-                            >
-                                Submit Review
-                            </button>
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); setIsSkipped(true); }} 
-                                className="px-6 py-3 bg-slate-50 text-slate-500 text-[10px] font-black uppercase rounded-2xl border border-slate-100"
-                            >
-                                Skip
-                            </button>
-                        </div>
-                    </div>
+                    ) : (
+                        <button 
+                            onClick={() => setShowForm(true)}
+                            className="w-full py-3 bg-slate-50 hover:bg-slate-950 group/btn rounded-2xl transition-all border border-slate-100 flex items-center justify-center gap-3 shadow-sm"
+                        >
+                            <Star className="w-4 h-4 text-amber-500 group-hover:rotate-12 transition-transform" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white">Review Professional</span>
+                        </button>
+                    )}
                 </div>
             )}
 
