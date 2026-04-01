@@ -289,8 +289,14 @@ const DashboardOverviewContent = () => {
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="flex items-center justify-end gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded text-sm font-normal border">
-                                    <Star className="w-3.5 h-3.5 fill-current" /> {Number(p.rating || 0).toFixed(1)}
+                                <div className={`flex items-center justify-end gap-1 ${(p.ratingCount > 0 && p.rating > 0) ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} px-2 py-0.5 rounded text-sm font-normal border mb-1`}>
+                                    {(p.ratingCount > 0 && p.rating > 0) ? (
+                                        <>
+                                            <Star className="w-3.5 h-3.5 fill-current" /> {Number(p.rating).toFixed(1)}
+                                        </>
+                                    ) : (
+                                        <span className="text-[10px] uppercase tracking-widest px-1">New</span>
+                                    )}
                                 </div>
                             </div>
                         </div>

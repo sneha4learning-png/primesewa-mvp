@@ -202,7 +202,7 @@ const LandingPage = () => {
                                             </div>
                                             <div className="flex items-center gap-1 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/20">
                                                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                                                <span className="font-medium text-amber-600 text-xs">{(providerDetails && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
+                                                <span className="font-medium text-amber-600 text-xs">{(providerDetails && providerDetails.ratingCount > 0 && providerDetails.rating > 0) ? Number(providerDetails.rating).toFixed(1) : 'New'}</span>
                                             </div>
                                         </div>
                                         <div className="h-3 w-full bg-surface-100 rounded-full overflow-hidden shadow-inner">
