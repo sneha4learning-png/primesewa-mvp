@@ -267,10 +267,10 @@ const LandingPage = () => {
                         <div className="flex gap-4">
                             <div className="flex -space-x-3">
                                 {[
-                                    "https://images.unsplash.com/photo-1599566150163-29194dcaad36", // Indian man
-                                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb", // Indian woman
-                                    "https://images.unsplash.com/photo-1544005313-94ddf0286df2", // Indian woman
-                                    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"  // Indian man
+                                    "https://images.unsplash.com/photo-1589156280159-27698a70f29e", // Indian woman
+                                    "https://images.unsplash.com/photo-1633332755192-727a05c4013d", // Indian man
+                                    "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1", // Indian woman
+                                    "https://images.unsplash.com/photo-1566753323558-f4e0952af115"  // Indian man
                                 ].map((url, i) => (
                                     <div key={i} className={`w-12 h-12 rounded-2xl border-4 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black overflow-hidden shadow-sm`}>
                                         <img src={`${url}?q=80&w=150&auto=format&fit=crop`} alt="User" className="w-full h-full object-cover" />
@@ -287,9 +287,9 @@ const LandingPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
-                            { name: "Anjali Sharma", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb", role: "Home Owner", text: "The plumbing service was exceptional. The partner arrived within 30 minutes and fixed everything with professional tools. Highly recommended!", rating: 5 },
-                            { name: "Vikram Patel", img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36", role: "Business Owner", text: "Finally a reliable platform in Ahmedabad. I used PrimeSewa for my office deep cleaning, and the quality was comparable to top urban brands.", rating: 5 },
-                            { name: "Sneha Mehta", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2", role: "Working Professional", text: "The salon service at home is a game changer. Transparent pricing and expert beauticians. Five stars for the convenience!", rating: 4 }
+                            { name: "Anjali Sharma", img: "https://images.unsplash.com/photo-1589156280159-27698a70f29e", role: "Home Owner", text: "The plumbing service was exceptional. The partner arrived within 30 minutes and fixed everything with professional tools. Highly recommended!", rating: 5 },
+                            { name: "Vikram Patel", img: "https://images.unsplash.com/photo-1633332755192-727a05c4013d", role: "Business Owner", text: "Finally a reliable platform in Ahmedabad. I used PrimeSewa for my office deep cleaning, and the quality was comparable to top urban brands.", rating: 5 },
+                            { name: "Sneha Mehta", img: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1", role: "Working Professional", text: "The salon service at home is a game changer. Transparent pricing and expert beauticians. Five stars for the convenience!", rating: 4 }
                         ].map((t, i) => (
                             <div key={i} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group">
                                 <div className="flex gap-1 mb-6 text-amber-400">

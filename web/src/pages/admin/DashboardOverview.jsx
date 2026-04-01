@@ -1,9 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon, IndianRupee } from 'lucide-react';
+import { Users, Briefcase, DollarSign, CalendarDays, Star, TrendingUp, BarChart as BarChartIcon, IndianRupee, PieChart as PieChartIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area, PieChart, Pie } from 'recharts';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc, writeBatch, getDocs } from 'firebase/firestore';
+
+class ErrorBoundary extends Component {
+    constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+    static getDerivedStateFromError(error) { return { hasError: true, error }; }
+    componentDidCatch(error) { console.error('Admin Dashboard Error:', error); }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-rose-100 shadow-xl shadow-rose-900/5 max-w-2xl mx-auto my-12">
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Something went wrong</h2>
+                    <p className="text-slate-500 text-sm mb-8 leading-relaxed max-w-sm mx-auto">
+                        An error occurred while loading the admin analytics.
+                        <br/><span className="text-[10px] text-rose-400 font-mono mt-2 block">{this.state.error?.message}</span>
+                    </p>
+                    <button onClick={() => window.location.reload()} className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all">Reload</button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 const StatCard = ({ title, value, icon, colorClass }) => {
     const Icon = icon;
@@ -30,7 +51,7 @@ const formatTime = (timeStr) => {
     return `${hour}:${String(m).padStart(2, '0')} ${period}`;
 };
 
-const DashboardOverview = () => {
+const DashboardOverviewContent = () => {
     const [stats, setStats] = useState({
         totalBookings: 0,
         pendingBookings: 0,
@@ -47,7 +68,6 @@ const DashboardOverview = () => {
     const [categoryMix, setCategoryMix] = useState([]);
     const [topProviders, setTopProviders] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
 
     useEffect(() => {
         setIsLoading(true);
@@ -162,95 +182,20 @@ const DashboardOverview = () => {
             setStats(prev => ({ ...prev, pendingPayouts: Math.floor(total) }));
         }, (err) => console.error("Payouts Listener Error:", err));
 
-        // 4. Data Hygiene Patcher (Legacy Cleanup & Taxonomy Unification — ENFORCING PRODUCTION STANDARDS)
+        // 4. Data Hygiene Patcher
         const unsubPatch = onSnapshot(collection(db, 'providers'), async (snap) => {
-            const neighborhoods = [
-                ['Vastrapur', 'Satellite', 'Bopal'], ['SG Highway', 'Prahlad Nagar', 'Ghatlodia'],
-                ['Maninagar', 'Naroda', 'Nikol'], ['C.G. Road', 'Navrangpura', 'Paldi']
-            ];
+            const neighborhoods = [['Vastrapur', 'Satellite', 'Bopal'], ['SG Highway', 'Prahlad Nagar', 'Ghatlodia']];
             for (const d of snap.docs) {
                 const p = d.data();
-                let needsUpdate = false;
-                const updatePayload = {};
-
-                // Fix Location/Areas for unlocalized records
-                if (!p.serviceAreas || p.serviceAreas.length === 0 || p.location === 'Ahmedabad') {
+                if (!p.patchApplied && (!p.serviceAreas || p.serviceAreas.length === 0)) {
                     const idx = d.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % neighborhoods.length;
-                    updatePayload.serviceAreas = neighborhoods[idx];
-                    updatePayload.location = neighborhoods[idx].join(', ');
-                    needsUpdate = true;
-                }
-
-                // Production Taxonomy Normalization (Generic only)
-                const currentCat = String(p.category || '').toUpperCase();
-                if (currentCat === 'SALON & BEAUTY' || currentCat === 'BEAUTY' || currentCat === 'SALON') {
-                    updatePayload.category = 'Salon for Women';
-                    needsUpdate = true;
-                } else if (currentCat === 'SALON FOR MEN' || currentCat === 'GROOMING') {
-                    updatePayload.category = 'Salon for Men';
-                    needsUpdate = true;
-                }
-
-                if (needsUpdate) {
-                    await updateDoc(doc(db, 'providers', d.id), { ...updatePayload, patchApplied: true });
+                    await updateDoc(doc(db, 'providers', d.id), { serviceAreas: neighborhoods[idx], location: neighborhoods[idx].join(', '), patchApplied: true });
                 }
             }
         });
 
         return () => { unsubBookings(); unsubProviders(); unsubPayouts(); unsubPatch(); };
     }, []);
-    
-    // ADMIN UTILITY: Database Hygiene — ONLY implementation permitted per project head
-    const handleHardReset = async () => {
-        if (!window.confirm("CRITICAL: This will delete ALL bookings, payouts, and commissions records to ensure a fresh production environment. Continue?")) return;
-        
-        try {
-            const batch = writeBatch(db);
-            
-            // 1. Purge Dynamic Content
-            const colRefs = ['bookings', 'payouts', 'commissions'];
-            for (const col of colRefs) {
-                const snap = await getDocs(collection(db, col));
-                snap.forEach(d => batch.delete(d.ref));
-            }
-
-            // 2. Identify & Remove Mock Providers (IDs starting with dev-prov- or known test patterns)
-            const pSnap = await getDocs(collection(db, 'providers'));
-            const mockNames = ["test provider", "ace service partner", "new provider", "anjali premium beauty", "rajesh grooming studio", "sanjay services", "priya home care", "vikram painting expert"].map(n => n.toLowerCase());
-            
-            pSnap.forEach(d => {
-                const p = d.data();
-                const pName = (p.name || '').toLowerCase().trim();
-                const isMock = d.id.startsWith('dev-prov-') || !p.phone || mockNames.includes(pName);
-                if (isMock) {
-                    batch.delete(d.ref);
-                } else {
-                    // Reset stats for real providers (Jobs & Ratings)
-                    batch.update(d.ref, {
-                        jobs: 0,
-                        rating: 0,
-                        ratingCount: 0
-                    });
-                }
-            });
-
-            await batch.commit();
-            const summary = `
-✅ SUCCESS: Database Cleaned!
---------------------------------
-🧹 All dynamic records purged.
-👤 Mock providers removed.
-📈 Dashboard is now a clean slate.
-
-The system is now ready for production-level testing! 🏁
-            `;
-            alert(summary);
-            window.location.reload();
-        } catch (err) {
-            console.error("Database Cleanup Error:", err);
-            alert("❌ CRITICAL CLEANUP FAILURE: " + err.message);
-        }
-    };
 
     if (isLoading) return <div className="min-h-[400px] flex items-center justify-center text-indigo-600 font-medium tracking-wide">Initializing Analytics...</div>;
 
@@ -259,31 +204,23 @@ The system is now ready for production-level testing! 🏁
             {dbError && (
                 <div className="bg-red-50 border border-red-200 text-red-800 px-5 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
                     <span className="text-red-500 text-lg">⚠️</span>
-                    <span><strong>Database connection error.</strong> Could not fetch data from Firestore. Check your Firebase credentials and Firestore rules.</span>
+                    <span>Database connection error. Could not fetch data from Firestore.</span>
                 </div>
             )}
-
-
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <StatCard title="Total Bookings" value={stats.totalBookings} icon={CalendarDays} colorClass="bg-gradient-to-br from-blue-500 to-blue-700" />
                 <StatCard title="Pending Jobs" value={stats.pendingBookings} icon={Briefcase} colorClass="bg-gradient-to-br from-amber-500 to-orange-600" />
                 <StatCard title="Active Pros" value={stats.activeProviders} icon={Users} colorClass="bg-gradient-to-br from-indigo-500 to-violet-700" />
-                <StatCard title="Revenue (15%)" value={`₹${stats.commissionEarned.toFixed(0)}`} icon={BarChartIcon} colorClass="bg-gradient-to-br from-emerald-500 to-teal-700" />
-                <StatCard title="Pending Payouts" value={`₹${Math.floor(stats.pendingPayouts)}`} icon={DollarSign} colorClass="bg-gradient-to-br from-rose-500 to-pink-700" />
+                <StatCard title="Revenue (15%)" value={<div className="flex items-center"><IndianRupee className="w-4 h-4 mr-0.5"/>{stats.commissionEarned.toFixed(0)}</div>} icon={BarChartIcon} colorClass="bg-gradient-to-br from-emerald-500 to-teal-700" />
+                <StatCard title="Pending Payouts" value={<div className="flex items-center"><IndianRupee className="w-4 h-4 mr-0.5"/>{Math.floor(stats.pendingPayouts)}</div>} icon={DollarSign} colorClass="bg-gradient-to-br from-rose-500 to-pink-700" />
             </div>
 
-            {/* Analytical Reports Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-lg transition-all">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-indigo-500" /> Booking Volume
-                            </h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Last 7 Days Activity</p>
-                        </div>
-                    </div>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2 mb-8">
+                        <TrendingUp className="w-5 h-5 text-indigo-500" /> Booking Volume
+                    </h3>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData}>
@@ -294,228 +231,131 @@ The system is now ready for production-level testing! 🏁
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} dy={10} />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} />
                                 <YAxis hide />
-                                <Tooltip 
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
-                                    itemStyle={{ fontWeight: 'bold', color: '#4f46e5' }}
-                                />
+                                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }} />
                                 <Area type="monotone" dataKey="bookings" stroke="#4f46e5" strokeWidth={4} fillOpacity={1} fill="url(#colorBookings)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-lg transition-all">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <DollarSign className="w-5 h-5 text-emerald-500" /> Revenue Stream
-                            </h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Daily Platform Earnings</p>
-                        </div>
-                    </div>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2 mb-8">
+                        <DollarSign className="w-5 h-5 text-emerald-500" /> Revenue Stream
+                    </h3>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} dy={10} />
+                                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} />
                                 <YAxis hide />
-                                <Tooltip 
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
-                                    itemStyle={{ fontWeight: 'bold', color: '#10b981' }}
-                                    formatter={(value) => [`₹${value}`, 'Revenue']}
-                                />
+                                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }} formatter={(v) => [`₹${v}`, 'Revenue']} />
                                 <Bar dataKey="revenue" fill="#10b981" radius={[6, 6, 0, 0]} barSize={24} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-lg transition-all">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <PieChartIcon className="w-5 h-5 text-amber-500" /> Category Mix
-                            </h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Market Segment Breakdown</p>
-                        </div>
-                    </div>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
+                    <h3 className="text-lg font-black text-slate-800 flex items-center gap-2 mb-8">
+                        <PieChartIcon className="w-5 h-5 text-amber-500" /> Category Mix
+                    </h3>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
-                                <Pie
-                                    data={categoryMix}
-                                    innerRadius={50}
-                                    outerRadius={70}
-                                    paddingAngle={8}
-                                    dataKey="value"
-                                    stroke="none"
-                                >
+                                <Pie data={categoryMix} innerRadius={50} outerRadius={70} paddingAngle={8} dataKey="value" stroke="none">
                                     {categoryMix.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ee4444', '#8b5cf6'][index % 5]} />
                                     ))}
                                 </Pie>
-                                <Tooltip 
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
-                                />
+                                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }} />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
             </div>
 
-            {/* Top 5 Providers */}
             <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <h3 className="text-lg font-normal text-gray-800 mb-4 flex items-center justify-between">
-                    Top Rated Providers <Link to="/admin/providers" className="text-sm text-blue-600 hover:underline">View All</Link>
-                </h3>
-                {topProviders.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {topProviders.map((p, index) => (
-                            <div key={p.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all bg-white relative overflow-hidden group">
-                                <div className={`absolute left-0 top-0 bottom-0 w-1 ${index === 0 ? 'bg-amber-400' : index === 1 ? 'bg-slate-300' : index === 2 ? 'bg-amber-700' : 'bg-transparent'}`}></div>
-                                <div className="flex items-center gap-4 ml-2">
-                                    <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-normal text-lg border border-slate-200">
-                                        {(p.name || 'U').charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <p className="font-normal text-slate-900 leading-tight">{p.name}</p>
-                                        <p className="text-xs text-slate-500 font-medium">{(p.category || 'No Category')} Specialist</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <div className={`flex items-center justify-end gap-1 ${(p.jobs > 0 && p.rating > 0) ? 'text-amber-500 bg-amber-50 border-amber-100' : 'text-slate-400 bg-slate-50 border-slate-100'} px-2 py-0.5 rounded text-sm font-normal border mb-1`}>
-                                        {(p.jobs > 0 && p.rating > 0) ? (
-                                            <>
-                                                <Star className="w-3.5 h-3.5 fill-current" /> {Number(p.rating).toFixed(1)}
-                                            </>
-                                        ) : (
-                                            <span className="text-[10px] uppercase tracking-widest px-1">New</span>
-                                        )}
-                                    </div>
-                                    <div className="text-xs text-slate-500 font-normal uppercase tracking-wider">{p.jobs || 0} Jobs</div>
+                <h3 className="text-lg font-normal text-gray-800 mb-4">Top Rated Providers</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {topProviders.map((p, index) => (
+                        <div key={p.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-white relative overflow-hidden">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-normal text-lg">{(p.name || 'U').charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <p className="font-normal text-slate-900 leading-tight">{p.name}</p>
+                                    <p className="text-xs text-slate-500">{(p.category || 'No Category')}</p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-slate-500 text-sm py-12 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50">
-                        Not enough data to determine top providers
-                    </div>
-                )}
+                            <div className="text-right">
+                                <div className="flex items-center justify-end gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded text-sm font-normal border">
+                                    <Star className="w-3.5 h-3.5 fill-current" /> {Number(p.rating || 0).toFixed(1)}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Recent Bookings Stub */}
                 <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                    <h3 className="text-lg font-normal text-gray-800 mb-4 flex items-center justify-between">
-                        Recent Bookings <Link to="/admin/bookings" className="text-sm text-blue-600 hover:underline">View All</Link>
-                    </h3>
-                    {recentBookings.length > 0 ? (
-                        <div className="space-y-4">
-                            {recentBookings.map(b => (
-                                <div key={b.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100">
-                                    <div>
-                                        <p className="font-normal text-gray-900">{b.service}</p>
-                                        <p className="text-xs text-gray-500">{b.customer || 'Unknown'} • {b.provider || 'Unassigned'}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="flex items-center justify-end gap-2 mb-1">
-                                            {b.ratingGiven && (
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 italic">
-                                                        <Star size={10} className="fill-current" />
-                                                        <span className="text-[10px] font-black">{Number(b.ratingGiven).toFixed(1)}</span>
-                                                    </div>
-                                                    {b.testimonial && (
-                                                        <p className="text-[9px] text-slate-400 italic font-medium max-w-[120px] truncate text-right">"{b.testimonial}"</p>
-                                                    )}
+                    <h3 className="text-lg font-normal text-gray-800 mb-4">Recent Bookings</h3>
+                    <div className="space-y-4">
+                        {recentBookings.map(b => (
+                            <div key={b.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100">
+                                <div>
+                                    <p className="font-normal text-gray-900">{b.service}</p>
+                                    <p className="text-xs text-gray-500">{b.customer || 'Unknown'} • {b.provider || 'Unassigned'}</p>
+                                </div>
+                                <div className="text-right">
+                                    <div className="flex items-center justify-end gap-2 mb-1">
+                                        {b.ratingGiven && (
+                                            <div className="flex flex-col items-end gap-1">
+                                                <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 italic">
+                                                    <Star size={10} className="fill-current" />
+                                                    <span className="text-[10px] font-black">{Number(b.ratingGiven || 0).toFixed(1)}</span>
                                                 </div>
-                                            )}
-                                            <p className="font-normal text-gray-900">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
-                                        </div>
-                                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-normal uppercase tracking-wider ${b.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                            b.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
-                                                b.status === 'negotiating' ? 'bg-purple-100 text-purple-700' :
-                                                    'bg-amber-100 text-amber-700'
-                                            }`}>
-                                            {b.status}
-                                        </span>
+                                                {b.testimonial && <p className="text-[9px] text-slate-400 italic max-w-[120px] truncate">"{b.testimonial}"</p>}
+                                            </div>
+                                        )}
+                                        <p className="font-normal text-gray-900 flex items-center"><IndianRupee className="w-3 h-3 mr-0.5"/>{(b.proposedPrice || b.price || 0).toFixed(0)}</p>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-gray-500 text-sm py-8 text-center border-2 border-dashed border-gray-100 rounded-lg bg-gray-50">
-                            No recent bookings found
-                        </div>
-                    )}
-                </div>
-
-                {/* Pending Provider Approvals Stub */}
-                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                    <h3 className="text-lg font-normal text-gray-800 mb-4 flex items-center justify-between">
-                        Pending Approvals <Link to="/admin/providers" state={{ status: 'pending' }} className="text-sm text-blue-600 hover:underline">Review All</Link>
-                    </h3>
-                    {pendingProviders.length > 0 ? (
-                        <div className="space-y-4">
-                            {pendingProviders.map(p => (
-                                <div key={p.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-normal">
-                                            {(p.name || 'U').charAt(0)}
-                                        </div>
-                                        <div>
-                                            <p className="font-normal text-gray-900">{p.name}</p>
-                                            <p className="text-xs text-gray-500">{(p.category || 'No Category')} • {p.phone}</p>
-                                        </div>
-                                    </div>
-                                    <Link to="/admin/providers" state={{ searchTerm: p.name }} className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-medium text-sm rounded-lg transition-colors">
-                                        Review
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-gray-500 text-sm py-8 text-center border-2 border-dashed border-gray-100 rounded-lg bg-gray-50">
-                            No pending provider approvals
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Declined Bookings Section */}
-            {recentDeclined.length > 0 && (
-                <div className="bg-rose-50/50 rounded-xl border border-rose-100 p-6 shadow-sm">
-                    <h3 className="text-lg font-normal text-rose-900 mb-4 flex items-center gap-2">
-                        Recent Declined Requests
-                    </h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        {recentDeclined.map(b => (
-                            <div key={b.id} className="flex flex-col p-4 rounded-lg bg-white border border-rose-100 shadow-sm opacity-90 transition-opacity hover:opacity-100">
-                                <div className="flex justify-between items-start mb-2">
-                                    <p className="font-normal text-slate-800">{b.service}</p>
-                                    <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-normal uppercase tracking-wider ${b.status === 'cancelled' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                    <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-normal uppercase tracking-wider ${b.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                         {b.status}
                                     </span>
                                 </div>
-                                <p className="text-xs text-slate-700 font-normal mb-1">👤 {b.customer}</p>
-                                <p className="text-xs text-slate-500 font-medium mb-1">🔧 {b.provider}</p>
-                                {(b.date || b.time) && (
-                                    <p className="text-xs text-slate-400 font-medium mt-1 flex items-center gap-1">
-                                        📅 {b.date || '—'}{b.time ? ` • 🕐 ${formatTime(b.time)}` : ''}
-                                    </p>
-                                )}
                             </div>
                         ))}
                     </div>
                 </div>
-            )}
 
-            
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <h3 className="text-lg font-normal text-gray-800 mb-4">Pending Approvals</h3>
+                    <div className="space-y-4">
+                        {pendingProviders.map(p => (
+                            <div key={p.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center">{(p.name || 'U').charAt(0)}</div>
+                                    <div>
+                                        <p className="font-normal text-gray-900">{p.name}</p>
+                                        <p className="text-xs text-gray-500">{(p.category || 'No Category')}</p>
+                                    </div>
+                                </div>
+                                <Link to="/admin/providers" className="px-3 py-1.5 bg-indigo-50 text-indigo-600 font-medium text-sm rounded-lg">Review</Link>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
+
+const DashboardOverview = () => (
+    <ErrorBoundary>
+        <DashboardOverviewContent />
+    </ErrorBoundary>
+);
 
 export default DashboardOverview;

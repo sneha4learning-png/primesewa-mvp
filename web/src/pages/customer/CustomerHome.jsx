@@ -876,7 +876,7 @@ const CustomerHome = () => {
 
             {/* DASHBOARD STATS & INSIGHTS - MAKING IT MORE INFORMATIVE */}
             {userData?.uid && bookingStep === 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 animate-fade-in px-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 animate-fade-in px-2">
                     <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
@@ -885,17 +885,6 @@ const CustomerHome = () => {
                             <div>
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">My Services</p>
                                 <h3 className="text-xl font-black text-slate-900 tracking-tighter">{(activeBookings.length + pastBookings.length) || 0} Total Requests</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
-                                <ShieldCheck className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Prime Safety</p>
-                                <h3 className="text-xl font-black text-slate-900 tracking-tighter">100% Insured Care</h3>
                             </div>
                         </div>
                     </div>
