@@ -347,15 +347,51 @@ const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
                                 {booking.status === 'negotiating' ? 'Action Required: New Quote' : booking.status}
                             </div>
                         </div>
-                        {booking.status === 'negotiating' && (
-                            <div className="mt-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-[2rem] animate-pulse">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                                        <IndianRupee className="w-6 h-6" />
+                        {String(booking.status || '').toLowerCase().trim() === 'negotiating' && (
+                            <div className="mt-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-[2rem] animate-pulse relative z-20">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
+                                            <IndianRupee className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-amber-300 uppercase tracking-widest mb-1">New Pricing Proposal</p>
+                                            <p className="text-sm font-bold text-white leading-tight">The expert has proposed a revised quote of ₹{booking.proposedPrice} for this service.</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">New Pricing Proposal</p>
-                                        <p className="text-sm font-bold text-amber-900 leading-tight">The expert has proposed a revised quote for your service. Please review and respond below.</p>
+                                    <div className="flex gap-3 w-full sm:w-auto">
+                                        <button 
+                                            onClick={async () => {
+                                                try {
+                                                    await updateDoc(doc(db, 'bookings', booking.id), { 
+                                                        status: 'accepted',
+                                                        price: booking.proposedPrice,
+                                                        proposedPrice: null 
+                                                    });
+                                                    sendNotification('admin', 'Customer Accepted Quote', `Customer accepted ₹${booking.proposedPrice} for ${booking.service}.`, 'success');
+                                                    if (booking.providerUid) {
+                                                        sendNotification(booking.providerUid, 'Quote Accepted', `Your proposal of ₹${booking.proposedPrice} was accepted!`, 'success');
+                                                    }
+                                                } catch (e) { console.error(e); }
+                                            }}
+                                            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex-1 sm:flex-none"
+                                        >
+                                            Accept
+                                        </button>
+                                        <button 
+                                            onClick={async () => {
+                                                try {
+                                                    await updateDoc(doc(db, 'bookings', booking.id), { status: 'rejected' });
+                                                    sendNotification('admin', 'Customer Rejected Quote', `Customer declined ₹${booking.proposedPrice} for ${booking.service}.`, 'error');
+                                                    if (booking.providerUid) {
+                                                        sendNotification(booking.providerUid, 'Quote Rejected', `Your proposal of ₹${booking.proposedPrice} was declined.`, 'error');
+                                                    }
+                                                } catch (e) { console.error(e); }
+                                            }}
+                                            className="px-6 py-3 bg-white/10 hover:bg-rose-600 border border-white/20 text-white rounded-xl font-black uppercase text-[10px] tracking-widest transition-all active:scale-95 flex-1 sm:flex-none"
+                                        >
+                                            Decline
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -492,45 +528,7 @@ const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
                             </div>
                         )}
 
-                        {String(booking.status).toLowerCase() === 'negotiating' && (
-                            <div className="grid grid-cols-2 gap-4 pt-4">
-                                <button 
-                                    onClick={async () => {
-                                        try {
-                                            await updateDoc(doc(db, 'bookings', booking.id), { 
-                                                status: 'accepted',
-                                                price: booking.proposedPrice,
-                                                proposedPrice: null 
-                                            });
-                                            // Notify Admin
-                                            sendNotification('admin', 'Customer Accepted Quote', `Customer accepted the proposal of ₹${booking.proposedPrice} for ${booking.service}.`, 'success');
-                                            // Notify Provider
-                                            if (booking.providerUid) {
-                                                sendNotification(booking.providerUid, 'Quote Accepted', `Your proposal of ₹${booking.proposedPrice} was accepted! Reach the location soon.`, 'success');
-                                            }
-                                        } catch (e) { console.error(e); }
-                                    }}
-                                    className="py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2"
-                                >
-                                    <CheckCircle2 className="w-4 h-4" /> Accept Quote
-                                </button>
-                                <button 
-                                    onClick={async () => {
-                                        try {
-                                            await updateDoc(doc(db, 'bookings', booking.id), { status: 'rejected' });
-                                            // Notify Admin & Provider
-                                            sendNotification('admin', 'Customer Rejected Quote', `Customer declined the proposal of ₹${booking.proposedPrice} for ${booking.service}.`, 'error');
-                                            if (booking.providerUid) {
-                                                sendNotification(booking.providerUid, 'Quote Rejected', `Your proposal of ₹${booking.proposedPrice} was declined by the customer.`, 'error');
-                                            }
-                                        } catch (e) { console.error(e); }
-                                    }}
-                                    className="py-5 bg-white border-2 border-rose-100 hover:border-rose-500 text-rose-500 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
-                                >
-                                    <XCircle className="w-4 h-4" /> Decline
-                                </button>
-                            </div>
-                        )}
+                         {/* Redundant controls removed to consolidate in header banner */}
 
                         <div className="pt-8 text-center border-t border-slate-100">
                             <div className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 rounded-2xl">
@@ -1159,7 +1157,7 @@ const CustomerHome = () => {
                                                 {ratingState.bookingId === b.id ? (
                                                     <div className="flex flex-col gap-3 animate-in slide-in-from-top duration-300">
                                                         <div className="flex items-center justify-between">
-                                                            <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Rate Story</span>
+                                                            <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Rate Experience</span>
                                                             <div className="flex gap-1">
                                                                 {[1, 2, 3, 4, 5].map(s => (
                                                                     <Star 
@@ -1200,6 +1198,22 @@ const CustomerHome = () => {
                                                         Review Professional
                                                     </button>
                                                 )}
+                                            </div>
+                                        )}
+
+                                        {b.status === 'completed' && b.rated && (
+                                            <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <CheckCircle2 className="w-3 h-3" /> Service Rated
+                                                </span>
+                                                <div className="flex gap-0.5">
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <Star 
+                                                            key={s} 
+                                                            className={`w-3.5 h-3.5 ${s <= (b.ratingGiven || 0) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} 
+                                                        />
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                     </div>

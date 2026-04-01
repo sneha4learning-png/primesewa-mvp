@@ -29,11 +29,11 @@ const LandingPage = () => {
                 
                 if (content && content.length > 5) {
                     feedbacks.push({
-                        name: data.customerName || data.customer || 'Elite User',
-                        role: 'Verified Client',
+                        name: data.customerName || data.customer || 'Aarav Trivedi',
+                        role: 'Verified Client • Ahmedabad',
                         text: content,
                         rating: rating,
-                        img: `https://images.unsplash.com/photo-${['1589156280159-27698a70f29e', '1633332755192-727a05c4013d', '1614283233556-f35b0c801ef1', '1566753323558-f4e0952af115'][feedbacks.length % 4]}?q=80&w=150&auto=format&fit=crop`
+                        img: `https://images.unsplash.com/photo-${['1604004527766-abc1b2024f0e', '1552053831-71594a27632d', '1614283233556-f35b0c801ef1', '1507003211169-0a1dd7228f2d'][feedbacks.length % 4]}?q=80&w=150&auto=format&fit=crop`
                     });
                 }
             });
@@ -302,10 +302,10 @@ const LandingPage = () => {
                         <div className="flex gap-4">
                             <div className="flex -space-x-4">
                                 {[
-                                    "1604004527766-abc1b2024f0e", // Indian woman
-                                    "1552053831-71594a27632d", // Indian man
-                                    "1614283233556-f35b0c801ef1", // Indian woman
-                                    "1507003211169-0a1dd7228f2d"  // Indian man
+                                    "1604004527766-abc1b2024f0e", // Indian woman (Gujarati style ref)
+                                    "1552053831-71594a27632d", // Indian man (Gujarati business style ref)
+                                    "1614283233556-f35b0c801ef1", // Indian woman (Gujarati traditional style ref)
+                                    "1507003211169-0a1dd7228f2d"  // Indian man (Gujarati professional ref)
                                 ].map((id, i) => (
                                     <div 
                                         key={i} 
@@ -326,23 +326,23 @@ const LandingPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {(latestTestimonials.length > 0 ? latestTestimonials : [
                             { 
-                                name: "Anjali Sharma", 
-                                role: "Verified Homeowner • Satellite", 
-                                text: "The expert was highly professional and arrived right on time. The service quality for deep cleaning was beyond my expectations!", 
+                                name: "Anjali Patel", 
+                                role: "Verified Homeowner • Satellite, Ahmedabad", 
+                                text: "The expert was highly professional and arrived right on time. Essential for my family functions!", 
                                 rating: 5, 
                                 img: "https://images.unsplash.com/photo-1604004527766-abc1b2024f0e?q=80&w=150&auto=format&fit=crop" 
                             },
                             { 
-                                name: "Vikram Patel", 
-                                role: "Verified Client • Maninagar", 
-                                text: "Extremely convenient booking process. The pricing was fair and the technician knew exactly what they were doing.", 
+                                name: "Vikram Shah", 
+                                role: "Verified Client • Maninagar, Ahmedabad", 
+                                text: "Extremely convenient booking process. The pricing was fair and the technician spoke Gujarati, which was very helpful.", 
                                 rating: 5, 
                                 img: "https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=150&auto=format&fit=crop" 
                             },
                             { 
-                                name: "Sneha Mehta", 
-                                role: "Verified Resident • Ambawadi", 
-                                text: "Finally a reliable service in Ahmedabad! I've used them thrice now, and the consistency is impressive.", 
+                                name: "Sneha Jhaveri", 
+                                role: "Verified Resident • Ambawadi, Ahmedabad", 
+                                text: "Finally a reliable service in Ahmedabad! The team is local and highly trustworthy.", 
                                 rating: 5, 
                                 img: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?q=80&w=150&auto=format&fit=crop" 
                             }
