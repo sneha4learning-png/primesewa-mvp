@@ -328,12 +328,16 @@ const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
             <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md" onClick={onClose} />
             <div className="relative w-full max-w-2xl bg-slate-50 rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto hide-scrollbar border border-white/10">
-                <button onClick={onClose} className="absolute top-8 right-8 z-10 p-3 bg-white/80 backdrop-blur hover:bg-rose-500 hover:text-white rounded-2xl shadow-xl transition-all group active:scale-95">
-                    <XCircle className="w-6 h-6" />
-                </button>
-
                 {/* DUAL COLOR GRADIENT HEADER */}
                 <div className="bg-gradient-to-br from-indigo-950 to-indigo-900 border-b border-white/10 relative overflow-hidden">
+                    {/* HIGHER Z-INDEX CLOSE BUTTON */}
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); onClose(); }} 
+                        className="absolute top-6 right-6 z-50 p-2.5 bg-white/10 hover:bg-rose-500/80 text-white rounded-2xl shadow-2xl backdrop-blur-xl transition-all group active:scale-90 border border-white/10"
+                        title="Close Modal"
+                    >
+                        <XCircle className="w-6 h-6" />
+                    </button>
                     <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full -ml-20 -mb-20 blur-2xl"></div>
                     
