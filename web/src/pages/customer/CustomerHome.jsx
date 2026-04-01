@@ -1157,38 +1157,38 @@ const CustomerHome = () => {
                                         </div>
                                         
                                         {b.status === 'completed' && !b.rated && (
-                                            <div className="mt-3 pt-3 border-t border-slate-50">
+                                            <div className="mt-4 pt-4 border-t border-slate-50">
                                                 {ratingState.bookingId === b.id ? (
-                                                    <div className="flex flex-col gap-2 animate-in slide-in-from-top duration-300">
+                                                    <div className="flex flex-col gap-3 animate-in slide-in-from-top duration-300">
                                                         <div className="flex items-center justify-between px-1">
-                                                            <span className="text-[8px] font-black text-indigo-600 uppercase tracking-widest">Rate Story</span>
-                                                            <div className="flex gap-0.5">
+                                                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Rate Your Experience</span>
+                                                            <div className="flex gap-1.5">
                                                                 {[1, 2, 3, 4, 5].map(s => (
                                                                     <Star 
                                                                         key={s} 
                                                                         onClick={(e) => { e.stopPropagation(); setRatingState(prev => ({ ...prev, rating: s })); }} 
-                                                                        className={`w-3.5 h-3.5 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`} 
+                                                                        className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} 
                                                                     />
                                                                 ))}
                                                             </div>
                                                         </div>
                                                         <textarea 
-                                                            placeholder="Your feedback..."
+                                                            placeholder="Describe your service experience..."
                                                             value={ratingState.testimonial}
                                                             onChange={(e) => setRatingState(prev => ({ ...prev, testimonial: e.target.value }))}
-                                                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-2xl text-[9px] font-medium outline-none focus:border-indigo-500 min-h-[50px] resize-none"
+                                                            className="w-full p-4 bg-slate-100 border border-slate-200 rounded-2xl text-[11px] font-medium text-slate-700 outline-none focus:border-indigo-500 min-h-[60px] resize-none shadow-inner"
                                                         />
-                                                        <div className="flex gap-2">
+                                                        <div className="flex gap-3">
                                                             <button 
                                                                 onClick={(e) => { e.stopPropagation(); submitRating(b); }} 
                                                                 disabled={ratingState.rating === 0}
-                                                                className="flex-1 py-2 bg-slate-900 hover:bg-indigo-600 text-white text-[8px] font-black uppercase rounded-xl transition-all active:scale-95 disabled:opacity-30"
+                                                                className="flex-1 py-3 bg-slate-900 hover:bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all active:scale-95 disabled:bg-slate-200 disabled:text-slate-400"
                                                             >
-                                                                Submit
+                                                                Submit Review
                                                             </button>
                                                             <button 
                                                                 onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: null, rating: 0, testimonial: '' }); }} 
-                                                                className="px-3 py-2 bg-slate-100 text-slate-400 text-[8px] font-black uppercase rounded-xl"
+                                                                className="px-6 py-3 bg-slate-50 text-slate-500 text-[10px] font-black uppercase rounded-2xl border border-slate-100"
                                                             >
                                                                 Skip
                                                             </button>
@@ -1197,25 +1197,25 @@ const CustomerHome = () => {
                                                 ) : (
                                                     <button 
                                                         onClick={() => setRatingState({ bookingId: b.id, rating: 0, testimonial: '' })}
-                                                        className="w-full py-2.5 bg-slate-50 hover:bg-slate-900 group/btn rounded-2xl transition-all border border-slate-100/50 flex items-center justify-center gap-2"
+                                                        className="w-full py-3 bg-slate-50 hover:bg-slate-950 group/btn rounded-2xl transition-all border border-slate-100 flex items-center justify-center gap-3 shadow-sm"
                                                     >
-                                                        <Star className="w-3 h-3 text-amber-500 group-hover/btn:rotate-12 transition-transform" />
-                                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 group-hover/btn:text-white">Review Professional</span>
+                                                        <Star className="w-4 h-4 text-amber-500 group-hover:rotate-12 transition-transform" />
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white">Review Professional</span>
                                                     </button>
                                                 )}
                                             </div>
                                         )}
 
                                         {b.status === 'completed' && b.rated && (
-                                            <div className="mt-3 pt-3 border-t border-slate-50 flex items-center justify-between">
-                                                <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5 leading-none">
-                                                    <CheckCircle2 className="w-2.5 h-2.5" /> Rated
+                                            <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2 leading-none">
+                                                    <CheckCircle2 className="w-3.5 h-3.5" /> Service Rated
                                                 </span>
-                                                <div className="flex gap-0.5">
+                                                <div className="flex gap-1">
                                                     {[1, 2, 3, 4, 5].map(s => (
                                                         <Star 
                                                             key={s} 
-                                                            className={`w-3 h-3 ${s <= (b.ratingGiven || 0) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} 
+                                                            className={`w-4 h-4 ${s <= (b.ratingGiven || 0) ? 'text-amber-500 fill-amber-500' : 'text-slate-100'}`} 
                                                         />
                                                     ))}
                                                 </div>
