@@ -201,7 +201,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                     <div className="flex justify-between items-start mb-6">
                         <div className="pt-2">
                             <h2 className="text-xl sm:text-2xl font-medium text-slate-900 tracking-tight leading-tight">{name}</h2>
-                            <p className="text-[9px] font-normal text-slate-400 uppercase tracking-widest mt-1">{category} • Verified Partner</p>
+                            <p className="text-[9px] font-normal text-slate-400 uppercase tracking-widest mt-1">{category} • Prime Specialist</p>
                         </div>
                         <div className="flex gap-2 shrink-0">
                             <button onClick={() => { const phone = String(p.phone || ''); if (!phone) { alert('Contact details unavailable.'); return; } window.location.href = `tel:${phone}`; }} className="px-4 py-2 bg-emerald-50 text-emerald-600 font-medium rounded-xl border border-emerald-100 transition-all flex items-center justify-center gap-2 text-[9px] uppercase tracking-widest hover:bg-emerald-100">
@@ -221,7 +221,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                         <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-indigo-200">
                             <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1.5" />
                             <div className="text-lg sm:text-xl font-black text-slate-900 leading-none">
-                                {liveJobsCount > 0 ? liveJobsCount : 'Verifying'}
+                                {liveJobsCount > 0 ? liveJobsCount : 'New Hub'}
                             </div>
                             <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">Active Jobs</div>
                         </div>
@@ -1048,8 +1048,8 @@ const CustomerHome = () => {
                                 <Star className="w-8 h-8 text-amber-400 fill-current" />
                             </div>
                             <div>
-                                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Account Status</p>
-                                <h3 className="text-white text-2xl font-black uppercase tracking-tight leading-none group-hover:text-amber-400 transition-colors italic">Verified Client</h3>
+                                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Platform Access</p>
+                                <h3 className="text-white text-2xl font-black uppercase tracking-tight leading-none group-hover:text-amber-400 transition-colors italic">Prime Member</h3>
                             </div>
                         </div>
                     </div>
