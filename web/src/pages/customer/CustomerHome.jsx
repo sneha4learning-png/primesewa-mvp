@@ -491,68 +491,24 @@ const CustomerHome = () => {
     const { userData } = useAuth();
     const { sendNotification } = useNotifications();
 
+    // 1. REFS & STATE (Initializers)
+    const catalogRef = useRef(null);
+    const addressSearchTimeout = useRef(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [analyticsData, setAnalyticsData] = useState({ spendingTrend: [], categoryMix: [] });
-
-    useEffect(() => {
-        if (!userData?.uid) return;
-        
-        const all = [...activeBookings, ...pastBookings];
-        
-        // 1. Spending Trend (Last 6 Months)
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const last6 = Array.from({ length: 6 }, (_, i) => {
-            const d = new Date();
-            d.setMonth(d.getMonth() - (5 - i));
-            return { month: months[d.getMonth()], spend: 0 };
-        });
-
-        all.forEach(b => {
-            if (b.status === 'completed') {
-                const bDate = new Date(b.date || (b.createdAt?.toDate ? b.createdAt.toDate() : 0));
-                const monthLabel = months[bDate.getMonth()];
-                const dayObj = last6.find(m => m.month === monthLabel);
-                if (dayObj) {
-                    dayObj.spend += (parseInt(b.price) || 0);
-                }
-            }
-        });
-        
-        // 2. Category Mix
-        const mix = {};
-        all.forEach(b => {
-            const cat = b.serviceCategory || b.service?.split(' ')[0] || 'Other';
-            mix[cat] = (mix[cat] || 0) + 1;
-        });
-        const pieData = Object.entries(mix).map(([name, value]) => ({ name, value }));
-
-        setAnalyticsData({ spendingTrend: last6, categoryMix: pieData });
-    }, [activeBookings, pastBookings, userData?.uid]);
-    const serviceImages = useMemo(() => [
-        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop", // Plumbing
-        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop", // Electrical
-        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop", // Cleaning
-        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop", // Carpentry
-        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop", // Salon
-        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070&auto=format&fit=crop"  // Appliance Repair
-    ], []);
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentImageIndex(prev => (prev + 1) % serviceImages.length);
-        }, 8000);
-        return () => clearInterval(timer);
-    }, [serviceImages.length]);
-
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [bookingStep, setBookingStep] = useState(0); 
     const [onlineProviders, setOnlineProviders] = useState([]);
     const [activeBookings, setActiveBookings] = useState([]);
     const [pastBookings, setPastBookings] = useState([]);
     const [pendingBookingData, setPendingBookingData] = useState(null);
-    const [sortBy] = useState('rating');
-    const [ratingFilter] = useState('0');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortBy, setSortBy] = useState('rating');
+    const [ratingFilter, setRatingFilter] = useState('0');
+    const [selectedSubServices, setSelectedSubServices] = useState([]);
+    const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
+    const [selectedBooking, setSelectedBooking] = useState(null);
     const [selectedProviderProfile, setSelectedProviderProfile] = useState(null);
-    const catalogRef = useRef(null);
     const [bookingDate, setBookingDate] = useState('');
     const [bookingSlot, setBookingSlot] = useState('');
     const [bookingDesc, setBookingDesc] = useState('');
@@ -561,14 +517,18 @@ const CustomerHome = () => {
     const [bookingCity] = useState('Ahmedabad');
     const [bookingCoords, setBookingCoords] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
     const [isLocating, setIsLocating] = useState(false);
     const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [isSearchingAddress, setIsSearchingAddress] = useState(false);
-    const addressSearchTimeout = useRef(null);
-    const [selectedSubServices, setSelectedSubServices] = useState([]);
-    const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
-    const [selectedBooking, setSelectedBooking] = useState(null);
+
+    const serviceImages = useMemo(() => [
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070&auto=format&fit=crop"
+    ], []);
 
     const getTodayStr = () => new Date().toISOString().split('T')[0];
 
@@ -588,24 +548,57 @@ const CustomerHome = () => {
         
         if (bookingDate === getTodayStr()) {
             const currentHour = new Date().getHours();
-            // Map slots to include isPast status instead of filtering
-            return slots.map(s => ({
-                ...s,
-                isPast: s.hour <= currentHour
-            }));
+            return slots.map(s => ({ ...s, isPast: s.hour <= currentHour }));
         }
         return slots.map(s => ({ ...s, isPast: false }));
     }, [bookingDate]);
 
+    // 3. ANALYTICS CALCULATION
+    useEffect(() => {
+        if (!userData?.uid) return;
+        const allSet = [...activeBookings, ...pastBookings];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const last6 = Array.from({ length: 6 }, (_, i) => {
+            const d = new Date();
+            d.setMonth(d.getMonth() - (5 - i));
+            return { month: months[d.getMonth()], spend: 0 };
+        });
+
+        allSet.forEach(b => {
+            if (String(b.status).toLowerCase() === 'completed') {
+                const bDateStr = b.date || (b.completedAt?.toDate ? b.completedAt.toDate().toISOString().split('T')[0] : null);
+                if (bDateStr) {
+                    const bDate = new Date(bDateStr);
+                    const monthLabel = months[bDate.getMonth()];
+                    const dayObj = last6.find(m => m.month === monthLabel);
+                    if (dayObj) dayObj.spend += (parseInt(b.price) || 0);
+                }
+            }
+        });
+        
+        const mix = {};
+        allSet.forEach(b => {
+            const cat = b.serviceCategory || b.service?.split(' ')[0] || 'Other';
+            mix[cat] = (mix[cat] || 0) + 1;
+        });
+        setAnalyticsData({ spendingTrend: last6, categoryMix: Object.entries(mix).map(([name, value]) => ({ name, value })) });
+    }, [activeBookings, pastBookings, userData?.uid]);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex(prev => (prev + 1) % serviceImages.length);
+        }, 8000);
+        return () => clearInterval(timer);
+    }, [serviceImages.length]);
+
     useEffect(() => {
         if (bookingSlot) {
             const selected = availableSlots.find(s => s.id === bookingSlot);
-            if (selected && selected.isPast) {
-                setBookingSlot('');
-            }
+            if (selected && selected.isPast) setBookingSlot('');
         }
     }, [availableSlots, bookingSlot]);
 
+    // 4. EVENT HANDLERS
     const handleMyLocation = () => {
         if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
         setIsLocating(true);
@@ -662,27 +655,11 @@ const CustomerHome = () => {
         });
 
         if (userData?.uid) {
-            // BROADER QUERY: Match by UID OR Phone for maximum historical consistency
-            const q = query(
-                collection(db, 'bookings'), 
-                or(
-                    where('customerUid', '==', userData.uid),
-                    where('customerPhone', '==', userData.phone || '')
-                )
-            );
-            
+            const q = query(collection(db, 'bookings'), or(where('customerUid', '==', userData.uid), where('customerPhone', '==', userData.phone || '')));
             const unsubscribeBookings = onSnapshot(q, (snapshot) => {
                 const allMyBookings = [];
-                snapshot.forEach(d => {
-                    allMyBookings.push({ id: d.id, ...d.data() });
-                });
-                
-                const sorted = allMyBookings.sort((a, b) => {
-                    const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-                    const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-                    return timeB - timeA;
-                });
-
+                snapshot.forEach(d => allMyBookings.push({ id: d.id, ...d.data() }));
+                const sorted = allMyBookings.sort((a, b) => (b.createdAt?.toMillis || 0) - (a.createdAt?.toMillis || 0));
                 setActiveBookings(sorted.filter(b => !['completed', 'rejected', 'cancelled'].includes(String(b.status).toLowerCase())));
                 setPastBookings(sorted.filter(b => ['completed', 'rejected', 'cancelled'].includes(String(b.status).toLowerCase())).slice(0, 10));
             });
