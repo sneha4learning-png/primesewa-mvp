@@ -766,41 +766,86 @@ const CustomerHome = () => {
                         </div>
 
                         {selectedCategory ? (
-                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2">
-                                {displayedProviders.map(p => (
-                                    <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-10 group cursor-pointer hover:scale-[1.03] transition-all duration-500 relative overflow-hidden flex flex-col justify-between min-h-[340px]">
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-bl-[8rem] pointer-events-none group-hover:bg-indigo-100/50 transition-colors"></div>
-                                        
-                                        <div className="flex items-center gap-6 mb-10 relative z-10">
-                                            <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center border shadow-lg group-hover:shadow-indigo-100 transition-all">
-                                                <div className="w-16 h-16 bg-indigo-50 rounded-[1.5rem] flex items-center justify-center text-indigo-600">
-                                                    <UserCircle className="w-10 h-10" />
-                                                </div>
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="text-xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tight leading-tight mb-2 transition-colors">{p.name}</h4>
-                                                <div className="flex items-center gap-2">
-                                                    <Star className="w-4 h-4 text-amber-500 fill-current" />
-                                                    <span className="text-sm font-black text-slate-900">{p.rating || 'New'}</span>
-                                                </div>
-                                            </div>
+                             <div className="space-y-12">
+                                {/* Sub-services Selection Section */}
+                                <div className="bg-white/80 backdrop-blur-xl rounded-[3rem] p-10 border border-white/20 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-700">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div>
+                                            <h3 className="text-2xl font-black text-slate-950 uppercase italic tracking-tighter">Explore {selectedCategory} Services</h3>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Select sub-categories to find specialized professionals</p>
                                         </div>
-
-                                        <div className="w-full h-px bg-slate-100 mb-8"></div>
-
-                                        <div className="flex justify-between items-center relative z-10">
-                                            <div>
-                                                <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5">STARTING AT</p>
-                                                <p className="text-3xl font-black text-slate-950 italic">
-                                                    ₹{p.price}<span className="text-sm font-bold text-slate-400 not-italic"> / hr</span>
-                                                </p>
-                                            </div>
-                                            <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="px-8 py-4 bg-slate-950 hover:bg-indigo-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95">
-                                                Book Now
-                                            </button>
+                                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                            <Sparkles className="w-6 h-6" />
                                         </div>
                                     </div>
-                                ))}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => (
+                                            <button 
+                                                key={sub.name}
+                                                onClick={() => {
+                                                    const exists = selectedSubServices.includes(sub.name);
+                                                    setSelectedSubServices(exists ? selectedSubServices.filter(s => s !== sub.name) : [...selectedSubServices, sub.name]);
+                                                }}
+                                                className={`p-5 rounded-[2rem] border transition-all text-left group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-xl' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
+                                            >
+                                                <p className={`text-[9px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.includes(sub.name) ? 'text-indigo-200' : 'text-slate-400'}`}>Package</p>
+                                                <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
+                                                <div className="flex items-center gap-1 mt-2">
+                                                    <IndianRupee className={`w-3 h-3 ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`} />
+                                                    <span className={`text-xs font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`}>Starting ₹{sub.price}</span>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-4 px-4">
+                                    <div className="h-px flex-1 bg-slate-200"></div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Available Specialists</p>
+                                    <div className="h-px flex-1 bg-slate-200"></div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2 pb-20">
+                                    {displayedProviders.map(p => {
+                                        // Sanitize price to avoid double symbols or units
+                                        const cleanPrice = String(p.price || '449').replace(/[₹\s,]/g, '').split('/')[0];
+                                        
+                                        return (
+                                            <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-10 group cursor-pointer hover:scale-[1.03] transition-all duration-500 relative overflow-hidden flex flex-col justify-between min-h-[340px]">
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-bl-[8rem] pointer-events-none group-hover:bg-indigo-100/50 transition-colors"></div>
+                                                
+                                                <div className="flex items-center gap-6 mb-10 relative z-10">
+                                                    <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center border shadow-lg group-hover:shadow-indigo-100 transition-all">
+                                                        <div className="w-16 h-16 bg-indigo-50 rounded-[1.5rem] flex items-center justify-center text-indigo-600">
+                                                            <UserCircle className="w-10 h-10" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="text-xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tight leading-tight mb-2 transition-colors">{p.name || 'Prime Specialist'}</h4>
+                                                        <div className="flex items-center gap-2">
+                                                            <Star className="w-4 h-4 text-amber-500 fill-current" />
+                                                            <span className="text-sm font-black text-slate-900">{p.rating || 'New Hub'}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="w-full h-px bg-slate-100 mb-8"></div>
+
+                                                <div className="flex justify-between items-center relative z-10">
+                                                    <div>
+                                                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5">STARTING AT</p>
+                                                        <p className="text-3xl font-black text-slate-950 italic">
+                                                            ₹{cleanPrice}<span className="text-sm font-bold text-slate-400 not-italic"> / hr</span>
+                                                        </p>
+                                                    </div>
+                                                    <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="px-8 py-4 bg-slate-950 hover:bg-indigo-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95">
+                                                        Book Now
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                              </div>
                         ) : (
                             <div className="py-24 text-center bg-indigo-50/20 rounded-[4rem] border-2 border-dashed border-indigo-100">
