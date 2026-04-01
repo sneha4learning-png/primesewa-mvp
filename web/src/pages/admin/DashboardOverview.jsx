@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
+import { Users, Briefcase, DollarSign, CalendarDays, Clock, MapPin, CheckCircle2, Star, TrendingUp, BarChart as BarChartIcon, IndianRupee } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area, PieChart, Pie } from 'recharts';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc, writeBatch, getDocs } from 'firebase/firestore';
@@ -423,9 +423,14 @@ The system is now ready for production-level testing! 🏁
                                     <div className="text-right">
                                         <div className="flex items-center justify-end gap-2 mb-1">
                                             {b.ratingGiven && (
-                                                <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 italic">
-                                                    <Star size={10} className="fill-current" />
-                                                    <span className="text-[10px] font-black">{Number(b.ratingGiven).toFixed(1)}</span>
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <div className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 italic">
+                                                        <Star size={10} className="fill-current" />
+                                                        <span className="text-[10px] font-black">{Number(b.ratingGiven).toFixed(1)}</span>
+                                                    </div>
+                                                    {b.testimonial && (
+                                                        <p className="text-[9px] text-slate-400 italic font-medium max-w-[120px] truncate text-right">"{b.testimonial}"</p>
+                                                    )}
                                                 </div>
                                             )}
                                             <p className="font-normal text-gray-900">₹{(b.proposedPrice || b.price || 0).toFixed(0)}</p>

@@ -796,9 +796,16 @@ const ProviderDashboardContent = () => {
                                             <h4 className="font-normal text-slate-800">{job.service}</h4>
                                             <p className="text-xs text-slate-500">#{job.id}</p>
                                             {job.ratingGiven && (
-                                                <div className="flex items-center gap-1 text-amber-500 mt-1">
-                                                    <Star className="w-3.5 h-3.5 fill-current" />
-                                                    <span className="text-xs font-normal w-full truncate">{Number(job.ratingGiven).toFixed(1)} Rating</span>
+                                                <div className="flex flex-col gap-1 text-amber-500 mt-1">
+                                                    <div className="flex items-center gap-1">
+                                                        <Star className="w-3.5 h-3.5 fill-current" />
+                                                        <span className="text-xs font-normal">{Number(job.ratingGiven).toFixed(1)} Rating</span>
+                                                    </div>
+                                                    {job.testimonial && (
+                                                        <p className="text-[10px] text-slate-500 italic font-medium leading-tight mt-1 border-l-2 border-indigo-100 pl-2 py-0.5 line-clamp-2 hover:line-clamp-none transition-all">
+                                                            "{job.testimonial}"
+                                                        </p>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>

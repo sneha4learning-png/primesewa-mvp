@@ -506,7 +506,7 @@ const CustomerHome = () => {
     const [sortBy, setSortBy] = useState('rating');
     const [ratingFilter, setRatingFilter] = useState('0');
     const [selectedSubServices, setSelectedSubServices] = useState([]);
-    const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0 });
+    const [ratingState, setRatingState] = useState({ bookingId: null, rating: 0, testimonial: '' });
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [selectedProviderProfile, setSelectedProviderProfile] = useState(null);
     const [bookingDate, setBookingDate] = useState('');
@@ -794,13 +794,15 @@ const CustomerHome = () => {
         if (ratingState.rating > 0) {
             try {
                 // 1. Update Booking Record
-                await updateDoc(doc(db, 'bookings', booking.id), { rated: true, ratingGiven: ratingState.rating });
+                await updateDoc(doc(db, 'bookings', booking.id), { 
+                    rated: true, 
+                    ratingGiven: ratingState.rating,
+                    testimonial: ratingState.testimonial || ''
+                });
                 
                 // 2. Update Provider's Global Rating (Optimistic average for demo)
                 if (booking.providerUid) {
                     const provRef = doc(db, 'providers', booking.providerUid);
-                    // Standard demo logic: (avg * count + new) / (count + 1)
-                    // But for the demo simplicity, we'll just push a fresh 5.0 or 4.9 style rating if it's the first few
                     const snap = await getDocs(query(collection(db, 'bookings'), where('providerUid', '==', booking.providerUid), where('rated', '==', true)));
                     const ratings = snap.docs.map(d => d.data().ratingGiven || 0);
                     const avg = ratings.reduce((a, b) => a + b, 0) / (ratings.length || 1);
@@ -811,7 +813,7 @@ const CustomerHome = () => {
                     });
                 }
                 
-                setRatingState({ bookingId: null, rating: 0 });
+                setRatingState({ bookingId: null, rating: 0, testimonial: '' });
                 alert("Thank you for your feedback!");
             } catch (err) {
                 console.error("Rating submission error:", err);
@@ -1103,27 +1105,45 @@ const CustomerHome = () => {
                                                     {!b.rated ? (
                                                         <div className="flex items-center gap-2">
                                                             {ratingState.bookingId === b.id ? (
-                                                                <div className="flex items-center gap-2 animate-in slide-in-from-right duration-300">
-                                                                    <div className="flex gap-1">
-                                                                        {[1, 2, 3, 4, 5].map(s => (
-                                                                            <Star 
-                                                                                key={s} 
-                                                                                onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: b.id, rating: s }); }} 
-                                                                                className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'text-slate-200 hover:text-amber-200'}`} 
-                                                                            />
-                                                                        ))}
+                                                                <div className="flex flex-col gap-4 animate-in slide-in-from-right duration-300 bg-white p-6 rounded-3xl border border-indigo-100 shadow-xl min-w-[280px]">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Rate Experience</span>
+                                                                        <div className="flex gap-1">
+                                                                            {[1, 2, 3, 4, 5].map(s => (
+                                                                                <Star 
+                                                                                    key={s} 
+                                                                                    onClick={(e) => { e.stopPropagation(); setRatingState(prev => ({ ...prev, rating: s })); }} 
+                                                                                    className={`w-5 h-5 cursor-pointer transition-all hover:scale-125 ${s <= ratingState.rating ? 'text-amber-500 fill-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'text-slate-200 hover:text-amber-200'}`} 
+                                                                                />
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
-                                                                    <button 
-                                                                        onClick={(e) => { e.stopPropagation(); submitRating(b); }} 
-                                                                        disabled={ratingState.rating === 0}
-                                                                        className="px-4 py-2 bg-indigo-600 hover:bg-slate-900 text-white text-[8px] font-black uppercase rounded-lg shadow-lg disabled:opacity-50 transition-all active:scale-95"
-                                                                    >
-                                                                        Submit
-                                                                    </button>
+                                                                    <textarea 
+                                                                        placeholder="Share your experience (optional)..."
+                                                                        className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-[11px] font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none min-h-[80px]"
+                                                                        value={ratingState.testimonial}
+                                                                        onChange={(e) => setRatingState(prev => ({ ...prev, testimonial: e.target.value }))}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    />
+                                                                    <div className="flex gap-2">
+                                                                        <button 
+                                                                            onClick={(e) => { e.stopPropagation(); submitRating(b); }} 
+                                                                            disabled={ratingState.rating === 0}
+                                                                            className="flex-1 py-3 bg-indigo-600 hover:bg-slate-900 text-white text-[9px] font-black uppercase rounded-xl shadow-lg disabled:opacity-50 transition-all active:scale-95"
+                                                                        >
+                                                                            Submit Feedback
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: null, rating: 0, testimonial: '' }); }} 
+                                                                            className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 text-[9px] font-black uppercase rounded-xl transition-all"
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             ) : (
                                                                 <button 
-                                                                    onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: b.id, rating: 0 }); }} 
+                                                                    onClick={(e) => { e.stopPropagation(); setRatingState({ bookingId: b.id, rating: 0, testimonial: '' }); }} 
                                                                     className="px-5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[9px] font-black uppercase rounded-xl transition-all border border-indigo-100"
                                                                 >
                                                                     Rate Service
