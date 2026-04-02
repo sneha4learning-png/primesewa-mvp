@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { db } from '../../firebase/config';
-import { collection, getDocs, writeBatch, doc } from 'firebase/firestore';
+import { collection, getDocs, writeBatch, doc, query, where, deleteDoc } from 'firebase/firestore';
 
 const CleanupPage = () => {
     const [status, setStatus] = useState('');
@@ -232,6 +232,42 @@ const CleanupPage = () => {
                         className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 active:scale-95'}`}
                     >
                         Sync Profiles (Ratings & Jobs ↔ Bookings)
+                    </button>
+                    <button
+                        onClick={async () => {
+                            if (!window.confirm('Delete the "Plumbing (Tap Fix)" ₹361 entry from 2026-03-31?')) return;
+                            setLoading(true);
+                            setStatus('🗑️ Deleting Specific Entry...');
+                            try {
+                                const q = query(collection(db, 'bookings'), where('service', '==', 'Plumbing (Tap Fix)'));
+                                const snap = await getDocs(q);
+                                if (snap.empty) {
+                                    setStatus('❓ No matching entry found.');
+                                    return;
+                                }
+                                
+                                let deleted = 0;
+                                snap.forEach(async (d) => {
+                                    const data = d.data();
+                                    const priceMatch = (String(data.price) === '361' || data.price === 361);
+                                    const dateMatch = (data.date === '2026-03-31');
+                                    // Also check slot/time/status
+                                    if (priceMatch && dateMatch) {
+                                        await deleteDoc(doc(db, 'bookings', d.id));
+                                        deleted++;
+                                    }
+                                });
+                                setStatus(`✅ Successfully removed ${deleted} entries.`);
+                            } catch (e) {
+                                setStatus(`❌ Error: ${e.message}`);
+                            } finally {
+                                setLoading(true);
+                            }
+                        }}
+                        disabled={loading}
+                        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${loading ? 'bg-slate-700 text-slate-500' : 'bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 active:scale-95'}`}
+                    >
+                        Remove Specific Entry (Plumbing ₹361)
                     </button>
                     <button
                         onClick={unblockAll}

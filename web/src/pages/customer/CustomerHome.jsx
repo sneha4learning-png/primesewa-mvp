@@ -544,6 +544,11 @@ const CustomerHome = () => {
         return () => unsubscribeProviders();
     }, [userData]);
 
+    const handleCategorySelect = (catName) => {
+        setSelectedCategory(catName);
+        setSelectedSubServices([]); // Reset sub-services when category changes
+    };
+
     const handleMyLocation = () => {
         if (!navigator.geolocation) return;
         setIsLocating(true);
@@ -563,12 +568,26 @@ const CustomerHome = () => {
 
     const handleBook = (provider) => {
         const base = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
+        
+        // Calculate sub-services total if any selected
+        const categoryData = categories.find(c => c.name === selectedCategory);
+        let subtotal = 0;
+        if (categoryData && selectedSubServices.length > 0) {
+            selectedSubServices.forEach(sName => {
+                const sub = categoryData.subServices?.find(ss => ss.name === sName);
+                if (sub) subtotal += sub.price;
+            });
+        }
+        
+        // Final price logic: Base + Sub-services (if any)
+        const finalPrice = base + subtotal;
+
         setPendingBookingData({ 
             provider: provider.name,
             providerUid: provider.id,
-            price: base,
+            price: finalPrice,
             service: `${selectedCategory || 'Prime'} Service`,
-            subServices: selectedSubServices
+            subServices: [...selectedSubServices]
         });
         setBookingStep(1);
     };
@@ -772,7 +791,7 @@ const CustomerHome = () => {
                             </div>
                             <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-10 gap-4">
                                 {categories.map(cat => (
-                                    <button key={cat.id} onClick={() => setSelectedCategory(cat.name)} className={`flex flex-col items-center gap-3 transition-all ${selectedCategory === cat.name ? 'scale-110' : 'opacity-60'}`}>
+                                    <button key={cat.id} onClick={() => handleCategorySelect(cat.name)} className={`flex flex-col items-center gap-3 transition-all ${selectedCategory === cat.name ? 'scale-110' : 'opacity-60'}`}>
                                         <div className={`w-16 h-16 rounded-[2rem] flex items-center justify-center ${selectedCategory === cat.name ? 'bg-indigo-600 text-white shadow-xl' : 'bg-white border'}`}><cat.icon className="w-7 h-7" /></div>
                                         <span className="text-[9px] font-black uppercase text-center">{cat.name}</span>
                                     </button>
@@ -922,7 +941,7 @@ const CustomerHome = () => {
                                             {pendingBookingData.subServices?.length > 0 && (
                                                 <div className="flex flex-wrap gap-2.5 mt-6">
                                                     {pendingBookingData.subServices.map(s => (
-                                                        <span key={s} className="px-4 py-1.5 bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-indigo-200 border border-white/5">
+                                                        <span key={s} className="px-5 py-2.5 bg-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-100 border border-indigo-400/30 shadow-lg">
                                                             {s}
                                                         </span>
                                                     ))}
