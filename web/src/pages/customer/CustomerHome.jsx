@@ -812,7 +812,19 @@ const CustomerHome = () => {
                                             <Sparkles className="w-6 h-6" />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                        {/* Base Plate Highlighter */}
+                                        <div 
+                                            className={`p-5 rounded-[2rem] border transition-all text-left ${selectedSubServices.length === 0 ? 'bg-indigo-600 border-indigo-600 shadow-xl' : 'bg-white border-slate-100'}`}
+                                        >
+                                            <p className={`text-[9px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.length === 0 ? 'text-indigo-200' : 'text-slate-400'}`}>Current Package</p>
+                                            <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Standard Base Rate</h4>
+                                            <div className="flex items-center gap-1 mt-2">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${selectedSubServices.length === 0 ? 'bg-indigo-300 animate-pulse' : 'bg-slate-200'}`}></div>
+                                                <span className={`text-[10px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-400'}`}>ACTIVE BY DEFAULT</span>
+                                            </div>
+                                        </div>
+                                        
                                         {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => (
                                             <button 
                                                 key={sub.name}
@@ -841,9 +853,21 @@ const CustomerHome = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2 pb-20">
                                     {displayedProviders.map(p => {
-                                        // Use consistent base rate logic capped at 199
+                                        // Calculate dynamic price based on selection
                                         const rawPrice = parseInt(String(p.price || '149').replace(/\D/g, ''));
                                         const baseRate = Math.min(rawPrice, 199);
+                                        
+                                        // Calculate sub-services total if any selected
+                                        const categoryData = categories.find(c => c.name === selectedCategory);
+                                        let subtotalSum = 0;
+                                        if (categoryData && selectedSubServices.length > 0) {
+                                            selectedSubServices.forEach(sName => {
+                                                const subObj = categoryData.subServices?.find(ss => ss.name === sName);
+                                                if (subObj) subtotalSum += subObj.price;
+                                            });
+                                        }
+
+                                        const currentTotalDisplay = baseRate + subtotalSum;
                                         const ratingValue = Number(p.rating || 0);
                                         const hasValidRating = ratingValue > 0 && (p.ratingCount || 0) > 0;
                                         
@@ -889,13 +913,17 @@ const CustomerHome = () => {
                                                 </div>
 
                                                 <div className="w-full h-px bg-linear-to-r from-slate-100 via-slate-50 to-white my-8"></div>
-
                                                 <div className="flex justify-between items-end relative z-10">
                                                     <div>
-                                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Service Entrance</p>
+                                                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Total Service Value</p>
                                                         <div className="flex items-baseline gap-1">
-                                                            <span className="text-4xl font-black text-slate-950 italic">₹{baseRate}</span>
-                                                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Base Cost</span>
+                                                            <span className="text-4xl font-black text-slate-950 italic">₹{currentTotalDisplay}</span>
+                                                            {subtotalSum > 0 && (
+                                                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Incl. Add-ons</span>
+                                                            )}
+                                                            {subtotalSum === 0 && (
+                                                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Base Cost Only</span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-16 px-10 bg-slate-950 hover:bg-indigo-600 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-indigo-200/50 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
