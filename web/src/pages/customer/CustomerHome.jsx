@@ -205,7 +205,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                             <button onClick={() => { const phone = String(p.phone || ''); if (!phone) { alert('Contact details unavailable.'); return; } window.location.href = `tel:${phone}`; }} className="px-4 py-2 bg-emerald-50 text-emerald-600 font-medium rounded-xl border border-emerald-100 transition-all flex items-center justify-center gap-2 text-[9px] uppercase tracking-widest hover:bg-emerald-100">
                                 <Phone className="w-3 h-3" /> Call
                             </button>
-                            <button onClick={() => handleBook(p)} className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl text-[9px] uppercase shadow-lg shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95">Book</button>
+                            <button onClick={() => { handleBook(p); onClose(); }} className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl text-[9px] uppercase shadow-lg shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95">Book</button>
                         </div>
                     </div>
                     <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
@@ -811,8 +811,11 @@ const CustomerHome = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2 pb-20">
                                     {displayedProviders.map(p => {
-                                        // Sanitize price to avoid double symbols or units
-                                        const cleanPrice = String(p.price || '449').replace(/[₹\s,]/g, '').split('/')[0];
+                                        // Use consistent base rate logic capped at 199
+                                        const rawPrice = parseInt(String(p.price || '149').replace(/\D/g, ''));
+                                        const baseRate = Math.min(rawPrice, 199);
+                                        const ratingValue = Number(p.rating || 0);
+                                        const hasValidRating = ratingValue > 0 && (p.ratingCount || 0) > 0;
                                         
                                         return (
                                             <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-10 group cursor-pointer hover:scale-[1.03] transition-all duration-500 relative overflow-hidden flex flex-col justify-between min-h-[340px]">
@@ -827,10 +830,10 @@ const CustomerHome = () => {
                                                     <div className="flex-1">
                                                         <h4 className="text-xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tight leading-tight mb-2 transition-colors">{p.name || 'Prime Specialist'}</h4>
                                                         <div className="flex items-center gap-4">
-                                                            {p.rating > 0 && (
+                                                            {hasValidRating && (
                                                                 <div className="flex items-center gap-2">
                                                                     <Star className="w-4 h-4 text-amber-500 fill-current" />
-                                                                    <span className="text-sm font-black text-slate-900">{p.rating}</span>
+                                                                    <span className="text-sm font-black text-slate-900">{ratingValue}</span>
                                                                 </div>
                                                             )}
                                                             <button 
@@ -849,7 +852,7 @@ const CustomerHome = () => {
                                                     <div>
                                                         <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5">STARTING AT</p>
                                                         <p className="text-3xl font-black text-slate-950 italic">
-                                                            ₹{cleanPrice}<span className="ml-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest not-italic">Base Rate</span>
+                                                            ₹{baseRate}<span className="ml-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest not-italic">Base Rate</span>
                                                         </p>
                                                     </div>
                                                     <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="px-8 py-4 bg-slate-950 hover:bg-indigo-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95">
