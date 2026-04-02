@@ -148,7 +148,7 @@ const getServiceImage = (category = '') => {
     return "https://images.unsplash.com/photo-1542013936693-884638332954?w=800&q=80";
 };
 
-const ProviderProfileModal = ({ p, onClose, handleBook }) => {
+const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = [], categoryData }) => {
     const [liveJobsCount, setLiveJobsCount] = useState(p?.jobs || p?.jobCount || 0);
 
     useEffect(() => {
@@ -174,6 +174,17 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
     const ratingValue = typeof p.rating === 'number' ? p.rating : parseFloat(String(p.rating || 0));
     const price = String(p.price || '499');
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
+
+    const rawPrice = parseInt(price.replace(/\D/g, '') || '0');
+    const baseRate = Math.min(rawPrice > 0 ? rawPrice : 149, 199);
+    let subtotalSum = 0;
+    if (categoryData && selectedSubServices.length > 0) {
+        selectedSubServices.forEach(sName => {
+            const subObj = categoryData.subServices?.find(ss => ss.name === sName);
+            if (subObj) subtotalSum += subObj.price;
+        });
+    }
+    const currentTotalDisplay = baseRate + subtotalSum;
 
     return createPortal(
         <div className="fixed inset-0 w-full h-full bg-black/90 flex items-center justify-center p-4 sm:p-6" style={{ zIndex: 99999, position: 'fixed', top: 0, left: 0 }} onClick={onClose}>
@@ -229,11 +240,36 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                             <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 group/stat">
                                 <IndianRupee className="w-6 h-6 text-emerald-500 mx-auto mb-3 group-hover/stat:animate-bounce" />
                                 <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none tracking-tighter">
-                                    ₹{Math.min(parseInt(String(price).replace(/\D/g, '')), 199)}
+                                    ₹{currentTotalDisplay > 0 ? currentTotalDisplay : Math.min(parseInt(String(price).replace(/\D/g, '') || '0'), 199)}
                                 </div>
-                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Starting From</div>
+                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">{subtotalSum > 0 ? 'Total Value' : 'Starting From'}</div>
                             </div>
                         </div>
+
+                        {/* Sub Services Highlight */}
+                        <div className="mb-6 bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100">
+                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-4 flex items-center gap-3">
+                                <Sparkles className="w-4 h-4 text-indigo-500" /> Package Details
+                            </h3>
+                            {selectedSubServices.length > 0 ? (
+                                <div className="flex flex-wrap gap-2.5">
+                                    <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm">
+                                        Standard Base Package Active
+                                    </span>
+                                    {selectedSubServices.map(s => (
+                                        <span key={s} className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">
+                                            {s}
+                                        </span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
+                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Base cost will apply if you will not select any sub service</span>
+                                </div>
+                            )}
+                        </div>
+
                         {portfolio.length > 0 && (
                             <div className="mb-6 animate-in slide-in-from-bottom-4 duration-1000">
                                 <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
@@ -824,7 +860,9 @@ const CustomerHome = () => {
                                             <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Standard Base Rate</h4>
                                             <div className="flex items-center gap-1 mt-2">
                                                 <div className={`w-1.5 h-1.5 rounded-full ${selectedSubServices.length === 0 ? 'bg-indigo-300 animate-pulse' : 'bg-slate-200'}`}></div>
-                                                <span className={`text-[10px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-400'}`}>ACTIVE BY DEFAULT</span>
+                                                <span className={`text-[10px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-400'}`}>
+                                                    {selectedSubServices.length === 0 ? 'Base cost will apply if you will not select any sub service' : 'ACTIVE BY DEFAULT'}
+                                                </span>
                                             </div>
                                         </div>
                                         
@@ -988,6 +1026,9 @@ const CustomerHome = () => {
                                             <h3 className="text-4xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
                                             {pendingBookingData.subServices?.length > 0 ? (
                                                 <div className="flex flex-wrap gap-2.5 mt-6">
+                                                    <span className="px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
+                                                        Standard Base Package Active
+                                                    </span>
                                                     {pendingBookingData.subServices.map(s => (
                                                         <span key={s} className="px-5 py-2.5 bg-indigo-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-100 border border-indigo-400/30 shadow-lg">
                                                             {s}
@@ -997,7 +1038,7 @@ const CustomerHome = () => {
                                             ) : (
                                                 <div className="mt-6">
                                                     <span className="px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
-                                                        Standard Base Package Active
+                                                        Base cost will apply if you will not select any sub service
                                                     </span>
                                                 </div>
                                             )}
@@ -1082,7 +1123,7 @@ const CustomerHome = () => {
             </div>
 
             {isActivityModalOpen && <ActivityOverviewModal activeBookings={activeBookings} pastBookings={pastBookings} submitRating={submitRating} onClose={() => setIsActivityModalOpen(false)} acceptOffer={acceptOffer} rejectOffer={rejectOffer} openTracking={(id) => { setSelectedBooking(id); setIsActivityModalOpen(false); }} />}
-            {selectedProviderProfile && <ProviderProfileModal p={selectedProviderProfile} onClose={() => setSelectedProviderProfile(null)} handleBook={handleBook} />}
+            {selectedProviderProfile && <ProviderProfileModal p={selectedProviderProfile} onClose={() => setSelectedProviderProfile(null)} handleBook={handleBook} selectedSubServices={selectedSubServices} categoryData={categories.find(c => c.name === selectedCategory)} />}
             {selectedBooking && <BookingDetailsModal bookingId={selectedBooking} onClose={() => setSelectedBooking(null)} sendNotification={sendNotification} />}
         </div>
     );
