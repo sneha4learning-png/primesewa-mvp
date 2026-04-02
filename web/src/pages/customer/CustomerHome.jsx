@@ -712,6 +712,25 @@ const CustomerHome = () => {
         if (rating > 0) {
             try {
                 await updateDoc(doc(db, 'bookings', booking.id), { rated: true, ratingGiven: rating, testimonial: testimonial || '' });
+                
+                if (booking.provider) {
+                    const q = query(collection(db, 'providers'), where('name', '==', booking.provider));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        const providerDoc = querySnapshot.docs[0];
+                        const providerData = providerDoc.data();
+                        const currentCount = providerData.ratingCount || 0;
+                        const currentRating = providerData.rating || 0;
+                        const newCount = currentCount + 1;
+                        const newRating = ((currentRating * currentCount) + rating) / newCount;
+                        
+                        await updateDoc(doc(db, 'providers', providerDoc.id), { 
+                            rating: newRating,
+                            ratingCount: newCount
+                        });
+                    }
+                }
+                
                 alert("Thank you for your feedback!");
             } catch (err) { console.error(err); }
         }

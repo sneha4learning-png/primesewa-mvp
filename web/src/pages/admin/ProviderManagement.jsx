@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock, Star } from 'lucide-react';
+import { Search, MoreVertical, CheckCircle, XCircle, ShieldOff, FileText, ExternalLink, Clock, Star, Briefcase } from 'lucide-react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, doc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { useNotifications } from '../../context/NotificationContext';
@@ -20,13 +20,20 @@ const ProviderManagement = () => {
     const itemsPerPage = 5;
 
     useEffect(() => {
-        // 1. Live bookings for job counts
+        // 1. Live bookings for job counts and ratings
         const unsubBookings = onSnapshot(collection(db, 'bookings'), (bSnap) => {
             const allBookings = bSnap.docs.map(d => d.data());
             const completedCounts = new Map();
+            const ratingSums = new Map();
+            const ratingCounts = new Map();
+
             allBookings.forEach(b => {
                 if (b.status === 'completed') {
                     completedCounts.set(b.provider, (completedCounts.get(b.provider) || 0) + 1);
+                }
+                if (b.rated && b.ratingGiven > 0) {
+                    ratingSums.set(b.provider, (ratingSums.get(b.provider) || 0) + b.ratingGiven);
+                    ratingCounts.set(b.provider, (ratingCounts.get(b.provider) || 0) + 1);
                 }
             });
 
@@ -36,10 +43,17 @@ const ProviderManagement = () => {
                 pSnap.forEach((doc) => {
                     const data = doc.data();
                     const actualCompleted = completedCounts.get(data.name) || 0;
+                    
+                    // Prioritize dynamically computed ratings over raw data
+                    const dynamicRatingCount = ratingCounts.get(data.name) || 0;
+                    const dynamicRating = dynamicRatingCount > 0 ? (ratingSums.get(data.name) / dynamicRatingCount) : 0;
+                    
                     fetched.push({
                         id: doc.id,
                         ...data,
-                        jobs: actualCompleted
+                        jobs: actualCompleted,
+                        rating: dynamicRating > 0 ? dynamicRating : data.rating,
+                        ratingCount: dynamicRatingCount > 0 ? dynamicRatingCount : data.ratingCount
                     });
                 });
                 setProviders(fetched);
