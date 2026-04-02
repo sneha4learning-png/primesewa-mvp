@@ -538,6 +538,8 @@ const CustomerHome = () => {
     const [isLocating, setIsLocating] = useState(false);
     const [bookingCoords, setBookingCoords] = useState(null);
     const [bookingComments, setBookingComments] = useState('');
+    const [minRating, setMinRating] = useState(0);
+
 
     const serviceImages = useMemo(() => [
         "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070", // Plumbing
@@ -745,9 +747,10 @@ const CustomerHome = () => {
         return onlineProviders.filter(p => {
             if (selectedCategory && !p.category?.includes(selectedCategory)) return false;
             if (searchQuery && !p.name?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            if (minRating > 0 && (p.rating || 0) < minRating) return false;
             return true;
         }).sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    }, [onlineProviders, selectedCategory, searchQuery]);
+    }, [onlineProviders, selectedCategory, searchQuery, minRating]);
 
     return (
         <div className="min-h-screen relative overflow-x-hidden pt-6">
@@ -929,7 +932,6 @@ const CustomerHome = () => {
                                                     const next = selectedSubServices.includes(sub.name) 
                                                         ? selectedSubServices.filter(s => s !== sub.name) 
                                                         : [...selectedSubServices, sub.name];
-                                                    console.log('Selection update:', sub.name, next);
                                                     setSelectedSubServices(next);
                                                 }}
                                                 className={`p-5 rounded-[2rem] border transition-all text-left group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-xl' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
@@ -937,18 +939,35 @@ const CustomerHome = () => {
                                                 <p className={`text-[9px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.includes(sub.name) ? 'text-indigo-200' : 'text-slate-400'}`}>Package</p>
                                                 <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
                                                 <div className="flex items-center gap-1 mt-2">
-                                                    <IndianRupee className={`w-3 h-3 ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`} />
-                                                    <span className={`text-xs font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`}>Starting ₹{sub.price}</span>
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${selectedSubServices.includes(sub.name) ? 'bg-indigo-300' : 'bg-indigo-600'}`}></div>
+                                                    <span className={`text-[10px] font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`}>CUSTOMIZED PLAN AVAILABLE</span>
                                                 </div>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 px-4">
-                                    <div className="h-px flex-1 bg-slate-200"></div>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Available Specialists</p>
-                                    <div className="h-px flex-1 bg-slate-200"></div>
+                                <div className="flex flex-col md:flex-row items-center gap-6 px-4">
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="h-px flex-1 bg-slate-200"></div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Available Specialists</p>
+                                        <div className="h-px flex-1 bg-slate-200"></div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-full border border-slate-100 shadow-sm">
+                                        <Filter className="w-4 h-4 text-indigo-500" />
+                                        <div className="flex gap-2">
+                                            {[0, 4.5, 4.0, 3.0].map(val => (
+                                                <button 
+                                                    key={val}
+                                                    onClick={() => setMinRating(val)}
+                                                    className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${minRating === val ? 'bg-slate-950 text-white shadow-lg' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
+                                                >
+                                                    {val === 0 ? 'All' : `${val}+ Stars`}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2 pb-20">
@@ -1015,14 +1034,21 @@ const CustomerHome = () => {
                                                 <div className="w-full h-px bg-linear-to-r from-slate-100 via-slate-50 to-white my-8"></div>
                                                 <div className="flex justify-between items-end relative z-10">
                                                     <div>
-                                                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Total Service Value</p>
-                                                        <div className="flex items-baseline gap-1">
-                                                            <span className="text-4xl font-black text-slate-950 italic">₹{currentTotalDisplay}</span>
+                                                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Service Comparison Total</p>
+                                                        <div className="flex flex-col">
+                                                            <div className="flex items-baseline gap-1">
+                                                                <span className="text-4xl font-black text-slate-950 italic">₹{currentTotalDisplay}</span>
+                                                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Total</span>
+                                                            </div>
                                                             {subtotalSum > 0 && (
-                                                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Incl. Add-ons</span>
+                                                                <div className="flex items-center gap-2 mt-1">
+                                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">₹{baseRate} Base</span>
+                                                                    <PlusIcon className="w-2.5 h-2.5 text-slate-300" />
+                                                                    <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">₹{subtotalSum} Specialist additions</span>
+                                                                </div>
                                                             )}
                                                             {subtotalSum === 0 && (
-                                                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Base Cost Only</span>
+                                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Standard Base Rate Only</p>
                                                             )}
                                                         </div>
                                                     </div>
