@@ -960,9 +960,20 @@ const CustomerHome = () => {
                                     <Calendar className="w-8 h-8" />
                                 </div>
                                 <div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex flex-wrap items-center gap-3">
                                         <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
-                                        <span className="px-3 py-1 bg-rose-50 text-rose-500 rounded-lg text-[8px] font-black uppercase tracking-widest border border-rose-100">v2.4.1 Fix</span>
+                                        <span className="px-3 py-1 bg-slate-900 text-white rounded-lg text-[8px] font-black uppercase tracking-widest border border-slate-700 shadow-md">v2.5.0 Final</span>
+                                        {pendingBookingData.subServices?.length === 0 ? (
+                                            <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[8px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1 shadow-sm">
+                                                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
+                                                Standard Base Active
+                                            </span>
+                                        ) : (
+                                            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[8px] font-black uppercase tracking-widest border border-indigo-100 flex items-center gap-1 shadow-sm">
+                                                <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce"></div>
+                                                {pendingBookingData.subServices.length} Selected Service(s)
+                                            </span>
+                                        )}
                                     </div>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Finalize your professional service request</p>
                                 </div>
