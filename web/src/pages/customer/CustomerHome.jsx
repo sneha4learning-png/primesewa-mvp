@@ -638,6 +638,31 @@ const CustomerHome = () => {
         setBookingStep(1);
     };
 
+    const toggleSubServiceInReview = (subName) => {
+        const nextSubServices = selectedSubServices.includes(subName) 
+            ? selectedSubServices.filter(s => s !== subName) 
+            : [...selectedSubServices, subName];
+            
+        setSelectedSubServices(nextSubServices);
+
+        if (pendingBookingData) {
+            let subtotal = 0;
+            const categoryData = categories.find(c => c.name === selectedCategory);
+            if (categoryData && nextSubServices.length > 0) {
+                nextSubServices.forEach(sName => {
+                    const sub = categoryData.subServices?.find(ss => ss.name === sName);
+                    if (sub) subtotal += sub.price;
+                });
+            }
+            setPendingBookingData(prev => ({
+                ...prev,
+                subServices: nextSubServices,
+                subtotalSum: subtotal,
+                price: (prev.baseRate || 199) + subtotal
+            }));
+        }
+    };
+
     const confirmBooking = async (e) => {
         e.preventDefault();
         if (!userData || !pendingBookingData) return;
@@ -1007,7 +1032,6 @@ const CustomerHome = () => {
                                 <div>
                                     <div className="flex flex-wrap items-center gap-3">
                                         <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
-                                        <span className="px-3 py-1 bg-slate-900 text-white rounded-lg text-[8px] font-black uppercase tracking-widest border border-slate-700 shadow-md">v2.5.0 Final</span>
                                         {pendingBookingData.subServices?.length === 0 ? (
                                             <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[8px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1 shadow-sm">
                                                 <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -1032,28 +1056,43 @@ const CustomerHome = () => {
                                             <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Service Package</p>
                                             <h3 className="text-4xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
                                             {pendingBookingData.subServices?.length > 0 ? (
-                                                <div className="flex flex-col gap-2.5 mt-6">
+                                                <div className="flex flex-col gap-2.5 mt-6 mb-8">
                                                     <div className="flex justify-between items-center px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
                                                         <span>Standard Base Package Active</span>
                                                         <span>₹{pendingBookingData.baseRate || 199}</span>
                                                     </div>
-                                                    {pendingBookingData.subServices.map(s => {
-                                                        const pPrice = categories.find(c => c.name === selectedCategory)?.subServices?.find(ss => ss.name === s)?.price || 0;
-                                                        return (
-                                                            <div key={s} className="flex justify-between items-center px-5 py-2.5 bg-indigo-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-100 border border-indigo-400/30 shadow-lg">
-                                                                <span>{s}</span>
-                                                                <span>₹{pPrice}</span>
-                                                            </div>
-                                                        );
-                                                    })}
                                                 </div>
                                             ) : (
-                                                <div className="mt-6 flex">
+                                                <div className="mt-6 mb-8 flex">
                                                     <span className="px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md animate-pulse">
                                                         Base cost will apply if you will not select any sub service
                                                     </span>
                                                 </div>
                                             )}
+
+                                            <div>
+                                                <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Customize Your Package</p>
+                                                <div className="flex flex-col gap-3">
+                                                    {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => {
+                                                        const isSelected = pendingBookingData.subServices?.includes(sub.name);
+                                                        return (
+                                                            <button 
+                                                                key={sub.name}
+                                                                onClick={(e) => { e.preventDefault(); toggleSubServiceInReview(sub.name); }}
+                                                                className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left group ${isSelected ? 'bg-indigo-500/20 border-indigo-500/50 shadow-xl' : 'bg-white/5 border-white/10 hover:border-indigo-400/50 hover:bg-white/10'}`}
+                                                            >
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isSelected ? 'bg-indigo-500 border-indigo-400' : 'border-white/30'}`}>
+                                                                        {isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
+                                                                    </div>
+                                                                    <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-slate-300'}`}>{sub.name}</span>
+                                                                </div>
+                                                                <span className={`text-xs font-black ${isSelected ? 'text-indigo-300' : 'text-white/40'}`}>+ ₹{sub.price}</span>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.2em] mb-2">Booking Value</p>
