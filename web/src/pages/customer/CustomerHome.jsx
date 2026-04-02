@@ -1047,13 +1047,12 @@ const CustomerHome = () => {
                                 </div>
                                 <div className="text-right hidden md:block">
                                     <div className="flex -space-x-3 justify-end mb-2 filter drop-shadow-md">
-                                        <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-900 relative z-40 flex items-center justify-center text-white text-[10px] font-black shadow-inner overflow-hidden">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent"></div>
-                                            <span className="relative z-10">Us</span>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-40 object-cover shadow-sm" src="https://images.unsplash.com/photo-1540331547168-8b63109225b7?w=100&h=100&q=80&fit=crop" alt="Anjali"/>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-30 object-cover shadow-sm" src="https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=100&h=100&q=80&fit=crop" alt="Vikram"/>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-20 object-cover shadow-sm" src="https://images.unsplash.com/photo-1533227268408-a534020a3bc7?w=100&h=100&q=80&fit=crop" alt="Sneha"/>
+                                        <div className="w-10 h-10 rounded-full border-2 border-white relative z-10 bg-indigo-600 flex items-center justify-center text-white text-[9px] font-black shadow-sm overflow-hidden">
+                                            +82
                                         </div>
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-30 object-cover shadow-sm" src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=100&h=100&q=80&fit=crop" alt="Dog"/>
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-20 object-cover shadow-sm" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&q=80&fit=crop" alt="Person"/>
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-10 object-cover shadow-sm" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&q=80&fit=crop" alt="Person"/>
                                     </div>
                                     <div className="text-sm font-black text-slate-900 leading-none mb-1 text-right">4.8 / 5.0</div>
                                     <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Average User Rating</div>
@@ -1072,10 +1071,7 @@ const CustomerHome = () => {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 mt-auto">
-                                        <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-[11px] shadow-md border-2 border-blue-100 relative overflow-hidden">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                                            <span className="relative z-10">Anjali</span>
-                                        </div>
+                                        <img src="https://images.unsplash.com/photo-1540331547168-8b63109225b7?w=100&h=100&q=80&fit=crop" alt="Anjali Patel" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
                                         <div>
                                             <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Anjali Patel</h4>
                                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
@@ -1096,7 +1092,7 @@ const CustomerHome = () => {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 mt-auto">
-                                        <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=100&h=100&q=80&fit=crop" alt="Vikram Shah" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
+                                        <img src="https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=100&h=100&q=80&fit=crop" alt="Vikram Shah" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
                                         <div>
                                             <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Vikram Shah</h4>
                                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
@@ -1117,7 +1113,7 @@ const CustomerHome = () => {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 mt-auto">
-                                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&q=80&fit=crop" alt="Sneha Jhaveri" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
+                                        <img src="https://images.unsplash.com/photo-1533227268408-a534020a3bc7?w=100&h=100&q=80&fit=crop" alt="Sneha Jhaveri" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
                                         <div>
                                             <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Sneha Jhaveri</h4>
                                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
