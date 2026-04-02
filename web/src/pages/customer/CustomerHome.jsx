@@ -488,6 +488,7 @@ const CustomerHome = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLocating, setIsLocating] = useState(false);
     const [bookingCoords, setBookingCoords] = useState(null);
+    const [bookingComments, setBookingComments] = useState('');
 
     const serviceImages = useMemo(() => [
         "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070",
@@ -558,7 +559,8 @@ const CustomerHome = () => {
             provider: provider.name,
             providerUid: provider.id,
             price: base,
-            service: `${selectedCategory || 'Prime'} Service`
+            service: `${selectedCategory || 'Prime'} Service`,
+            subServices: selectedSubServices
         });
         setBookingStep(1);
     };
@@ -583,6 +585,8 @@ const CustomerHome = () => {
                 area: bookingArea,
                 latitude: bookingCoords?.lat || null,
                 longitude: bookingCoords?.lon || null,
+                comments: bookingComments,
+                subServices: pendingBookingData.subServices || [],
                 createdAt: serverTimestamp()
             };
             await addDoc(collection(db, 'bookings'), booking);
@@ -822,9 +826,19 @@ const CustomerHome = () => {
                                                     </div>
                                                     <div className="flex-1">
                                                         <h4 className="text-xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tight leading-tight mb-2 transition-colors">{p.name || 'Prime Specialist'}</h4>
-                                                        <div className="flex items-center gap-2">
-                                                            <Star className="w-4 h-4 text-amber-500 fill-current" />
-                                                            <span className="text-sm font-black text-slate-900">{p.rating || 'New Hub'}</span>
+                                                        <div className="flex items-center gap-4">
+                                                            {p.rating > 0 && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <Star className="w-4 h-4 text-amber-500 fill-current" />
+                                                                    <span className="text-sm font-black text-slate-900">{p.rating}</span>
+                                                                </div>
+                                                            )}
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); setSelectedProviderProfile(p); }} 
+                                                                className="text-[9px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-600 pb-0.5 hover:text-indigo-800 hover:border-indigo-800 transition-all"
+                                                            >
+                                                                Profile Details
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -835,7 +849,7 @@ const CustomerHome = () => {
                                                     <div>
                                                         <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5">STARTING AT</p>
                                                         <p className="text-3xl font-black text-slate-950 italic">
-                                                            ₹{cleanPrice}<span className="text-sm font-bold text-slate-400 not-italic"> / hr</span>
+                                                            ₹{cleanPrice}<span className="ml-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest not-italic">Base Rate</span>
                                                         </p>
                                                     </div>
                                                     <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="px-8 py-4 bg-slate-950 hover:bg-indigo-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95">
@@ -862,26 +876,83 @@ const CustomerHome = () => {
                         <button onClick={() => setBookingStep(0)} className="absolute top-6 right-6 p-2"><XCircle className="w-8 h-8 text-slate-200" /></button>
                         <div className="space-y-12">
                             <h2 className="text-3xl font-black uppercase tracking-tighter">Confirm Booking</h2>
+                            
                             <div className="bg-slate-950 p-10 rounded-[3rem] text-white shadow-2xl">
-                                <h3 className="text-2xl font-black italic uppercase mb-8">{pendingBookingData.service}</h3>
-                                <div className="flex justify-between pt-8 border-t border-white/10">
-                                    <div><p className="text-[9px] text-white/40 uppercase mb-1">Total</p><p className="text-5xl font-black">₹{pendingBookingData.price}</p></div>
-                                    <p className="text-sm font-bold uppercase italic">{pendingBookingData.provider}</p>
+                                <div className="flex justify-between items-start mb-8">
+                                    <div>
+                                        <h3 className="text-2xl font-black italic uppercase mb-2">{pendingBookingData.service}</h3>
+                                        {pendingBookingData.subServices?.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mt-4">
+                                                {pendingBookingData.subServices.map(s => (
+                                                    <span key={s} className="px-3 py-1 bg-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-indigo-300">
+                                                        {s}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[9px] text-white/40 uppercase mb-1">Total</p>
+                                        <p className="text-5xl font-black">₹{pendingBookingData.price}</p>
+                                    </div>
+                                </div>
+                                <div className="pt-8 border-t border-white/10 flex justify-between items-center">
+                                    <p className="text-sm font-bold uppercase italic text-indigo-400">Professional: {pendingBookingData.provider}</p>
                                 </div>
                             </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                 <input required type="date" value={bookingDate} min={getTodayStr()} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-6 bg-slate-50 rounded-3xl font-bold" />
-                                 <div className="grid grid-cols-2 gap-3">
-                                    {availableSlots.map(s => (
-                                        <button key={s.id} onClick={() => !s.isPast && setBookingSlot(s.id)} className={`py-5 rounded-2xl text-[10px] font-black uppercase ${s.isPast ? 'opacity-20' : bookingSlot === s.id ? 'bg-indigo-600 text-white shadow-xl' : 'bg-white border text-slate-400'}`}>{s.label}</button>
-                                    ))}
+                                 <div>
+                                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4">Select Schedule</p>
+                                     <input required type="date" value={bookingDate} min={getTodayStr()} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-6 bg-slate-50 rounded-3xl font-bold border border-slate-100 outline-none focus:border-indigo-600 transition-all mb-4" />
+                                     <div className="grid grid-cols-2 gap-3">
+                                        {availableSlots.map(s => (
+                                            <button key={s.id} onClick={() => !s.isPast && setBookingSlot(s.id)} className={`py-5 rounded-2xl text-[10px] font-black uppercase transition-all ${s.isPast ? 'opacity-20 cursor-not-allowed' : bookingSlot === s.id ? 'bg-indigo-600 text-white shadow-xl scale-105' : 'bg-white border text-slate-400 hover:border-indigo-200'}`}>{s.label}</button>
+                                        ))}
+                                     </div>
+                                 </div>
+
+                                 <div className="space-y-6">
+                                     <div className="flex items-center justify-between">
+                                         <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Service Location</p>
+                                         <button 
+                                            onClick={handleMyLocation} 
+                                            disabled={isLocating}
+                                            className="flex items-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-all disabled:opacity-50"
+                                         >
+                                             {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <MapPin className="w-3 h-3" />}
+                                             Use My Location
+                                         </button>
+                                     </div>
+                                     <div className="space-y-4">
+                                         <input placeholder="House No. / Flat Name" value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-6 bg-slate-50 rounded-3xl border border-slate-100 outline-none focus:border-indigo-600 transition-all" />
+                                         <input placeholder="Area / Locality / Landmark" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-6 bg-slate-50 rounded-3xl border border-slate-100 outline-none focus:border-indigo-600 transition-all" />
+                                     </div>
+                                     
+                                     {bookingCoords && (
+                                         <div className="h-40 rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
+                                             <OSMMap 
+                                                latitude={bookingCoords.lat} 
+                                                longitude={bookingCoords.lon} 
+                                             />
+                                         </div>
+                                     )}
                                  </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <input placeholder="House No." value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-6 bg-slate-50 rounded-3xl" />
-                                <input placeholder="Area" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-6 bg-slate-50 rounded-3xl" />
+
+                            <div className="space-y-4">
+                                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Additional Instructions for Specialist</p>
+                                <textarea 
+                                    placeholder="Add any specific requirements or landmarks to help the specialist find you..." 
+                                    value={bookingComments} 
+                                    onChange={e => setBookingComments(e.target.value)} 
+                                    className="w-full p-6 bg-slate-50 rounded-3xl border border-slate-100 outline-none focus:border-indigo-600 transition-all min-h-[120px] resize-none"
+                                />
                             </div>
-                            <button onClick={confirmBooking} disabled={isSubmitting || !bookingSlot || !bookingDate || !bookingArea} className="w-full py-6 bg-slate-900 text-white font-black uppercase text-xs rounded-[2rem] shadow-2xl active:scale-95 disabled:opacity-50">Place Service Request</button>
+
+                            <button onClick={confirmBooking} disabled={isSubmitting || !bookingSlot || !bookingDate || !bookingArea} className="w-full py-6 bg-slate-900 text-white font-black uppercase text-xs rounded-[2rem] shadow-2xl active:scale-95 disabled:opacity-50 hover:bg-indigo-600 transition-all">
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Place Service Request'}
+                            </button>
                         </div>
                     </div>
                 )}
