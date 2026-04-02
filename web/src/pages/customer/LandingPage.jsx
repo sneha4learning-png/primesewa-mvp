@@ -47,16 +47,16 @@ const LandingPage = () => {
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const serviceImages = [
-        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop", // Plumbing
-        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070&auto=format&fit=crop", // Electrical
-        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop", // Cleaning
-        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070&auto=format&fit=crop", // Carpentry
-        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070&auto=format&fit=crop", // Salon
-        "/assets/ac_repair.png", // AC Repair
-        "/assets/painting.png", // Painting
-        "/assets/movers.png", // Packers & Movers
-        "/assets/pest_control.png", // Pest Control
-        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070&auto=format&fit=crop"  // Appliance Repair
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070", // Plumbing
+        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070", // Electrical
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070", // Cleaning
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070", // Carpentry
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070", // Salon
+        "https://images.unsplash.com/photo-1563453392212-326f5e854473?q=80&w=2070", // AC Repair
+        "https://images.unsplash.com/photo-1589939705384-5185138a04b9?q=80&w=2070", // Painting
+        "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=2070", // Packers & Movers
+        "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?q=80&w=2070", // Pest Control
+        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070"  // Appliance Repair
     ];
 
     useEffect(() => {
@@ -302,10 +302,10 @@ const LandingPage = () => {
                         <div className="flex gap-4">
                             <div className="flex -space-x-4">
                                 {[
-                                    "1604004527766-abc1b2024f0e", // Indian woman (Gujarati style ref)
-                                    "1552053831-71594a27632d", // Indian man (Gujarati business style ref)
-                                    "1614283233556-f35b0c801ef1", // Indian woman (Gujarati traditional style ref)
-                                    "1507003211169-0a1dd7228f2d"  // Indian man (Gujarati professional ref)
+                                    "1540331547168-8b63109225b7", // Indian woman (Anjali Patel ref)
+                                    "1566753323558-f4e0952af115", // Indian man (Vikram Shah ref)
+                                    "1533227268408-a534020a3bc7", // Indian woman (Sneha Jhaveri ref)
+                                    "1507003211169-0a1dd7228f2d"  // Indian man (Professional ref)
                                 ].map((id, i) => (
                                     <div 
                                         key={i} 
@@ -330,21 +330,21 @@ const LandingPage = () => {
                                 role: "Verified Homeowner • Satellite, Ahmedabad", 
                                 text: "The expert was highly professional and arrived right on time. Essential for my family functions!", 
                                 rating: 5, 
-                                img: "https://images.unsplash.com/photo-1604004527766-abc1b2024f0e?q=80&w=150&auto=format&fit=crop" 
+                                img: "https://images.unsplash.com/photo-1540331547168-8b63109225b7?q=80&w=150&auto=format&fit=crop" 
                             },
                             { 
                                 name: "Vikram Shah", 
                                 role: "Verified Client • Maninagar, Ahmedabad", 
                                 text: "Extremely convenient booking process. The pricing was fair and the technician spoke Gujarati, which was very helpful.", 
                                 rating: 5, 
-                                img: "https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=150&auto=format&fit=crop" 
+                                img: "https://images.unsplash.com/photo-1566753323558-f4e0952af115?q=80&w=150&auto=format&fit=crop" 
                             },
                             { 
                                 name: "Sneha Jhaveri", 
                                 role: "Verified Resident • Ambawadi, Ahmedabad", 
                                 text: "Finally a reliable service in Ahmedabad! The team is local and highly trustworthy.", 
                                 rating: 5, 
-                                img: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?q=80&w=150&auto=format&fit=crop" 
+                                img: "https://images.unsplash.com/photo-1533227268408-a534020a3bc7?q=80&w=150&auto=format&fit=crop" 
                             }
                         ]).map((t, i) => (
                             <div key={i} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group min-h-[320px] flex flex-col justify-between">
