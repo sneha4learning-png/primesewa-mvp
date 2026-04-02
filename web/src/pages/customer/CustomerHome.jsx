@@ -954,7 +954,10 @@ const CustomerHome = () => {
                                     <Calendar className="w-8 h-8" />
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
+                                    <div className="flex items-center gap-4">
+                                        <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
+                                        <span className="px-3 py-1 bg-indigo-50 text-indigo-500 rounded-lg text-[8px] font-black uppercase tracking-widest border border-indigo-100">v2.4.0 Live</span>
+                                    </div>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Finalize your professional service request</p>
                                 </div>
                             </div>
