@@ -545,8 +545,10 @@ const CustomerHome = () => {
     }, [userData]);
 
     const handleCategorySelect = (catName) => {
-        setSelectedCategory(catName);
-        setSelectedSubServices([]); // Reset sub-services when category changes
+        if (selectedCategory !== catName) {
+            setSelectedCategory(catName);
+            setSelectedSubServices([]); // Only reset if switching categories
+        }
     };
 
     const handleMyLocation = () => {
@@ -567,6 +569,7 @@ const CustomerHome = () => {
     };
 
     const handleBook = (provider) => {
+        console.log('Final Selection to Modal:', { cat: selectedCategory, sub: selectedSubServices });
         const base = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
         
         // Calculate sub-services total if any selected
@@ -829,8 +832,11 @@ const CustomerHome = () => {
                                             <button 
                                                 key={sub.name}
                                                 onClick={() => {
-                                                    const exists = selectedSubServices.includes(sub.name);
-                                                    setSelectedSubServices(exists ? selectedSubServices.filter(s => s !== sub.name) : [...selectedSubServices, sub.name]);
+                                                    const next = selectedSubServices.includes(sub.name) 
+                                                        ? selectedSubServices.filter(s => s !== sub.name) 
+                                                        : [...selectedSubServices, sub.name];
+                                                    console.log('Selection update:', sub.name, next);
+                                                    setSelectedSubServices(next);
                                                 }}
                                                 className={`p-5 rounded-[2rem] border transition-all text-left group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-xl' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
                                             >
@@ -956,7 +962,7 @@ const CustomerHome = () => {
                                 <div>
                                     <div className="flex items-center gap-4">
                                         <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
-                                        <span className="px-3 py-1 bg-indigo-50 text-indigo-500 rounded-lg text-[8px] font-black uppercase tracking-widest border border-indigo-100">v2.4.0 Live</span>
+                                        <span className="px-3 py-1 bg-rose-50 text-rose-500 rounded-lg text-[8px] font-black uppercase tracking-widest border border-rose-100">v2.4.1 Fix</span>
                                     </div>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Finalize your professional service request</p>
                                 </div>
@@ -969,13 +975,19 @@ const CustomerHome = () => {
                                         <div>
                                             <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Service Package</p>
                                             <h3 className="text-4xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
-                                            {pendingBookingData.subServices?.length > 0 && (
+                                            {pendingBookingData.subServices?.length > 0 ? (
                                                 <div className="flex flex-wrap gap-2.5 mt-6">
                                                     {pendingBookingData.subServices.map(s => (
-                                                        <span key={s} className="px-5 py-2.5 bg-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-100 border border-indigo-400/30 shadow-lg">
+                                                        <span key={s} className="px-5 py-2.5 bg-indigo-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-100 border border-indigo-400/30 shadow-lg">
                                                             {s}
                                                         </span>
                                                     ))}
+                                                </div>
+                                            ) : (
+                                                <div className="mt-6">
+                                                    <span className="px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
+                                                        Standard Base Package Active
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>
