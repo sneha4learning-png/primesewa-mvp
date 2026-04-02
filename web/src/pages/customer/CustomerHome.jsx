@@ -1037,6 +1037,98 @@ const CustomerHome = () => {
                                 <p className="text-slate-400 text-[10px] uppercase font-medium">Please select a category above to continue.</p>
                             </div>
                         )}
+
+                        {/* Testimonials Section */}
+                        <div className="mt-20 pt-10">
+                            <div className="flex justify-between items-end mb-10">
+                                <div>
+                                    <h3 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-2">Testimonials</h3>
+                                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">Loved by Ahmedabad</h2>
+                                </div>
+                                <div className="text-right hidden md:block">
+                                    <div className="flex -space-x-3 justify-end mb-2 filter drop-shadow-md">
+                                        <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-900 relative z-40 flex items-center justify-center text-white text-[10px] font-black shadow-inner overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent"></div>
+                                            <span className="relative z-10">Us</span>
+                                        </div>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-30 object-cover shadow-sm" src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=100&h=100&q=80&fit=crop" alt="Dog"/>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-20 object-cover shadow-sm" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&q=80&fit=crop" alt="Person"/>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-10 object-cover shadow-sm" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&q=80&fit=crop" alt="Person"/>
+                                    </div>
+                                    <div className="text-sm font-black text-slate-900 leading-none mb-1 text-right">4.8 / 5.0</div>
+                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Average User Rating</div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Card 1 */}
+                                <div className="bg-blue-50/20 p-8 rounded-[2.5rem] border border-blue-100 flex flex-col justify-between hover:shadow-xl hover:bg-white transition-all duration-500 group">
+                                    <div>
+                                        <div className="flex gap-1 mb-6 text-amber-500">
+                                            <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
+                                        </div>
+                                        <p className="text-slate-600 font-medium italic text-sm leading-relaxed mb-8">
+                                            "The expert was highly professional and arrived right on time. Essential for my family functions!"
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-auto">
+                                        <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-[11px] shadow-md border-2 border-blue-100 relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                                            <span className="relative z-10">Anjali</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Anjali Patel</h4>
+                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
+                                                Verified Homeowner • Satellite,<br />Ahmedabad
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Card 2 */}
+                                <div className="bg-slate-50/50 p-8 rounded-[2.5rem] border border-slate-100 flex flex-col justify-between hover:shadow-xl hover:bg-white transition-all duration-500 group">
+                                    <div>
+                                        <div className="flex gap-1 mb-6 text-amber-500">
+                                            <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
+                                        </div>
+                                        <p className="text-slate-600 font-medium italic text-sm leading-relaxed mb-8">
+                                            "Extremely convenient booking process. The pricing was fair and the technician spoke Gujarati, which was very helpful."
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-auto">
+                                        <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=100&h=100&q=80&fit=crop" alt="Vikram Shah" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
+                                        <div>
+                                            <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Vikram Shah</h4>
+                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
+                                                Verified Client • Maninagar,<br />Ahmedabad
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Card 3 */}
+                                <div className="bg-slate-50/50 p-8 rounded-[2.5rem] border border-slate-100 flex flex-col justify-between hover:shadow-xl hover:bg-white transition-all duration-500 group">
+                                    <div>
+                                        <div className="flex gap-1 mb-6 text-amber-500">
+                                            <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
+                                        </div>
+                                        <p className="text-slate-600 font-medium italic text-sm leading-relaxed mb-8">
+                                            "Finally a reliable service in Ahmedabad! The team is local and highly trustworthy."
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-auto">
+                                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&q=80&fit=crop" alt="Sneha Jhaveri" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
+                                        <div>
+                                            <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Sneha Jhaveri</h4>
+                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
+                                                Verified Resident • Ambawadi,<br />Ahmedabad
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 )}
 
