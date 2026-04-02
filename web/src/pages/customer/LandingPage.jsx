@@ -443,7 +443,7 @@ const LandingPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-16 border-b border-white/10 pb-20">
                         <div className="col-span-1 md:col-span-1 space-y-10">
                             <Link to="/" className="flex items-center gap-4 group">
-                                <div className="w-16 h-16 bg-white rounded-3xl p-3 shadow-xl shadow-white/5 group-hover:scale-110 transition-transform duration-500">
+                                <div className="w-24 h-24 bg-white rounded-3xl p-3 shadow-xl shadow-white/5 group-hover:scale-110 transition-transform duration-500">
                                     <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-full h-full object-contain" />
                                 </div>
                                 <span className="text-3xl font-medium bg-clip-text text-transparent bg-linear-to-r from-white to-white/70 tracking-tighter">PrimeSewa</span>

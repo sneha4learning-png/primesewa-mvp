@@ -196,55 +196,63 @@ const ProviderProfileModal = ({ p, onClose, handleBook }) => {
                     </div>
                 </div>
                 <div className="pt-10 px-6 sm:px-10 pb-8 flex-1 overflow-y-auto hide-scrollbar">
-                    <div className="flex justify-between items-start mb-6">
-                        <div className="pt-2">
-                            <h2 className="text-xl sm:text-2xl font-medium text-slate-900 tracking-tight leading-tight">{name}</h2>
-                            <p className="text-[9px] font-normal text-slate-400 uppercase tracking-widest mt-1">{category} • Prime Specialist</p>
-                        </div>
-                        <div className="flex gap-2 shrink-0">
-                            <button onClick={() => { const phone = String(p.phone || ''); if (!phone) { alert('Contact details unavailable.'); return; } window.location.href = `tel:${phone}`; }} className="px-4 py-2 bg-emerald-50 text-emerald-600 font-medium rounded-xl border border-emerald-100 transition-all flex items-center justify-center gap-2 text-[9px] uppercase tracking-widest hover:bg-emerald-100">
-                                <Phone className="w-3 h-3" /> Call
-                            </button>
-                            <button onClick={() => { handleBook(p); onClose(); }} className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl text-[9px] uppercase shadow-lg shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95">Book</button>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
-                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-amber-200">
-                            <Star className="w-4 h-4 text-amber-500 mx-auto mb-1.5 fill-current" />
-                            <div className="text-lg sm:text-xl font-black text-slate-900 leading-none">
-                                {(liveJobsCount > 0 && ratingValue > 0 && (p.ratingCount || 0) > 0) ? ratingValue.toFixed(1) : 'New'}
+                        <div className="flex justify-between items-start mb-8">
+                            <div className="pt-2">
+                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-none italic uppercase">{name}</h2>
+                                <div className="flex items-center gap-3 mt-3">
+                                    <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase rounded-full tracking-widest border border-indigo-100">{category}</span>
+                                    <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase rounded-full tracking-widest border border-emerald-100 flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Prime Verified</span>
+                                </div>
                             </div>
-                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">{(liveJobsCount > 0 && ratingValue > 0 && (p.ratingCount || 0) > 0) ? 'Rating' : 'Partner Status'}</div>
-                        </div>
-                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-indigo-200">
-                            <Briefcase className="w-4 h-4 text-indigo-500 mx-auto mb-1.5" />
-                            <div className="text-lg sm:text-xl font-black text-slate-900 leading-none">
-                                {liveJobsCount > 0 ? liveJobsCount : 'New Hub'}
-                            </div>
-                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">Active Jobs</div>
-                        </div>
-                        <div className="bg-slate-50 p-4 rounded-3xl text-center border border-slate-100 transition-colors hover:border-emerald-200">
-                            <IndianRupee className="w-4 h-4 text-emerald-500 mx-auto mb-1.5" />
-                            <div className="text-lg sm:text-xl font-black text-slate-900 leading-none tracking-tighter">
-                                ₹{Math.min(parseInt(String(price).replace(/\D/g, '')), 199)}
-                            </div>
-                            <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-2">Base Cost</div>
-                        </div>
-                    </div>
-                    {portfolio.length > 0 && (
-                        <div className="mb-6">
-                            <h3 className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <Sparkles className="w-3 h-3 text-indigo-400" /> Work Showcase
-                            </h3>
-                            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar snap-x">
-                                {portfolio.filter(Boolean).map((img, i) => (
-                                    <div key={i} className="shrink-0 snap-start">
-                                        <img src={String(img)} onError={(e) => { e.target.onerror = null; e.target.src = getServiceImage(category); }} className="w-44 h-32 sm:w-52 sm:h-36 rounded-2xl object-cover border border-slate-200 shadow-sm transition-transform hover:scale-105 duration-500" alt="Work Sample" />
-                                    </div>
-                                ))}
+                            <div className="flex gap-3 shrink-0">
+                                <button onClick={() => { const phone = String(p.phone || ''); if (!phone) { alert('Contact details unavailable.'); return; } window.location.href = `tel:${phone}`; }} className="w-12 h-12 bg-white text-emerald-600 rounded-2xl border-2 border-emerald-50 transition-all flex items-center justify-center hover:bg-emerald-50 hover:scale-110 active:scale-95 shadow-sm">
+                                    <Phone className="w-6 h-6 border-none" />
+                                </button>
+                                <button onClick={() => { handleBook(p); onClose(); }} className="px-8 py-4 bg-indigo-600 hover:bg-slate-950 text-white font-black rounded-2xl text-[11px] uppercase shadow-2xl shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95 tracking-[0.2em]">Book Professional</button>
                             </div>
                         </div>
-                    )}
+                        <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-10">
+                            <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-amber-500/5 group/stat">
+                                <Star className="w-6 h-6 text-amber-500 mx-auto mb-3 fill-current group-hover/stat:rotate-12 transition-transform" />
+                                <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+                                    {(liveJobsCount > 0 && ratingValue > 0 && (p.ratingCount || 0) > 0) ? ratingValue.toFixed(1) : 'NEW'}
+                                </div>
+                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Specialist Rating</div>
+                            </div>
+                            <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 group/stat">
+                                <Briefcase className="w-6 h-6 text-indigo-500 mx-auto mb-3 group-hover/stat:scale-110 transition-transform" />
+                                <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+                                    {liveJobsCount > 0 ? liveJobsCount : '0'}
+                                </div>
+                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Completed Jobs</div>
+                            </div>
+                            <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 group/stat">
+                                <IndianRupee className="w-6 h-6 text-emerald-500 mx-auto mb-3 group-hover/stat:animate-bounce" />
+                                <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none tracking-tighter">
+                                    ₹{Math.min(parseInt(String(price).replace(/\D/g, '')), 199)}
+                                </div>
+                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Starting From</div>
+                            </div>
+                        </div>
+                        {portfolio.length > 0 && (
+                            <div className="mb-6 animate-in slide-in-from-bottom-4 duration-1000">
+                                <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+                                    <Sparkles className="w-4 h-4 text-indigo-500" /> Professional Portfolio
+                                </h3>
+                                <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                                    {portfolio.filter(Boolean).map((img, i) => (
+                                        <div key={i} className="shrink-0 snap-start group/work first:ml-0">
+                                            <div className="relative overflow-hidden rounded-[2.5rem] border-4 border-slate-50 shadow-lg">
+                                                <img src={String(img)} onError={(e) => { e.target.onerror = null; e.target.src = getServiceImage(category); }} className="w-64 h-48 object-cover transition-transform duration-700 group-hover/work:scale-115" alt="Work Sample" />
+                                                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-0 group-hover/work:opacity-100 transition-opacity flex items-end p-6">
+                                                    <span className="text-white text-[10px] font-black uppercase tracking-widest">Verified Work</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                 </div>
             </div>
         </div>,
@@ -639,51 +647,54 @@ const CustomerHome = () => {
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 flex flex-col gap-10">
-                <div className={`relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-indigo-950 p-12 text-white' : 'glass-card p-10'}`}>
+                <div className={`relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-indigo-950 p-12 text-white' : 'glass-card p-10 border border-white/50 shadow-indigo-200/20'}`}>
                     <div className="text-center mb-10">
-                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-16 h-16 mx-auto mb-6 bg-white p-2 rounded-2xl" />
-                        <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic text-slate-950">
+                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-24 h-24 mx-auto mb-8 bg-white p-3 rounded-[2rem] shadow-2xl animate-pulse-slow" />
+                        <h1 className={`text-4xl md:text-7xl font-black tracking-tighter uppercase italic shadow-sm ${!userData?.uid ? 'text-white' : 'text-slate-950'}`}>
                             {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Premier Service Platform'}
                         </h1>
+                        <p className={`mt-4 text-[10px] uppercase font-black tracking-[0.3em] ${!userData?.uid ? 'text-indigo-300' : 'text-slate-400'}`}>Ahmedabad's Elite Home Service Network</p>
                     </div>
-                    <div className="relative max-w-2xl mx-auto flex items-center bg-white shadow-2xl rounded-[2rem] border p-2">
+                    <div className="relative max-w-2xl mx-auto flex items-center bg-white shadow-2xl rounded-[2rem] border-2 border-indigo-50 p-2 hover:border-indigo-100 transition-all focus-within:scale-[1.02] duration-500">
                         <Search className="w-6 h-6 text-indigo-600 ml-6 mr-4" />
-                        <input type="text" placeholder="Search professionals..." className="flex-1 py-4 font-bold outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                        <input type="text" placeholder="What are you looking for today?" className="flex-1 py-4 font-bold outline-none text-slate-700 placeholder:text-slate-300" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                     </div>
                 </div>
 
                 {userData?.uid && bookingStep === 0 && (
                     <div className="space-y-10">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-white p-7 rounded-[2.5rem] flex items-center gap-5 border shadow-sm group hover:scale-[1.02] transition-transform">
-                                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-                                    <Briefcase className="w-7 h-7 text-indigo-600" />
+                            <div className="bg-white p-8 rounded-[3rem] flex items-center gap-6 border border-slate-100 shadow-xl shadow-slate-200/40 group hover:scale-[1.02] transition-all hover:bg-slate-50">
+                                <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-white group-hover:shadow-lg transition-all">
+                                    <Briefcase className="w-8 h-8 text-indigo-600" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.1em] mb-1">Total Services</p>
-                                    <h3 className="text-2xl font-black text-slate-900 leading-none">{allMyBookings.length}</h3>
+                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-1.5">Total Services</p>
+                                    <h3 className="text-3xl font-black text-slate-900 leading-none">{allMyBookings.length}</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setIsActivityModalOpen(true)} className="bg-indigo-600 p-7 rounded-[2.5rem] flex items-center gap-5 text-white relative overflow-hidden group shadow-xl shadow-indigo-600/20 active:scale-95 transition-all">
-                                <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                                <Activity className="w-8 h-8 relative z-10" />
-                                <div className="relative z-10 text-left">
-                                    <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.1em] mb-1">Center</p>
-                                    <h3 className="text-2xl font-black italic leading-none">Activity Hub</h3>
+                            <button onClick={() => setIsActivityModalOpen(true)} className="bg-indigo-600 p-8 rounded-[3rem] flex items-center gap-6 text-white relative overflow-hidden group shadow-2xl shadow-indigo-600/30 active:scale-95 transition-all">
+                                <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all">
+                                    <Activity className="w-8 h-8 text-white relative z-10" />
+                                </div>
+                                <div className="relative z-10 text-left flex-1">
+                                    <p className="text-indigo-200 text-[10px] uppercase font-black tracking-[0.2em] mb-1.5">Live Status</p>
+                                    <h3 className="text-3xl font-black italic leading-none">Activity Hub</h3>
                                 </div>
                                 {activeBookings.length > 0 && (
-                                    <span className="ml-auto w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center text-[11px] font-black shadow-lg animate-bounce relative z-10">
+                                    <span className="w-10 h-10 bg-rose-500 rounded-2xl flex items-center justify-center text-[11px] font-black shadow-lg animate-bounce relative z-10">
                                         {activeBookings.length}
                                     </span>
                                 )}
                             </button>
-                            <div className="bg-indigo-950 p-7 rounded-[2.5rem] text-white flex items-center gap-5 shadow-xl shadow-indigo-950/20">
-                                <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center">
+                            <div className="bg-indigo-950 p-8 rounded-[3rem] text-white flex items-center gap-6 shadow-2xl shadow-indigo-950/40 hover:bg-black transition-colors group">
+                                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center group-hover:bg-white/10 transition-all">
                                     <Star className="w-8 h-8 text-amber-400 fill-current" />
                                 </div>
                                 <div>
-                                    <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.1em] mb-1">Membership</p>
-                                    <h3 className="text-2xl font-black italic leading-none text-amber-400">Prime Member</h3>
+                                    <p className="text-indigo-300 text-[10px] uppercase font-black tracking-[0.2em] mb-1.5">Membership</p>
+                                    <h3 className="text-3xl font-black italic leading-none text-amber-400">Prime Member</h3>
                                 </div>
                             </div>
                         </div>
@@ -818,27 +829,39 @@ const CustomerHome = () => {
                                         const hasValidRating = ratingValue > 0 && (p.ratingCount || 0) > 0;
                                         
                                         return (
-                                            <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-10 group cursor-pointer hover:scale-[1.03] transition-all duration-500 relative overflow-hidden flex flex-col justify-between min-h-[340px]">
-                                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-bl-[8rem] pointer-events-none group-hover:bg-indigo-100/50 transition-colors"></div>
+                                            <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-[3.5rem] border-2 border-slate-50 shadow-2xl shadow-indigo-100/40 p-12 group cursor-pointer hover:scale-[1.03] transition-all duration-700 relative overflow-hidden flex flex-col justify-between min-h-[400px]">
+                                                <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50/20 rounded-bl-[100%] pointer-events-none group-hover:bg-indigo-600/5 transition-all duration-700"></div>
                                                 
-                                                <div className="flex items-center gap-6 mb-10 relative z-10">
-                                                    <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center border shadow-lg group-hover:shadow-indigo-100 transition-all">
-                                                        <div className="w-16 h-16 bg-indigo-50 rounded-[1.5rem] flex items-center justify-center text-indigo-600">
-                                                            <UserCircle className="w-10 h-10" />
+                                                <div>
+                                                    <div className="flex items-start justify-between mb-8 relative z-10">
+                                                        <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center border-2 border-slate-50 shadow-xl group-hover:shadow-indigo-200 group-hover:-rotate-6 transition-all duration-500 relative overflow-hidden">
+                                                            <div className="absolute inset-0 bg-linear-to-br from-indigo-50 to-white"></div>
+                                                            <UserCircle className="w-14 h-14 text-indigo-600 relative z-10" />
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm group-hover:scale-110 transition-transform">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Active Now</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div className="flex-1">
-                                                        <h4 className="text-xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tight leading-tight mb-2 transition-colors">{p.name || 'Prime Specialist'}</h4>
+
+                                                    <div className="relative z-10">
+                                                        <h4 className="text-2xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tighter leading-none mb-3 transition-colors">{p.name || 'Prime Specialist'}</h4>
+                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">{p.category?.[0] || 'Member Expert'}</p>
+                                                        
                                                         <div className="flex items-center gap-4">
-                                                            {hasValidRating && (
-                                                                <div className="flex items-center gap-2">
-                                                                    <Star className="w-4 h-4 text-amber-500 fill-current" />
-                                                                    <span className="text-sm font-black text-slate-900">{ratingValue}</span>
+                                                            {hasValidRating ? (
+                                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-xl border border-amber-100">
+                                                                    <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                                                                    <span className="text-xs font-black text-slate-900">{ratingValue}</span>
                                                                 </div>
+                                                            ) : (
+                                                                <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl uppercase tracking-widest">Expert Partner</span>
                                                             )}
                                                             <button 
                                                                 onClick={(e) => { e.stopPropagation(); setSelectedProviderProfile(p); }} 
-                                                                className="text-[9px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-600 pb-0.5 hover:text-indigo-800 hover:border-indigo-800 transition-all"
+                                                                className="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b-2 border-slate-100 pb-0.5 hover:text-indigo-600 hover:border-indigo-600 transition-all"
                                                             >
                                                                 Profile Details
                                                             </button>
@@ -846,17 +869,18 @@ const CustomerHome = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="w-full h-px bg-slate-100 mb-8"></div>
+                                                <div className="w-full h-px bg-linear-to-r from-slate-100 via-slate-50 to-white my-8"></div>
 
-                                                <div className="flex justify-between items-center relative z-10">
+                                                <div className="flex justify-between items-end relative z-10">
                                                     <div>
-                                                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1.5">STARTING AT</p>
-                                                        <p className="text-3xl font-black text-slate-950 italic">
-                                                            ₹{baseRate}<span className="ml-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest not-italic">Base Rate</span>
-                                                        </p>
+                                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Service Entrance</p>
+                                                        <div className="flex items-baseline gap-1">
+                                                            <span className="text-4xl font-black text-slate-950 italic">₹{baseRate}</span>
+                                                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Base Cost</span>
+                                                        </div>
                                                     </div>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="px-8 py-4 bg-slate-950 hover:bg-indigo-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active:scale-95">
-                                                        Book Now
+                                                    <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-16 px-10 bg-slate-950 hover:bg-indigo-600 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-indigo-200/50 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+                                                        Book <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                                     </button>
                                                 </div>
                                             </div>
@@ -875,32 +899,55 @@ const CustomerHome = () => {
                 )}
 
                 {bookingStep === 1 && pendingBookingData && (
-                    <div className="max-w-4xl bg-white rounded-[3rem] shadow-2xl p-16 mx-auto relative border">
-                        <button onClick={() => setBookingStep(0)} className="absolute top-6 right-6 p-2"><XCircle className="w-8 h-8 text-slate-200" /></button>
+                    <div className="max-w-4xl bg-white rounded-[4rem] shadow-2xl p-16 mx-auto relative border border-slate-100 animate-in fade-in zoom-in-95 duration-700">
+                        <button onClick={() => setBookingStep(0)} className="absolute top-8 right-8 p-3 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 rounded-2xl transition-all"><XCircle className="w-8 h-8 text-slate-200" /></button>
                         <div className="space-y-12">
-                            <h2 className="text-3xl font-black uppercase tracking-tighter">Confirm Booking</h2>
-                            
-                            <div className="bg-slate-950 p-10 rounded-[3rem] text-white shadow-2xl">
-                                <div className="flex justify-between items-start mb-8">
-                                    <div>
-                                        <h3 className="text-2xl font-black italic uppercase mb-2">{pendingBookingData.service}</h3>
-                                        {pendingBookingData.subServices?.length > 0 && (
-                                            <div className="flex flex-wrap gap-2 mt-4">
-                                                {pendingBookingData.subServices.map(s => (
-                                                    <span key={s} className="px-3 py-1 bg-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-indigo-300">
-                                                        {s}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-[9px] text-white/40 uppercase mb-1">Total</p>
-                                        <p className="text-5xl font-black">₹{pendingBookingData.price}</p>
-                                    </div>
+                            <div className="flex items-center gap-6 border-b border-slate-100 pb-8">
+                                <div className="w-16 h-16 bg-indigo-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl">
+                                    <Calendar className="w-8 h-8" />
                                 </div>
-                                <div className="pt-8 border-t border-white/10 flex justify-between items-center">
-                                    <p className="text-sm font-bold uppercase italic text-indigo-400">Professional: {pendingBookingData.provider}</p>
+                                <div>
+                                    <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Finalize your professional service request</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-950 p-12 rounded-[3.5rem] text-white shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-500/20 transition-colors duration-1000"></div>
+                                <div className="relative z-10">
+                                    <div className="flex justify-between items-start mb-10">
+                                        <div>
+                                            <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Service Package</p>
+                                            <h3 className="text-4xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
+                                            {pendingBookingData.subServices?.length > 0 && (
+                                                <div className="flex flex-wrap gap-2.5 mt-6">
+                                                    {pendingBookingData.subServices.map(s => (
+                                                        <span key={s} className="px-4 py-1.5 bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-indigo-200 border border-white/5">
+                                                            {s}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.2em] mb-2">Booking Value</p>
+                                            <p className="text-6xl font-black text-white italic">₹{pendingBookingData.price}</p>
+                                        </div>
+                                    </div>
+                                    <div className="pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                        <div className="flex items-center gap-4 bg-white/5 px-6 py-4 rounded-3xl border border-white/5">
+                                            <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
+                                                <UserCircle className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <p className="text-white/40 text-[8px] uppercase font-black tracking-widest">Selected Expert</p>
+                                                <p className="text-sm font-black uppercase tracking-tight text-white">{pendingBookingData.provider}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-indigo-400 italic">
+                                            <ShieldCheck className="w-5 h-5" /> Secured by PrimeSewa
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

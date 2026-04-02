@@ -7,14 +7,14 @@ import NotificationBell from '../components/NotificationBell';
 const navLinkClass = ({ isActive }) =>
     `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive
         ? 'bg-gradient-to-r from-indigo-600/20 to-violet-600/20 text-indigo-400 shadow-inner border border-indigo-500/20'
-        : 'text-slate-400 hover:bg-white/5 hover:text-white'}`;
+        : 'text-slate-300 hover:bg-white/10 hover:text-white hover:shadow-lg transition-all duration-300'}`;
 
 const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
     <>
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
             <span className="flex items-center gap-4">
-                <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-14 h-14 object-contain" />
+                <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain shadow-2xl shadow-blue-500/20" />
                 <span className="text-2xl font-medium text-white tracking-tighter">PrimeSewa</span>
             </span>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
