@@ -302,17 +302,17 @@ const LandingPage = () => {
                         <div className="flex gap-4">
                             <div className="flex -space-x-4">
                                 {[
-                                    "1540331547168-8b63109225b7", // Indian woman (Anjali Patel ref)
-                                    "1566753323558-f4e0952af115", // Indian man (Vikram Shah ref)
-                                    "1533227268408-a534020a3bc7", // Indian woman (Sneha Jhaveri ref)
-                                    "1507003211169-0a1dd7228f2d"  // Indian man (Professional ref)
-                                ].map((id, i) => (
+                                    "/testimonials/anjali.png", 
+                                    "/testimonials/vikram.png", 
+                                    "/testimonials/sneha.png", 
+                                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150"
+                                ].map((src, i) => (
                                     <div 
                                         key={i} 
                                         className="w-14 h-14 rounded-full border-4 border-slate-900 overflow-hidden bg-slate-800 shadow-2xl transition-transform hover:scale-110 active:scale-90 cursor-pointer"
                                         style={{ transitionDelay: `${i * 100}ms` }}
                                     >
-                                        <img src={`https://images.unsplash.com/photo-${id}?q=80&w=150&auto=format&fit=crop`} alt="User" className="w-full h-full object-cover" />
+                                        <img src={src} alt="User" className="w-full h-full object-cover" />
                                     </div>
                                 ))}
                             </div>
@@ -330,21 +330,21 @@ const LandingPage = () => {
                                 role: "Verified Homeowner • Satellite, Ahmedabad", 
                                 text: "The expert was highly professional and arrived right on time. Essential for my family functions!", 
                                 rating: 5, 
-                                img: "https://images.unsplash.com/photo-1540331547168-8b63109225b7?q=80&w=150&auto=format&fit=crop" 
+                                img: "/testimonials/anjali.png" 
                             },
                             { 
                                 name: "Vikram Shah", 
                                 role: "Verified Client • Maninagar, Ahmedabad", 
                                 text: "Extremely convenient booking process. The pricing was fair and the technician spoke Gujarati, which was very helpful.", 
                                 rating: 5, 
-                                img: "https://images.unsplash.com/photo-1566753323558-f4e0952af115?q=80&w=150&auto=format&fit=crop" 
+                                img: "/testimonials/vikram.png" 
                             },
                             { 
                                 name: "Sneha Jhaveri", 
                                 role: "Verified Resident • Ambawadi, Ahmedabad", 
                                 text: "Finally a reliable service in Ahmedabad! The team is local and highly trustworthy.", 
                                 rating: 5, 
-                                img: "https://images.unsplash.com/photo-1533227268408-a534020a3bc7?q=80&w=150&auto=format&fit=crop" 
+                                img: "/testimonials/sneha.png" 
                             }
                         ]).map((t, i) => (
                             <div key={i} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:border-indigo-200 transition-all group min-h-[320px] flex flex-col justify-between">

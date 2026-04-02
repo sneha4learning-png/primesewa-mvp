@@ -1052,9 +1052,9 @@ const CustomerHome = () => {
                                 </div>
                                 <div className="text-right hidden md:block">
                                     <div className="flex -space-x-3 justify-end mb-2 filter drop-shadow-md">
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-40 object-cover shadow-sm" src="https://images.unsplash.com/photo-1540331547168-8b63109225b7?w=100&h=100&q=80&fit=crop" alt="Anjali"/>
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-30 object-cover shadow-sm" src="https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=100&h=100&q=80&fit=crop" alt="Vikram"/>
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-20 object-cover shadow-sm" src="https://images.unsplash.com/photo-1533227268408-a534020a3bc7?w=100&h=100&q=80&fit=crop" alt="Sneha"/>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-40 object-cover shadow-sm" src="/testimonials/anjali.png" alt="Anjali"/>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-30 object-cover shadow-sm" src="/testimonials/vikram.png" alt="Vikram"/>
+                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-20 object-cover shadow-sm" src="/testimonials/sneha.png" alt="Sneha"/>
                                         <div className="w-10 h-10 rounded-full border-2 border-white relative z-10 bg-indigo-600 flex items-center justify-center text-white text-[9px] font-black shadow-sm overflow-hidden">
                                             +82
                                         </div>
@@ -1076,7 +1076,7 @@ const CustomerHome = () => {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 mt-auto">
-                                        <img src="https://images.unsplash.com/photo-1540331547168-8b63109225b7?w=100&h=100&q=80&fit=crop" alt="Anjali Patel" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
+                                        <img src="/testimonials/anjali.png" alt="Anjali Patel" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
                                         <div>
                                             <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Anjali Patel</h4>
                                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
@@ -1097,7 +1097,7 @@ const CustomerHome = () => {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 mt-auto">
-                                        <img src="https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=100&h=100&q=80&fit=crop" alt="Vikram Shah" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
+                                        <img src="/testimonials/vikram.png" alt="Vikram Shah" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
                                         <div>
                                             <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Vikram Shah</h4>
                                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
@@ -1118,7 +1118,7 @@ const CustomerHome = () => {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 mt-auto">
-                                        <img src="https://images.unsplash.com/photo-1533227268408-a534020a3bc7?w=100&h=100&q=80&fit=crop" alt="Sneha Jhaveri" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
+                                        <img src="/testimonials/sneha.png" alt="Sneha Jhaveri" className="w-12 h-12 rounded-2xl object-cover shadow-sm border-2 border-slate-100" />
                                         <div>
                                             <h4 className="text-sm font-black text-slate-900 leading-none mb-1">Sneha Jhaveri</h4>
                                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
