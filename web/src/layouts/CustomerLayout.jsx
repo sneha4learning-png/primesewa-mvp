@@ -23,11 +23,11 @@ const CustomerLayout = () => {
     return (
         <div className="min-h-screen flex flex-col bg-slate-50">
             {/* Navbar */}
-            <header className="h-16 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
+            <header className="h-24 border-b border-indigo-100 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-4 group" onClick={closeMobileMenu}>
-                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain transition-transform group-hover:scale-110 duration-500" />
-                        <span className="text-2xl font-medium bg-clip-text text-transparent bg-linear-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
+                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain transition-transform group-hover:scale-110 duration-500 py-1" />
+                        <span className="text-3xl font-medium bg-clip-text text-transparent bg-linear-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
                     </Link>
 
                     {/* Desktop Nav */}
