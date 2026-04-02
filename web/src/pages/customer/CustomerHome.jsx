@@ -756,17 +756,17 @@ const CustomerHome = () => {
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 flex flex-col gap-10">
-                <div className={`relative overflow-hidden rounded-[3rem] shadow-2xl transition-all duration-700 ${!userData?.uid ? 'bg-indigo-950 p-12 text-white' : 'glass-card p-10 border border-white/50 shadow-indigo-200/20'}`}>
-                    <div className="text-center mb-10">
-                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-24 h-24 mx-auto mb-8 bg-white p-3 rounded-[2rem] shadow-2xl animate-pulse-slow" />
-                        <h1 className={`text-4xl md:text-7xl font-black tracking-tighter uppercase italic shadow-sm ${!userData?.uid ? 'text-white' : 'text-slate-950'}`}>
+                <div className={`relative overflow-hidden rounded-[2rem] shadow-xl transition-all duration-700 ${!userData?.uid ? 'bg-slate-950/95 backdrop-blur-xl p-10 text-white border border-white/10' : 'bg-white/80 backdrop-blur-xl p-8 border border-white shadow-slate-200/50'}`}>
+                    <div className="text-center mb-8">
+                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-16 h-16 mx-auto mb-4 bg-white p-2.5 rounded-2xl shadow-md ring-1 ring-slate-100/50" />
+                        <h1 className={`text-3xl md:text-5xl font-extrabold tracking-tight ${!userData?.uid ? 'text-white' : 'text-slate-900'}`}>
                             {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Premier Service Platform'}
                         </h1>
-                        <p className={`mt-4 text-[10px] uppercase font-black tracking-[0.3em] ${!userData?.uid ? 'text-indigo-300' : 'text-slate-400'}`}>Ahmedabad's Elite Home Service Network</p>
+                        <p className={`mt-3 text-[11px] font-bold tracking-widest uppercase ${!userData?.uid ? 'text-indigo-300' : 'text-indigo-600/70'}`}>Ahmedabad's Elite Home Service Network</p>
                     </div>
-                    <div className="relative max-w-2xl mx-auto flex items-center bg-white shadow-2xl rounded-[2rem] border-2 border-indigo-50 p-2 hover:border-indigo-100 transition-all focus-within:scale-[1.02] duration-500">
-                        <Search className="w-6 h-6 text-indigo-600 ml-6 mr-4" />
-                        <input type="text" placeholder="What are you looking for today?" className="flex-1 py-4 font-bold outline-none text-slate-700 placeholder:text-slate-300" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                    <div className={`relative max-w-2xl mx-auto flex items-center shadow-lg rounded-2xl border transition-all focus-within:ring-4 focus-within:ring-indigo-500/10 duration-300 ${!userData?.uid ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200 focus-within:border-indigo-300 hover:border-indigo-200'}`}>
+                        <Search className={`w-5 h-5 ml-5 mr-3 ${!userData?.uid ? 'text-indigo-400' : 'text-indigo-500'}`} />
+                        <input type="text" placeholder="What are you looking for today?" className={`flex-1 py-4 pr-5 font-semibold outline-none bg-transparent text-sm ${!userData?.uid ? 'text-white placeholder:text-slate-500' : 'text-slate-800 placeholder:text-slate-400'}`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                     </div>
                 </div>
 
