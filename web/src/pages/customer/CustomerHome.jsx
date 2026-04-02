@@ -252,20 +252,25 @@ const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = []
                                 <Sparkles className="w-4 h-4 text-indigo-500" /> Package Details
                             </h3>
                             {selectedSubServices.length > 0 ? (
-                                <div className="flex flex-wrap gap-2.5">
-                                    <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm">
-                                        Standard Base Package Active
-                                    </span>
-                                    {selectedSubServices.map(s => (
-                                        <span key={s} className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">
-                                            {s}
-                                        </span>
-                                    ))}
+                                <div className="flex flex-col gap-2.5">
+                                    <div className="flex justify-between items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm">
+                                        <span>Standard Base Package Active</span>
+                                        <span>₹{baseRate}</span>
+                                    </div>
+                                    {selectedSubServices.map(sName => {
+                                        const subPrice = categoryData?.subServices?.find(ss => ss.name === sName)?.price || 0;
+                                        return (
+                                            <div key={sName} className="flex justify-between items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">
+                                                <span>{sName}</span>
+                                                <span>₹{subPrice}</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
-                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Base cost will apply if you will not select any sub service</span>
+                                    <span className="text-[10px] animate-pulse font-black text-indigo-600 uppercase tracking-widest">Base cost will apply if you will not select any sub service</span>
                                 </div>
                             )}
                         </div>
@@ -626,7 +631,9 @@ const CustomerHome = () => {
             providerUid: provider.id,
             price: finalPrice,
             service: `${selectedCategory || 'Prime'} Service`,
-            subServices: [...selectedSubServices]
+            subServices: [...selectedSubServices],
+            baseRate: base,
+            subtotalSum: subtotal
         });
         setBookingStep(1);
     };
@@ -860,7 +867,7 @@ const CustomerHome = () => {
                                             <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Standard Base Rate</h4>
                                             <div className="flex items-center gap-1 mt-2">
                                                 <div className={`w-1.5 h-1.5 rounded-full ${selectedSubServices.length === 0 ? 'bg-indigo-300 animate-pulse' : 'bg-slate-200'}`}></div>
-                                                <span className={`text-[10px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-400'}`}>
+                                                <span className={`text-[10px] font-black ${selectedSubServices.length === 0 ? 'text-white animate-pulse' : 'text-slate-400'}`}>
                                                     {selectedSubServices.length === 0 ? 'Base cost will apply if you will not select any sub service' : 'ACTIVE BY DEFAULT'}
                                                 </span>
                                             </div>
@@ -1025,19 +1032,24 @@ const CustomerHome = () => {
                                             <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Service Package</p>
                                             <h3 className="text-4xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
                                             {pendingBookingData.subServices?.length > 0 ? (
-                                                <div className="flex flex-wrap gap-2.5 mt-6">
-                                                    <span className="px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
-                                                        Standard Base Package Active
-                                                    </span>
-                                                    {pendingBookingData.subServices.map(s => (
-                                                        <span key={s} className="px-5 py-2.5 bg-indigo-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-100 border border-indigo-400/30 shadow-lg">
-                                                            {s}
-                                                        </span>
-                                                    ))}
+                                                <div className="flex flex-col gap-2.5 mt-6">
+                                                    <div className="flex justify-between items-center px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
+                                                        <span>Standard Base Package Active</span>
+                                                        <span>₹{pendingBookingData.baseRate || 199}</span>
+                                                    </div>
+                                                    {pendingBookingData.subServices.map(s => {
+                                                        const pPrice = categories.find(c => c.name === selectedCategory)?.subServices?.find(ss => ss.name === s)?.price || 0;
+                                                        return (
+                                                            <div key={s} className="flex justify-between items-center px-5 py-2.5 bg-indigo-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-100 border border-indigo-400/30 shadow-lg">
+                                                                <span>{s}</span>
+                                                                <span>₹{pPrice}</span>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             ) : (
-                                                <div className="mt-6">
-                                                    <span className="px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
+                                                <div className="mt-6 flex">
+                                                    <span className="px-5 py-2.5 bg-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md animate-pulse">
                                                         Base cost will apply if you will not select any sub service
                                                     </span>
                                                 </div>
@@ -1046,6 +1058,13 @@ const CustomerHome = () => {
                                         <div className="text-right">
                                             <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.2em] mb-2">Booking Value</p>
                                             <p className="text-6xl font-black text-white italic">₹{pendingBookingData.price}</p>
+                                            {pendingBookingData.subServices?.length > 0 && (
+                                                <div className="mt-2 text-right">
+                                                    <p className="text-white/50 text-[10px] font-black uppercase tracking-widest">
+                                                        Base: ₹{pendingBookingData.baseRate} + Add-ons: ₹{pendingBookingData.subtotalSum}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
