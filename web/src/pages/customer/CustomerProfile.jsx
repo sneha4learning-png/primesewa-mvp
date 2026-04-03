@@ -1,19 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../firebase/AuthContext';
 import { UserCircle, Phone, Save, CheckCircle2, Shield, Star, Clock, Zap, Edit3, ExternalLink, Wrench } from 'lucide-react';
 import { db } from '../../firebase/config';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 
 const CustomerProfile = () => {
-    const { userData, setUserData } = useAuth();
+    const { currentUser, userData, setUserData } = useAuth();
 
     const initialName = userData?.name || (userData?.uid === 'mock-cust' ? 'Guest User' : '');
-    const initialPhone = (userData?.phone || userData?.phoneNumber || '').replace('+91', '');
+    const phoneSource = userData?.phone || currentUser?.phoneNumber || userData?.phoneNumber || '';
+    const initialPhone = String(phoneSource).replace('+91', '').trim();
 
     const [name, setName] = useState(initialName);
-    const [phone] = useState(initialPhone);
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [totalBookings, setTotalBookings] = useState(0);
+
+    useEffect(() => {
+        if (userData?.uid) {
+            const q = query(
+                collection(db, 'bookings'),
+                where('customerUid', '==', userData.uid)
+            );
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                setTotalBookings(snapshot.size);
+            });
+            return () => unsubscribe();
+        }
+    }, [userData?.uid]);
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -59,7 +73,7 @@ const CustomerProfile = () => {
     const memberSince = userData?.createdAt?.toDate?.()?.getFullYear?.() || '2024';
 
     const stats = [
-        { icon: Star, label: 'Bookings', value: '—', color: 'text-amber-500', bg: 'bg-amber-50' },
+        { icon: Star, label: 'Bookings', value: totalBookings, color: 'text-amber-500', bg: 'bg-amber-50' },
         { icon: Clock, label: 'Member Since', value: memberSince, color: 'text-blue-500', bg: 'bg-blue-50' },
     ];
 
@@ -165,7 +179,7 @@ const CustomerProfile = () => {
                                         type="tel"
                                         readOnly
                                         disabled
-                                        value={phone}
+                                        value={initialPhone}
                                         className="w-full pl-14 pr-4 py-4 bg-slate-100/50 border border-slate-200 rounded-2xl transition-all font-medium text-slate-400 outline-none cursor-not-allowed"
                                         placeholder="9876543210"
                                     />
