@@ -777,7 +777,7 @@ const CustomerHome = () => {
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 flex flex-col gap-6">
-                <div className={`relative overflow-hidden rounded-[2rem] shadow-xl transition-all duration-700 ${!userData?.uid ? 'bg-slate-950/95 backdrop-blur-xl p-8 text-white border border-white/10' : 'bg-white/80 backdrop-blur-xl p-6 border border-white shadow-slate-200/50'}`}>
+                <div id="top" className={`relative overflow-hidden rounded-[2rem] shadow-xl transition-all duration-700 scroll-mt-28 ${!userData?.uid ? 'bg-slate-950/95 backdrop-blur-xl p-8 text-white border border-white/10' : 'bg-white/80 backdrop-blur-xl p-6 border border-white shadow-slate-200/50'}`}>
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-4">
                             <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-10 h-10 bg-white p-2 rounded-xl shadow-md ring-1 ring-slate-100/50" />
@@ -913,7 +913,7 @@ const CustomerHome = () => {
 
                 {bookingStep === 0 && (
                     <div className="space-y-6 pb-20">
-                        <div className="space-y-4">
+                        <div id="service-catalog" className="space-y-4 scroll-mt-28">
                             <div className="flex justify-between items-center px-2">
                                 <h2 className="text-base font-black tracking-tighter uppercase italic">Choose Category</h2>
                                 {selectedCategory && <button onClick={() => setSelectedCategory(null)} className="text-[9px] font-black text-indigo-600 uppercase border-b-2 border-indigo-600">Reset</button>}
