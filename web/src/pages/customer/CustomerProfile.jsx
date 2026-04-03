@@ -8,7 +8,7 @@ const CustomerProfile = () => {
     const { currentUser, userData, setUserData } = useAuth();
 
     const initialName = userData?.name || (userData?.uid === 'mock-cust' ? 'Guest User' : '');
-    const phoneSource = userData?.phone || currentUser?.phoneNumber || userData?.phoneNumber || '';
+    const phoneSource = currentUser?.phoneNumber || userData?.phone || userData?.phoneNumber || '';
     const initialPhone = String(phoneSource).replace('+91', '').trim();
 
     const [name, setName] = useState(initialName);
