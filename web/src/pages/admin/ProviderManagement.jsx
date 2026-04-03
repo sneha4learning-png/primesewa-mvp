@@ -10,8 +10,8 @@ const ProviderManagement = () => {
     const location = useLocation();
     const { sendNotification } = useNotifications();
     const [providers, setProviders] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
+    const [searchTerm, setSearchTerm] = useState(location.state?.searchTerm || '');
+    const [statusFilter, setStatusFilter] = useState(location.state?.status || 'All');
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [providerBookings, setProviderBookings] = useState([]);
     const [viewDocumentUrl, setViewDocumentUrl] = useState(null);
@@ -92,14 +92,13 @@ const ProviderManagement = () => {
         }
     };
 
-    useEffect(() => {
-        if (location.state?.searchTerm) {
-            setSearchTerm(location.state.searchTerm);
-        }
-        if (location.state?.status) {
-            setStatusFilter(location.state.status);
-        }
-    }, [location.state]);
+    // Sync state if location.state changes after initial mount
+    const [prevLocKey, setPrevLocKey] = useState(location.key);
+    if (location.key !== prevLocKey) {
+        setPrevLocKey(location.key);
+        if (location.state?.searchTerm) setSearchTerm(location.state.searchTerm);
+        if (location.state?.status) setStatusFilter(location.state.status);
+    }
 
     const handleViewHistory = async (provider) => {
         setSelectedProvider(provider);

@@ -322,7 +322,7 @@ const ProviderLogin = () => {
             setCurrentImageIndex((prev) => (prev + 1) % serviceImages.length);
         }, 5000);
         return () => clearInterval(timer);
-    }, []);
+    }, [serviceImages.length]);
 
     return (
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 md:py-16 bg-linear-to-br from-indigo-500 via-indigo-600 to-violet-700">

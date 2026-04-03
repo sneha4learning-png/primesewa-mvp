@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Users, Briefcase, DollarSign, CalendarDays, Star, TrendingUp, BarChart as BarChartIcon, IndianRupee, PieChart as PieChartIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area, PieChart, Pie } from 'recharts';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, doc, updateDoc, writeBatch, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 
 class ErrorBoundary extends Component {
     constructor(props) { super(props); this.state = { hasError: false, error: null }; }
@@ -41,15 +41,7 @@ const StatCard = ({ title, value, icon, colorClass }) => {
     );
 };
 
-// Converts 24-hour time string (e.g. "16:00") → AM/PM (e.g. "4:00 PM") — consistent with all panels
-const formatTime = (timeStr) => {
-    if (!timeStr) return '';
-    const [h, m] = timeStr.split(':').map(Number);
-    if (isNaN(h)) return timeStr;
-    const period = h >= 12 ? 'PM' : 'AM';
-    const hour = h % 12 || 12;
-    return `${hour}:${String(m).padStart(2, '0')} ${period}`;
-};
+
 
 const DashboardOverviewContent = () => {
     const [stats, setStats] = useState({
@@ -61,7 +53,6 @@ const DashboardOverviewContent = () => {
         pendingPayouts: 0
     });
     const [recentBookings, setRecentBookings] = useState([]);
-    const [recentDeclined, setRecentDeclined] = useState([]);
     const [pendingProviders, setPendingProviders] = useState([]);
     const [dbError, setDbError] = useState(false);
     const [chartData, setChartData] = useState([]);
@@ -110,7 +101,6 @@ const DashboardOverviewContent = () => {
                 });
 
             setRecentBookings(sorted.filter(b => !['cancelled', 'rejected'].includes(b.status)).slice(0, 6));
-            setRecentDeclined(sorted.filter(b => ['cancelled', 'rejected'].includes(b.status)).slice(0, 6));
 
             setStats(prev => ({
                 ...prev,
@@ -265,8 +255,8 @@ const DashboardOverviewContent = () => {
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie data={categoryMix} innerRadius={50} outerRadius={70} paddingAngle={8} dataKey="value" stroke="none">
-                                    {categoryMix.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ee4444', '#8b5cf6'][index % 5]} />
+                                    {categoryMix.map((entry, idx) => (
+                                        <Cell key={`cell-${idx}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ee4444', '#8b5cf6'][idx % 5]} />
                                     ))}
                                 </Pie>
                                 <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }} />
@@ -279,7 +269,7 @@ const DashboardOverviewContent = () => {
             <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h3 className="text-lg font-normal text-gray-800 mb-4">Top Rated Providers</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {topProviders.map((p, index) => (
+                    {topProviders.map((p) => (
                         <div key={p.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-white relative overflow-hidden">
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-normal text-lg">{(p.name || 'U').charAt(0).toUpperCase()}</div>

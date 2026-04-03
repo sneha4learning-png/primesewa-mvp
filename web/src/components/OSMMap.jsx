@@ -10,8 +10,10 @@ const OSMMap = ({ houseNo, area, address, latitude, longitude, height = "100%", 
             const lat = parseFloat(latitude);
             const lon = parseFloat(longitude);
             const size = 0.002;
-            setOsmBbox(`${lon - size}%2C${lat - size}%2C${lon + size}%2C${lat + size}`);
-            setLoading(false);
+            Promise.resolve().then(() => {
+                setOsmBbox(`${lon - size}%2C${lat - size}%2C${lon + size}%2C${lat + size}`);
+                setLoading(false);
+            });
             return;
         }
 

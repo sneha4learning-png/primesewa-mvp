@@ -142,9 +142,7 @@ const CommissionDashboard = () => {
     const totalPages = Math.ceil(commissions.length / itemsPerPage);
     const paginatedRecords = commissions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [timeRange]);
+
 
     const handleExportCSV = () => {
         if (commissions.length === 0) return alert('No data to export');
@@ -184,7 +182,7 @@ const CommissionDashboard = () => {
                         <div className="relative">
                             <select
                                 value={timeRange}
-                                onChange={(e) => setTimeRange(e.target.value)}
+                                onChange={(e) => { setTimeRange(e.target.value); setCurrentPage(1); }}
                                 className="appearance-none pl-4 pr-10 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-gray-700"
                             >
                                 <option value="All">All Time</option>

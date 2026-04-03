@@ -1,5 +1,5 @@
 // PRIME SEWA DEPLOYMENT TRIGGER: RELIABLE BUILD 2026-04-01-T18:30
-import { useState, useEffect, useMemo, useRef, Component } from 'react';
+import { useState, useEffect, useMemo, Component } from 'react';
 import { createPortal } from 'react-dom';
 import OSMMap from '../../components/OSMMap';
 
@@ -32,7 +32,7 @@ class ErrorBoundary extends Component {
 }
 
 const categories = [
-    { 
+    {
         id: '1', name: 'Plumbing', icon: Droplets, color: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-500', type: 'Job-based', subtitle: 'Pipes & Taps',
         subServices: [
             { name: 'Tap Fix', price: 149 },
@@ -41,7 +41,7 @@ const categories = [
             { name: 'Tank Clean', price: 899 }
         ]
     },
-    { 
+    {
         id: '2', name: 'Electrical', icon: Zap, color: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-500', type: 'Job-based', subtitle: 'Wiring & Fixes',
         subServices: [
             { name: 'Switch Fix', price: 99 },
@@ -50,7 +50,7 @@ const categories = [
             { name: 'Wiring Check', price: 999 }
         ]
     },
-    { 
+    {
         id: '3', name: 'Cleaning', icon: Sparkles, color: 'from-emerald-500/10 to-emerald-600/5', iconColor: 'text-emerald-500', type: 'Job-based', subtitle: 'Deep Clean',
         subServices: [
             { name: 'Bathroom Deep Clean', price: 449 },
@@ -59,7 +59,7 @@ const categories = [
             { name: 'Full Home Clean', price: 1499 }
         ]
     },
-    { 
+    {
         id: '4', name: 'Carpentry', icon: Hammer, color: 'from-orange-500/10 to-orange-600/5', iconColor: 'text-orange-500', type: 'Job-based', subtitle: 'Furniture',
         subServices: [
             { name: 'Hinge/Handle Repair', price: 99 },
@@ -68,7 +68,7 @@ const categories = [
             { name: 'New Wardrobe/Cabinet', price: 2499 }
         ]
     },
-    { 
+    {
         id: '5', name: 'Painting', icon: Paintbrush, color: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-500', type: 'Job-based', subtitle: 'Home Wall',
         subServices: [
             { name: 'Single Wall Painting', price: 399 },
@@ -77,7 +77,7 @@ const categories = [
             { name: 'Full Home Painting Consultation', price: 0 }
         ]
     },
-    { 
+    {
         id: '6', name: 'AC Repair', icon: Wind, color: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-500', type: 'Job-based', subtitle: 'Cooling',
         subServices: [
             { name: 'AC Servicing (Split)', price: 499 },
@@ -86,7 +86,7 @@ const categories = [
             { name: 'AC Installation', price: 999 }
         ]
     },
-    { 
+    {
         id: '7', name: 'Appliance Repair', icon: Monitor, color: 'from-rose-500/10 to-rose-600/5', iconColor: 'text-rose-500', type: 'Job-based', subtitle: 'Fridge & TV',
         subServices: [
             { name: 'Washing Machine Repair', price: 399 },
@@ -95,7 +95,7 @@ const categories = [
             { name: 'TV/LED Panel Fix', price: 799 }
         ]
     },
-    { 
+    {
         id: '10', name: 'Salon for Men', icon: Scissors, color: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-500', type: 'Job-based', subtitle: 'Haircare',
         subServices: [
             { name: 'Haircut', price: 199 },
@@ -104,7 +104,7 @@ const categories = [
             { name: 'Facial', price: 599 }
         ]
     },
-    { 
+    {
         id: '12', name: 'Salon for Women', icon: Scissors, color: 'from-pink-500/10 to-pink-600/5', iconColor: 'text-pink-500', type: 'Job-based', subtitle: 'Beauty',
         subServices: [
             { name: 'Threading', price: 99 },
@@ -113,7 +113,7 @@ const categories = [
             { name: 'Pedicure', price: 699 }
         ]
     },
-    { 
+    {
         id: '9', name: 'Pest Control', icon: Bug, color: 'from-red-500/10 to-red-600/5', iconColor: 'text-red-500', type: 'Job-based', subtitle: 'Protection',
         subServices: [
             { name: 'General Pest Control', price: 699 },
@@ -122,7 +122,7 @@ const categories = [
             { name: 'Bed Bug Treatment', price: 1199 }
         ]
     },
-    { 
+    {
         id: '11', name: 'Packers & Movers', icon: Truck, color: 'from-blue-600/10 to-blue-700/5', iconColor: 'text-blue-600', type: 'Job-based', subtitle: 'Safe Move',
         subServices: [
             { name: 'Packing & Shifting', price: 2999 },
@@ -183,7 +183,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = []
             const subObj = categoryData.subServices?.find(ss => ss.name === sName);
             if (subObj) {
                 // Provider-specific variance based on ID for demo purposes, or actual subServicePrices if available
-                const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35; 
+                const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35;
                 const providerPrice = p.subServicePrices?.[sName] || Math.max(subObj.price + variance, 49);
                 subtotalSum += providerPrice;
             }
@@ -212,95 +212,95 @@ const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = []
                     </div>
                 </div>
                 <div className="pt-10 px-6 sm:px-10 pb-8 flex-1 overflow-y-auto hide-scrollbar">
-                        <div className="flex justify-between items-start mb-8">
-                            <div className="pt-2">
-                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-none italic uppercase">{name}</h2>
-                                <div className="flex items-center gap-3 mt-3">
-                                    <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase rounded-full tracking-widest border border-indigo-100">{category}</span>
-                                    <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase rounded-full tracking-widest border border-emerald-100 flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Prime Verified</span>
-                                </div>
-                            </div>
-                            <div className="flex gap-3 shrink-0">
-                                <button onClick={() => { const phone = String(p.phone || ''); if (!phone) { alert('Contact details unavailable.'); return; } window.location.href = `tel:${phone}`; }} className="w-12 h-12 bg-white text-emerald-600 rounded-2xl border-2 border-emerald-50 transition-all flex items-center justify-center hover:bg-emerald-50 hover:scale-110 active:scale-95 shadow-sm">
-                                    <Phone className="w-6 h-6 border-none" />
-                                </button>
-                                <button onClick={() => { handleBook(p); onClose(); }} className="px-8 py-4 bg-indigo-600 hover:bg-slate-950 text-white font-black rounded-2xl text-[11px] uppercase shadow-2xl shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95 tracking-[0.2em]">Book Professional</button>
+                    <div className="flex justify-between items-start mb-8">
+                        <div className="pt-2">
+                            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter leading-none italic uppercase">{name}</h2>
+                            <div className="flex items-center gap-3 mt-3">
+                                <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase rounded-full tracking-widest border border-indigo-100">{category}</span>
+                                <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase rounded-full tracking-widest border border-emerald-100 flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Prime Verified</span>
                             </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-10">
-                            <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-amber-500/5 group/stat">
-                                <Star className="w-6 h-6 text-amber-500 mx-auto mb-3 fill-current group-hover/stat:rotate-12 transition-transform" />
-                                <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
-                                    {(liveJobsCount > 0 && ratingValue > 0 && (p.ratingCount || 0) > 0) ? ratingValue.toFixed(1) : 'NEW'}
-                                </div>
-                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Specialist Rating</div>
-                            </div>
-                            <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 group/stat">
-                                <Briefcase className="w-6 h-6 text-indigo-500 mx-auto mb-3 group-hover/stat:scale-110 transition-transform" />
-                                <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
-                                    {liveJobsCount > 0 ? liveJobsCount : '0'}
-                                </div>
-                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Completed Jobs</div>
-                            </div>
-                            <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 group/stat">
-                                <IndianRupee className="w-6 h-6 text-emerald-500 mx-auto mb-3 group-hover/stat:animate-bounce" />
-                                <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none tracking-tighter">
-                                    ₹{currentTotalDisplay > 0 ? currentTotalDisplay : Math.min(parseInt(String(price).replace(/\D/g, '') || '0'), 199)}
-                                </div>
-                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">{subtotalSum > 0 ? 'Total Value' : 'Starting From'}</div>
-                            </div>
+                        <div className="flex gap-3 shrink-0">
+                            <button onClick={() => { const phone = String(p.phone || ''); if (!phone) { alert('Contact details unavailable.'); return; } window.location.href = `tel:${phone}`; }} className="w-12 h-12 bg-white text-emerald-600 rounded-2xl border-2 border-emerald-50 transition-all flex items-center justify-center hover:bg-emerald-50 hover:scale-110 active:scale-95 shadow-sm">
+                                <Phone className="w-6 h-6 border-none" />
+                            </button>
+                            <button onClick={() => { handleBook(p); onClose(); }} className="px-8 py-4 bg-indigo-600 hover:bg-slate-950 text-white font-black rounded-2xl text-[11px] uppercase shadow-2xl shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95 tracking-[0.2em]">Book Professional</button>
                         </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-10">
+                        <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-amber-500/5 group/stat">
+                            <Star className="w-6 h-6 text-amber-500 mx-auto mb-3 fill-current group-hover/stat:rotate-12 transition-transform" />
+                            <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+                                {(liveJobsCount > 0 && ratingValue > 0 && (p.ratingCount || 0) > 0) ? ratingValue.toFixed(1) : 'NEW'}
+                            </div>
+                            <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Specialist Rating</div>
+                        </div>
+                        <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 group/stat">
+                            <Briefcase className="w-6 h-6 text-indigo-500 mx-auto mb-3 group-hover/stat:scale-110 transition-transform" />
+                            <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">
+                                {liveJobsCount > 0 ? liveJobsCount : '0'}
+                            </div>
+                            <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">Completed Jobs</div>
+                        </div>
+                        <div className="bg-slate-50 p-6 rounded-[2rem] text-center border border-slate-100 transition-all hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 group/stat">
+                            <IndianRupee className="w-6 h-6 text-emerald-500 mx-auto mb-3 group-hover/stat:animate-bounce" />
+                            <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-none tracking-tighter">
+                                ₹{currentTotalDisplay > 0 ? currentTotalDisplay : Math.min(parseInt(String(price).replace(/\D/g, '') || '0'), 199)}
+                            </div>
+                            <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3">{subtotalSum > 0 ? 'Total Value' : 'Starting From'}</div>
+                        </div>
+                    </div>
 
-                        {/* Sub Services Highlight */}
-                        <div className="mb-6 bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100">
-                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-4 flex items-center gap-3">
-                                <Sparkles className="w-4 h-4 text-indigo-500" /> Package Details
-                            </h3>
-                            {selectedSubServices.length > 0 ? (
-                                <div className="flex flex-col gap-2.5">
-                                    <div className="flex justify-between items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm">
-                                        <span>Standard Base Package Active</span>
-                                        <span>₹{baseRate}</span>
-                                    </div>
-                                    {selectedSubServices.map(sName => {
-                                        const subObj = categoryData?.subServices?.find(ss => ss.name === sName);
-                                        const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35;
-                                        const subPrice = p.subServicePrices?.[sName] || Math.max((subObj?.price || 0) + variance, 49);
-                                        return (
-                                            <div key={sName} className="flex justify-between items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">
-                                                <span>{sName}</span>
-                                                <span>₹{subPrice}</span>
-                                            </div>
-                                        );
-                                    })}
+                    {/* Sub Services Highlight */}
+                    <div className="mb-6 bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100">
+                        <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-4 flex items-center gap-3">
+                            <Sparkles className="w-4 h-4 text-indigo-500" /> Package Details
+                        </h3>
+                        {selectedSubServices.length > 0 ? (
+                            <div className="flex flex-col gap-2.5">
+                                <div className="flex justify-between items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm">
+                                    <span>Standard Base Package Active</span>
+                                    <span>₹{baseRate}</span>
                                 </div>
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
-                                    <span className="text-[10px] animate-pulse font-black text-indigo-600 uppercase tracking-widest">Base cost will apply if you will not select any sub service</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {portfolio.length > 0 && (
-                            <div className="mb-6 animate-in slide-in-from-bottom-4 duration-1000">
-                                <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
-                                    <Sparkles className="w-4 h-4 text-indigo-500" /> Professional Portfolio
-                                </h3>
-                                <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar snap-x">
-                                    {portfolio.filter(Boolean).map((img, i) => (
-                                        <div key={i} className="shrink-0 snap-start group/work first:ml-0">
-                                            <div className="relative overflow-hidden rounded-[2.5rem] border-4 border-slate-50 shadow-lg">
-                                                <img src={String(img)} onError={(e) => { e.target.onerror = null; e.target.src = getServiceImage(category); }} className="w-64 h-48 object-cover transition-transform duration-700 group-hover/work:scale-115" alt="Work Sample" />
-                                                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-0 group-hover/work:opacity-100 transition-opacity flex items-end p-6">
-                                                    <span className="text-white text-[10px] font-black uppercase tracking-widest">Verified Work</span>
-                                                </div>
-                                            </div>
+                                {selectedSubServices.map(sName => {
+                                    const subObj = categoryData?.subServices?.find(ss => ss.name === sName);
+                                    const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35;
+                                    const subPrice = p.subServicePrices?.[sName] || Math.max((subObj?.price || 0) + variance, 49);
+                                    return (
+                                        <div key={sName} className="flex justify-between items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">
+                                            <span>{sName}</span>
+                                            <span>₹{subPrice}</span>
                                         </div>
-                                    ))}
-                                </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></div>
+                                <span className="text-[10px] animate-pulse font-black text-indigo-600 uppercase tracking-widest">Base cost will apply if you will not select any sub service</span>
                             </div>
                         )}
+                    </div>
+
+                    {portfolio.length > 0 && (
+                        <div className="mb-6 animate-in slide-in-from-bottom-4 duration-1000">
+                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+                                <Sparkles className="w-4 h-4 text-indigo-500" /> Professional Portfolio
+                            </h3>
+                            <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                                {portfolio.filter(Boolean).map((img, i) => (
+                                    <div key={i} className="shrink-0 snap-start group/work first:ml-0">
+                                        <div className="relative overflow-hidden rounded-[2.5rem] border-4 border-slate-50 shadow-lg">
+                                            <img src={String(img)} onError={(e) => { e.target.onerror = null; e.target.src = getServiceImage(category); }} className="w-64 h-48 object-cover transition-transform duration-700 group-hover/work:scale-115" alt="Work Sample" />
+                                            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-0 group-hover/work:opacity-100 transition-opacity flex items-end p-6">
+                                                <span className="text-white text-[10px] font-black uppercase tracking-widest">Verified Work</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>,
@@ -322,7 +322,7 @@ const HistoryItem = ({ b, submitRating }) => {
                 </div>
                 <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
             </div>
-            
+
             <div className="flex justify-between items-end mb-4">
                 <div>
                     <p className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-1.5">{b.service}</p>
@@ -333,7 +333,7 @@ const HistoryItem = ({ b, submitRating }) => {
                     <p className="text-2xl font-black text-slate-950">₹{b.price}</p>
                 </div>
             </div>
-            
+
             {b.status === 'completed' && !b.rated && (
                 <div className="mt-6 pt-6 border-t border-slate-50">
                     {showForm ? (
@@ -395,8 +395,8 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                     {/* LEFT: LIVE ACTIVITY BLOCK */}
                     <div className="w-full md:w-5/12 border-r border-slate-100 flex flex-col bg-slate-50/50 p-8">
                         <div className="flex items-center gap-3 mb-8">
-                             <div className="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></div>
-                             <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Live Activity</h3>
+                            <div className="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></div>
+                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Live Activity</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar-indigo">
                             {activeBookings.length === 0 ? (
@@ -413,7 +413,7 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                                         </div>
                                         <h4 className="text-2xl font-black text-slate-950 uppercase tracking-tight leading-none mb-3 group-hover:text-indigo-600 transition-colors">{b.service}</h4>
                                         <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Hub Partner...'}</p>
-                                        
+
                                         {(b.status === 'Negotiating' || b.status === 'negotiating') && b.offerPrice && (
                                             <div className="mt-8 p-6 bg-slate-950 rounded-[2rem] border border-white/10 text-white italic shadow-2xl">
                                                 <div className="flex items-center justify-between mb-6">
@@ -438,22 +438,22 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                     {/* RIGHT: RECENT HISTORY BLOCK */}
                     <div className="flex-1 flex flex-col bg-white p-8">
                         <div className="flex items-center gap-3 mb-8">
-                             <Clock className="w-6 h-6 text-indigo-600" />
-                             <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">RECENT HISTORY</h3>
+                            <Clock className="w-6 h-6 text-indigo-600" />
+                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">RECENT HISTORY</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar-indigo">
-                             {pastBookings.length === 0 ? (
+                            {pastBookings.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center py-20 opacity-30">
                                     <Clock className="w-12 h-12 mb-4" />
                                     <p className="text-[11px] font-black uppercase tracking-[0.2em]">History is Empty</p>
                                 </div>
-                             ) : (
+                            ) : (
                                 <div className="grid grid-cols-1 gap-6 w-full">
                                     {pastBookings.map(b => (
                                         <HistoryItem key={b.id} b={b} submitRating={submitRating} />
                                     ))}
                                 </div>
-                             )}
+                            )}
                         </div>
                     </div>
                 </div>
@@ -464,7 +464,7 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
 };
 
 
-const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
+const BookingDetailsModal = ({ bookingId, onClose }) => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -504,14 +504,14 @@ const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
                 </div>
                 <div className="p-10 space-y-8">
                     <div className="grid grid-cols-2 gap-6 text-sm font-black">
-                         <div>
+                        <div>
                             <p className="text-[9px] text-slate-400 uppercase mb-1">Schedule</p>
                             <p>{booking.date} at {formatTime(booking.slot)}</p>
-                         </div>
-                         <div>
+                        </div>
+                        <div>
                             <p className="text-[9px] text-slate-400 uppercase mb-1">Total</p>
                             <p className="text-2xl text-indigo-600">₹{booking.price}</p>
-                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -523,10 +523,9 @@ const BookingDetailsModal = ({ bookingId, onClose, sendNotification }) => {
 const CustomerHome = () => {
     const { userData } = useAuth();
     const { sendNotification } = useNotifications();
-    const catalogRef = useRef(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [bookingStep, setBookingStep] = useState(0); 
+    const [bookingStep, setBookingStep] = useState(0);
     const [onlineProviders, setOnlineProviders] = useState([]);
     const [activeBookings, setActiveBookings] = useState([]);
     const [pastBookings, setPastBookings] = useState([]);
@@ -560,6 +559,13 @@ const CustomerHome = () => {
         "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?q=80&w=2070", // Pest Control
         "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070"  // Appliance Repair
     ], []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % serviceImages.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [serviceImages.length]);
 
     const getTodayStr = () => new Date().toISOString().split('T')[0];
     const availableSlots = useMemo(() => {
@@ -626,7 +632,7 @@ const CustomerHome = () => {
     const handleBook = (provider) => {
         console.log('Final Selection to Modal:', { cat: selectedCategory, sub: selectedSubServices });
         const base = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
-        
+
         // Calculate sub-services total if any selected
         const categoryData = categories.find(c => c.name === selectedCategory);
         let subtotal = 0;
@@ -636,11 +642,11 @@ const CustomerHome = () => {
                 if (sub) subtotal += sub.price;
             });
         }
-        
+
         // Final price logic: Base + Sub-services (if any)
         const finalPrice = base + subtotal;
 
-        setPendingBookingData({ 
+        setPendingBookingData({
             provider: provider.name,
             providerUid: provider.id,
             price: finalPrice,
@@ -653,10 +659,10 @@ const CustomerHome = () => {
     };
 
     const toggleSubServiceInReview = (subName) => {
-        const nextSubServices = selectedSubServices.includes(subName) 
-            ? selectedSubServices.filter(s => s !== subName) 
+        const nextSubServices = selectedSubServices.includes(subName)
+            ? selectedSubServices.filter(s => s !== subName)
             : [...selectedSubServices, subName];
-            
+
         setSelectedSubServices(nextSubServices);
 
         if (pendingBookingData) {
@@ -726,7 +732,7 @@ const CustomerHome = () => {
         if (rating > 0) {
             try {
                 await updateDoc(doc(db, 'bookings', booking.id), { rated: true, ratingGiven: rating, testimonial: testimonial || '' });
-                
+
                 if (booking.provider) {
                     const q = query(collection(db, 'providers'), where('name', '==', booking.provider));
                     const querySnapshot = await getDocs(q);
@@ -737,14 +743,14 @@ const CustomerHome = () => {
                         const currentRating = providerData.rating || 0;
                         const newCount = currentCount + 1;
                         const newRating = ((currentRating * currentCount) + rating) / newCount;
-                        
-                        await updateDoc(doc(db, 'providers', providerDoc.id), { 
+
+                        await updateDoc(doc(db, 'providers', providerDoc.id), {
                             rating: newRating,
                             ratingCount: newCount
                         });
                     }
                 }
-                
+
                 alert("Thank you for your feedback!");
             } catch (err) { console.error(err); }
         }
@@ -770,117 +776,135 @@ const CustomerHome = () => {
                 <div className="absolute inset-0 bg-linear-to-b from-slate-50 via-slate-100/30 to-slate-200/40"></div>
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 flex flex-col gap-10">
-                <div className={`relative overflow-hidden rounded-[2rem] shadow-xl transition-all duration-700 ${!userData?.uid ? 'bg-slate-950/95 backdrop-blur-xl p-10 text-white border border-white/10' : 'bg-white/80 backdrop-blur-xl p-8 border border-white shadow-slate-200/50'}`}>
-                    <div className="text-center mb-8">
-                        <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-16 h-16 mx-auto mb-4 bg-white p-2.5 rounded-2xl shadow-md ring-1 ring-slate-100/50" />
-                        <h1 className={`text-3xl md:text-5xl font-extrabold tracking-tight ${!userData?.uid ? 'text-white' : 'text-slate-900'}`}>
-                            {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Premier Service Platform'}
-                        </h1>
-                        <p className={`mt-3 text-[11px] font-bold tracking-widest uppercase ${!userData?.uid ? 'text-indigo-300' : 'text-indigo-600/70'}`}>Ahmedabad's Elite Home Service Network</p>
-                    </div>
-                    <div className={`relative max-w-2xl mx-auto flex items-center shadow-lg rounded-2xl border transition-all focus-within:ring-4 focus-within:ring-indigo-500/10 duration-300 ${!userData?.uid ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200 focus-within:border-indigo-300 hover:border-indigo-200'}`}>
-                        <Search className={`w-5 h-5 ml-5 mr-3 ${!userData?.uid ? 'text-indigo-400' : 'text-indigo-500'}`} />
-                        <input type="text" placeholder="What are you looking for today?" className={`flex-1 py-4 pr-5 font-semibold outline-none bg-transparent text-sm ${!userData?.uid ? 'text-white placeholder:text-slate-500' : 'text-slate-800 placeholder:text-slate-400'}`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 flex flex-col gap-6">
+                <div className={`relative overflow-hidden rounded-[2rem] shadow-xl transition-all duration-700 ${!userData?.uid ? 'bg-slate-950/95 backdrop-blur-xl p-8 text-white border border-white/10' : 'bg-white/80 backdrop-blur-xl p-6 border border-white shadow-slate-200/50'}`}>
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                            <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-10 h-10 bg-white p-2 rounded-xl shadow-md ring-1 ring-slate-100/50" />
+                            <div className="text-left">
+                                <h1 className={`text-xl md:text-2xl font-extrabold tracking-tight leading-none ${!userData?.uid ? 'text-white' : 'text-slate-900'}`}>
+                                    {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Premier Service Platform'}
+                                </h1>
+                                <p className={`mt-1 text-[9px] font-bold tracking-widest uppercase ${!userData?.uid ? 'text-indigo-300' : 'text-indigo-600/70'}`}>Ahmedabad's Elite Home Service Network</p>
+                            </div>
+                        </div>
+                        <div className={`relative flex-1 max-w-md w-full flex items-center shadow-sm rounded-xl border transition-all focus-within:ring-4 focus-within:ring-indigo-500/10 duration-300 ${!userData?.uid ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200 focus-within:border-indigo-300 hover:border-indigo-200'}`}>
+                            <Search className={`w-4 h-4 ml-4 mr-2 ${!userData?.uid ? 'text-indigo-400' : 'text-indigo-500'}`} />
+                            <input type="text" placeholder="Search services..." className={`flex-1 py-2.5 pr-4 font-semibold outline-none bg-transparent text-xs ${!userData?.uid ? 'text-white placeholder:text-slate-500' : 'text-slate-800 placeholder:text-slate-400'}`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                        </div>
                     </div>
                 </div>
 
                 {userData?.uid && bookingStep === 0 && (
-                    <div className="space-y-10">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-white p-8 rounded-[3rem] flex items-center gap-6 border border-slate-100 shadow-xl shadow-slate-200/40 group hover:scale-[1.02] transition-all hover:bg-slate-50">
-                                <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-white group-hover:shadow-lg transition-all">
-                                    <Briefcase className="w-8 h-8 text-indigo-600" />
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-white p-5 rounded-3xl flex items-center gap-4 border border-slate-100 shadow-xl shadow-slate-200/20 group hover:scale-[1.02] transition-all hover:bg-slate-50">
+                                <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-white group-hover:shadow-lg transition-all">
+                                    <Briefcase className="w-6 h-6 text-indigo-600" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-1.5">Total Services</p>
-                                    <h3 className="text-3xl font-black text-slate-900 leading-none">{allMyBookings.length}</h3>
+                                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em] mb-1">Total Services</p>
+                                    <h3 className="text-xl font-black text-slate-900 leading-none">{allMyBookings.length}</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setIsActivityModalOpen(true)} className="bg-indigo-600 p-8 rounded-[3rem] flex items-center gap-6 text-white relative overflow-hidden group shadow-2xl shadow-indigo-600/30 active:scale-95 transition-all">
-                                <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all">
-                                    <Activity className="w-8 h-8 text-white relative z-10" />
+                            <button onClick={() => setIsActivityModalOpen(true)} className="bg-indigo-600 p-5 rounded-3xl flex items-center gap-4 text-white relative overflow-hidden group shadow-2xl shadow-indigo-600/20 active:scale-95 transition-all outline-none">
+                                <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all">
+                                    <Activity className="w-6 h-6 text-white relative z-10" />
                                 </div>
                                 <div className="relative z-10 text-left flex-1">
-                                    <p className="text-indigo-200 text-[10px] uppercase font-black tracking-[0.2em] mb-1.5">Live Status</p>
-                                    <h3 className="text-3xl font-black italic leading-none">Activity Hub</h3>
+                                    <p className="text-indigo-200 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Live Status</p>
+                                    <h3 className="text-xl font-black italic leading-none">Activity Hub</h3>
                                 </div>
                                 {activeBookings.length > 0 && (
-                                    <span className="w-10 h-10 bg-rose-500 rounded-2xl flex items-center justify-center text-[11px] font-black shadow-lg animate-bounce relative z-10">
+                                    <span className="w-8 h-8 bg-rose-500 rounded-xl flex items-center justify-center text-[10px] font-black shadow-lg animate-bounce relative z-10">
                                         {activeBookings.length}
                                     </span>
                                 )}
                             </button>
-                            <div className="bg-indigo-950 p-8 rounded-[3rem] text-white flex items-center gap-6 shadow-2xl shadow-indigo-950/40 hover:bg-black transition-colors group">
-                                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center group-hover:bg-white/10 transition-all">
-                                    <Star className="w-8 h-8 text-amber-400 fill-current" />
+                            <div className="bg-indigo-950 p-5 rounded-3xl text-white flex items-center gap-4 shadow-2xl shadow-indigo-950/20 hover:bg-black transition-colors group">
+                                <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center group-hover:bg-white/10 transition-all">
+                                    <Star className="w-6 h-6 text-amber-400 fill-current" />
                                 </div>
                                 <div>
-                                    <p className="text-indigo-300 text-[10px] uppercase font-black tracking-[0.2em] mb-1.5">Membership</p>
-                                    <h3 className="text-3xl font-black italic leading-none text-amber-400">Prime Member</h3>
+                                    <p className="text-indigo-300 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Membership</p>
+                                    <h3 className="text-xl font-black italic leading-none text-amber-400">Prime Member</h3>
                                 </div>
                             </div>
                         </div>
 
                         {/* Integrated Activity & History Block on Dashboard */}
                         {(activeBookings.length > 0 || pastBookings.length > 0) && (
-                            <div className="bg-white rounded-[3.5rem] border border-slate-100 shadow-2xl overflow-hidden flex flex-col md:flex-row transition-all duration-700 animate-in fade-in zoom-in-95">
+                            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden flex flex-col md:flex-row transition-all duration-700">
                                 {/* Dashboard Live Activity Side */}
-                                <div className="w-full md:w-5/12 bg-slate-50/70 p-10 border-r border-slate-100">
-                                     <div className="flex items-center justify-between mb-8">
-                                         <div className="flex items-center gap-4">
-                                            <div className="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></div>
-                                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em] italic">Live Activity</h3>
-                                         </div>
-                                         <button onClick={() => setIsActivityModalOpen(true)} className="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-600 pb-0.5">Control Center</button>
-                                     </div>
-                                     {activeBookings.length === 0 ? (
-                                         <div className="h-48 flex flex-col items-center justify-center text-center opacity-30 py-20">
-                                             <Activity className="w-10 h-10 mb-4" />
-                                             <p className="text-[11px] font-black uppercase tracking-[0.2em]">No Live Activity</p>
-                                         </div>
-                                     ) : (
-                                         <div className="space-y-6">
-                                             {activeBookings.slice(0, 2).map(b => (
-                                                 <div key={b.id} className="bg-white p-7 rounded-[2.5rem] border border-slate-200 shadow-sm group hover:border-indigo-200 transition-all cursor-pointer" onClick={() => setIsActivityModalOpen(true)}>
-                                                     <div className="flex justify-between items-start mb-4">
-                                                         <div className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase rounded-full">{b.status}</div>
-                                                         <span className="text-[10px] font-bold text-slate-200">#{b.id.slice(-4).toUpperCase()}</span>
-                                                     </div>
-                                                     <h4 className="text-xl font-black text-slate-950 uppercase tracking-tight leading-none mb-2">{b.service}</h4>
-                                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Hub Partner...'}</p>
-                                                 </div>
-                                             ))}
-                                             {activeBookings.length > 2 && (
-                                                 <button onClick={() => setIsActivityModalOpen(true)} className="w-full py-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest bg-white rounded-2xl border-2 border-dashed border-indigo-50 hover:bg-indigo-50 transition-colors">
-                                                     + View {activeBookings.length - 2} More Active
-                                                 </button>
-                                             )}
-                                         </div>
-                                     )}
+                                <div className="w-full md:w-5/12 bg-slate-50/50 p-6 border-r border-slate-100">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">Live Activity</h3>
+                                        </div>
+                                        <button onClick={() => setIsActivityModalOpen(true)} className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Full View</button>
+                                    </div>
+                                    {activeBookings.length === 0 ? (
+                                        <div className="py-8 flex flex-col items-center justify-center text-center opacity-30">
+                                            <Activity className="w-8 h-8 mb-2" />
+                                            <p className="text-[9px] font-black uppercase tracking-widest">No Live Activity</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {activeBookings.slice(0, 1).map(b => (
+                                                <div key={b.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:border-indigo-200 transition-all cursor-pointer" onClick={() => setIsActivityModalOpen(true)}>
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[8px] font-black uppercase rounded-full">{b.status}</div>
+                                                        <span className="text-[9px] font-bold text-slate-200">#{b.id.slice(-4).toUpperCase()}</span>
+                                                    </div>
+                                                    <h4 className="text-sm font-black text-slate-950 uppercase tracking-tight leading-none mb-1">{b.service}</h4>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Partner...'}</p>
+                                                </div>
+                                            ))}
+                                            {activeBookings.length > 1 && (
+                                                <button onClick={() => setIsActivityModalOpen(true)} className="w-full py-3 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-white rounded-2xl border-2 border-dashed border-indigo-50">
+                                                    + {activeBookings.length - 1} More Active
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                                 {/* Dashboard History Side */}
-                                <div className="flex-1 p-10 bg-white">
-                                     <div className="flex items-center gap-4 mb-8">
-                                         <Clock className="w-6 h-6 text-indigo-600" />
-                                         <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em] italic">RECENT HISTORY</h3>
-                                     </div>
-                                     {pastBookings.length === 0 ? (
-                                         <div className="h-48 flex flex-col items-center justify-center text-center opacity-30 py-20">
-                                             <Clock className="w-10 h-10 mb-4" />
-                                             <p className="text-[11px] font-black uppercase tracking-[0.2em]">History Empty</p>
-                                         </div>
-                                     ) : (
-                                         <div className="grid grid-cols-1 gap-6 w-full">
-                                             {pastBookings.slice(0, 3).map(b => (
-                                                 <HistoryItem key={b.id} b={b} submitRating={submitRating} />
-                                             ))}
-                                             <button onClick={() => setIsActivityModalOpen(true)} className="w-full py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 rounded-3xl hover:bg-slate-100 transition-colors mt-2">
-                                                 Explore Full Service Records
-                                             </button>
-                                         </div>
-                                     )}
+                                <div className="flex-1 p-6 bg-white">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Clock className="w-4 h-4 text-indigo-600" />
+                                        <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">RECENT HISTORY</h3>
+                                    </div>
+                                    {pastBookings.length === 0 ? (
+                                        <div className="py-8 flex flex-col items-center justify-center text-center opacity-30">
+                                            <Clock className="w-8 h-8 mb-2" />
+                                            <p className="text-[9px] font-black uppercase tracking-widest">History Empty</p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 gap-4 w-full">
+                                            {pastBookings.slice(0, 1).map(b => (
+                                                <div key={b.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-3xl border border-slate-100">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                                                            <Briefcase className="w-5 h-5 text-indigo-600" />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-xs font-black text-slate-900 uppercase leading-none mb-1">{b.service}</h4>
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{b.date}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-xs font-black text-slate-900 leading-none mb-1">₹{b.price}</p>
+                                                        <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">{b.status}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <button onClick={() => setIsActivityModalOpen(true)} className="w-full py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
+                                                Explore All Records
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -888,66 +912,62 @@ const CustomerHome = () => {
                 )}
 
                 {bookingStep === 0 && (
-                    <div className="space-y-16 pb-20">
-                        <div className="space-y-8">
-                            <div className="flex justify-between items-end px-4">
-                                <h2 className="text-4xl font-black tracking-tighter uppercase italic">Choose a Category</h2>
-                                {selectedCategory && <button onClick={() => setSelectedCategory(null)} className="text-[10px] font-black text-indigo-600 uppercase border-b-2 border-indigo-600">Reset</button>}
+                    <div className="space-y-6 pb-20">
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center px-2">
+                                <h2 className="text-base font-black tracking-tighter uppercase italic">Choose Category</h2>
+                                {selectedCategory && <button onClick={() => setSelectedCategory(null)} className="text-[9px] font-black text-indigo-600 uppercase border-b-2 border-indigo-600">Reset</button>}
                             </div>
-                            <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-10 gap-4">
+                            <div className="flex overflow-x-auto pb-4 gap-4 hide-scrollbar snap-x px-2">
                                 {categories.map(cat => (
-                                    <button key={cat.id} onClick={() => handleCategorySelect(cat.name)} className={`flex flex-col items-center gap-3 transition-all ${selectedCategory === cat.name ? 'scale-110' : 'opacity-60'}`}>
-                                        <div className={`w-16 h-16 rounded-[2rem] flex items-center justify-center ${selectedCategory === cat.name ? 'bg-indigo-600 text-white shadow-xl' : 'bg-white border'}`}><cat.icon className="w-7 h-7" /></div>
-                                        <span className="text-[9px] font-black uppercase text-center">{cat.name}</span>
+                                    <button key={cat.id} onClick={() => handleCategorySelect(cat.name)} className={`flex flex-col items-center gap-2 transition-all group snap-start ${selectedCategory === cat.name ? 'scale-105' : 'opacity-60 hover:opacity-100'}`}>
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${selectedCategory === cat.name ? 'bg-indigo-600 text-white shadow-lg rotate-3' : 'bg-white border hover:border-indigo-200'}`}>
+                                            <cat.icon className="w-5 h-5" />
+                                        </div>
+                                        <span className={`text-[7px] font-black uppercase text-center leading-tight tracking-tighter whitespace-nowrap ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500'}`}>{cat.name}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         {selectedCategory ? (
-                             <div className="space-y-12">
+                             <div className="space-y-6">
                                 {/* Sub-services Selection Section */}
-                                <div className="bg-white/80 backdrop-blur-xl rounded-[3rem] p-10 border border-white/20 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-700">
-                                    <div className="flex items-center justify-between mb-8">
+                                <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-5 border border-white/20 shadow-xl animate-in fade-in slide-in-from-top-4 duration-700">
+                                    <div className="flex items-center justify-between mb-3">
                                         <div>
-                                            <h3 className="text-2xl font-black text-slate-950 uppercase italic tracking-tighter">Explore {selectedCategory} Services</h3>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Select sub-categories to find specialized professionals</p>
+                                            <h3 className="text-sm font-black text-slate-950 uppercase italic tracking-tighter">{selectedCategory} Packages</h3>
+                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">Select options for price comparison</p>
                                         </div>
-                                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                                            <Sparkles className="w-6 h-6" />
+                                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                                            <Sparkles className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                    <div className="flex overflow-x-auto pb-4 gap-3 hide-scrollbar snap-x">
                                         {/* Base Plate Highlighter */}
-                                        <div 
-                                            className={`p-5 rounded-[2rem] border transition-all text-left ${selectedSubServices.length === 0 ? 'bg-indigo-600 border-indigo-600 shadow-xl' : 'bg-white border-slate-100'}`}
-                                        >
-                                            <p className={`text-[9px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.length === 0 ? 'text-indigo-200' : 'text-slate-400'}`}>Current Package</p>
-                                            <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Standard Base Rate</h4>
-                                            <div className="flex items-center gap-1 mt-2">
-                                                <div className={`w-1.5 h-1.5 rounded-full ${selectedSubServices.length === 0 ? 'bg-indigo-300 animate-pulse' : 'bg-slate-200'}`}></div>
-                                                <span className={`text-[10px] font-black ${selectedSubServices.length === 0 ? 'text-white animate-pulse' : 'text-slate-400'}`}>
-                                                    {selectedSubServices.length === 0 ? 'Base cost will apply if you will not select any sub service' : 'ACTIVE BY DEFAULT'}
-                                                </span>
+                                        <div className={`shrink-0 w-32 p-3 rounded-2xl border transition-all text-left snap-start ${selectedSubServices.length === 0 ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'bg-white border-slate-100'}`}>
+                                            <p className={`text-[7px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.length === 0 ? 'text-indigo-200' : 'text-slate-400'}`}>Standard</p>
+                                            <h4 className={`text-[10px] font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Base Rate</h4>
+                                            <div className="flex items-center gap-1 mt-1">
+                                                <span className={`text-[7px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-400'}`}>INCLUDED</span>
                                             </div>
                                         </div>
-                                        
+
                                         {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => (
-                                            <button 
+                                            <button
                                                 key={sub.name}
                                                 onClick={() => {
-                                                    const next = selectedSubServices.includes(sub.name) 
-                                                        ? selectedSubServices.filter(s => s !== sub.name) 
+                                                    const next = selectedSubServices.includes(sub.name)
+                                                        ? selectedSubServices.filter(s => s !== sub.name)
                                                         : [...selectedSubServices, sub.name];
                                                     setSelectedSubServices(next);
                                                 }}
-                                                className={`p-5 rounded-[2rem] border transition-all text-left group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-xl' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
+                                                className={`shrink-0 w-32 p-3 rounded-2xl border transition-all text-left snap-start group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
                                             >
-                                                <p className={`text-[9px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.includes(sub.name) ? 'text-indigo-200' : 'text-slate-400'}`}>Package</p>
-                                                <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
-                                                <div className="flex items-center gap-1 mt-2">
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${selectedSubServices.includes(sub.name) ? 'bg-indigo-300' : 'bg-indigo-600'}`}></div>
-                                                    <span className={`text-[10px] font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`}>CUSTOMIZED PLAN AVAILABLE</span>
+                                                <p className={`text-[7px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.includes(sub.name) ? 'text-indigo-200' : 'text-slate-400'}`}>+ Service</p>
+                                                <h4 className={`text-[10px] font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
+                                                <div className="flex items-center gap-1 mt-1">
+                                                    <span className={`text-[8px] font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`}>₹{sub.price}</span>
                                                 </div>
                                             </button>
                                         ))}
@@ -960,12 +980,12 @@ const CustomerHome = () => {
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Available Specialists</p>
                                         <div className="h-px flex-1 bg-slate-200"></div>
                                     </div>
-                                    
+
                                     <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-full border border-slate-100 shadow-sm">
                                         <Filter className="w-4 h-4 text-indigo-500" />
                                         <div className="flex gap-2">
                                             {[0, 4.5, 4.0, 3.0].map(val => (
-                                                <button 
+                                                <button
                                                     key={val}
                                                     onClick={() => setMinRating(val)}
                                                     className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${minRating === val ? 'bg-slate-950 text-white shadow-lg' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}`}
@@ -977,20 +997,16 @@ const CustomerHome = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2 pb-20">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-2 pb-10">
                                     {displayedProviders.map(p => {
-                                        // Calculate dynamic price based on selection
                                         const rawPrice = parseInt(String(p.price || '149').replace(/\D/g, ''));
                                         const baseRate = Math.min(rawPrice, 199);
-                                        
-                                        // Calculate sub-services total if any selected
                                         const categoryData = categories.find(c => c.name === selectedCategory);
                                         let subtotalSum = 0;
                                         if (categoryData && selectedSubServices.length > 0) {
                                             selectedSubServices.forEach(sName => {
                                                 const subObj = categoryData.subServices?.find(ss => ss.name === sName);
                                                 if (subObj) {
-                                                    // Provider-specific variance based on ID for demo purposes
                                                     const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35;
                                                     const providerPrice = p.subServicePrices?.[sName] || Math.max(subObj.price + variance, 49);
                                                     subtotalSum += providerPrice;
@@ -1003,102 +1019,59 @@ const CustomerHome = () => {
                                         const hasValidRating = ratingValue > 0 && (p.ratingCount || 0) > 0;
                                         
                                         return (
-                                            <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-[3.5rem] border-2 border-slate-50 shadow-2xl shadow-indigo-100/40 p-12 group cursor-pointer hover:scale-[1.03] transition-all duration-700 relative overflow-hidden flex flex-col justify-between min-h-[400px]">
-                                                <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50/20 rounded-bl-[100%] pointer-events-none group-hover:bg-indigo-600/5 transition-all duration-700"></div>
-                                                
-                                                <div>
-                                                    <div className="flex items-start justify-between mb-8 relative z-10">
-                                                        <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center border-2 border-slate-50 shadow-xl group-hover:shadow-indigo-200 group-hover:-rotate-6 transition-all duration-500 relative overflow-hidden">
-                                                            <div className="absolute inset-0 bg-linear-to-br from-indigo-50 to-white"></div>
-                                                            <UserCircle className="w-14 h-14 text-indigo-600 relative z-10" />
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm group-hover:scale-110 transition-transform">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Active Now</span>
-                                                            </div>
-                                                        </div>
+                                            <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-2xl border border-slate-100 shadow-md p-4 group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col justify-between border-b-2 hover:border-b-indigo-500">
+                                                <div className="relative z-10 flex items-center gap-3 mb-3">
+                                                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 shrink-0">
+                                                        <UserCircle className="w-7 h-7 text-indigo-600" />
                                                     </div>
-
-                                                    <div className="relative z-10">
-                                                        <h4 className="text-2xl font-black text-slate-950 group-hover:text-indigo-600 uppercase italic tracking-tighter leading-none mb-3 transition-colors">{p.name || 'Prime Specialist'}</h4>
-                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">{p.category?.[0] || 'Member Expert'}</p>
-                                                        
-                                                        <div className="flex items-center gap-4">
-                                                            {hasValidRating ? (
-                                                                <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-xl border border-amber-100">
-                                                                    <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
-                                                                    <span className="text-xs font-black text-slate-900">{ratingValue}</span>
-                                                                </div>
-                                                            ) : (
-                                                                <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl uppercase tracking-widest">Expert Partner</span>
-                                                            )}
-                                                            <button 
-                                                                onClick={(e) => { e.stopPropagation(); setSelectedProviderProfile(p); }} 
-                                                                className="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b-2 border-slate-100 pb-0.5 hover:text-indigo-600 hover:border-indigo-600 transition-all"
-                                                            >
-                                                                Profile Details
-                                                            </button>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-xs font-black text-slate-950 truncate uppercase leading-none mb-1">{p.name || 'Specialist'}</h4>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Star className="w-2 h-2 text-amber-500 fill-current" />
+                                                            <span className="text-[9px] font-black text-slate-900">{hasValidRating ? ratingValue.toFixed(1) : 'NEW'}</span>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div className="w-full h-px bg-linear-to-r from-slate-100 via-slate-50 to-white my-8"></div>
-                                                <div className="flex justify-between items-end relative z-10">
+                                                <div className="flex items-end justify-between pt-2 border-t border-slate-50">
                                                     <div>
-                                                        <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Service Comparison Total</p>
-                                                        <div className="flex flex-col">
-                                                            <div className="flex items-baseline gap-1">
-                                                                <span className="text-4xl font-black text-slate-950 italic">₹{currentTotalDisplay}</span>
-                                                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-2">Total</span>
-                                                            </div>
-                                                            {subtotalSum > 0 && (
-                                                                <div className="flex items-center gap-2 mt-1">
-                                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">₹{baseRate} Base</span>
-                                                                    <PlusIcon className="w-2.5 h-2.5 text-slate-300" />
-                                                                    <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">₹{subtotalSum} Specialist additions</span>
-                                                                </div>
-                                                            )}
-                                                            {subtotalSum === 0 && (
-                                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Standard Base Rate Only</p>
-                                                            )}
-                                                        </div>
+                                                        <p className="text-[7px] font-black text-indigo-500 uppercase tracking-widest">Total Cost</p>
+                                                        <p className="text-sm font-black text-slate-950">₹{currentTotalDisplay}</p>
                                                     </div>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-16 px-10 bg-slate-950 hover:bg-indigo-600 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-indigo-200/50 transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
-                                                        Book <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                    <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-7 px-3 bg-slate-950 text-white rounded-lg text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all">
+                                                        Book
                                                     </button>
                                                 </div>
                                             </div>
                                         );
                                     })}
                                 </div>
-                             </div>
+                            </div>
                         ) : (
-                            <div className="py-24 text-center bg-indigo-50/20 rounded-[4rem] border-2 border-dashed border-indigo-100">
-                                <Zap className="w-12 h-12 text-indigo-400 mx-auto mb-6" />
-                                <h3 className="text-2xl font-black uppercase italic">Search Ahmedabad's Finest Professionals</h3>
-                                <p className="text-slate-400 text-[10px] uppercase font-medium">Please select a category above to continue.</p>
+                            <div className="py-20 text-center bg-indigo-50/20 rounded-[3rem] border-2 border-dashed border-indigo-100">
+                                <Zap className="w-10 h-10 text-indigo-400 mx-auto mb-4" />
+                                <h3 className="text-xl font-black uppercase italic tracking-tighter">Search Ahmedabad's Elite Pros</h3>
+                                <p className="text-slate-400 text-[9px] uppercase font-bold tracking-widest">Select a category to start comparing pricing</p>
                             </div>
                         )}
 
                         {/* Testimonials Section */}
-                        <div className="mt-20 pt-10">
-                            <div className="flex justify-between items-end mb-10">
+                        <div className="mt-10 pt-6">
+                            <div className="flex justify-between items-end mb-6">
                                 <div>
-                                    <h3 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-2">Testimonials</h3>
-                                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">Loved by Ahmedabad</h2>
+                                    <p className="text-[8px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-1">Testimonials</p>
+                                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter leading-none italic uppercase">Loved by Ahmedabad</h2>
                                 </div>
                                 <div className="text-right hidden md:block">
-                                    <div className="flex -space-x-3 justify-end mb-2 filter drop-shadow-md">
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-40 object-cover shadow-sm" src="/testimonials/anjali.png" alt="Anjali"/>
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-30 object-cover shadow-sm" src="/testimonials/vikram.png" alt="Vikram"/>
-                                        <img className="w-10 h-10 rounded-full border-2 border-white relative z-20 object-cover shadow-sm" src="/testimonials/sneha.png" alt="Sneha"/>
-                                        <div className="w-10 h-10 rounded-full border-2 border-white relative z-10 bg-indigo-600 flex items-center justify-center text-white text-[9px] font-black shadow-sm overflow-hidden">
+                                    <div className="flex -space-x-2 justify-end mb-1 filter drop-shadow-md">
+                                        <img className="w-8 h-8 rounded-full border-2 border-white relative z-40 object-cover shadow-sm" src="/testimonials/anjali.png" alt="Anjali" />
+                                        <img className="w-8 h-8 rounded-full border-2 border-white relative z-30 object-cover shadow-sm" src="/testimonials/vikram.png" alt="Vikram" />
+                                        <img className="w-8 h-8 rounded-full border-2 border-white relative z-20 object-cover shadow-sm" src="/testimonials/sneha.png" alt="Sneha" />
+                                        <div className="w-8 h-8 rounded-full border-2 border-white relative z-10 bg-indigo-600 flex items-center justify-center text-white text-[8px] font-black shadow-sm overflow-hidden">
                                             +82
                                         </div>
                                     </div>
-                                    <div className="text-sm font-black text-slate-900 leading-none mb-1 text-right">4.8 / 5.0</div>
-                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Average User Rating</div>
+                                    <div className="text-[10px] font-black text-slate-900 leading-none text-right">4.8 / 5.0 Rating</div>
                                 </div>
                             </div>
 
@@ -1167,174 +1140,173 @@ const CustomerHome = () => {
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 )}
 
-                {bookingStep === 1 && pendingBookingData && (
-                    <div className="max-w-3xl bg-white rounded-[2rem] shadow-2xl p-8 mx-auto relative border border-slate-100 animate-in fade-in zoom-in-95 duration-700">
-                        <button onClick={() => setBookingStep(0)} className="absolute top-6 right-6 p-2 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"><XCircle className="w-6 h-6 text-slate-300" /></button>
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
-                                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md">
-                                    <Calendar className="w-5 h-5" />
+            {bookingStep === 1 && pendingBookingData && (
+                <div className="max-w-2xl bg-white rounded-3xl shadow-2xl p-6 mx-auto relative border border-slate-100 animate-in fade-in zoom-in-95 duration-700">
+                    <button onClick={() => setBookingStep(0)} className="absolute top-4 right-4 p-2 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"><XCircle className="w-5 h-5 text-slate-300" /></button>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
+                            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                                <Calendar className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <h2 className="text-xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
+                                    {pendingBookingData.subServices?.length === 0 ? (
+                                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[7px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1">
+                                            <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
+                                            Standard Base Active
+                                        </span>
+                                    ) : (
+                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[7px] font-black uppercase tracking-widest border border-indigo-100 flex items-center gap-1">
+                                            <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce"></div>
+                                            {pendingBookingData.subServices.length} Selected
+                                        </span>
+                                    )}
                                 </div>
-                                <div>
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <h2 className="text-xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
-                                        {pendingBookingData.subServices?.length === 0 ? (
-                                            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[7px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1">
-                                                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
-                                                Standard Base Active
-                                            </span>
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Finalize your service request</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-950 p-6 rounded-[2rem] text-white shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-500/20 transition-colors duration-1000"></div>
+                            <div className="relative z-10">
+                                <div className="gap-x-8 flex flex-wrap lg:flex-nowrap justify-between items-start mb-4">
+                                    <div className="w-full lg:w-3/5">
+                                        <p className="text-indigo-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Service Package</p>
+                                        <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
+                                        {pendingBookingData.subServices?.length > 0 ? (
+                                            <div className="flex flex-col gap-2 mt-4 mb-4">
+                                                <div className="flex justify-between items-center px-4 py-2 bg-emerald-500/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
+                                                    <span>Standard Base Package Active</span>
+                                                    <span>₹{pendingBookingData.baseRate || 199}</span>
+                                                </div>
+                                            </div>
                                         ) : (
-                                            <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[7px] font-black uppercase tracking-widest border border-indigo-100 flex items-center gap-1">
-                                                <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce"></div>
-                                                {pendingBookingData.subServices.length} Selected
-                                            </span>
+                                            <div className="mt-4 mb-4 flex">
+                                                <span className="px-4 py-2 bg-emerald-500/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md animate-pulse">
+                                                    Base cost will apply if no sub service
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div>
+                                            <p className="text-indigo-400 text-[9px] font-black uppercase tracking-[0.2em] mb-2">Customize Package</p>
+                                            <div className="flex flex-col gap-2">
+                                                {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => {
+                                                    const isSelected = pendingBookingData.subServices?.includes(sub.name);
+                                                    return (
+                                                        <button
+                                                            key={sub.name}
+                                                            onClick={(e) => { e.preventDefault(); toggleSubServiceInReview(sub.name); }}
+                                                            className={`flex items-center justify-between p-2.5 rounded-xl border transition-all text-left group ${isSelected ? 'bg-indigo-500/20 border-indigo-500/50 shadow-sm' : 'bg-white/5 border-white/10 hover:border-indigo-400/50 hover:bg-white/10'}`}
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${isSelected ? 'bg-indigo-500 border-indigo-400' : 'border-white/30'}`}>
+                                                                    {isSelected && <CheckCircle2 className="w-2.5 h-2.5 text-white" />}
+                                                                </div>
+                                                                <span className={`text-xs font-bold leading-none ${isSelected ? 'text-white' : 'text-slate-300'}`}>{sub.name}</span>
+                                                            </div>
+                                                            <span className={`text-[10px] font-black ${isSelected ? 'text-indigo-300' : 'text-white/40'}`}>+ ₹{sub.price}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="text-right mt-4 lg:mt-0 w-full lg:w-auto">
+                                        <p className="text-white/40 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Total</p>
+                                        <p className="text-4xl font-black text-white italic leading-none">₹{pendingBookingData.price}</p>
+                                        {pendingBookingData.subServices?.length > 0 && (
+                                            <div className="mt-1 text-right">
+                                                <p className="text-white/50 text-[8px] font-black uppercase tracking-widest">
+                                                    Base: ₹{pendingBookingData.baseRate} + Add: ₹{pendingBookingData.subtotalSum}
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Finalize your service request</p>
                                 </div>
-                            </div>
-
-                            <div className="bg-slate-950 p-6 rounded-[2rem] text-white shadow-2xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-500/20 transition-colors duration-1000"></div>
-                                <div className="relative z-10">
-                                    <div className="gap-x-8 flex flex-wrap lg:flex-nowrap justify-between items-start mb-4">
-                                        <div className="w-full lg:w-3/5">
-                                            <p className="text-indigo-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Service Package</p>
-                                            <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
-                                            {pendingBookingData.subServices?.length > 0 ? (
-                                                <div className="flex flex-col gap-2 mt-4 mb-4">
-                                                    <div className="flex justify-between items-center px-4 py-2 bg-emerald-500/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
-                                                        <span>Standard Base Package Active</span>
-                                                        <span>₹{pendingBookingData.baseRate || 199}</span>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="mt-4 mb-4 flex">
-                                                    <span className="px-4 py-2 bg-emerald-500/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md animate-pulse">
-                                                        Base cost will apply if no sub service
-                                                    </span>
-                                                </div>
-                                            )}
-
-                                            <div>
-                                                <p className="text-indigo-400 text-[9px] font-black uppercase tracking-[0.2em] mb-2">Customize Package</p>
-                                                <div className="flex flex-col gap-2">
-                                                    {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => {
-                                                        const isSelected = pendingBookingData.subServices?.includes(sub.name);
-                                                        return (
-                                                            <button 
-                                                                key={sub.name}
-                                                                onClick={(e) => { e.preventDefault(); toggleSubServiceInReview(sub.name); }}
-                                                                className={`flex items-center justify-between p-2.5 rounded-xl border transition-all text-left group ${isSelected ? 'bg-indigo-500/20 border-indigo-500/50 shadow-sm' : 'bg-white/5 border-white/10 hover:border-indigo-400/50 hover:bg-white/10'}`}
-                                                            >
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${isSelected ? 'bg-indigo-500 border-indigo-400' : 'border-white/30'}`}>
-                                                                        {isSelected && <CheckCircle2 className="w-2.5 h-2.5 text-white" />}
-                                                                    </div>
-                                                                    <span className={`text-xs font-bold leading-none ${isSelected ? 'text-white' : 'text-slate-300'}`}>{sub.name}</span>
-                                                                </div>
-                                                                <span className={`text-[10px] font-black ${isSelected ? 'text-indigo-300' : 'text-white/40'}`}>+ ₹{sub.price}</span>
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
+                                <div className="pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div className="flex items-center gap-4 bg-white/5 px-6 py-4 rounded-3xl border border-white/5">
+                                        <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
+                                            <UserCircle className="w-6 h-6" />
                                         </div>
-                                        <div className="text-right mt-4 lg:mt-0 w-full lg:w-auto">
-                                            <p className="text-white/40 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Total</p>
-                                            <p className="text-4xl font-black text-white italic leading-none">₹{pendingBookingData.price}</p>
-                                            {pendingBookingData.subServices?.length > 0 && (
-                                                <div className="mt-1 text-right">
-                                                    <p className="text-white/50 text-[8px] font-black uppercase tracking-widest">
-                                                        Base: ₹{pendingBookingData.baseRate} + Add: ₹{pendingBookingData.subtotalSum}
-                                                    </p>
-                                                </div>
-                                            )}
+                                        <div>
+                                            <p className="text-white/40 text-[8px] uppercase font-black tracking-widest">Selected Expert</p>
+                                            <p className="text-sm font-black uppercase tracking-tight text-white">{pendingBookingData.provider}</p>
                                         </div>
                                     </div>
-                                    <div className="pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                        <div className="flex items-center gap-4 bg-white/5 px-6 py-4 rounded-3xl border border-white/5">
-                                            <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
-                                                <UserCircle className="w-6 h-6" />
-                                            </div>
-                                            <div>
-                                                <p className="text-white/40 text-[8px] uppercase font-black tracking-widest">Selected Expert</p>
-                                                <p className="text-sm font-black uppercase tracking-tight text-white">{pendingBookingData.provider}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-indigo-400 italic">
-                                            <ShieldCheck className="w-5 h-5" /> Secured by PrimeSewa
-                                        </div>
+                                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-indigo-400 italic">
+                                        <ShieldCheck className="w-5 h-5" /> Secured by PrimeSewa
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                 <div>
-                                     <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Select Schedule</p>
-                                     <input required type="date" value={bookingDate} min={getTodayStr()} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-3 bg-slate-50 rounded-2xl text-sm font-bold border border-slate-100 outline-none focus:border-indigo-600 transition-all mb-3 text-slate-700" />
-                                     <div className="grid grid-cols-2 gap-2">
-                                        {availableSlots.map(s => (
-                                            <button key={s.id} onClick={() => !s.isPast && setBookingSlot(s.id)} className={`py-3 rounded-xl text-[9px] font-black uppercase transition-all ${s.isPast ? 'opacity-20 cursor-not-allowed' : bookingSlot === s.id ? 'bg-indigo-600 text-white shadow-md scale-105' : 'bg-white border text-slate-400 hover:border-indigo-200 hover:bg-slate-50'}`}>{s.label}</button>
-                                        ))}
-                                     </div>
-                                 </div>
-
-                                 <div className="space-y-4">
-                                     <div className="flex items-center justify-between">
-                                         <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Service Location</p>
-                                         <button 
-                                            onClick={handleMyLocation} 
-                                            disabled={isLocating}
-                                            className="flex items-center gap-1.5 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-all disabled:opacity-50"
-                                         >
-                                             {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <MapPin className="w-3 h-3" />}
-                                             Use My Location
-                                         </button>
-                                     </div>
-                                     <div className="space-y-2">
-                                         <input placeholder="House No. / Flat Name" value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all text-sm" />
-                                         <input placeholder="Area / Locality / Landmark" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all text-sm" />
-                                     </div>
-                                     
-                                     {bookingCoords && (
-                                         <div className="h-28 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                                             <OSMMap 
-                                                latitude={bookingCoords.lat} 
-                                                longitude={bookingCoords.lon} 
-                                             />
-                                         </div>
-                                     )}
-                                 </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Additional Instructions</p>
-                                <textarea 
-                                    placeholder="Add any specific requirements..." 
-                                    value={bookingComments} 
-                                    onChange={e => setBookingComments(e.target.value)} 
-                                    rows={2}
-                                    className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all min-h-[60px] resize-none text-sm"
-                                />
-                            </div>
-
-                            <button onClick={confirmBooking} disabled={isSubmitting || !bookingSlot || !bookingDate || !bookingArea} className="w-full py-4 bg-slate-900 text-white font-black uppercase text-xs rounded-xl shadow-xl active:scale-95 disabled:opacity-50 hover:bg-indigo-600 transition-all">
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Place Service Request'}
-                            </button>
                         </div>
-                    </div>
-                )}
-            </div>
 
-            {isActivityModalOpen && <ActivityOverviewModal activeBookings={activeBookings} pastBookings={pastBookings} submitRating={submitRating} onClose={() => setIsActivityModalOpen(false)} acceptOffer={acceptOffer} rejectOffer={rejectOffer} openTracking={(id) => { setSelectedBooking(id); setIsActivityModalOpen(false); }} />}
-            {selectedProviderProfile && <ProviderProfileModal p={selectedProviderProfile} onClose={() => setSelectedProviderProfile(null)} handleBook={handleBook} selectedSubServices={selectedSubServices} categoryData={categories.find(c => c.name === selectedCategory)} />}
-            {selectedBooking && <BookingDetailsModal bookingId={selectedBooking} onClose={() => setSelectedBooking(null)} sendNotification={sendNotification} />}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Select Schedule</p>
+                                <input required type="date" value={bookingDate} min={getTodayStr()} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-3 bg-slate-50 rounded-2xl text-sm font-bold border border-slate-100 outline-none focus:border-indigo-600 transition-all mb-3 text-slate-700" />
+                                <div className="grid grid-cols-2 gap-2">
+                                    {availableSlots.map(s => (
+                                        <button key={s.id} onClick={() => !s.isPast && setBookingSlot(s.id)} className={`py-3 rounded-xl text-[9px] font-black uppercase transition-all ${s.isPast ? 'opacity-20 cursor-not-allowed' : bookingSlot === s.id ? 'bg-indigo-600 text-white shadow-md scale-105' : 'bg-white border text-slate-400 hover:border-indigo-200 hover:bg-slate-50'}`}>{s.label}</button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Service Location</p>
+                                    <button
+                                        onClick={handleMyLocation}
+                                        disabled={isLocating}
+                                        className="flex items-center gap-1.5 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-all disabled:opacity-50"
+                                    >
+                                        {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <MapPin className="w-3 h-3" />}
+                                        Use My Location
+                                    </button>
+                                </div>
+                                <div className="space-y-2">
+                                    <input placeholder="House/Flat No." value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all text-xs" />
+                                    <input placeholder="Area/Locality" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all text-xs" />
+                                </div>
+
+                                {bookingCoords && (
+                                    <div className="h-28 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                                        <OSMMap
+                                            latitude={bookingCoords.lat}
+                                            longitude={bookingCoords.lon}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Additional Instructions</p>
+                            <textarea
+                                placeholder="Add any specific requirements..."
+                                value={bookingComments}
+                                onChange={e => setBookingComments(e.target.value)}
+                                rows={2}
+                                className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all min-h-[60px] resize-none text-sm"
+                            />
+                        </div>
+
+                        <button onClick={confirmBooking} disabled={isSubmitting || !bookingSlot || !bookingDate || !bookingArea} className="w-full py-4 bg-slate-900 text-white font-black uppercase text-xs rounded-xl shadow-xl active:scale-95 disabled:opacity-50 hover:bg-indigo-600 transition-all">
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Place Service Request'}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
+
+            { isActivityModalOpen && <ActivityOverviewModal activeBookings={activeBookings} pastBookings={pastBookings} submitRating={submitRating} onClose={() => setIsActivityModalOpen(false)} acceptOffer={acceptOffer} rejectOffer={rejectOffer} openTracking={(id) => { setSelectedBooking(id); setIsActivityModalOpen(false); }} /> }
+    { selectedProviderProfile && <ProviderProfileModal p={selectedProviderProfile} onClose={() => setSelectedProviderProfile(null)} handleBook={handleBook} selectedSubServices={selectedSubServices} categoryData={categories.find(c => c.name === selectedCategory)} /> }
+    { selectedBooking && <BookingDetailsModal bookingId={selectedBooking} onClose={() => setSelectedBooking(null)} /> }
+        </div >
     );
 };
 

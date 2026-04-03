@@ -64,7 +64,7 @@ const LandingPage = () => {
             setCurrentImageIndex((prev) => (prev + 1) % serviceImages.length);
         }, 3000);
         return () => clearInterval(timer);
-    }, []);
+    }, [serviceImages.length]);
 
     useEffect(() => {
         // 1. Listen to Top Rated Active/Online Provider
