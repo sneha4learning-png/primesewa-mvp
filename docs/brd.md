@@ -193,20 +193,16 @@ Clean, data-dense, minimalist UI optimized for desktop monitors. Utilizing stand
 6.  [ ] **Hosting Build:** Run `npm run build`. Configure `firebase.json` to serve `index.html` for all routes (SPA setup).
 10. [ ] **Go Live:** Fire `firebase deploy --only hosting`.
 
----
-
 ## 10. IMPLEMENTED MVP FEATURES (Development Reality)
-
 This section highlights the actual technical and feature decisions made during the MVP development phase:
-*   **Brand Identity:** Integrated the official "PrimeSewa" logo and brand naming consistently across all authentication screens and portal navbars.
-*   **Professional URLs (Flat Routing):** 
-    *   Customer Storefront: ` / ` and `/login`
-    *   Admin System: `/admin` and `/admin/login`
-    *   Provider Portal: `/provider` and `/provider/login`
+*   **Anchor-Based UI Navigation:** Integrated hash fragments (`#service-catalog`, `#top`) with `scroll-mt-28` offsets (via Tailwind) to allow seamless navigation between dashboard sections without page reloads, while accounting for the sticky header height.
+*   **Provider Interaction Design:** Refined the provider card UX by replacing "whole-card" click events with a dedicated **Info (i) icon**, preventing accidental navigation and ensuring explicit user intent when viewing profiles.
+*   **Typography & Visual Accessibility:** Enhanced readability by increasing font sizes from 7px to 10px+ and switching from light-gray (`slate-500`) to high-contrast (`slate-800`) text across all micro-labels on the dashboard.
+*   **Data Integrity & Profile Accuracy:** Implemented logic to prioritize the **Active Auth Session** over potentially stale Firestore data for phone numbers and names, synchronized with a real-time (onSnapshot) booking count tracker in the customer profile.
 *   **Authentication Resiliency:** Implemented Firebase Phone Auth (reCAPTCHA invisible) with a built-in **Dev Mode Fallback** (OTP: 1234, Admin Password: 'admin') to bypass billing restrictions during testing.
 *   **Automated CI/CD:** Defined a `.github/workflows/deploy.yml` pipeline that dynamically injects environment secrets and deploys to Firebase Hosting on every push to the `main` branch.
-*   **Live Tracking Statuses:** Implemented granular tracking for the provider's journey: `enroute` (🚗), `arrived` (📍), and `inprogress` (🔧), providing real-time transparency to the customer.
+*   **Live Journey Tracking:** Implemented granular tracking for the provider's journey: `enroute` (🚗), `arrived` (📍), and `inprogress` (🔧), providing real-time transparency to the customer via the **Activity Hub**.
 *   **Doorstep Detail (House No):** Implemented a mandatory "House / Flat / Floor No" field to supplement general map addresses, displayed prominently to providers in high-contrast badges for zero-confusion navigation.
 *   **Guest Booking Persistence (Session Recovery):** Implemented `sessionStorage` logic to allow guest users to start a booking, redirect to login, and return with all form data (date, time, address, coordinates) pre-filled.
 *   **Analytics Dashboards:** Integrated **Recharts** for visual tracking of booking trends, revenue, and daily earnings across Admin and Provider panels.
-*   **Mock State Management & Deduplication:** Utilized local phone mock auth with intelligent deduplication logic to prioritize real Firebase Auth profiles over pre-filled dev records during the transition phase.
+*   **Map Integration:** Leveraged OpenStreetMap for both coordinate selection during booking and visual tracking on finalized booking details.

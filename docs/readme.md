@@ -1,4 +1,4 @@
-﻿# PrimeSewa MVP
+# PrimeSewa MVP
 
 On-demand home services marketplace — Customer, Provider, and Admin portals.
 
@@ -59,12 +59,15 @@ primesewa-mvp/
 ## Key Features
 
 - **Cross-Portal Navigation**: Seamlessly switch between the customer storefront, provider dashboard, and admin panel with integrated quick links.
-- **Provider Verification Flow**: Enhanced registration requiring identity proofs and work history, creating a trusted marketplace.
+- **Anchor-Based Dashboard Navigation**: Implemented `#service-catalog` and `#top` anchors with `scroll-mt-28` offsets for precise navigation within the Customer Home page.
+- **Provider Card UX Refinement**: Replaced misleading whole-card clicks with a dedicated **Info (i) icon** for accessing provider profiles, preventing accidental modal triggers.
+- **Typography & Accessibility**: Enhanced readability across the customer dashboard with optimized font sizes (10px+), high-contrast colors (slate-800), and improved letter spacing for micro-labels.
+- **Data Synchronization & Accuracy**: Profile page now prioritizes the **Live Auth Session** for phone numbers and names, ensuring and displaying accurate real-time booking counts.
 - **Service Location Integration**: Free coordinate capture using HTML5 Geolocation and **Live Address Autocomplete** via OpenStreetMap Nominatim API.
 - **Precise Doorstep Tracking**: Implementation of a mandatory House/Flat No field with high-visibility provider badges for exact navigation.
 - **Guest Booking Persistence**: Intelligent `sessionStorage` logic that preserves booking details if a guest user is redirected to login mid-flow.
-- **Live Provider Tracking**: Customers can track the real-time arrival status of providers for accepted jobs.
-- **Refined Admin Suite**: Comprehensive operational management featuring consolidated booking histories, icon-driven action tables, and dummy data seeding for demonstrations.
+- **Activity Hub & Live Tracking**: A unified "Activity Hub" for customers to track real-time arrival status and manage booking history in a single, professional interface.
+- **Refined Admin Suite**: Comprehensive operational management featuring consolidated booking histories, icon-driven action tables, and Recharts-powered analytics.
 
 ---
 
