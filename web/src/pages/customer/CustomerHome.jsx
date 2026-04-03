@@ -1,4 +1,4 @@
-// PRIME SEWA DEPLOYMENT TRIGGER: RELIABLE BUILD 2026-04-01-T18:30
+// PRIME SEWA DEPLOYMENT TRIGGER: RELIABLE BUILD 2026-04-03-T13:00
 import { useState, useEffect, useMemo, Component } from 'react';
 import { createPortal } from 'react-dom';
 import OSMMap from '../../components/OSMMap';
@@ -6,7 +6,7 @@ import OSMMap from '../../components/OSMMap';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot, or } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight, TrendingUp, Activity, Clock } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight, TrendingUp, Activity, Clock, Info } from 'lucide-react';
 import { useNotifications } from '../../context/NotificationContext';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 
@@ -1019,7 +1019,14 @@ const CustomerHome = () => {
                                         const hasValidRating = ratingValue > 0 && (p.ratingCount || 0) > 0;
                                         
                                         return (
-                                            <div key={p.id} onClick={() => setSelectedProviderProfile(p)} className="bg-white rounded-2xl border border-slate-100 shadow-md p-4 group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col justify-between border-b-2 hover:border-b-indigo-500">
+                                            <div key={p.id} className="bg-white rounded-2xl border border-slate-100 shadow-md p-4 group hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col justify-between border-b-2 hover:border-b-indigo-500">
+                                                <button 
+                                                    onClick={(e) => { e.stopPropagation(); setSelectedProviderProfile(p); }}
+                                                    className="absolute top-2 right-2 p-1.5 text-slate-300 hover:text-indigo-600 hover:bg-indigo-100 rounded-lg transition-all z-20"
+                                                    title="View Full Profile & Reviews"
+                                                >
+                                                    <Info size={14} />
+                                                </button>
                                                 <div className="relative z-10 flex items-center gap-3 mb-3">
                                                     <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 shrink-0">
                                                         <UserCircle className="w-7 h-7 text-indigo-600" />
