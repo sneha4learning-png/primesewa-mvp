@@ -924,7 +924,7 @@ const CustomerHome = () => {
                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${selectedCategory === cat.name ? 'bg-indigo-600 text-white shadow-lg rotate-3' : 'bg-white border hover:border-indigo-200'}`}>
                                             <cat.icon className="w-5 h-5" />
                                         </div>
-                                        <span className={`text-[7px] font-black uppercase text-center leading-tight tracking-tighter whitespace-nowrap ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-500'}`}>{cat.name}</span>
+                                        <span className={`text-[10px] font-black uppercase text-center leading-tight tracking-wide whitespace-nowrap py-1 ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-800'}`}>{cat.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -937,7 +937,7 @@ const CustomerHome = () => {
                                     <div className="flex items-center justify-between mb-3">
                                         <div>
                                             <h3 className="text-sm font-black text-slate-950 uppercase italic tracking-tighter">{selectedCategory} Packages</h3>
-                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">Select options for price comparison</p>
+                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">Select options for price comparison</p>
                                         </div>
                                         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
                                             <Sparkles className="w-4 h-4" />
@@ -946,10 +946,10 @@ const CustomerHome = () => {
                                     <div className="flex overflow-x-auto pb-4 gap-3 hide-scrollbar snap-x">
                                         {/* Base Plate Highlighter */}
                                         <div className={`shrink-0 w-32 p-3 rounded-2xl border transition-all text-left snap-start ${selectedSubServices.length === 0 ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'bg-white border-slate-100'}`}>
-                                            <p className={`text-[7px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.length === 0 ? 'text-indigo-200' : 'text-slate-400'}`}>Standard</p>
+                                            <p className={`text-[8px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.length === 0 ? 'text-indigo-200' : 'text-slate-600'}`}>Standard</p>
                                             <h4 className={`text-[10px] font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Base Rate</h4>
                                             <div className="flex items-center gap-1 mt-1">
-                                                <span className={`text-[7px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-400'}`}>INCLUDED</span>
+                                                <span className={`text-[8px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-500'}`}>INCLUDED</span>
                                             </div>
                                         </div>
 
@@ -964,7 +964,7 @@ const CustomerHome = () => {
                                                 }}
                                                 className={`shrink-0 w-32 p-3 rounded-2xl border transition-all text-left snap-start group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
                                             >
-                                                <p className={`text-[7px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.includes(sub.name) ? 'text-indigo-200' : 'text-slate-400'}`}>+ Service</p>
+                                                <p className={`text-[8px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.includes(sub.name) ? 'text-indigo-200' : 'text-slate-600'}`}>+ Service</p>
                                                 <h4 className={`text-[10px] font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
                                                 <div className="flex items-center gap-1 mt-1">
                                                     <span className={`text-[8px] font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`}>₹{sub.price}</span>
@@ -977,7 +977,7 @@ const CustomerHome = () => {
                                 <div className="flex flex-col md:flex-row items-center gap-6 px-4">
                                     <div className="flex items-center gap-4 flex-1">
                                         <div className="h-px flex-1 bg-slate-200"></div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Available Specialists</p>
+                                        <p className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Available Specialists</p>
                                         <div className="h-px flex-1 bg-slate-200"></div>
                                     </div>
 
