@@ -10,6 +10,45 @@ import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, In
 import { useNotifications } from '../../context/NotificationContext';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 
+// Helper component for visual history trend
+const HistoryChart = ({ bookings }) => {
+    const data = useMemo(() => {
+        return [...bookings]
+            .filter(b => b.status === 'completed')
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(-6)
+            .map(b => ({
+                label: new Date(b.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                amount: typeof b.price === 'number' ? b.price : parseInt((b.price || '0').toString().replace(/[₹,]/g, '')) || 0
+            }));
+    }, [bookings]);
+
+    if (data.length < 2) return null;
+
+    return (
+        <div className="h-28 w-full mb-6 mt-2">
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                    <defs>
+                        <linearGradient id="colorHistory" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
+                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="label" hide />
+                    <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
+                    <Tooltip 
+                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }} 
+                        formatter={(v) => [`₹${v}`, 'Spent']}
+                    />
+                    <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorHistory)" />
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>
+    );
+};
+
 // Prevents any crash inside CustomerHome from showing a completely blank page
 class ErrorBoundary extends Component {
     constructor(props) { super(props); this.state = { hasError: false, error: null }; }
@@ -441,7 +480,9 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                             <Clock className="w-6 h-6 text-indigo-600" />
                             <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">RECENT HISTORY</h3>
                         </div>
-                        <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar-indigo">
+                        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar-indigo">
+                            <HistoryChart bookings={pastBookings} />
+                            <div className="space-y-6">
                             {pastBookings.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center py-20 opacity-30">
                                     <Clock className="w-12 h-12 mb-4" />
@@ -454,6 +495,7 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                                     ))}
                                 </div>
                             )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -527,7 +569,7 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                                     { key: 'enroute', label: 'En-Route', icon: Navigation },
                                     { key: 'arrived', label: 'Arrived', icon: MapPin },
                                     { key: 'inprogress', label: 'Working', icon: Zap }
-                                ].map((s, idx) => {
+                                ].map((s) => {
                                     const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
                                     const currentLevel = booking.trackingStatus ? statusOrder[booking.trackingStatus] || 0 : 0;
                                     const thisLevel = statusOrder[s.key];
@@ -987,7 +1029,9 @@ const CustomerHome = () => {
                                             <p className="text-[9px] font-black uppercase tracking-widest">History Empty</p>
                                         </div>
                                     ) : (
-                                        <div className="grid grid-cols-1 gap-4 w-full">
+                                        <div className="flex-1 overflow-hidden">
+                                            <HistoryChart bookings={pastBookings} />
+                                            <div className="grid grid-cols-1 gap-4 w-full">
                                             {pastBookings.slice(0, 1).map(b => (
                                                 <div key={b.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-3xl border border-slate-100">
                                                     <div className="flex items-center gap-4">
@@ -1009,7 +1053,8 @@ const CustomerHome = () => {
                                                 Explore All Records
                                             </button>
                                         </div>
-                                    )}
+                                    </div>
+                                )}
                                 </div>
                             </div>
                         )}
