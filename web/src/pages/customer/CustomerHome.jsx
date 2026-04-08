@@ -427,68 +427,92 @@ const HistoryItem = ({ b, submitRating }) => {
 };
 
 const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onClose, acceptOffer, rejectOffer, openTracking }) => {
+    const [activeTab, setActiveTab] = useState(activeBookings.length > 0 ? 'live' : 'history');
+
     return createPortal(
         <div className="fixed inset-0 z-[100000] bg-indigo-950/60 backdrop-blur-3xl flex items-center justify-center p-4 md:p-8" onClick={onClose}>
-            <div className="bg-slate-50 w-full max-w-7xl h-full max-h-[90vh] rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col relative border border-white/20" onClick={e => e.stopPropagation()}>
-                <div className="bg-white px-10 py-8 border-b border-slate-100 flex items-center justify-between shrink-0">
-                    <div>
+            <div className="bg-slate-50 w-full max-w-6xl h-full max-h-[90vh] rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col relative border border-white/20" onClick={e => e.stopPropagation()}>
+                <div className="bg-white px-10 py-8 border-b border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0">
+                    <div className="text-center md:text-left">
                         <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Activity Hub</h2>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Live tracking and member service history</p>
                     </div>
-                    <button onClick={onClose} className="p-4 bg-slate-50 hover:bg-rose-50 hover:text-rose-500 rounded-[2rem] text-slate-400 transition-all active:scale-95">
+
+                    <div className="bg-slate-100 p-1.5 rounded-[2rem] flex items-center gap-1 shadow-inner">
+                        <button 
+                            onClick={() => setActiveTab('live')}
+                            className={`px-8 py-3 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'live' ? 'bg-indigo-600 text-white shadow-xl translate-y-[-1px]' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <div className="flex items-center gap-2">
+                                {activeBookings.length > 0 && <div className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></div>}
+                                Live Tracking
+                            </div>
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('history')}
+                            className={`px-8 py-3 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-indigo-600 text-white shadow-xl translate-y-[-1px]' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            Service Records
+                        </button>
+                    </div>
+
+                    <button onClick={onClose} className="p-4 bg-slate-50 hover:bg-rose-50 hover:text-rose-500 rounded-[2rem] text-slate-400 transition-all active:scale-95 shrink-0 hidden md:block">
                         <XCircle className="w-8 h-8" />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
-                    {/* LEFT: LIVE ACTIVITY BLOCK */}
-                    <div className="w-full md:w-5/12 border-r border-slate-100 flex flex-col bg-slate-50/50 p-8">
+                <div className="flex-1 overflow-hidden relative">
+                    {/* LIVE ACTIVITY VIEW */}
+                    <div className={`absolute inset-0 transition-all duration-700 p-8 flex flex-col ${activeTab === 'live' ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 pointer-events-none'}`}>
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></div>
-                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Live Activity</h3>
+                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Active Bookings</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar-indigo">
                             {activeBookings.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center py-20 opacity-30">
                                     <Activity className="w-12 h-12 mb-4" />
-                                    <p className="text-[11px] font-black uppercase tracking-[0.2em]">No Live Activity</p>
+                                    <p className="text-[11px] font-black uppercase tracking-[0.2em]">No Live Activity Found</p>
+                                    <button onClick={() => setActiveTab('history')} className="mt-6 text-[9px] font-black text-indigo-600 uppercase border-b-2 border-indigo-600 pb-1">View Recent History instead</button>
                                 </div>
                             ) : (
-                                activeBookings.map(b => (
-                                    <div key={b.id} className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 group">
-                                        <div className="flex justify-between items-start mb-6">
-                                            <div className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase rounded-full tracking-widest">{b.status}</div>
-                                            <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
-                                        </div>
-                                        <h4 className="text-2xl font-black text-slate-950 uppercase tracking-tight leading-none mb-3 group-hover:text-indigo-600 transition-colors">{b.service}</h4>
-                                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Hub Partner...'}</p>
-
-                                        {(b.status?.toLowerCase() === 'negotiating') && (b.proposedPrice || b.offerPrice) && (
-                                            <div className="mt-8 p-6 bg-slate-950 rounded-[2rem] border border-white/10 text-white italic shadow-2xl">
-                                                <div className="flex items-center justify-between mb-6">
-                                                    <p className="text-indigo-300 text-[10px] font-black uppercase tracking-widest">Counter Offer</p>
-                                                    <p className="text-3xl font-black">₹{b.proposedPrice || b.offerPrice}</p>
-                                                </div>
-                                                <div className="flex gap-3">
-                                                    <button onClick={() => acceptOffer(b)} className="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg shadow-emerald-500/20">Accept</button>
-                                                    <button onClick={() => rejectOffer(b)} className="flex-1 py-4 bg-white/10 hover:bg-white/20 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all">Decline</button>
-                                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {activeBookings.map(b => (
+                                        <div key={b.id} className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 group">
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase rounded-full tracking-widest">{b.status}</div>
+                                                <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
                                             </div>
-                                        )}
-                                        {b.status === 'accepted' && (
-                                            <button onClick={() => openTracking(b.id)} className="w-full mt-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg shadow-indigo-600/20">Track Specialist</button>
-                                        )}
-                                    </div>
-                                ))
+                                            <h4 className="text-2xl font-black text-slate-950 uppercase tracking-tight leading-none mb-3 group-hover:text-indigo-600 transition-colors">{b.service}</h4>
+                                            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Hub Partner...'}</p>
+
+                                            {(b.status?.toLowerCase() === 'negotiating') && (b.proposedPrice || b.offerPrice) && (
+                                                <div className="mt-8 p-6 bg-slate-950 rounded-[2rem] border border-white/10 text-white italic shadow-2xl">
+                                                    <div className="flex items-center justify-between mb-6">
+                                                        <p className="text-indigo-300 text-[10px] font-black uppercase tracking-widest">Counter Offer</p>
+                                                        <p className="text-3xl font-black">₹{b.proposedPrice || b.offerPrice}</p>
+                                                    </div>
+                                                    <div className="flex gap-3">
+                                                        <button onClick={() => acceptOffer(b)} className="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg shadow-emerald-500/20">Accept</button>
+                                                        <button onClick={() => rejectOffer(b)} className="flex-1 py-4 bg-white/10 hover:bg-white/20 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all">Decline</button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {b.status === 'accepted' && (
+                                                <button onClick={() => openTracking(b.id)} className="w-full mt-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg shadow-indigo-600/20">Track Specialist</button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
 
-                    {/* RIGHT: RECENT HISTORY BLOCK */}
-                    <div className="flex-1 flex flex-col bg-white p-8">
+                    {/* HISTORY VIEW */}
+                    <div className={`absolute inset-0 transition-all duration-700 p-8 flex flex-col ${activeTab === 'history' ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'}`}>
                         <div className="flex items-center gap-3 mb-8">
                             <Clock className="w-6 h-6 text-indigo-600" />
-                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">RECENT HISTORY</h3>
+                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Service History</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar-indigo">
                             <div className="space-y-6">
@@ -498,7 +522,7 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                                     <p className="text-[11px] font-black uppercase tracking-[0.2em]">History is Empty</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 gap-6 w-full">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                                     {pastBookings.map(b => (
                                         <HistoryItem key={b.id} b={b} submitRating={submitRating} />
                                     ))}
