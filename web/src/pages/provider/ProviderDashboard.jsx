@@ -738,7 +738,7 @@ const ProviderDashboardContent = () => {
                                                 />
                                                 <button 
                                                     onClick={() => proposePrice(req)}
-                                                    className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95"
+                                                    className="bg-indigo-600 text-white px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-wider whitespace-nowrap shadow-lg shadow-indigo-600/20 active:scale-95"
                                                 >
                                                     Send Proposal
                                                 </button>
