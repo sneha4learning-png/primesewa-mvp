@@ -6,7 +6,7 @@ import OSMMap from '../../components/OSMMap';
 import { useAuth } from '../../firebase/AuthContext';
 import { db } from '../../firebase/config';
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, serverTimestamp, onSnapshot, or } from 'firebase/firestore';
-import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight, TrendingUp, Activity, Clock, Info } from 'lucide-react';
+import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, IndianRupee, Calendar, Clock as ClockIcon, XCircle, Phone, ShieldCheck, Loader2, Filter, Briefcase, Plus as PlusIcon, UserCircle, Hammer, Paintbrush, Wind, Monitor, Scissors, Bug, PieChart as PieChartIcon, AlertCircle, Truck, ArrowRight, TrendingUp, Activity, Clock, Info, Navigation } from 'lucide-react';
 import { useNotifications } from '../../context/NotificationContext';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 
@@ -502,17 +502,108 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
                     <h1 className="text-3xl font-black italic uppercase tracking-tighter">{booking.service}</h1>
                     <div className="mt-4 px-4 py-1.5 bg-emerald-500 rounded-full inline-block text-[9px] font-black uppercase tracking-widest">{booking.status}</div>
                 </div>
-                <div className="p-10 space-y-8">
-                    <div className="grid grid-cols-2 gap-6 text-sm font-black">
-                        <div>
-                            <p className="text-[9px] text-slate-400 uppercase mb-1">Schedule</p>
-                            <p>{booking.date} at {formatTime(booking.slot)}</p>
+                <div className="p-10 space-y-10">
+                    {/* Real-time Tracking Stepper */}
+                    {['accepted', 'inprogress', 'arrived', 'enroute'].includes(booking.status?.toLowerCase()) && (
+                        <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Service Progress</h3>
+                            </div>
+                            
+                            <div className="relative flex justify-between">
+                                {/* Connector Line */}
+                                <div className="absolute top-5 left-0 w-full h-0.5 bg-slate-100 -z-0"></div>
+                                <div 
+                                    className="absolute top-5 left-0 h-0.5 bg-indigo-500 transition-all duration-1000 -z-0"
+                                    style={{ 
+                                        width: booking.trackingStatus === 'inprogress' ? '100%' : 
+                                               booking.trackingStatus === 'arrived' ? '66%' : 
+                                               booking.trackingStatus === 'enroute' ? '33%' : '0%' 
+                                    }}
+                                ></div>
+
+                                {[
+                                    { key: 'enroute', label: 'En-Route', icon: Navigation },
+                                    { key: 'arrived', label: 'Arrived', icon: MapPin },
+                                    { key: 'inprogress', label: 'Working', icon: Zap }
+                                ].map((s, idx) => {
+                                    const statusOrder = { 'enroute': 1, 'arrived': 2, 'inprogress': 3 };
+                                    const currentLevel = booking.trackingStatus ? statusOrder[booking.trackingStatus] || 0 : 0;
+                                    const thisLevel = statusOrder[s.key];
+                                    const isActive = currentLevel >= thisLevel;
+                                    const isCurrent = booking.trackingStatus === s.key;
+
+                                    return (
+                                        <div key={s.key} className="relative z-10 flex flex-col items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-500 border-4 border-white shadow-xl ${isActive ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-300'}`}>
+                                                <s.icon className={`w-4 h-4 ${isCurrent ? 'animate-bounce' : ''}`} />
+                                            </div>
+                                            <span className={`text-[8px] font-black uppercase tracking-widest ${isActive ? 'text-slate-900' : 'text-slate-300'}`}>{s.label}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {booking.trackingStatus && (
+                                <div className="mt-8 pt-6 border-t border-slate-50 flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                                        <Info className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Live Update</p>
+                                        <p className="text-xs font-bold text-slate-700">
+                                            {booking.trackingStatus === 'enroute' && 'Your specialist is on the way to your location.'}
+                                            {booking.trackingStatus === 'arrived' && 'The professional has arrived at your doorstep.'}
+                                            {booking.trackingStatus === 'inprogress' && 'The service is currently being performed.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <p className="text-[9px] text-slate-400 uppercase mb-1">Total</p>
-                            <p className="text-2xl text-indigo-600">₹{booking.price}</p>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-8">
+                        <div className="bg-white p-6 rounded-[2rem] border border-slate-100">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Service Expert</p>
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <UserCircle className="w-6 h-6" />
+                                </div>
+                                <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">{booking.provider || 'Assigning...'}</h4>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-[2rem] border border-slate-100">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Booking ID</p>
+                            <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest italic">#{booking.id.slice(-8).toUpperCase()}</h4>
                         </div>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-8">
+                        <div>
+                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-2">Schedule Detail</p>
+                            <div className="flex items-center gap-3 text-slate-900">
+                                <Calendar className="w-4 h-4 text-indigo-500" />
+                                <p className="text-sm font-black uppercase tracking-tight">{booking.date} at {formatTime(booking.slot || booking.time)}</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-2">Financial Summary</p>
+                            <p className="text-3xl font-black text-indigo-600 italic tracking-tighter">₹{booking.price}</p>
+                        </div>
+                    </div>
+
+                    {booking.address && (
+                        <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white">
+                            <div className="flex items-start gap-4 mb-4">
+                                <MapPin className="w-5 h-5 text-indigo-400 shrink-0" />
+                                <div>
+                                    <p className="text-[9px] text-indigo-300/50 font-black uppercase tracking-widest mb-1">Service Destination</p>
+                                    <p className="text-sm font-medium leading-relaxed">{booking.address}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>,
