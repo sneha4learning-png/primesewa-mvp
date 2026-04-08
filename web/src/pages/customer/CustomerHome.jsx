@@ -10,41 +10,51 @@ import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, In
 import { useNotifications } from '../../context/NotificationContext';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 
-// Helper component for visual history trend
+// Helper component for visual history trend (Pie Chart Mode)
 const HistoryChart = ({ bookings }) => {
     const data = useMemo(() => {
-        return [...bookings]
-            .filter(b => b.status === 'completed')
-            .sort((a, b) => new Date(a.date) - new Date(b.date))
-            .slice(-6)
-            .map(b => ({
-                label: new Date(b.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                amount: typeof b.price === 'number' ? b.price : parseInt((b.price || '0').toString().replace(/[₹,]/g, '')) || 0
-            }));
+        const catMap = {};
+        bookings.filter(b => b.status === 'completed').forEach(b => {
+            const cat = b.service?.split('(')[0]?.trim() || 'Other';
+            catMap[cat] = (catMap[cat] || 0) + 1;
+        });
+        return Object.entries(catMap).map(([name, value]) => ({ name, value })).slice(0, 5);
     }, [bookings]);
 
-    if (data.length < 2) return null;
+    const COLORS = ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#e0e7ff'];
+
+    if (data.length === 0) return null;
 
     return (
-        <div className="h-28 w-full mb-6 mt-2">
+        <div className="h-32 w-full mb-6 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data}>
-                    <defs>
-                        <linearGradient id="colorHistory" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
-                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                        </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis dataKey="label" hide />
-                    <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
+                <PieChart>
+                    <Pie
+                        data={data}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={30}
+                        outerRadius={45}
+                        paddingAngle={5}
+                        dataKey="value"
+                    >
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(255,255,255,0.2)" strokeWidth={2} />
+                        ))}
+                    </Pie>
                     <Tooltip 
-                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }} 
-                        formatter={(v) => [`₹${v}`, 'Spent']}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontSize: '10px', fontStyle: 'italic', fontWeight: '900' }}
                     />
-                    <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorHistory)" />
-                </AreaChart>
+                </PieChart>
             </ResponsiveContainer>
+            <div className="flex flex-col gap-1 pr-4">
+                {data.map((d, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: COLORS[i % COLORS.length]}}></div>
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter truncate w-16">{d.name}</span>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
@@ -481,7 +491,6 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                             <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">RECENT HISTORY</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar-indigo">
-                            <HistoryChart bookings={pastBookings} />
                             <div className="space-y-6">
                             {pastBookings.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center py-20 opacity-30">
@@ -972,37 +981,36 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        {/* Integrated Activity & History Block on Dashboard */}
+                        {/* Distinct Dashboard Activity Blocks */}
                         {(activeBookings.length > 0 || pastBookings.length > 0) && (
-                            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden flex flex-col md:flex-row transition-all duration-700">
-                                {/* Dashboard Live Activity Side */}
-                                <div className="w-full md:w-5/12 bg-slate-50/50 p-6 border-r border-slate-100">
-                                    <div className="flex items-center justify-between mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-700">
+                                {/* Dashboard Live Activity Card */}
+                                <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl p-8 hover:shadow-indigo-500/5 transition-all overflow-hidden relative">
+                                    <div className="flex items-center justify-between mb-8">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">Live Activity</h3>
+                                            <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                                            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] italic">Active Service</h3>
                                         </div>
-                                        <button onClick={() => setIsActivityModalOpen(true)} className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Full View</button>
+                                        <button onClick={() => setIsActivityModalOpen(true)} className="text-[10px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-4 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Full View</button>
                                     </div>
                                     {activeBookings.length === 0 ? (
-                                        <div className="py-8 flex flex-col items-center justify-center text-center opacity-30">
-                                            <Activity className="w-8 h-8 mb-2" />
-                                            <p className="text-[9px] font-black uppercase tracking-widest">No Live Activity</p>
+                                        <div className="py-20 flex flex-col items-center justify-center text-center opacity-30">
+                                            <Activity className="w-10 h-10 mb-4" />
+                                            <p className="text-[10px] font-black uppercase tracking-widest">No Active Bookings</p>
                                         </div>
                                     ) : (
-                                        <div className="space-y-4">
+                                        <div className="space-y-6">
                                             {activeBookings.slice(0, 1).map(b => (
-                                                <div key={b.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:border-indigo-200 transition-all cursor-pointer" onClick={() => setIsActivityModalOpen(true)}>
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <div className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[8px] font-black uppercase rounded-full">{b.status}</div>
-                                                        <span className="text-[9px] font-bold text-slate-200">#{b.id.slice(-4).toUpperCase()}</span>
+                                                <div key={b.id} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 hover:border-indigo-200 transition-all cursor-pointer group" onClick={() => setIsActivityModalOpen(true)}>
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <div className="px-3 py-1 bg-white text-indigo-600 text-[9px] font-black uppercase rounded-full shadow-sm">{b.status}</div>
+                                                        <span className="text-[10px] font-bold text-slate-200 group-hover:text-indigo-200">#ACTIVE</span>
                                                     </div>
-                                                    <h4 className="text-sm font-black text-slate-950 uppercase tracking-tight leading-none mb-1">{b.service}</h4>
+                                                    <h4 className="text-lg font-black text-slate-950 uppercase tracking-tight leading-none mb-2">{b.service}</h4>
                                                     <div className="flex justify-between items-end">
-                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Partner...'}</p>
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Expert...'}</p>
                                                         {(b.status?.toLowerCase() === 'negotiating') && (b.proposedPrice || b.offerPrice) && (
                                                             <div className="text-right">
-                                                                <p className="text-[7px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">Price Offer</p>
                                                                 <p className="text-xs font-black text-indigo-600 leading-none">₹{b.proposedPrice || b.offerPrice}</p>
                                                             </div>
                                                         )}
@@ -1010,51 +1018,41 @@ const CustomerHome = () => {
                                                 </div>
                                             ))}
                                             {activeBookings.length > 1 && (
-                                                <button onClick={() => setIsActivityModalOpen(true)} className="w-full py-3 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-white rounded-2xl border-2 border-dashed border-indigo-50">
-                                                    + {activeBookings.length - 1} More Active
+                                                <button onClick={() => setIsActivityModalOpen(true)} className="w-full py-4 text-[10px] font-black text-indigo-500 uppercase tracking-widest bg-indigo-50 rounded-2xl border-2 border-dashed border-indigo-100 hover:border-indigo-300 transition-all">
+                                                    + {activeBookings.length - 1} More Activity
                                                 </button>
                                             )}
                                         </div>
                                     )}
                                 </div>
-                                {/* Dashboard History Side */}
-                                <div className="flex-1 p-6 bg-white">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <Clock className="w-4 h-4 text-indigo-600" />
-                                        <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">RECENT HISTORY</h3>
+
+                                {/* Dashboard Analytics & History Card */}
+                                <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl p-8 hover:shadow-indigo-500/5 transition-all flex flex-col">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <Clock className="w-5 h-5 text-indigo-600" />
+                                        <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] italic">Spending Hub</h3>
                                     </div>
                                     {pastBookings.length === 0 ? (
-                                        <div className="py-8 flex flex-col items-center justify-center text-center opacity-30">
-                                            <Clock className="w-8 h-8 mb-2" />
-                                            <p className="text-[9px] font-black uppercase tracking-widest">History Empty</p>
+                                        <div className="py-20 flex flex-col items-center justify-center text-center opacity-30 flex-1">
+                                            <div className="w-20 h-20 rounded-full border-4 border-dashed border-slate-200 mb-4 flex items-center justify-center">
+                                                <PieChartIcon className="w-8 h-8" />
+                                            </div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest">Analytics Ready After First Job</p>
                                         </div>
                                     ) : (
-                                        <div className="flex-1 overflow-hidden">
+                                        <div className="flex-1 flex flex-col">
                                             <HistoryChart bookings={pastBookings} />
-                                            <div className="grid grid-cols-1 gap-4 w-full">
-                                            {pastBookings.slice(0, 1).map(b => (
-                                                <div key={b.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-3xl border border-slate-100">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-                                                            <Briefcase className="w-5 h-5 text-indigo-600" />
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="text-xs font-black text-slate-900 uppercase leading-none mb-1">{b.service}</h4>
-                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{b.date}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-xs font-black text-slate-900 leading-none mb-1">₹{b.price}</p>
-                                                        <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">{b.status}</p>
-                                                    </div>
+                                            <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Spent</p>
+                                                    <p className="text-xl font-black text-slate-900">₹{pastBookings.reduce((sum, b) => sum + (typeof b.price === 'number' ? b.price : parseInt((b.price || '0').toString().replace(/[₹,]/g, '')) || 0), 0)}</p>
                                                 </div>
-                                            ))}
-                                            <button onClick={() => setIsActivityModalOpen(true)} className="w-full py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                                                Explore All Records
-                                            </button>
+                                                <button onClick={() => setIsActivityModalOpen(true)} className="flex items-center gap-2 py-3 px-6 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-900/10">
+                                                    Full History <ArrowRight className="w-3 h-3" />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
                                 </div>
                             </div>
                         )}
