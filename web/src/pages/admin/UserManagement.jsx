@@ -31,8 +31,7 @@ const UserManagement = () => {
                     allBookingsListFull.push({ id: doc.id, ...b });
                 });
 
-                const sortedAll = allBookingsListFull.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-                const allBookingsList = sortedAll.slice(0, 5);
+                const allBookingsList = allBookingsListFull.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
                 allBookingsList.forEach(b => {
                     if (b.customer) bookingCounts[b.customer] = (bookingCounts[b.customer] || 0) + 1;

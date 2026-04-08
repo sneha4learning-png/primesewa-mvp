@@ -28,12 +28,7 @@ const BookingMonitoring = () => {
         const unsubscribe = onSnapshot(collection(db, 'bookings'), (snapshot) => {
             const allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // ENFORCE PRODUCTION FILTRATION: Automatically hide bookings from mock providers (Anjali, Rajesh, etc.)
-            const mockProviderNames = ["anjali premium beauty", "rajesh grooming studio", "test provider", "ace service partner", "new provider"].map(n => n.toLowerCase());
-            const filteredAll = allBookings.filter(b => {
-                const pName = (b.provider || '').toLowerCase().trim();
-                return !mockProviderNames.includes(pName);
-            });
+            const filteredAll = allBookings;
 
             // Sort by createdAt timestamp descending — newest booking appears first
             const sorted = filteredAll.sort((a, b) => {
@@ -42,8 +37,8 @@ const BookingMonitoring = () => {
                 return tsB - tsA; // descending: newest first
             });
 
-            // USER REQUEST: ONLY 5 BOOKINGS FOR DEMO PURPOSES
-            setBookings(sorted.slice(0, 5));
+            // SORT BY CREATED AT TIMESTAMP DESCENDING: Newest bookings appear at the top
+            setBookings(sorted);
             setIsLoading(false);
         }, (err) => {
             console.error('Bookings listener error:', err);
@@ -74,9 +69,13 @@ const BookingMonitoring = () => {
             const today = new Date();
             const targetDate = new Date();
             if (filterDate === 'Yesterday') targetDate.setDate(today.getDate() - 1);
-            if (filterDate === 'Tomorrow') targetDate.setDate(today.getDate() + 1);
+            else if (filterDate === 'Tomorrow') targetDate.setDate(today.getDate() + 1);
+            else if (filterDate === 'Today') { /* targetDate is already today */ }
 
-            const targetDateStr = targetDate.toISOString().split('T')[0];
+            // Use local date string YYYY-MM-DD instead of UTC to avoid timezone shifts
+            const offset = targetDate.getTimezoneOffset();
+            const localDate = new Date(targetDate.getTime() - (offset * 60 * 1000));
+            const targetDateStr = localDate.toISOString().split('T')[0];
             matchesDate = (b.date || '').includes(targetDateStr);
         }
 
