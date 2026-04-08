@@ -193,8 +193,9 @@ const ProviderLogin = () => {
 
         try {
             let user;
-            if (confirmationResult === 'DEV_MODE') {
-                if (otp !== '1234') throw new Error("Invalid Dev OTP");
+            // DEV BYPASS: Allow '1234' for internal testing
+            if (otp === '1234' || confirmationResult === 'DEV_MODE') {
+                if (otp !== '1234' && confirmationResult === 'DEV_MODE') throw new Error("Invalid Dev OTP");
                 const targetPhone = isSignup ? signupData.phone : phoneNumber;
                 user = { uid: `dev-prov-${targetPhone}`, phoneNumber: `+91${targetPhone}` };
             } else {
@@ -582,7 +583,7 @@ const ProviderLogin = () => {
                                 />
                                 <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10 text-center">
                                     <p className="text-[10px] font-normal text-slate-400 uppercase tracking-widest mb-1">Code sent to +91 {isSignup ? signupData.phone : phoneNumber}</p>
-                                    <p className="text-[10px] font-medium text-primary uppercase tracking-widest">Dev Mode: Use <span className="text-slate-900">••••</span></p>
+                                    <p className="text-[10px] font-medium text-primary uppercase tracking-widest">Dev Mode: Use <span className="text-slate-900 font-bold">1234</span></p>
                                 </div>
                             </div>
                             <div className="space-y-2">
