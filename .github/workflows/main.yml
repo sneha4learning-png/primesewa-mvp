@@ -72,5 +72,4 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          npx firebase-tools deploy --only hosting --project primeseva-mvp --token "$FIREBASE_TOKEN"
-
+          npx firebase-tools deploy --project primeseva-mvp --token "$FIREBASE_TOKEN"
