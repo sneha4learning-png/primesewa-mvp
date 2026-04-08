@@ -194,6 +194,7 @@ const getServiceImage = (category = '') => {
     if (cat.includes('pest')) return "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?w=800&q=80";
     if (cat.includes('mover') || cat.includes('pack')) return "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=800&q=80";
     if (cat.includes('appliance')) return "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80";
+    if (cat.includes('handyman') || cat.includes('repair')) return "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=800&q=80";
     return "https://images.unsplash.com/photo-1542013936693-884638332954?w=800&q=80";
 };
 
@@ -723,7 +724,8 @@ const CustomerHome = () => {
         "https://images.unsplash.com/photo-1589939705384-5185138a04b9?q=80&w=2070", // Painting
         "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=2070", // Packers & Movers
         "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?q=80&w=2070", // Pest Control
-        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070"  // Appliance Repair
+        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070", // Appliance Repair
+        "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?q=80&w=2070"  // Handyman
     ], []);
 
     useEffect(() => {

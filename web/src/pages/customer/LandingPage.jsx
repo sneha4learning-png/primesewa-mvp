@@ -56,7 +56,8 @@ const LandingPage = () => {
         "https://images.unsplash.com/photo-1589939705384-5185138a04b9?q=80&w=2070", // Painting
         "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=2070", // Packers & Movers
         "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?q=80&w=2070", // Pest Control
-        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070"  // Appliance Repair
+        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070", // Appliance Repair
+        "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?q=80&w=2070"  // Handyman
     ];
 
     useEffect(() => {
@@ -180,7 +181,7 @@ const LandingPage = () => {
                                 <img
                                     key={idx}
                                     src={img}
-                                    alt="Professional Handyman"
+                                    alt="Professional Home Service"
                                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-60' : 'opacity-0'}`}
                                 />
                             ))}
