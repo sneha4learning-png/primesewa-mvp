@@ -7,22 +7,29 @@ import { doc, getDoc } from 'firebase/firestore';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState(null);
-    const [userData, setUserData] = useState(null); // Role info and details from Firestore
+    const [currentUser, setCurrentUser] = useState(() => {
+        try {
+            const saved = localStorage.getItem('ps_user');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            console.error("Local storage hydration error:", e);
+            return null;
+        }
+    });
+
+    const [userData, setUserData] = useState(() => {
+        try {
+            const saved = localStorage.getItem('ps_userData');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            console.error("Local storage hydration error:", e);
+            return null;
+        }
+    });
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Hydrate from localStorage for mock/dev users first
-        const savedUser = localStorage.getItem('ps_user');
-        const savedData = localStorage.getItem('ps_userData');
-        if (savedUser && savedData) {
-            try {
-                setCurrentUser(JSON.parse(savedUser));
-                setUserData(JSON.parse(savedData));
-            } catch (e) {
-                console.error("Failed to parse saved auth", e);
-            }
-        }
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -86,6 +93,7 @@ export const AuthProvider = ({ children }) => {
             } else {
                 // Only clear if we don't have a fake dev-mode user (which isn't in firebase auth)
                 try {
+                    const savedUser = localStorage.getItem('ps_user');
                     const savedUserObj = savedUser ? JSON.parse(savedUser) : null;
                     if (!savedUserObj || (!savedUserObj.uid?.startsWith('dev-') && !savedUserObj.uid?.startsWith('mock-'))) {
                         setCurrentUser(null);

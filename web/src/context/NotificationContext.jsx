@@ -1,4 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase/config';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, limit, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
