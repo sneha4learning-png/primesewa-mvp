@@ -414,11 +414,11 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                                         <h4 className="text-2xl font-black text-slate-950 uppercase tracking-tight leading-none mb-3 group-hover:text-indigo-600 transition-colors">{b.service}</h4>
                                         <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Hub Partner...'}</p>
 
-                                        {(b.status === 'Negotiating' || b.status === 'negotiating') && b.offerPrice && (
+                                        {(b.status?.toLowerCase() === 'negotiating') && (b.proposedPrice || b.offerPrice) && (
                                             <div className="mt-8 p-6 bg-slate-950 rounded-[2rem] border border-white/10 text-white italic shadow-2xl">
                                                 <div className="flex items-center justify-between mb-6">
                                                     <p className="text-indigo-300 text-[10px] font-black uppercase tracking-widest">Counter Offer</p>
-                                                    <p className="text-3xl font-black">₹{b.offerPrice}</p>
+                                                    <p className="text-3xl font-black">₹{b.proposedPrice || b.offerPrice}</p>
                                                 </div>
                                                 <div className="flex gap-3">
                                                     <button onClick={() => acceptOffer(b)} className="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg shadow-emerald-500/20">Accept</button>
@@ -716,15 +716,21 @@ const CustomerHome = () => {
     };
 
     const acceptOffer = async (booking) => {
+        const finalPrice = booking.proposedPrice || booking.offerPrice || booking.price;
         try {
-            await updateDoc(doc(db, 'bookings', booking.id), { status: 'accepted', price: booking.offerPrice, offerPrice: null });
+            await updateDoc(doc(db, 'bookings', booking.id), { 
+                status: 'accepted', 
+                price: finalPrice, 
+                proposedPrice: null,
+                offerPrice: null 
+            });
             sendNotification('admin', 'Offer Accepted', `Accepted for ${booking.service}.`, 'success');
         } catch (e) { console.error(e); }
     };
 
     const rejectOffer = async (booking) => {
         try {
-            await updateDoc(doc(db, 'bookings', booking.id), { status: 'rejected', offerPrice: null });
+            await updateDoc(doc(db, 'bookings', booking.id), { status: 'rejected', proposedPrice: null, offerPrice: null });
         } catch (e) { console.error(e); }
     };
 
@@ -859,7 +865,15 @@ const CustomerHome = () => {
                                                         <span className="text-[9px] font-bold text-slate-200">#{b.id.slice(-4).toUpperCase()}</span>
                                                     </div>
                                                     <h4 className="text-sm font-black text-slate-950 uppercase tracking-tight leading-none mb-1">{b.service}</h4>
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Partner...'}</p>
+                                                    <div className="flex justify-between items-end">
+                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Partner...'}</p>
+                                                        {(b.status?.toLowerCase() === 'negotiating') && (b.proposedPrice || b.offerPrice) && (
+                                                            <div className="text-right">
+                                                                <p className="text-[7px] font-black text-indigo-500 uppercase tracking-widest leading-none mb-1">Price Offer</p>
+                                                                <p className="text-xs font-black text-indigo-600 leading-none">₹{b.proposedPrice || b.offerPrice}</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             ))}
                                             {activeBookings.length > 1 && (
