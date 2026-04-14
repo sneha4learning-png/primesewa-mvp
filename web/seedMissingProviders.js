@@ -17,7 +17,7 @@ const categories = [
     { 
         name: 'Plumbing', price: '₹399/hr',
         portfolio: [
-            "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=500&q=80",
+            "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&q=80",
             "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&q=80",
             "https://images.unsplash.com/photo-1607472583893-edb999c15597?w=500&q=80"
         ]
@@ -33,9 +33,9 @@ const categories = [
     { 
         name: 'Cleaning', price: '₹299/hr',
         portfolio: [
-            "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&q=80",
-            "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=500&q=80",
-            "https://images.unsplash.com/photo-1528740561666-dc2479dc08ab?w=500&q=80"
+            "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=500&q=80",
+            "https://images.unsplash.com/photo-1527515545081-5db817172677?w=500&q=80",
+            "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=500&q=80"
         ]
     },
     { 
@@ -65,7 +65,7 @@ const categories = [
     { 
         name: 'Appliance Repair', price: '₹549/hr',
         portfolio: [
-            "https://images.unsplash.com/photo-1574269908961-cf57e35e2a0c?w=500&q=80",
+            "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500&q=80",
             "https://images.unsplash.com/photo-1611323160547-e1d1c6f8aec8?w=500&q=80",
             "https://images.unsplash.com/photo-1607189735742-b25c75035e5d?w=500&q=80"
         ]
@@ -81,7 +81,7 @@ const categories = [
     { 
         name: 'Pest Control', price: '₹799/hr',
         portfolio: [
-            "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=500&q=80",
+            "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?w=500&q=80",
             "https://images.unsplash.com/photo-1591370874773-6702e8f12fd8?w=500&q=80",
             "https://images.unsplash.com/photo-1626897505254-e0f811aa9bf7?w=500&q=80"
         ]
@@ -89,15 +89,15 @@ const categories = [
     { 
         name: 'Salon & Beauty', price: '₹899/hr',
         portfolio: [
-            "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=500&q=80",
             "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500&q=80",
+            "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=500&q=80",
             "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=500&q=80"
         ]
     },
     { 
         name: 'Packers & Movers', price: '₹1499/job',
         portfolio: [
-            "https://images.unsplash.com/photo-1600518464441-9154a4dba221?w=500&q=80",
+            "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=500&q=80",
             "https://images.unsplash.com/photo-1530124560677-bda8ca47af7e?w=500&q=80",
             "https://images.unsplash.com/photo-1494891848038-7bd202a2afeb?w=500&q=80"
         ]

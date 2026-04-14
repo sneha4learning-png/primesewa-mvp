@@ -189,13 +189,13 @@ const getServiceImage = (category = '') => {
     if (cat.includes('clean')) return "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80";
     if (cat.includes('carpent')) return "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=800&q=80";
     if (cat.includes('salon') || cat.includes('beauty')) return "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80";
-    if (cat.includes('ac')) return "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=800&q=80";
+    if (cat.includes('ac')) return "https://images.unsplash.com/photo-1621905252507-b352175d2f24?w=800&q=80";
     if (cat.includes('paint')) return "https://images.unsplash.com/photo-1589939705384-5185138a04b9?w=800&q=80";
     if (cat.includes('pest')) return "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?w=800&q=80";
     if (cat.includes('mover') || cat.includes('pack')) return "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=800&q=80";
     if (cat.includes('appliance')) return "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80";
     if (cat.includes('handyman') || cat.includes('repair')) return "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=800&q=80";
-    return "https://images.unsplash.com/photo-1542013936693-884638332954?w=800&q=80";
+    return "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80"; // Professional House/Modern Interior Fallback
 };
 
 const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = [], categoryData }) => {
@@ -720,13 +720,18 @@ const CustomerHome = () => {
         "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070", // Cleaning
         "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070", // Carpentry
         "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070", // Salon
-        "https://images.unsplash.com/photo-1563453392212-326f5e854473?q=80&w=2070", // AC Repair
+        "https://images.unsplash.com/photo-1621905252507-b352175d2f24?q=80&w=2070", // AC Repair
         "https://images.unsplash.com/photo-1589939705384-5185138a04b9?q=80&w=2070", // Painting
         "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=2070", // Packers & Movers
         "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?q=80&w=2070", // Pest Control
         "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070", // Appliance Repair
         "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?q=80&w=2070"  // Handyman
     ], []);
+
+    const activeBackgroundImage = useMemo(() => {
+        if (!selectedCategory) return serviceImages[currentImageIndex];
+        return getServiceImage(selectedCategory).replace('w=800', 'w=2070');
+    }, [selectedCategory, currentImageIndex, serviceImages]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -942,11 +947,9 @@ const CustomerHome = () => {
     return (
         <div className="min-h-screen relative overflow-x-hidden pt-6">
             <div className="fixed inset-0 z-0 pointer-events-none">
-                {serviceImages.map((img, idx) => (
-                    <div key={idx} className={`absolute inset-0 transition-opacity duration-[2000ms] ease-in-out ${idx === currentImageIndex ? 'opacity-20' : 'opacity-0'}`}>
-                        <img src={img} alt="Service" className="w-full h-full object-cover" />
-                    </div>
-                ))}
+                <div className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out">
+                    <img src={activeBackgroundImage} alt="Service" className="w-full h-full object-cover" />
+                </div>
                 <div className="absolute inset-0 bg-linear-to-b from-slate-50 via-slate-100/30 to-slate-200/40"></div>
             </div>
 

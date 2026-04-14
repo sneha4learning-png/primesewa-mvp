@@ -9,7 +9,7 @@ const serviceImages = [
     "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070", // Cleaning
     "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070", // Carpentry
     "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070", // Salon
-    "https://images.unsplash.com/photo-1563453392212-326f5e854473?q=80&w=2070", // AC Repair
+    "https://images.unsplash.com/photo-1621905252507-b352175d2f24?q=80&w=2070", // AC Repair
     "https://images.unsplash.com/photo-1589939705384-5185138a04b9?q=80&w=2070", // Painting
     "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=2070", // Packers & Movers
     "https://images.unsplash.com/photo-1587393855524-087f83d95bc9?q=80&w=2070", // Pest Control
