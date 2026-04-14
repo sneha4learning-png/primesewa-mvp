@@ -4,9 +4,9 @@ import { useAuth } from '../../firebase/AuthContext';
 import { Lock, ShieldAlert, ArrowRight, ShieldCheck } from 'lucide-react';
 
 const serviceImages = [
-    "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=2070", // Plumbing
+    "https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070", // Plumbing
     "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070", // Electrical
-    "https://images.unsplash.com/photo-1527515545081-5db817172677?q=80&w=2070", // Cleaning
+    "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070", // Cleaning
     "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070", // Carpentry
     "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070", // Salon
     "https://images.unsplash.com/photo-1621905252507-b352175d2f24?q=80&w=2070", // AC Repair
