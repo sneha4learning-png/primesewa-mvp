@@ -47,9 +47,9 @@ const LandingPage = () => {
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const serviceImages = [
-        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070", // Plumbing
+        "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=2070", // Plumbing
         "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2070", // Electrical
-        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070", // Cleaning
+        "https://images.unsplash.com/photo-1527515545081-5db817172677?q=80&w=2070", // Cleaning
         "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=2070", // Carpentry
         "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=2070", // Salon
         "https://images.unsplash.com/photo-1621905252507-b352175d2f24?q=80&w=2070", // AC Repair
@@ -59,6 +59,23 @@ const LandingPage = () => {
         "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=2070", // Appliance Repair
         "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?q=80&w=2070"  // Handyman
     ];
+
+    const getCategoryIndex = (catName = '') => {
+        const cat = String(catName).toLowerCase();
+        if (cat.includes('plumb')) return 0;
+        if (cat.includes('electri')) return 1;
+        if (cat.includes('clean')) return 2;
+        if (cat.includes('carpent')) return 3;
+        if (cat.includes('salon') || cat.includes('beauty')) return 4;
+        if (cat.includes('ac')) return 5;
+        if (cat.includes('paint')) return 6;
+        if (cat.includes('pack') || cat.includes('mover')) return 7;
+        if (cat.includes('pest')) return 8;
+        if (cat.includes('appliance')) return 9;
+        return 10; // Handyman/Repair fallback
+    };
+
+    const activeImageIndex = providerDetails ? getCategoryIndex(providerDetails.category) : currentImageIndex;
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -182,7 +199,8 @@ const LandingPage = () => {
                                     key={idx}
                                     src={img}
                                     alt="Professional Home Service"
-                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === currentImageIndex ? 'opacity-60' : 'opacity-0'}`}
+                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2070"; }}
+                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === activeImageIndex ? 'opacity-60' : 'opacity-0'}`}
                                 />
                             ))}
                             <div className="absolute top-6 right-6 flex gap-2 z-20">
