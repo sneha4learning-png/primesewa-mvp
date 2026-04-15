@@ -950,7 +950,7 @@ const CustomerHome = () => {
                 <div className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out">
                     <img src={activeBackgroundImage} alt="Service" className="w-full h-full object-cover" />
                 </div>
-                <div className="absolute inset-0 bg-linear-to-b from-slate-50 via-slate-100/30 to-slate-200/40"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-50/60 via-slate-50/95 to-white"></div>
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 flex flex-col gap-6">
