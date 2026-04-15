@@ -225,7 +225,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = []
     const price = String(p.price || '499');
     const portfolio = Array.isArray(p.portfolio) ? p.portfolio : [];
 
-    const rawPrice = parseInt(price.replace(/\D/g, '') || '0');
+    const rawPrice = parseInt(price.replace(/\D/g, '') || '0') || 0;
     const baseRate = Math.min(rawPrice > 0 ? rawPrice : 149, 199);
     let subtotalSum = 0;
     if (categoryData && selectedSubServices.length > 0) {
@@ -233,7 +233,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = []
             const subObj = categoryData.subServices?.find(ss => ss.name === sName);
             if (subObj) {
                 // Provider-specific variance based on ID for demo purposes, or actual subServicePrices if available
-                const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35;
+                const variance = (parseInt(String(p.id || '').slice(-3), 16) || 0) % 15 * 5 - 35;
                 const providerPrice = p.subServicePrices?.[sName] || Math.max(subObj.price + variance, 49);
                 subtotalSum += providerPrice;
             }
@@ -314,7 +314,7 @@ const ProviderProfileModal = ({ p, onClose, handleBook, selectedSubServices = []
                                 </div>
                                 {selectedSubServices.map(sName => {
                                     const subObj = categoryData?.subServices?.find(ss => ss.name === sName);
-                                    const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35;
+                                    const variance = (parseInt(String(p.id || '').slice(-3), 16) || 0) % 15 * 5 - 35;
                                     const subPrice = p.subServicePrices?.[sName] || Math.max((subObj?.price || 0) + variance, 49);
                                     return (
                                         <div key={sName} className="flex justify-between items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">
@@ -804,7 +804,7 @@ const CustomerHome = () => {
 
     const handleBook = (provider) => {
         console.log('Final Selection to Modal:', { cat: selectedCategory, sub: selectedSubServices });
-        const base = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')), 199);
+        const base = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')) || 149, 199);
 
         // Calculate sub-services total if any selected
         const categoryData = categories.find(c => c.name === selectedCategory);
@@ -1176,7 +1176,7 @@ const CustomerHome = () => {
 
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-2 pb-10">
                                     {displayedProviders.map(p => {
-                                        const rawPrice = parseInt(String(p.price || '149').replace(/\D/g, ''));
+                                        const rawPrice = parseInt(String(p.price || '149').replace(/\D/g, '')) || 149;
                                         const baseRate = Math.min(rawPrice, 199);
                                         const categoryData = categories.find(c => c.name === selectedCategory);
                                         let subtotalSum = 0;
@@ -1184,7 +1184,7 @@ const CustomerHome = () => {
                                             selectedSubServices.forEach(sName => {
                                                 const subObj = categoryData.subServices?.find(ss => ss.name === sName);
                                                 if (subObj) {
-                                                    const variance = (parseInt(String(p.id).slice(-3), 16) % 15) * 5 - 35;
+                                                    const variance = (parseInt(String(p.id || '').slice(-3), 16) || 0) % 15 * 5 - 35;
                                                     const providerPrice = p.subServicePrices?.[sName] || Math.max(subObj.price + variance, 49);
                                                     subtotalSum += providerPrice;
                                                 }
