@@ -35,7 +35,7 @@ export default function BookingDetails() {
             <div className="text-center">
                 <XCircle className="w-16 h-16 text-rose-500 mx-auto mb-6" />
                 <h2 className="text-2xl font-black text-slate-900">Booking Not Found</h2>
-                <button onClick={() => navigate('/dashboard')} className="mt-6 px-8 py-3 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-950 transition-all">Back to Dashboard</button>
+                <button onClick={() => navigate('/dashboard')} className="mt-6 px-8 py-3 brand-gradient text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:shadow-lg hover:shadow-indigo-600/30 transition-all">Back to Dashboard</button>
             </div>
         </div>
     );
@@ -212,8 +212,8 @@ export default function BookingDetails() {
                         )}
 
                         <div className="pt-8 text-center border-t border-slate-100">
-                            <div className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 rounded-2xl">
-                                <ShieldCheck className="w-4 h-4 text-indigo-400" />
+                            <div className="inline-flex items-center gap-2 px-6 py-3 brand-gradient rounded-2xl shadow-lg shadow-indigo-600/20">
+                                <ShieldCheck className="w-4 h-4 text-white" />
                                 <p className="text-[9px] font-black text-white uppercase tracking-widest">PrimeSewa Security Covered</p>
                             </div>
                         </div>

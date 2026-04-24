@@ -378,7 +378,7 @@ const CommissionDashboard = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             {p.status === 'pending' && (
-                                                <button onClick={() => markAsPaid(p.id)} className="px-3 py-1.5 bg-slate-900 text-white text-[10px] uppercase tracking-widest rounded-lg hover:bg-black transition-all">
+                                                <button onClick={() => markAsPaid(p.id)} className="px-3 py-1.5 brand-gradient text-white text-[10px] uppercase tracking-widest rounded-lg hover:shadow-lg hover:shadow-indigo-600/20 transition-all">
                                                     Process Payment
                                                 </button>
                                             )}

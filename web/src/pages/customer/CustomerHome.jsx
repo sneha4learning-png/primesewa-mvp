@@ -729,9 +729,8 @@ const CustomerHome = () => {
     ];
 
     const activeBackgroundImage = useMemo(() => {
-        if (!selectedCategory) return serviceImages[currentImageIndex];
-        return getServiceImage(selectedCategory).replace('w=800', 'w=2070');
-    }, [selectedCategory, currentImageIndex, serviceImages]);
+        return serviceImages[currentImageIndex];
+    }, [currentImageIndex, serviceImages]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -954,7 +953,7 @@ const CustomerHome = () => {
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 flex flex-col gap-6">
-                <div id="top" className={`relative overflow-hidden rounded-[2rem] shadow-xl transition-all duration-700 scroll-mt-28 ${!userData?.uid ? 'bg-slate-950/95 backdrop-blur-xl p-8 text-white border border-white/10' : 'bg-white/80 backdrop-blur-xl p-6 border border-white shadow-slate-200/50'}`}>
+                <div id="top" className={`relative overflow-hidden rounded-[2rem] shadow-xl transition-all duration-700 scroll-mt-28 ${!userData?.uid ? 'brand-gradient p-8 text-white border border-white/10' : 'bg-white/80 backdrop-blur-xl p-6 border border-white shadow-slate-200/50'}`}>
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-4">
                             <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-10 h-10 bg-white p-2 rounded-xl shadow-md ring-1 ring-slate-100/50" />
@@ -965,7 +964,7 @@ const CustomerHome = () => {
                                 <p className={`mt-1 text-[9px] font-bold tracking-widest uppercase ${!userData?.uid ? 'text-indigo-300' : 'text-indigo-600/70'}`}>Ahmedabad's Elite Home Service Network</p>
                             </div>
                         </div>
-                        <div className={`relative flex-1 max-w-md w-full flex items-center shadow-sm rounded-xl border transition-all focus-within:ring-4 focus-within:ring-indigo-500/10 duration-300 ${!userData?.uid ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200 focus-within:border-indigo-300 hover:border-indigo-200'}`}>
+                        <div className={`relative flex-1 max-w-md w-full flex items-center shadow-sm rounded-xl border transition-all focus-within:ring-4 focus-within:ring-indigo-500/10 duration-300 ${!userData?.uid ? 'bg-white/10 border-white/10' : 'bg-white border-slate-200 focus-within:border-indigo-300 hover:border-indigo-200'}`}>
                             <Search className={`w-4 h-4 ml-4 mr-2 ${!userData?.uid ? 'text-indigo-400' : 'text-indigo-500'}`} />
                             <input type="text" placeholder="Search services..." className={`flex-1 py-2.5 pr-4 font-semibold outline-none bg-transparent text-xs ${!userData?.uid ? 'text-white placeholder:text-slate-500' : 'text-slate-800 placeholder:text-slate-400'}`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                         </div>
@@ -1113,7 +1112,7 @@ const CustomerHome = () => {
                                 <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-5 border border-white/20 shadow-xl animate-in fade-in slide-in-from-top-4 duration-700">
                                     <div className="flex items-center justify-between mb-3">
                                         <div>
-                                            <h3 className="text-sm font-black text-slate-950 uppercase italic tracking-tighter">{selectedCategory} Packages</h3>
+                                            <h3 className="text-sm font-black text-indigo-950 uppercase italic tracking-tighter">{selectedCategory} Packages</h3>
                                             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">Select options for price comparison</p>
                                         </div>
                                         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
@@ -1209,7 +1208,7 @@ const CustomerHome = () => {
                                                         <UserCircle className="w-7 h-7 text-indigo-600" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="text-xs font-black text-slate-950 truncate uppercase leading-none mb-1">{p.name || 'Specialist'}</h4>
+                                                        <h4 className="text-xs font-black text-indigo-950 truncate uppercase leading-none mb-1">{p.name || 'Specialist'}</h4>
                                                         <div className="flex items-center gap-1.5">
                                                             <Star className="w-2 h-2 text-amber-500 fill-current" />
                                                             <span className="text-[9px] font-black text-slate-900">{hasValidRating ? ratingValue.toFixed(1) : 'NEW'}</span>
@@ -1220,9 +1219,9 @@ const CustomerHome = () => {
                                                 <div className="flex items-end justify-between pt-2 border-t border-slate-50">
                                                     <div>
                                                         <p className="text-[7px] font-black text-indigo-500 uppercase tracking-widest">Total Cost</p>
-                                                        <p className="text-sm font-black text-slate-950">₹{currentTotalDisplay}</p>
+                                                        <p className="text-sm font-black text-indigo-950">₹{currentTotalDisplay}</p>
                                                     </div>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-7 px-3 bg-slate-950 text-white rounded-lg text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all">
+                                                    <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-7 px-3 brand-gradient text-white rounded-lg text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all">
                                                         Book
                                                     </button>
                                                 </div>
@@ -1354,7 +1353,7 @@ const CustomerHome = () => {
                             </div>
                         </div>
 
-                        <div className="bg-slate-950 p-6 rounded-[2rem] text-white shadow-2xl relative overflow-hidden group">
+                        <div className="brand-gradient p-6 rounded-[2rem] text-white shadow-2xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-500/20 transition-colors duration-1000"></div>
                             <div className="relative z-10">
                                 <div className="gap-x-8 flex flex-wrap lg:flex-nowrap justify-between items-start mb-4">

@@ -338,7 +338,7 @@ const ProviderLogin = () => {
                         <img src={img} alt="Background" className="w-full h-full object-cover mix-blend-overlay" />
                     </div>
                 ))}
-                <div className="absolute inset-0 bg-linear-to-b from-indigo-900/20 via-indigo-950/40 to-indigo-950/60 transition-colors duration-1000"></div>
+                <div className="absolute inset-0 bg-linear-to-b from-indigo-600/20 via-indigo-800/40 to-violet-900/60 transition-colors duration-1000"></div>
                 <div className="absolute inset-0 mesh-gradient opacity-30 mix-blend-soft-light"></div>
             </div>
 

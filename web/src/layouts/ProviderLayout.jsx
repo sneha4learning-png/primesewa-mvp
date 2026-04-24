@@ -111,15 +111,15 @@ const ProviderLayout = () => {
     return (
         <div className="flex h-screen bg-[#F8FAFC]">
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-72 bg-gradient-to-br from-indigo-950 to-violet-950 border-r border-white/10 flex-col relative overflow-hidden">
+            <aside className="hidden lg:flex w-72 brand-gradient border-r border-white/10 flex-col relative overflow-hidden">
                 {renderSidebarInner()}
             </aside>
 
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div className="lg:hidden fixed inset-0 z-50 flex">
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-                    <aside className="relative w-72 bg-gradient-to-br from-indigo-950 to-violet-950 flex flex-col overflow-hidden z-10">
+                    <div className="fixed inset-0 bg-indigo-950/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+                    <aside className="relative w-72 brand-gradient flex flex-col overflow-hidden z-10">
                         {renderSidebarInner()}
                     </aside>
                 </div>

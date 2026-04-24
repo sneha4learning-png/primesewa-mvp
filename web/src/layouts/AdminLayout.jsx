@@ -50,15 +50,15 @@ const AdminLayout = () => {
     return (
         <div className="flex h-screen bg-[#F8FAFC]">
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-72 bg-gradient-to-br from-indigo-950 to-violet-950 border-r border-white/10 flex-col relative overflow-hidden">
+            <aside className="hidden lg:flex w-72 brand-gradient border-r border-white/10 flex-col relative overflow-hidden">
                 <SidebarInner setSidebarOpen={setSidebarOpen} handleLogout={handleLogout} />
             </aside>
 
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div className="lg:hidden fixed inset-0 z-50 flex">
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-                    <aside className="relative w-72 bg-gradient-to-br from-indigo-950 to-violet-950 flex flex-col overflow-hidden z-10">
+                    <div className="fixed inset-0 bg-indigo-950/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+                    <aside className="relative w-72 brand-gradient flex flex-col overflow-hidden z-10">
                         <SidebarInner setSidebarOpen={setSidebarOpen} handleLogout={handleLogout} />
                     </aside>
                 </div>
@@ -81,7 +81,7 @@ const AdminLayout = () => {
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Root Access
                             </span>
                         </div>
-                        <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-white font-medium shadow-md">A</div>
+                        <div className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl brand-gradient flex items-center justify-center text-white font-medium shadow-md">A</div>
                     </div>
                 </header>
                 <div className="flex-1 overflow-y-auto p-4 lg:p-10 relative">

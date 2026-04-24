@@ -30,7 +30,7 @@ class ErrorBoundary extends Component {
                         We encountered an error while loading your dashboard contents. Our team has been notified.
                         <br/><span className="text-[10px] text-rose-400 font-mono mt-2 block">{this.state.error?.message}</span>
                     </p>
-                    <button onClick={() => window.location.reload()} className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-600/20 active:scale-95">Reload Dashboard</button>
+                    <button onClick={() => window.location.reload()} className="px-8 py-3 brand-gradient text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:shadow-lg hover:shadow-indigo-600/30 transition-all shadow-xl active:scale-95">Reload Dashboard</button>
                 </div>
             );
         }
@@ -516,7 +516,7 @@ const ProviderDashboardContent = () => {
                     </h2>
                     <div className="space-y-5">
                         {paginatedActive.map(job => (
-                            <div key={job.id} className="bg-indigo-950 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group border border-white/5">
+                            <div key={job.id} className="brand-gradient rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group border border-white/5">
                                 <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -mr-40 -mt-20 group-hover:scale-125 transition-transform duration-1000"></div>
                                 
                                 <div className="relative z-10 flex flex-col h-full">
@@ -574,7 +574,7 @@ const ProviderDashboardContent = () => {
                                                         key={s.key}
                                                         onClick={() => updateTrackingStatus(job, s.key)}
                                                         disabled={isPastOrCurrent}
-                                                        className={`py-4 px-2 rounded-2xl flex flex-col items-center gap-2 transition-all border shadow-lg ${isCurrent ? s.activeColor : (isPastOrCurrent ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 opacity-50' : 'bg-white/10 border-white/10 text-white/60 hover:bg-white hover:text-indigo-950')}`}
+                                                        className={`py-4 px-2 rounded-2xl flex flex-col items-center gap-2 transition-all border shadow-lg ${isCurrent ? s.activeColor : (isPastOrCurrent ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 opacity-50' : 'bg-white/10 border-white/10 text-white/60 hover:bg-white hover:text-indigo-600')}`}
                                                     >
                                                         <s.icon className={`w-5 h-5 ${isCurrent ? 'animate-bounce' : ''}`} />
                                                         <span className="text-[9px] font-black uppercase tracking-widest">{s.label}</span>
@@ -598,7 +598,7 @@ const ProviderDashboardContent = () => {
                                             </button>
                                             <button 
                                                 onClick={() => setConfirmingJobId(job.id)}
-                                                className="px-6 bg-white text-indigo-950 rounded-2xl h-12 font-black uppercase text-[10px] tracking-widest hover:bg-emerald-400 hover:text-white transition-all shadow-xl active:scale-95"
+                                                className="px-6 bg-white text-indigo-600 rounded-2xl h-12 font-black uppercase text-[10px] tracking-widest hover:bg-emerald-400 hover:text-white transition-all shadow-xl active:scale-95"
                                             >
                                                 Complete
                                             </button>
@@ -657,7 +657,7 @@ const ProviderDashboardContent = () => {
                                 
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-6 relative z-10">
                                     <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center text-2xl font-black text-white shadow-xl">
+                                        <div className="w-16 h-16 brand-gradient rounded-[1.5rem] flex items-center justify-center text-2xl font-black text-white shadow-xl">
                                             {(req.customer || '?').charAt(0)}
                                         </div>
                                         <div>
@@ -677,7 +677,7 @@ const ProviderDashboardContent = () => {
                                 <div className="bg-slate-50/50 rounded-[2.5rem] p-8 mb-8 border border-slate-100 relative overflow-hidden group-hover:bg-white transition-colors duration-500">
                                     <div className="flex flex-wrap items-center gap-2 mb-6">
                                         {((req.service || '').includes('(') ? (req.service.split('(')[1].replace(')', '').split(', ')) : [req.service]).map((s, i) => (
-                                            <span key={i} className="px-5 py-2.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] shadow-lg shadow-indigo-200 border-2 border-white/10">{s}</span>
+                                            <span key={i} className="px-5 py-2.5 brand-gradient text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] shadow-lg shadow-indigo-200 border-2 border-white/10">{s}</span>
                                         ))}
                                     </div>
                                     
@@ -707,7 +707,7 @@ const ProviderDashboardContent = () => {
                                                 <div className="flex gap-4">
                                         <button 
                                             onClick={() => acceptRequest(req)}
-                                            className="flex-[2.5] bg-slate-950 text-white h-16 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-primary transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
+                                            className="flex-[2.5] brand-gradient text-white h-16 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:shadow-indigo-500/40 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
                                         >
                                             Accept Request <CheckCircle2 className="w-4 h-4" />
                                         </button>
