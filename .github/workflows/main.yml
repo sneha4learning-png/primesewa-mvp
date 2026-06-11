@@ -23,6 +23,8 @@ permissions:
   contents: read
   deployments: write
   statuses: write
+  checks: write
+  actions: write
 
 jobs:
   deploy:
