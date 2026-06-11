@@ -10,6 +10,35 @@ import { Search, MapPin, Star, Wrench, Zap, Droplets, Sparkles, CheckCircle2, In
 import { useNotifications } from '../../context/NotificationContext';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 
+const localAhmedabadAreas = [
+    { name: "Vastrapur, Ahmedabad", lat: 23.0350, lon: 72.5293 },
+    { name: "Bopal, Ahmedabad", lat: 23.0338, lon: 72.4633 },
+    { name: "South Bopal, Ahmedabad", lat: 23.0235, lon: 72.4705 },
+    { name: "Satellite, Ahmedabad", lat: 23.0280, lon: 72.5070 },
+    { name: "Gota, Ahmedabad", lat: 23.0784, lon: 72.5447 },
+    { name: "Thaltej, Ahmedabad", lat: 23.0497, lon: 72.5117 },
+    { name: "Prahlad Nagar, Ahmedabad", lat: 23.0120, lon: 72.5059 },
+    { name: "Naroda, Ahmedabad", lat: 23.0805, lon: 72.6482 },
+    { name: "Maninagar, Ahmedabad", lat: 22.9978, lon: 72.6015 },
+    { name: "Chandkheda, Ahmedabad", lat: 23.1099, lon: 72.5853 },
+    { name: "Odhav, Ahmedabad", lat: 22.9868, lon: 72.6738 },
+    { name: "Paldi, Ahmedabad", lat: 23.0135, lon: 72.5623 },
+    { name: "Ellisbridge, Ahmedabad", lat: 23.0225, lon: 72.5714 },
+    { name: "Sola, Ahmedabad", lat: 23.0647, lon: 72.5293 },
+    { name: "Vatva, Ahmedabad", lat: 22.9515, lon: 72.6178 },
+    { name: "Nikol, Ahmedabad", lat: 23.0435, lon: 72.6695 },
+    { name: "SG Highway, Ahmedabad", lat: 23.0284, lon: 72.5020 },
+    { name: "Ranip, Ahmedabad", lat: 23.0763, lon: 72.5724 },
+    { name: "Motera, Ahmedabad", lat: 23.1026, lon: 72.5975 },
+    { name: "Ambawadi, Ahmedabad", lat: 23.0220, lon: 72.5400 },
+    { name: "Memnagar, Ahmedabad", lat: 23.0470, lon: 72.5360 },
+    { name: "Bodakdev, Ahmedabad", lat: 23.0360, lon: 72.5150 },
+    { name: "Naranpura, Ahmedabad", lat: 23.0550, lon: 72.5490 },
+    { name: "Usmanpura, Ahmedabad", lat: 23.0450, lon: 72.5690 },
+    { name: "Navrangpura, Ahmedabad", lat: 23.0360, lon: 72.5620 },
+    { name: "Sabarmati, Ahmedabad", lat: 23.0820, lon: 72.5890 }
+];
+
 // Helper component for visual history trend (Pie Chart Mode)
 const HistoryChart = ({ bookings }) => {
     const data = useMemo(() => {
@@ -791,32 +820,43 @@ const CustomerHome = () => {
     const [locationError, setLocationError] = useState('');
 
     const handleMyLocation = () => {
+        console.log("handleMyLocation triggered");
         // Geolocation only works on HTTPS or localhost
         if (!navigator.geolocation) {
             setLocationError('Geolocation is not supported by your browser.');
+            return;
+        }
+        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            console.warn("Geolocation requires HTTPS context");
+            setLocationError('Location service requires a secure HTTPS connection (or localhost).');
             return;
         }
         setIsLocating(true);
         setLocationError('');
 
         const options = {
-            enableHighAccuracy: true,
-            timeout: 10000,       // 10 second limit — never hangs silently
-            maximumAge: 60000     // Accept a cached position up to 1 min old
+            enableHighAccuracy: false, // More reliable for desktop geolocating
+            timeout: 12000,            // 12 second limit
+            maximumAge: 60000          // 1 minute cached position
         };
 
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
-                try {
-                    const { latitude, longitude } = pos.coords;
-                    const res = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
-                        { headers: { 'Accept-Language': 'en' } }
-                    );
-                    if (!res.ok) throw new Error('Nominatim error');
-                    const data = await res.json();
+                const { latitude, longitude } = pos.coords;
+                console.log(`Coordinates detected: ${latitude}, ${longitude}`);
+                setBookingCoords({ lat: latitude, lon: longitude });
 
-                    // Build a clean readable address from structured fields
+                try {
+                    // Call reverse geocode with email parameter and NO custom headers to prevent OPTIONS preflight blocks
+                    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1&accept-language=en&email=primesevamvp@gmail.com`;
+                    console.log(`OSM Reverse Geocode url: ${url}`);
+                    const res = await fetch(url);
+                    console.log(`OSM Reverse Geocode response status: ${res.status}`);
+                    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                    
+                    const data = await res.json();
+                    console.log("OSM Reverse Geocode data received:", data);
+
                     const addr = data.address || {};
                     const parts = [
                         addr.road || addr.pedestrian || addr.footway,
@@ -828,20 +868,37 @@ const CustomerHome = () => {
                         ? parts.join(', ')
                         : (data.display_name?.split(',').slice(0, 3).join(',').trim() || 'Location detected');
 
-                    setBookingCoords({ lat: latitude, lon: longitude });
+                    console.log(`Auto-filling resolved address: ${readableArea}`);
                     setBookingArea(readableArea);
                 } catch (e) {
-                    console.error('Reverse geocode failed:', e);
-                    setLocationError('Could not get address. Please type it manually.');
+                    console.error('Reverse geocode failed or blocked:', e);
+                    
+                    // Fallback geocoding: Find the closest predefined area in Ahmedabad
+                    console.log("Using closest local Ahmedabad area fallback...");
+                    let closestArea = localAhmedabadAreas[0];
+                    let minDistance = Infinity;
+                    
+                    localAhmedabadAreas.forEach(area => {
+                        const dist = Math.pow(area.lat - latitude, 2) + Math.pow(area.lon - longitude, 2);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            closestArea = area;
+                        }
+                    });
+
+                    console.log(`Closest local area: ${closestArea.name}`);
+                    setBookingArea(closestArea.name);
+                    setBookingCoords({ lat: closestArea.lat, lon: closestArea.lon });
                 } finally {
                     setIsLocating(false);
                 }
             },
             (err) => {
+                console.error("Browser geolocation error:", err);
                 setIsLocating(false);
                 switch (err.code) {
                     case err.PERMISSION_DENIED:
-                        setLocationError('Location access denied. Please allow location in browser settings.');
+                        setLocationError('Location access denied. Please allow location access in your browser settings.');
                         break;
                     case err.POSITION_UNAVAILABLE:
                         setLocationError('Location unavailable. Please type your area manually.');
@@ -1533,21 +1590,69 @@ const CustomerHome = () => {
                                                     setBookingCoords(null); // clear stale pin
                                                     setShowSuggestions(true);
                                                     clearTimeout(areaDebounceRef.current);
-                                                    if (val.length < 3) { setAreaSuggestions([]); return; }
+
+                                                    // 1. Instant local matching for Ahmedabad areas
+                                                    const matchedLocal = localAhmedabadAreas.filter(area =>
+                                                        area.name.toLowerCase().includes(val.toLowerCase())
+                                                    );
+                                                    setAreaSuggestions(matchedLocal);
+
+                                                    // 2. Fetch from OSM API for more specific details (if 3+ characters)
+                                                    if (val.length < 3) return;
+                                                    
                                                     areaDebounceRef.current = setTimeout(async () => {
                                                         setIsFetchingSuggestions(true);
+                                                        console.log(`Fetching OSM suggestions for: ${val}`);
                                                         try {
-                                                            const res = await fetch(
-                                                                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&addressdetails=1&limit=6&countrycodes=in`,
-                                                                { headers: { 'Accept-Language': 'en' } }
-                                                            );
-                                                            const results = await res.json();
-                                                            setAreaSuggestions(results);
-                                                        } catch { setAreaSuggestions([]); }
-                                                        setIsFetchingSuggestions(false);
+                                                            // Query with Ahmedabad suffix to restrict results
+                                                            const queryTerm = val.toLowerCase().includes('ahmedabad') ? val : `${val}, Ahmedabad`;
+                                                            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(queryTerm)}&format=json&addressdetails=1&limit=8&countrycodes=in&accept-language=en&email=primesevamvp@gmail.com`;
+                                                            
+                                                            const res = await fetch(url);
+                                                            console.log(`OSM autocomplete response status: ${res.status}`);
+                                                            if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                                                            
+                                                            const apiResults = await res.json();
+                                                            console.log(`OSM autocomplete results received:`, apiResults);
+
+                                                            // Merge API results with local matches, avoiding duplicates
+                                                            const combined = [...matchedLocal];
+                                                            apiResults.forEach(item => {
+                                                                const addr = item.address || {};
+                                                                const cleanName = [
+                                                                    addr.road || addr.neighbourhood || addr.suburb || item.name,
+                                                                    addr.city || addr.town || 'Ahmedabad'
+                                                                ].filter(Boolean).join(', ');
+
+                                                                const lat = parseFloat(item.lat);
+                                                                const lon = parseFloat(item.lon);
+
+                                                                // Prevent duplicate items
+                                                                const exists = combined.some(c => 
+                                                                    c.name.toLowerCase().includes(cleanName.toLowerCase()) ||
+                                                                    (Math.abs(c.lat - lat) < 0.0005 && Math.abs(c.lon - lon) < 0.0005)
+                                                                );
+
+                                                                if (!exists) {
+                                                                    combined.push({
+                                                                        name: item.display_name?.split(',').slice(0, 3).join(',').trim() || cleanName,
+                                                                        lat,
+                                                                        lon
+                                                                    });
+                                                                }
+                                                            });
+
+                                                            setAreaSuggestions(combined);
+                                                        } catch (err) {
+                                                            console.error("OSM autocomplete failed or blocked:", err);
+                                                            // Keep local matches if API fails
+                                                            setAreaSuggestions(matchedLocal);
+                                                        } finally {
+                                                            setIsFetchingSuggestions(false);
+                                                        }
                                                     }, 400);
                                                 }}
-                                                onFocus={() => bookingArea.length >= 3 && setShowSuggestions(true)}
+                                                onFocus={() => setShowSuggestions(true)}
                                                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                                                 className="w-full p-2.5 pr-8 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-teal-500 transition-all text-xs"
                                             />
