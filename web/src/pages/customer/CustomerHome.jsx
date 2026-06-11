@@ -1451,18 +1451,18 @@ const CustomerHome = () => {
                                 <div className="flex flex-wrap items-center gap-2">
                                     <h2 className="text-xl font-black uppercase tracking-tighter text-slate-900 italic">Review Your Booking</h2>
                                     {pendingBookingData.subServices?.length === 0 ? (
-                                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[7px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1">
-                                            <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
+                                        <span className="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                                             Standard Base Active
                                         </span>
                                     ) : (
-                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[7px] font-black uppercase tracking-widest border border-indigo-100 flex items-center gap-1">
-                                            <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce"></div>
+                                        <span className="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-black uppercase tracking-widest border border-indigo-100 flex items-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce"></div>
                                             {pendingBookingData.subServices.length} Selected
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Finalize your service request</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Finalize your service request</p>
                             </div>
                         </div>
 
@@ -1471,25 +1471,25 @@ const CustomerHome = () => {
                             <div className="relative z-10">
                                 <div className="gap-x-8 flex flex-wrap lg:flex-nowrap justify-between items-start mb-4">
                                     <div className="w-full lg:w-3/5">
-                                        <p className="text-indigo-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Service Package</p>
+                                        <p className="text-indigo-300 text-xs font-black uppercase tracking-[0.2em] mb-1">Service Package</p>
                                         <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-none">{pendingBookingData.service}</h3>
                                         {pendingBookingData.subServices?.length > 0 ? (
                                             <div className="flex flex-col gap-2 mt-4 mb-4">
-                                                <div className="flex justify-between items-center px-4 py-2 bg-emerald-500/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
+                                                <div className="flex justify-between items-center px-4 py-2 bg-emerald-500/10 rounded-xl text-xs font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md">
                                                     <span>Standard Base Package Active</span>
                                                     <span>₹{pendingBookingData.baseRate || 199}</span>
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="mt-4 mb-4 flex">
-                                                <span className="px-4 py-2 bg-emerald-500/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md animate-pulse">
+                                                <span className="px-4 py-2 bg-emerald-500/10 rounded-xl text-xs font-black uppercase tracking-widest text-emerald-400 border border-emerald-500/30 shadow-md animate-pulse">
                                                     Base cost will apply if no sub service
                                                 </span>
                                             </div>
                                         )}
 
                                         <div>
-                                            <p className="text-indigo-400 text-[9px] font-black uppercase tracking-[0.2em] mb-2">Customize Package</p>
+                                            <p className="text-indigo-300 text-xs font-black uppercase tracking-[0.2em] mb-2">Customize Package</p>
                                             <div className="flex flex-col gap-2">
                                                 {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => {
                                                     const isSelected = pendingBookingData.subServices?.includes(sub.name);
@@ -1505,7 +1505,7 @@ const CustomerHome = () => {
                                                                 </div>
                                                                 <span className={`text-xs font-bold leading-none ${isSelected ? 'text-white' : 'text-slate-300'}`}>{sub.name}</span>
                                                             </div>
-                                                            <span className={`text-[10px] font-black ${isSelected ? 'text-indigo-300' : 'text-white/40'}`}>+ ₹{sub.price}</span>
+                                                            <span className={`text-xs font-black ${isSelected ? 'text-indigo-300' : 'text-white/40'}`}>+ ₹{sub.price}</span>
                                                         </button>
                                                     );
                                                 })}
@@ -1513,11 +1513,11 @@ const CustomerHome = () => {
                                         </div>
                                     </div>
                                     <div className="text-right mt-4 lg:mt-0 w-full lg:w-auto">
-                                        <p className="text-white/40 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Total</p>
+                                        <p className="text-white/40 text-xs uppercase font-black tracking-[0.2em] mb-1">Total</p>
                                         <p className="text-4xl font-black text-white italic leading-none">₹{pendingBookingData.price}</p>
                                         {pendingBookingData.subServices?.length > 0 && (
                                             <div className="mt-1 text-right">
-                                                <p className="text-white/50 text-[8px] font-black uppercase tracking-widest">
+                                                <p className="text-white/50 text-[10px] font-black uppercase tracking-widest">
                                                     Base: ₹{pendingBookingData.baseRate} + Add: ₹{pendingBookingData.subtotalSum}
                                                 </p>
                                             </div>
@@ -1530,11 +1530,11 @@ const CustomerHome = () => {
                                             <UserCircle className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <p className="text-white/40 text-[8px] uppercase font-black tracking-widest">Selected Expert</p>
+                                            <p className="text-white/40 text-[10px] uppercase font-black tracking-widest">Selected Expert</p>
                                             <p className="text-sm font-black uppercase tracking-tight text-white">{pendingBookingData.provider}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-indigo-400 italic">
+                                    <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-indigo-400 italic">
                                         <ShieldCheck className="w-5 h-5" /> Secured by PrimeSewa
                                     </div>
                                 </div>
@@ -1543,22 +1543,22 @@ const CustomerHome = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Select Schedule</p>
+                                <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-2">Select Schedule</p>
                                 <input required type="date" value={bookingDate} min={getTodayStr()} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-3 bg-slate-50 rounded-2xl text-sm font-bold border border-slate-100 outline-none focus:border-indigo-600 transition-all mb-3 text-slate-700" />
                                 <div className="grid grid-cols-2 gap-2">
                                     {availableSlots.map(s => (
-                                        <button key={s.id} onClick={() => !s.isPast && setBookingSlot(s.id)} className={`py-3 rounded-xl text-[9px] font-black uppercase transition-all ${s.isPast ? 'opacity-20 cursor-not-allowed' : bookingSlot === s.id ? 'bg-indigo-600 text-white shadow-md scale-105' : 'bg-white border text-slate-400 hover:border-indigo-200 hover:bg-slate-50'}`}>{s.label}</button>
+                                        <button key={s.id} onClick={() => !s.isPast && setBookingSlot(s.id)} className={`py-3 rounded-xl text-xs font-black uppercase transition-all ${s.isPast ? 'opacity-20 cursor-not-allowed' : bookingSlot === s.id ? 'bg-indigo-600 text-white shadow-md scale-105' : 'bg-white border text-slate-400 hover:border-indigo-200 hover:bg-slate-50'}`}>{s.label}</button>
                                     ))}
                                 </div>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Service Location</p>
+                                    <p className="text-xs font-black uppercase text-slate-400 tracking-widest">Service Location</p>
                                     <button
                                         onClick={handleMyLocation}
                                         disabled={isLocating}
-                                        className="flex items-center gap-1.5 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-all disabled:opacity-50"
+                                        className="flex items-center gap-1.5 text-xs font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-all disabled:opacity-50"
                                     >
                                         {isLocating ? <Loader2 className="w-3 h-3 animate-spin" /> : <MapPin className="w-3 h-3" />}
                                         Use My Location
@@ -1663,12 +1663,7 @@ const CustomerHome = () => {
                                         {showSuggestions && areaSuggestions.length > 0 && (
                                             <ul className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl shadow-slate-200/60 overflow-hidden max-h-52 overflow-y-auto">
                                                 {areaSuggestions.map((s, i) => {
-                                                    const addr = s.address || {};
-                                                    const label = [
-                                                        addr.road || addr.neighbourhood || addr.suburb,
-                                                        addr.city || addr.town || addr.village || addr.county,
-                                                        addr.state
-                                                    ].filter(Boolean).join(', ') || s.display_name?.split(',').slice(0,3).join(',').trim();
+                                                    const label = s.name;
                                                     return (
                                                         <li
                                                             key={i}
