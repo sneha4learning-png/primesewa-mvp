@@ -51,7 +51,7 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 bg-linear-to-br from-indigo-500 via-indigo-600 to-violet-700">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8" style={{background: 'linear-gradient(160deg, #064e3b 0%, #065f46 25%, #0d9488 60%, #0891b2 100%)'}}>
             {/* Professional Background Slider */}
             <div className="absolute inset-0 z-0">
                 {serviceImages.map((img, idx) => (
@@ -62,7 +62,7 @@ const AdminLogin = () => {
                         <img src={img} alt="Service" className="w-full h-full object-cover mix-blend-overlay" />
                     </div>
                 ))}
-                <div className="absolute inset-0 bg-linear-to-b from-indigo-600/20 via-indigo-800/40 to-violet-900/60 transition-colors duration-1000"></div>
+                <div className="absolute inset-0 bg-linear-to-b from-emerald-600/10 via-teal-800/30 to-cyan-900/50 transition-colors duration-1000"></div>
                 <div className="absolute inset-0 mesh-gradient opacity-30 mix-blend-soft-light"></div>
             </div>
 
@@ -97,15 +97,17 @@ const AdminLogin = () => {
                 <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl shadow-indigo-500/10 border border-white p-10 text-slate-900">
                     <div className="text-center mb-10">
                         <div className="flex flex-col items-center justify-center mb-6">
-                            <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-xl border border-slate-100 p-4 transition-transform hover:scale-110 duration-500">
+                            <div className="w-24 h-24 rounded-3xl flex items-center justify-center mb-6 shadow-2xl p-1 transition-transform hover:scale-110 duration-500" style={{background: 'linear-gradient(135deg, #0d9488, #065f46)'}}>
+                                <div className="w-full h-full bg-white rounded-[1.4rem] flex items-center justify-center p-3">
                                 <img
                                     src="/primesewa_logo.png"
                                     alt="PrimeSewa"
                                     className="w-full h-full object-contain"
                                 />
+                                </div>
                             </div>
-                            <span className="text-4xl font-medium text-slate-950 tracking-tighter italic">PrimeSewa</span>
-                            <span className="text-[10px] font-medium text-primary mt-2 uppercase tracking-[0.25em]">Command Center</span>
+                            <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 tracking-tighter italic">PrimeSewa</span>
+                            <span className="text-xs font-semibold text-teal-600 mt-2 uppercase tracking-[0.25em]">Command Center</span>
                         </div>
                         <p className="text-slate-400 text-sm font-medium">Authorized Personnel Only</p>
                     </div>
