@@ -1,5 +1,5 @@
 // PRIME SEWA DEPLOYMENT TRIGGER: RELIABLE BUILD 2026-04-03-T13:00
-import { useState, useEffect, useMemo, Component } from 'react';
+import { useState, useEffect, useMemo, useRef, Component } from 'react';
 import { createPortal } from 'react-dom';
 import OSMMap from '../../components/OSMMap';
 
@@ -712,6 +712,10 @@ const CustomerHome = () => {
     const [bookingCoords, setBookingCoords] = useState(null);
     const [bookingComments, setBookingComments] = useState('');
     const [minRating, setMinRating] = useState(0);
+    const [areaSuggestions, setAreaSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+    const areaDebounceRef = useRef(null);
 
 
     const serviceImages = [
@@ -784,21 +788,73 @@ const CustomerHome = () => {
         }
     };
 
+    const [locationError, setLocationError] = useState('');
+
     const handleMyLocation = () => {
-        if (!navigator.geolocation) return;
+        // Geolocation only works on HTTPS or localhost
+        if (!navigator.geolocation) {
+            setLocationError('Geolocation is not supported by your browser.');
+            return;
+        }
         setIsLocating(true);
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            try {
-                const { latitude, longitude } = pos.coords;
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-                const data = await res.json();
-                if (data.display_name) {
+        setLocationError('');
+
+        const options = {
+            enableHighAccuracy: true,
+            timeout: 10000,       // 10 second limit — never hangs silently
+            maximumAge: 60000     // Accept a cached position up to 1 min old
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                try {
+                    const { latitude, longitude } = pos.coords;
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
+                        { headers: { 'Accept-Language': 'en' } }
+                    );
+                    if (!res.ok) throw new Error('Nominatim error');
+                    const data = await res.json();
+
+                    // Build a clean readable address from structured fields
+                    const addr = data.address || {};
+                    const parts = [
+                        addr.road || addr.pedestrian || addr.footway,
+                        addr.neighbourhood || addr.suburb || addr.quarter,
+                        addr.city || addr.town || addr.village || addr.county
+                    ].filter(Boolean);
+
+                    const readableArea = parts.length > 0
+                        ? parts.join(', ')
+                        : (data.display_name?.split(',').slice(0, 3).join(',').trim() || 'Location detected');
+
                     setBookingCoords({ lat: latitude, lon: longitude });
-                    setBookingArea(data.display_name.split(',')[0].trim());
+                    setBookingArea(readableArea);
+                } catch (e) {
+                    console.error('Reverse geocode failed:', e);
+                    setLocationError('Could not get address. Please type it manually.');
+                } finally {
+                    setIsLocating(false);
                 }
-            } catch (e) { console.error(e); }
-            setIsLocating(false);
-        }, () => setIsLocating(false));
+            },
+            (err) => {
+                setIsLocating(false);
+                switch (err.code) {
+                    case err.PERMISSION_DENIED:
+                        setLocationError('Location access denied. Please allow location in browser settings.');
+                        break;
+                    case err.POSITION_UNAVAILABLE:
+                        setLocationError('Location unavailable. Please type your area manually.');
+                        break;
+                    case err.TIMEOUT:
+                        setLocationError('Location request timed out. Please try again.');
+                        break;
+                    default:
+                        setLocationError('Could not detect location. Please type manually.');
+                }
+            },
+            options
+        );
     };
 
     const handleBook = (provider) => {
@@ -1451,9 +1507,82 @@ const CustomerHome = () => {
                                         Use My Location
                                     </button>
                                 </div>
+                                {locationError && (
+                                    <div className="flex items-center gap-2 px-3 py-2 bg-rose-50 border border-rose-200 rounded-xl">
+                                        <span className="text-rose-500 text-lg">⚠️</span>
+                                        <p className="text-xs font-semibold text-rose-600">{locationError}</p>
+                                    </div>
+                                )}
                                 <div className="space-y-2">
-                                    <input placeholder="House/Flat No." value={bookingHouseNo} onChange={e => setBookingHouseNo(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all text-xs" />
-                                    <input placeholder="Area/Locality" value={bookingArea} onChange={e => setBookingArea(e.target.value)} className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-600 transition-all text-xs" />
+                                    <input
+                                        placeholder="House/Flat No."
+                                        value={bookingHouseNo}
+                                        onChange={e => setBookingHouseNo(e.target.value)}
+                                        className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-teal-500 transition-all text-xs"
+                                    />
+                                    {/* Area/Locality with OSM autocomplete */}
+                                    <div className="relative">
+                                        <div className="relative">
+                                            <input
+                                                placeholder="Type area or locality..."
+                                                value={bookingArea}
+                                                autoComplete="off"
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    setBookingArea(val);
+                                                    setBookingCoords(null); // clear stale pin
+                                                    setShowSuggestions(true);
+                                                    clearTimeout(areaDebounceRef.current);
+                                                    if (val.length < 3) { setAreaSuggestions([]); return; }
+                                                    areaDebounceRef.current = setTimeout(async () => {
+                                                        setIsFetchingSuggestions(true);
+                                                        try {
+                                                            const res = await fetch(
+                                                                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&addressdetails=1&limit=6&countrycodes=in`,
+                                                                { headers: { 'Accept-Language': 'en' } }
+                                                            );
+                                                            const results = await res.json();
+                                                            setAreaSuggestions(results);
+                                                        } catch { setAreaSuggestions([]); }
+                                                        setIsFetchingSuggestions(false);
+                                                    }, 400);
+                                                }}
+                                                onFocus={() => bookingArea.length >= 3 && setShowSuggestions(true)}
+                                                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                                className="w-full p-2.5 pr-8 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-teal-500 transition-all text-xs"
+                                            />
+                                            {isFetchingSuggestions && (
+                                                <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-teal-500 animate-spin" />
+                                            )}
+                                        </div>
+                                        {showSuggestions && areaSuggestions.length > 0 && (
+                                            <ul className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl shadow-slate-200/60 overflow-hidden max-h-52 overflow-y-auto">
+                                                {areaSuggestions.map((s, i) => {
+                                                    const addr = s.address || {};
+                                                    const label = [
+                                                        addr.road || addr.neighbourhood || addr.suburb,
+                                                        addr.city || addr.town || addr.village || addr.county,
+                                                        addr.state
+                                                    ].filter(Boolean).join(', ') || s.display_name?.split(',').slice(0,3).join(',').trim();
+                                                    return (
+                                                        <li
+                                                            key={i}
+                                                            onMouseDown={() => {
+                                                                setBookingArea(label);
+                                                                setBookingCoords({ lat: parseFloat(s.lat), lon: parseFloat(s.lon) });
+                                                                setAreaSuggestions([]);
+                                                                setShowSuggestions(false);
+                                                            }}
+                                                            className="flex items-start gap-2.5 px-3 py-2.5 hover:bg-teal-50 cursor-pointer transition-colors border-b border-slate-50 last:border-0"
+                                                        >
+                                                            <MapPin className="w-3.5 h-3.5 text-teal-500 shrink-0 mt-0.5" />
+                                                            <span className="text-xs text-slate-700 leading-snug">{label}</span>
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {bookingCoords && (
