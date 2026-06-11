@@ -848,7 +848,8 @@ const CustomerHome = () => {
                     console.log(`IP coordinates detected: ${latitude}, ${longitude} (${city}, ${region})`);
                     setBookingCoords({ lat: latitude, lon: longitude });
                     await performReverseGeocode(latitude, longitude);
-                    setLocationError(''); // Clear error on successful IP-based resolution
+                    // Inform the user this is approximate location
+                    setLocationError('Using approximate location. Please type manually or adjust the map if incorrect.');
                 } else {
                     throw new Error("Invalid IP location data");
                 }
@@ -920,12 +921,6 @@ const CustomerHome = () => {
         if (!navigator.geolocation) {
             console.warn("Geolocation is not supported by your browser. Trying IP fallback.");
             useIpFallback('Geolocation is not supported by your browser.');
-            return;
-        }
-
-        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-            console.warn("Geolocation requires HTTPS context. Trying IP fallback.");
-            useIpFallback('Location service requires a secure HTTPS connection. Using IP-based location.');
             return;
         }
 
@@ -1652,9 +1647,9 @@ const CustomerHome = () => {
                                     </button>
                                 </div>
                                 {locationError && (
-                                    <div className="flex items-center gap-2 px-3 py-2 bg-rose-50 border border-rose-200 rounded-xl">
-                                        <span className="text-rose-500 text-lg">⚠️</span>
-                                        <p className="text-xs font-semibold text-rose-600">{locationError}</p>
+                                    <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${locationError.includes('approximate') ? 'bg-amber-50 border-amber-200 text-amber-600' : 'bg-rose-50 border-rose-200 text-rose-600'}`}>
+                                        <span className={`${locationError.includes('approximate') ? 'text-amber-500' : 'text-rose-500'} text-lg`}>⚠️</span>
+                                        <p className="text-xs font-semibold">{locationError}</p>
                                     </div>
                                 )}
                                 <div className="space-y-2">
@@ -1706,23 +1701,37 @@ const CustomerHome = () => {
                                                             const combined = [...matchedLocal];
                                                             apiResults.forEach(item => {
                                                                 const addr = item.address || {};
-                                                                const cleanName = [
-                                                                    addr.road || addr.neighbourhood || addr.suburb || item.name,
-                                                                    addr.city || addr.town || 'Ahmedabad'
-                                                                ].filter(Boolean).join(', ');
+                                                                const landmark = addr.amenity || addr.shop || addr.tourism || addr.building || addr.leisure || addr.house_name || addr.attraction || addr.place_of_worship || addr.office || addr.historic || addr.craft || addr.emergency || addr.military || addr.highway || addr.railway || item.name;
+
+                                                                const parts = [
+                                                                    landmark,
+                                                                    addr.road || addr.pedestrian || addr.footway,
+                                                                    addr.neighbourhood || addr.suburb || addr.quarter,
+                                                                    addr.city || addr.town || addr.village || addr.county || 'Ahmedabad'
+                                                                ].filter(Boolean);
+
+                                                                const uniqueParts = [];
+                                                                parts.forEach(part => {
+                                                                    const trimmed = part.trim();
+                                                                    if (trimmed && !uniqueParts.some(p => p.toLowerCase() === trimmed.toLowerCase())) {
+                                                                        uniqueParts.push(trimmed);
+                                                                    }
+                                                                });
+
+                                                                const cleanName = uniqueParts.join(', ');
 
                                                                 const lat = parseFloat(item.lat);
                                                                 const lon = parseFloat(item.lon);
 
                                                                 // Prevent duplicate items
                                                                 const exists = combined.some(c => 
-                                                                    c.name.toLowerCase().includes(cleanName.toLowerCase()) ||
+                                                                    c.name.toLowerCase() === cleanName.toLowerCase() ||
                                                                     (Math.abs(c.lat - lat) < 0.0005 && Math.abs(c.lon - lon) < 0.0005)
                                                                 );
 
                                                                 if (!exists) {
                                                                     combined.push({
-                                                                        name: item.display_name?.split(',').slice(0, 3).join(',').trim() || cleanName,
+                                                                        name: cleanName,
                                                                         lat,
                                                                         lon
                                                                     });
