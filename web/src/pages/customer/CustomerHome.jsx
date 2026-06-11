@@ -918,13 +918,17 @@ const CustomerHome = () => {
         console.log('Final Selection to Modal:', { cat: selectedCategory, sub: selectedSubServices });
         const base = Math.min(parseInt(String(provider.price || 149).replace(/\D/g, '')) || 149, 199);
 
-        // Calculate sub-services total if any selected
+        // Calculate sub-services total if any selected (provider-specific)
         const categoryData = categories.find(c => c.name === selectedCategory);
         let subtotal = 0;
         if (categoryData && selectedSubServices.length > 0) {
             selectedSubServices.forEach(sName => {
                 const sub = categoryData.subServices?.find(ss => ss.name === sName);
-                if (sub) subtotal += sub.price;
+                if (sub) {
+                    const variance = (parseInt(String(provider.id || '').slice(-3), 16) || 0) % 15 * 5 - 35;
+                    const providerPrice = provider.subServicePrices?.[sName] || Math.max(sub.price + variance, 49);
+                    subtotal += providerPrice;
+                }
             });
         }
 
@@ -953,10 +957,15 @@ const CustomerHome = () => {
         if (pendingBookingData) {
             let subtotal = 0;
             const categoryData = categories.find(c => c.name === selectedCategory);
+            const provider = onlineProviders.find(p => p.id === pendingBookingData.providerUid);
             if (categoryData && nextSubServices.length > 0) {
                 nextSubServices.forEach(sName => {
                     const sub = categoryData.subServices?.find(ss => ss.name === sName);
-                    if (sub) subtotal += sub.price;
+                    if (sub) {
+                        const variance = provider ? ((parseInt(String(provider.id || '').slice(-3), 16) || 0) % 15 * 5 - 35) : 0;
+                        const providerPrice = provider ? (provider.subServicePrices?.[sName] || Math.max(sub.price + variance, 49)) : sub.price;
+                        subtotal += providerPrice;
+                    }
                 });
             }
             setPendingBookingData(prev => ({
@@ -1062,7 +1071,7 @@ const CustomerHome = () => {
                 <div className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out">
                     <img src={activeBackgroundImage} alt="Service" className="w-full h-full object-cover" />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-50/60 via-slate-50/95 to-white"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-50/30 via-slate-50/50 to-white/70 backdrop-blur-[1px]"></div>
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 flex flex-col gap-6">
@@ -1074,7 +1083,7 @@ const CustomerHome = () => {
                                 <h1 className={`text-xl md:text-2xl font-extrabold tracking-tight leading-none ${!userData?.uid ? 'text-white' : 'text-slate-900'}`}>
                                     {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Premier Service Platform'}
                                 </h1>
-                                <p className={`mt-1 text-xs font-bold tracking-widest uppercase ${!userData?.uid ? 'text-emerald-200' : 'text-teal-600/80'}`}>Ahmedabad's Elite Home Service Network</p>
+                                <p className={`mt-1 text-xs font-bold tracking-widest uppercase ${!userData?.uid ? 'text-purple-200' : 'text-primary/80'}`}>Ahmedabad's Elite Home Service Network</p>
                             </div>
                         </div>
                         <div className={`relative flex-1 max-w-md w-full flex items-center shadow-sm rounded-xl border transition-all focus-within:ring-4 focus-within:ring-indigo-500/10 duration-300 ${!userData?.uid ? 'bg-white/10 border-white/10' : 'bg-white border-slate-200 focus-within:border-indigo-300 hover:border-indigo-200'}`}>
@@ -1213,7 +1222,7 @@ const CustomerHome = () => {
                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${selectedCategory === cat.name ? 'bg-indigo-600 text-white shadow-lg rotate-3' : 'bg-white border hover:border-indigo-200'}`}>
                                             <cat.icon className="w-5 h-5" />
                                         </div>
-                                        <span className={`text-xs font-black uppercase text-center leading-tight tracking-wide whitespace-nowrap py-1 ${selectedCategory === cat.name ? 'text-teal-600' : 'text-slate-800'}`}>{cat.name}</span>
+                                        <span className={`text-xs font-black uppercase text-center leading-tight tracking-wide whitespace-nowrap py-1 ${selectedCategory === cat.name ? 'text-primary' : 'text-slate-800'}`}>{cat.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -1253,10 +1262,10 @@ const CustomerHome = () => {
                                                 }}
                                                 className={`shrink-0 w-32 p-3 rounded-2xl border transition-all text-left snap-start group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
                                             >
-                                                <p className={`text-xs font-black uppercase tracking-wide mb-1 ${selectedSubServices.includes(sub.name) ? 'text-emerald-200' : 'text-slate-600'}`}>+ Service</p>
+                                                <p className={`text-xs font-black uppercase tracking-wide mb-1 ${selectedSubServices.includes(sub.name) ? 'text-purple-200' : 'text-slate-600'}`}>+ Service</p>
                                                 <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
                                                 <div className="flex items-center gap-1 mt-1">
-                                                    <span className={`text-sm font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-teal-600'}`}>₹{sub.price}</span>
+                                                    <span className={`text-sm font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-primary'}`}>₹{sub.price}</span>
                                                 </div>
                                             </button>
                                         ))}
@@ -1329,9 +1338,29 @@ const CustomerHome = () => {
                                                     </div>
                                                 </div>
 
+                                                {/* Price Breakdown */}
+                                                <div className="mt-2 mb-3 py-2 border-t border-slate-100 flex-1 flex flex-col gap-1.5">
+                                                    <div className="flex justify-between items-center text-[10px] text-slate-500 font-semibold tracking-wide">
+                                                        <span>BASE RATE</span>
+                                                        <span className="text-slate-800">₹{baseRate}</span>
+                                                    </div>
+                                                    {selectedSubServices.map(sName => {
+                                                        const subObj = categoryData?.subServices?.find(ss => ss.name === sName);
+                                                        if (!subObj) return null;
+                                                        const variance = (parseInt(String(p.id || '').slice(-3), 16) || 0) % 15 * 5 - 35;
+                                                        const providerPrice = p.subServicePrices?.[sName] || Math.max(subObj.price + variance, 49);
+                                                        return (
+                                                            <div key={sName} className="flex justify-between items-center text-[10px] text-indigo-600 font-black uppercase tracking-wider bg-indigo-50/50 px-2 py-0.5 rounded-lg border border-indigo-100/30">
+                                                                <span className="truncate max-w-[120px]">+ {sName}</span>
+                                                                <span>₹{providerPrice}</span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+
                                                 <div className="flex items-end justify-between pt-2 border-t border-slate-50">
                                                     <div>
-                                                        <p className="text-xs font-bold text-teal-600 uppercase tracking-wide">Total Cost</p>
+                                                        <p className="text-xs font-bold text-primary uppercase tracking-wide">Total Cost</p>
                                                         <p className="text-base font-black text-slate-900">₹{currentTotalDisplay}</p>
                                                     </div>
                                                     <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-7 px-3 brand-gradient text-white rounded-lg text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all">
@@ -1493,6 +1522,12 @@ const CustomerHome = () => {
                                             <div className="flex flex-col gap-2">
                                                 {categories.find(c => c.name === selectedCategory)?.subServices?.map(sub => {
                                                     const isSelected = pendingBookingData.subServices?.includes(sub.name);
+                                                    const provider = onlineProviders.find(p => p.id === pendingBookingData.providerUid);
+                                                    let providerPrice = sub.price;
+                                                    if (provider) {
+                                                        const variance = (parseInt(String(provider.id || '').slice(-3), 16) || 0) % 15 * 5 - 35;
+                                                        providerPrice = provider.subServicePrices?.[sub.name] || Math.max(sub.price + variance, 49);
+                                                    }
                                                     return (
                                                         <button
                                                             key={sub.name}
@@ -1505,7 +1540,7 @@ const CustomerHome = () => {
                                                                 </div>
                                                                 <span className={`text-xs font-bold leading-none ${isSelected ? 'text-white' : 'text-slate-300'}`}>{sub.name}</span>
                                                             </div>
-                                                            <span className={`text-xs font-black ${isSelected ? 'text-indigo-300' : 'text-white/40'}`}>+ ₹{sub.price}</span>
+                                                            <span className={`text-xs font-black ${isSelected ? 'text-indigo-300' : 'text-white/40'}`}>+ ₹{providerPrice}</span>
                                                         </button>
                                                     );
                                                 })}
@@ -1575,7 +1610,7 @@ const CustomerHome = () => {
                                         placeholder="House/Flat No."
                                         value={bookingHouseNo}
                                         onChange={e => setBookingHouseNo(e.target.value)}
-                                        className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-teal-500 transition-all text-xs"
+                                        className="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-primary transition-all text-xs"
                                     />
                                     {/* Area/Locality with OSM autocomplete */}
                                     <div className="relative">
@@ -1654,10 +1689,10 @@ const CustomerHome = () => {
                                                 }}
                                                 onFocus={() => setShowSuggestions(true)}
                                                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                                                className="w-full p-2.5 pr-8 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-teal-500 transition-all text-xs"
+                                                className="w-full p-2.5 pr-8 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-primary transition-all text-xs"
                                             />
                                             {isFetchingSuggestions && (
-                                                <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-teal-500 animate-spin" />
+                                                <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary animate-spin" />
                                             )}
                                         </div>
                                         {showSuggestions && areaSuggestions.length > 0 && (
@@ -1673,9 +1708,9 @@ const CustomerHome = () => {
                                                                 setAreaSuggestions([]);
                                                                 setShowSuggestions(false);
                                                             }}
-                                                            className="flex items-start gap-2.5 px-3 py-2.5 hover:bg-teal-50 cursor-pointer transition-colors border-b border-slate-50 last:border-0"
+                                                            className="flex items-start gap-2.5 px-3 py-2.5 hover:bg-violet-50 cursor-pointer transition-colors border-b border-slate-50 last:border-0"
                                                         >
-                                                            <MapPin className="w-3.5 h-3.5 text-teal-500 shrink-0 mt-0.5" />
+                                                            <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                                                             <span className="text-xs text-slate-700 leading-snug">{label}</span>
                                                         </li>
                                                     );

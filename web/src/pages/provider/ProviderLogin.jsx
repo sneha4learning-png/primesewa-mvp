@@ -327,7 +327,7 @@ const ProviderLogin = () => {
     }, [serviceImages.length]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 md:py-16" style={{background: 'linear-gradient(160deg, #064e3b 0%, #065f46 25%, #0d9488 60%, #0891b2 100%)'}}>
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8 md:py-16" style={{background: 'linear-gradient(160deg, #1e1b4b 0%, #311066 25%, #5b21b6 60%, #7c3aed 100%)'}}>
             {/* Professional Background Slider */}
             <div className="absolute inset-0 z-0">
                 {serviceImages.map((img, idx) => (
@@ -338,7 +338,7 @@ const ProviderLogin = () => {
                         <img src={img} alt="Background" className="w-full h-full object-cover mix-blend-overlay" />
                     </div>
                 ))}
-                <div className="absolute inset-0 bg-linear-to-b from-emerald-600/10 via-teal-800/30 to-cyan-900/50 transition-colors duration-1000"></div>
+                <div className="absolute inset-0 bg-linear-to-b from-indigo-900/10 via-purple-900/30 to-violet-950/50 transition-colors duration-1000"></div>
                 <div className="absolute inset-0 mesh-gradient opacity-30 mix-blend-soft-light"></div>
             </div>
 
@@ -346,7 +346,7 @@ const ProviderLogin = () => {
                 <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl shadow-indigo-500/10 border border-white p-8 md:p-10 text-slate-900">
                     <div className="text-center mb-8 relative">
                         <div className="flex flex-col items-center justify-center mb-6">
-                            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 shadow-2xl p-1 transition-transform hover:rotate-6 duration-500" style={{background: 'linear-gradient(135deg, #0d9488, #065f46)'}}>
+                            <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 shadow-2xl p-1 transition-transform hover:rotate-6 duration-500" style={{background: 'linear-gradient(135deg, #7c3aed, #ec4899)'}}>
                                 <div className="w-full h-full bg-white rounded-[1.25rem] flex items-center justify-center p-2.5">
                                 <img
                                     src="/primesewa_logo.png"
@@ -355,8 +355,8 @@ const ProviderLogin = () => {
                                 />
                                 </div>
                             </div>
-                            <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 tracking-tighter italic">PrimeSewa</span>
-                            <span className="text-xs font-semibold text-teal-600 mt-1 uppercase tracking-[0.25em]">Professional Portal</span>
+                            <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-purple-500 to-pink-500 tracking-tighter italic">PrimeSewa</span>
+                            <span className="text-xs font-semibold text-purple-600 mt-1 uppercase tracking-[0.25em]">Professional Portal</span>
                         </div>
                         <h2 className="text-2xl font-medium tracking-tight text-slate-900 mb-1">{isSignup ? 'Create Portfolio' : 'Partner Login'}</h2>
                         <p className="text-slate-500 text-xs font-medium">{isSignup ? 'Scale your service business with our global reach' : 'Manage your enterprise operations'}</p>
