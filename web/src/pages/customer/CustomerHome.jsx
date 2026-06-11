@@ -1080,9 +1080,9 @@ const CustomerHome = () => {
         <div className="min-h-screen relative overflow-x-hidden pt-6">
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out">
-                    <img src={activeBackgroundImage} alt="Service" className="w-full h-full object-cover" />
+                    <img src={activeBackgroundImage} alt="Service" className="w-full h-full object-cover opacity-20" />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-50/30 via-slate-50/50 to-white/70 backdrop-blur-[1px]"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-50/70 via-slate-50/85 to-white/95 backdrop-blur-[3px]"></div>
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 flex flex-col gap-6">
