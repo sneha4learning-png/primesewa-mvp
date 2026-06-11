@@ -834,23 +834,105 @@ const CustomerHome = () => {
 
     const handleMyLocation = () => {
         console.log("handleMyLocation triggered");
-        // Geolocation only works on HTTPS or localhost
-        if (!navigator.geolocation) {
-            setLocationError('Geolocation is not supported by your browser.');
-            return;
-        }
-        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-            console.warn("Geolocation requires HTTPS context");
-            setLocationError('Location service requires a secure HTTPS connection (or localhost).');
-            return;
-        }
         setIsLocating(true);
         setLocationError('');
 
+        const useIpFallback = async (originalErrorMessage) => {
+            console.log("Attempting IP-based location fallback...");
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                if (!res.ok) throw new Error(`IP API failed with status ${res.status}`);
+                const data = await res.json();
+                const { latitude, longitude, city, region } = data;
+                if (latitude && longitude) {
+                    console.log(`IP coordinates detected: ${latitude}, ${longitude} (${city}, ${region})`);
+                    setBookingCoords({ lat: latitude, lon: longitude });
+                    await performReverseGeocode(latitude, longitude);
+                    setLocationError(''); // Clear error on successful IP-based resolution
+                } else {
+                    throw new Error("Invalid IP location data");
+                }
+            } catch (ipErr) {
+                console.error("IP fallback failed:", ipErr);
+                setLocationError(originalErrorMessage || 'Could not detect location. Please type manually.');
+            } finally {
+                setIsLocating(false);
+            }
+        };
+
+        const performReverseGeocode = async (latitude, longitude) => {
+            try {
+                const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1&accept-language=en&email=primesevamvp@gmail.com`;
+                console.log(`OSM Reverse Geocode url: ${url}`);
+                const res = await fetch(url);
+                console.log(`OSM Reverse Geocode response status: ${res.status}`);
+                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                
+                const data = await res.json();
+                console.log("OSM Reverse Geocode data received:", data);
+
+                const addr = data.address || {};
+                const landmark = addr.amenity || addr.shop || addr.tourism || addr.building || addr.leisure || addr.house_name || addr.attraction || addr.place_of_worship || addr.office || addr.historic || addr.craft || addr.emergency || addr.military || addr.highway || addr.railway || data.name;
+                
+                const parts = [
+                    landmark,
+                    addr.road || addr.pedestrian || addr.footway,
+                    addr.neighbourhood || addr.suburb || addr.quarter,
+                    addr.city || addr.town || addr.village || addr.county
+                ].filter(Boolean);
+
+                const uniqueParts = [];
+                parts.forEach(part => {
+                    const trimmed = part.trim();
+                    if (trimmed && !uniqueParts.some(p => p.toLowerCase() === trimmed.toLowerCase())) {
+                        uniqueParts.push(trimmed);
+                    }
+                });
+
+                const readableArea = uniqueParts.length > 0
+                    ? uniqueParts.join(', ')
+                    : (data.display_name?.split(',').slice(0, 3).join(',').trim() || 'Location detected');
+
+                console.log(`Auto-filling resolved address: ${readableArea}`);
+                setBookingArea(readableArea);
+            } catch (e) {
+                console.error('Reverse geocode failed or blocked:', e);
+                
+                // Fallback geocoding: Find the closest predefined area in Ahmedabad
+                console.log("Using closest local Ahmedabad area fallback...");
+                let closestArea = localAhmedabadAreas[0];
+                let minDistance = Infinity;
+                
+                localAhmedabadAreas.forEach(area => {
+                    const dist = Math.pow(area.lat - latitude, 2) + Math.pow(area.lon - longitude, 2);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestArea = area;
+                    }
+                });
+
+                console.log(`Closest local area: ${closestArea.name}`);
+                setBookingArea(closestArea.name);
+                setBookingCoords({ lat: closestArea.lat, lon: closestArea.lon });
+            }
+        };
+
+        if (!navigator.geolocation) {
+            console.warn("Geolocation is not supported by your browser. Trying IP fallback.");
+            useIpFallback('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            console.warn("Geolocation requires HTTPS context. Trying IP fallback.");
+            useIpFallback('Location service requires a secure HTTPS connection. Using IP-based location.');
+            return;
+        }
+
         const options = {
-            enableHighAccuracy: false, // More reliable for desktop geolocating
-            timeout: 12000,            // 12 second limit
-            maximumAge: 60000          // 1 minute cached position
+            enableHighAccuracy: false,
+            timeout: 12000,
+            maximumAge: 60000
         };
 
         navigator.geolocation.getCurrentPosition(
@@ -858,70 +940,26 @@ const CustomerHome = () => {
                 const { latitude, longitude } = pos.coords;
                 console.log(`Coordinates detected: ${latitude}, ${longitude}`);
                 setBookingCoords({ lat: latitude, lon: longitude });
-
-                try {
-                    // Call reverse geocode with email parameter and NO custom headers to prevent OPTIONS preflight blocks
-                    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1&accept-language=en&email=primesevamvp@gmail.com`;
-                    console.log(`OSM Reverse Geocode url: ${url}`);
-                    const res = await fetch(url);
-                    console.log(`OSM Reverse Geocode response status: ${res.status}`);
-                    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-                    
-                    const data = await res.json();
-                    console.log("OSM Reverse Geocode data received:", data);
-
-                    const addr = data.address || {};
-                    const parts = [
-                        addr.road || addr.pedestrian || addr.footway,
-                        addr.neighbourhood || addr.suburb || addr.quarter,
-                        addr.city || addr.town || addr.village || addr.county
-                    ].filter(Boolean);
-
-                    const readableArea = parts.length > 0
-                        ? parts.join(', ')
-                        : (data.display_name?.split(',').slice(0, 3).join(',').trim() || 'Location detected');
-
-                    console.log(`Auto-filling resolved address: ${readableArea}`);
-                    setBookingArea(readableArea);
-                } catch (e) {
-                    console.error('Reverse geocode failed or blocked:', e);
-                    
-                    // Fallback geocoding: Find the closest predefined area in Ahmedabad
-                    console.log("Using closest local Ahmedabad area fallback...");
-                    let closestArea = localAhmedabadAreas[0];
-                    let minDistance = Infinity;
-                    
-                    localAhmedabadAreas.forEach(area => {
-                        const dist = Math.pow(area.lat - latitude, 2) + Math.pow(area.lon - longitude, 2);
-                        if (dist < minDistance) {
-                            minDistance = dist;
-                            closestArea = area;
-                        }
-                    });
-
-                    console.log(`Closest local area: ${closestArea.name}`);
-                    setBookingArea(closestArea.name);
-                    setBookingCoords({ lat: closestArea.lat, lon: closestArea.lon });
-                } finally {
-                    setIsLocating(false);
-                }
-            },
-            (err) => {
-                console.error("Browser geolocation error:", err);
+                await performReverseGeocode(latitude, longitude);
                 setIsLocating(false);
+            },
+            async (err) => {
+                console.error("Browser geolocation error:", err);
+                let fallbackMsg = '';
                 switch (err.code) {
                     case err.PERMISSION_DENIED:
-                        setLocationError('Location access denied. Please allow location access in your browser settings.');
+                        fallbackMsg = 'Location access denied. Using IP-based location fallback.';
                         break;
                     case err.POSITION_UNAVAILABLE:
-                        setLocationError('Location unavailable. Please type your area manually.');
+                        fallbackMsg = 'Location unavailable. Using IP-based location fallback.';
                         break;
                     case err.TIMEOUT:
-                        setLocationError('Location request timed out. Please try again.');
+                        fallbackMsg = 'Location request timed out. Using IP-based location fallback.';
                         break;
                     default:
-                        setLocationError('Could not detect location. Please type manually.');
+                        fallbackMsg = 'Could not detect browser location. Using IP-based location fallback.';
                 }
+                await useIpFallback(fallbackMsg);
             },
             options
         );
@@ -1646,8 +1684,8 @@ const CustomerHome = () => {
                                                     );
                                                     setAreaSuggestions(matchedLocal);
 
-                                                    // 2. Fetch from OSM API for more specific details (if 3+ characters)
-                                                    if (val.length < 3) return;
+                                                    // 2. Fetch from OSM API for more specific details (if 2+ characters)
+                                                    if (val.length < 2) return;
                                                     
                                                     areaDebounceRef.current = setTimeout(async () => {
                                                         setIsFetchingSuggestions(true);
