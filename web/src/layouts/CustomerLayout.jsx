@@ -27,7 +27,7 @@ const CustomerLayout = () => {
                 <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-4 group" onClick={closeMobileMenu}>
                         <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain transition-transform group-hover:scale-110 duration-500 py-1" />
-                        <span className="text-3xl font-medium bg-clip-text text-transparent bg-linear-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
+                        <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 tracking-tighter drop-shadow-sm">PrimeSewa</span>
                     </Link>
 
                     {/* Desktop Nav */}

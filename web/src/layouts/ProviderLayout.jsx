@@ -60,9 +60,9 @@ const ProviderLayout = () => {
     const providerInitial = userData?.name?.charAt(0) || 'P';
 
     const navLinkClass = ({ isActive }) =>
-        `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive
-            ? 'bg-gradient-to-r from-indigo-600/20 to-violet-600/20 text-indigo-400 shadow-inner border border-indigo-500/20'
-            : 'text-slate-400 hover:bg-white/5 hover:text-white'}`;
+        `flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${isActive
+            ? 'bg-white/20 text-white shadow-inner border border-white/30 backdrop-blur-sm'
+            : 'text-white/80 hover:bg-white/10 hover:text-white'}`;
 
     const renderSidebarInner = () => (
         <>
@@ -70,7 +70,7 @@ const ProviderLayout = () => {
             <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
                     <Link to="/provider" className="flex items-center gap-4 group">
                         <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain transition-transform group-hover:rotate-6 duration-500" />
-                        <span className="text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tighter">PrimeSewa</span>
+                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-indigo-200 tracking-tighter drop-shadow-lg">PrimeSewa</span>
                     </Link>
                 <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                     <X className="w-5 h-5" />

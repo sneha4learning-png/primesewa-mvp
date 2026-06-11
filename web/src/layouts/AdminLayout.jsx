@@ -5,9 +5,9 @@ import { useAuth } from '../firebase/AuthContext';
 import NotificationBell from '../components/NotificationBell';
 
 const navLinkClass = ({ isActive }) =>
-    `flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive
-        ? 'bg-gradient-to-r from-indigo-600/20 to-violet-600/20 text-indigo-400 shadow-inner border border-indigo-500/20'
-        : 'text-slate-300 hover:bg-white/10 hover:text-white hover:shadow-lg transition-all duration-300'}`;
+    `flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${isActive
+        ? 'bg-white/20 text-white shadow-inner border border-white/30 backdrop-blur-sm'
+        : 'text-white/80 hover:bg-white/10 hover:text-white hover:shadow-lg transition-all duration-300'}`;
 
 const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
     <>
@@ -15,7 +15,7 @@ const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
         <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
             <span className="flex items-center gap-4">
                 <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain shadow-2xl shadow-blue-500/20" />
-                <span className="text-2xl font-medium text-white tracking-tighter">PrimeSewa</span>
+                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-indigo-200 tracking-tighter drop-shadow-lg">PrimeSewa</span>
             </span>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                 <X className="w-5 h-5" />
