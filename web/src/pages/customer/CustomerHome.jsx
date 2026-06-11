@@ -1113,9 +1113,9 @@ const CustomerHome = () => {
         <div className="min-h-screen relative overflow-x-hidden pt-6">
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out">
-                    <img src={activeBackgroundImage} alt="Service" className="w-full h-full object-cover opacity-20" />
+                    <img src={activeBackgroundImage} alt="Service" className="w-full h-full object-cover opacity-45" />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-50/70 via-slate-50/85 to-white/95 backdrop-blur-[3px]"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-50/45 via-slate-50/60 to-white/80 backdrop-blur-[2px]"></div>
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 flex flex-col gap-6">
@@ -1309,7 +1309,9 @@ const CustomerHome = () => {
                                                 <p className={`text-xs font-black uppercase tracking-wide mb-1 ${selectedSubServices.includes(sub.name) ? 'text-purple-200' : 'text-slate-600'}`}>+ Service</p>
                                                 <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
                                                 <div className="flex items-center gap-1 mt-1">
-                                                    <span className={`text-sm font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-primary'}`}>₹{sub.price}</span>
+                                                    <span className={`text-xs font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-500'}`}>
+                                                        {selectedSubServices.includes(sub.name) ? 'SELECTED' : 'ADD'}
+                                                    </span>
                                                 </div>
                                             </button>
                                         ))}
