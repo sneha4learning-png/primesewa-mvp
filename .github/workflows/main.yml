@@ -1,4 +1,4 @@
-# CI/CD Pipeline - PrimeSewa MVP  (June 11, 2026 - v2 live-streaming build)
+# CI/CD Pipeline - PrimeSewa MVP  (June 11, 2026 - v3 live-streaming build)
 name: 🚀 Deploy PrimeSewa
 
 on:
