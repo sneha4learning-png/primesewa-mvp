@@ -15,7 +15,7 @@ const SidebarInner = ({ setSidebarOpen, handleLogout }) => (
         <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
             <span className="flex items-center gap-4">
                 <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain shadow-2xl shadow-blue-500/20" />
-                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-indigo-200 tracking-tighter drop-shadow-lg">PrimeSewa</span>
+                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-emerald-100 to-cyan-200 tracking-tighter drop-shadow-lg">PrimeSewa</span>
             </span>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                 <X className="w-5 h-5" />

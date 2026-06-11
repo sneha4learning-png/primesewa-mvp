@@ -961,7 +961,7 @@ const CustomerHome = () => {
                                 <h1 className={`text-xl md:text-2xl font-extrabold tracking-tight leading-none ${!userData?.uid ? 'text-white' : 'text-slate-900'}`}>
                                     {userData?.name ? `Hello, ${userData.name.split(' ')[0]}` : 'Premier Service Platform'}
                                 </h1>
-                                <p className={`mt-1 text-[9px] font-bold tracking-widest uppercase ${!userData?.uid ? 'text-indigo-300' : 'text-indigo-600/70'}`}>Ahmedabad's Elite Home Service Network</p>
+                                <p className={`mt-1 text-xs font-bold tracking-widest uppercase ${!userData?.uid ? 'text-emerald-200' : 'text-teal-600/80'}`}>Ahmedabad's Elite Home Service Network</p>
                             </div>
                         </div>
                         <div className={`relative flex-1 max-w-md w-full flex items-center shadow-sm rounded-xl border transition-all focus-within:ring-4 focus-within:ring-indigo-500/10 duration-300 ${!userData?.uid ? 'bg-white/10 border-white/10' : 'bg-white border-slate-200 focus-within:border-indigo-300 hover:border-indigo-200'}`}>
@@ -979,7 +979,7 @@ const CustomerHome = () => {
                                     <Briefcase className="w-6 h-6 text-indigo-600" />
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em] mb-1">Total Services</p>
+                                    <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">Total Services</p>
                                     <h3 className="text-xl font-black text-slate-900 leading-none">{allMyBookings.length}</h3>
                                 </div>
                             </div>
@@ -989,7 +989,7 @@ const CustomerHome = () => {
                                     <Activity className="w-6 h-6 text-white relative z-10" />
                                 </div>
                                 <div className="relative z-10 text-left flex-1">
-                                    <p className="text-indigo-200 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Live Status</p>
+                                    <p className="text-indigo-200 text-xs uppercase font-black tracking-widest mb-1">Live Status</p>
                                     <h3 className="text-xl font-black italic leading-none">Activity Hub</h3>
                                 </div>
                                 {activeBookings.length > 0 && (
@@ -1003,7 +1003,7 @@ const CustomerHome = () => {
                                     <Star className="w-6 h-6 text-amber-400 fill-current" />
                                 </div>
                                 <div>
-                                    <p className="text-indigo-300 text-[9px] uppercase font-black tracking-[0.2em] mb-1">Membership</p>
+                                    <p className="text-indigo-300 text-xs uppercase font-black tracking-widest mb-1">Membership</p>
                                     <h3 className="text-xl font-black italic leading-none text-amber-400">Prime Member</h3>
                                 </div>
                             </div>
@@ -1091,7 +1091,7 @@ const CustomerHome = () => {
                     <div className="space-y-6 pb-20">
                         <div id="service-catalog" className="space-y-4 scroll-mt-28">
                             <div className="flex justify-between items-center px-2">
-                                <h2 className="text-base font-black tracking-tighter uppercase italic">Choose Category</h2>
+                                <h2 className="text-lg font-black tracking-tighter uppercase italic">Choose Category</h2>
                                 {selectedCategory && <button onClick={() => setSelectedCategory(null)} className="text-[9px] font-black text-indigo-600 uppercase border-b-2 border-indigo-600">Reset</button>}
                             </div>
                             <div className="flex overflow-x-auto pb-4 gap-4 hide-scrollbar snap-x px-2">
@@ -1100,7 +1100,7 @@ const CustomerHome = () => {
                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${selectedCategory === cat.name ? 'bg-indigo-600 text-white shadow-lg rotate-3' : 'bg-white border hover:border-indigo-200'}`}>
                                             <cat.icon className="w-5 h-5" />
                                         </div>
-                                        <span className={`text-[10px] font-black uppercase text-center leading-tight tracking-wide whitespace-nowrap py-1 ${selectedCategory === cat.name ? 'text-indigo-600' : 'text-slate-800'}`}>{cat.name}</span>
+                                        <span className={`text-xs font-black uppercase text-center leading-tight tracking-wide whitespace-nowrap py-1 ${selectedCategory === cat.name ? 'text-teal-600' : 'text-slate-800'}`}>{cat.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -1113,7 +1113,7 @@ const CustomerHome = () => {
                                     <div className="flex items-center justify-between mb-3">
                                         <div>
                                             <h3 className="text-sm font-black text-indigo-950 uppercase italic tracking-tighter">{selectedCategory} Packages</h3>
-                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">Select options for price comparison</p>
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider leading-none">Select options for price comparison</p>
                                         </div>
                                         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
                                             <Sparkles className="w-4 h-4" />
@@ -1122,10 +1122,10 @@ const CustomerHome = () => {
                                     <div className="flex overflow-x-auto pb-4 gap-3 hide-scrollbar snap-x">
                                         {/* Base Plate Highlighter */}
                                         <div className={`shrink-0 w-32 p-3 rounded-2xl border transition-all text-left snap-start ${selectedSubServices.length === 0 ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'bg-white border-slate-100'}`}>
-                                            <p className={`text-[8px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.length === 0 ? 'text-indigo-200' : 'text-slate-600'}`}>Standard</p>
-                                            <h4 className={`text-[10px] font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Base Rate</h4>
+                                            <p className={`text-xs font-black uppercase tracking-wide mb-1 ${selectedSubServices.length === 0 ? 'text-indigo-200' : 'text-slate-600'}`}>Standard</p>
+                                            <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-900'}`}>Base Rate</h4>
                                             <div className="flex items-center gap-1 mt-1">
-                                                <span className={`text-[8px] font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-500'}`}>INCLUDED</span>
+                                                <span className={`text-xs font-black ${selectedSubServices.length === 0 ? 'text-white' : 'text-slate-500'}`}>INCLUDED</span>
                                             </div>
                                         </div>
 
@@ -1140,10 +1140,10 @@ const CustomerHome = () => {
                                                 }}
                                                 className={`shrink-0 w-32 p-3 rounded-2xl border transition-all text-left snap-start group ${selectedSubServices.includes(sub.name) ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'bg-white border-slate-100 hover:border-indigo-200'}`}
                                             >
-                                                <p className={`text-[8px] font-black uppercase tracking-widest mb-1 ${selectedSubServices.includes(sub.name) ? 'text-indigo-200' : 'text-slate-600'}`}>+ Service</p>
-                                                <h4 className={`text-[10px] font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
+                                                <p className={`text-xs font-black uppercase tracking-wide mb-1 ${selectedSubServices.includes(sub.name) ? 'text-emerald-200' : 'text-slate-600'}`}>+ Service</p>
+                                                <h4 className={`text-sm font-bold leading-tight ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-slate-900'}`}>{sub.name}</h4>
                                                 <div className="flex items-center gap-1 mt-1">
-                                                    <span className={`text-[8px] font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-indigo-600'}`}>₹{sub.price}</span>
+                                                    <span className={`text-sm font-black ${selectedSubServices.includes(sub.name) ? 'text-white' : 'text-teal-600'}`}>₹{sub.price}</span>
                                                 </div>
                                             </button>
                                         ))}
@@ -1153,7 +1153,7 @@ const CustomerHome = () => {
                                 <div className="flex flex-col md:flex-row items-center gap-6 px-4">
                                     <div className="flex items-center gap-4 flex-1">
                                         <div className="h-px flex-1 bg-slate-200"></div>
-                                        <p className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Available Specialists</p>
+                                        <p className="text-sm font-black text-slate-600 uppercase tracking-widest">Available Specialists</p>
                                         <div className="h-px flex-1 bg-slate-200"></div>
                                     </div>
 
@@ -1208,18 +1208,18 @@ const CustomerHome = () => {
                                                         <UserCircle className="w-7 h-7 text-indigo-600" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="text-xs font-black text-indigo-950 truncate uppercase leading-none mb-1">{p.name || 'Specialist'}</h4>
+                                                        <h4 className="text-sm font-black text-slate-900 truncate uppercase leading-none mb-1">{p.name || 'Specialist'}</h4>
                                                         <div className="flex items-center gap-1.5">
                                                             <Star className="w-2 h-2 text-amber-500 fill-current" />
-                                                            <span className="text-[9px] font-black text-slate-900">{hasValidRating ? ratingValue.toFixed(1) : 'NEW'}</span>
+                                                            <span className="text-xs font-black text-slate-700">{hasValidRating ? ratingValue.toFixed(1) : 'NEW'}</span>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 <div className="flex items-end justify-between pt-2 border-t border-slate-50">
                                                     <div>
-                                                        <p className="text-[7px] font-black text-indigo-500 uppercase tracking-widest">Total Cost</p>
-                                                        <p className="text-sm font-black text-indigo-950">₹{currentTotalDisplay}</p>
+                                                        <p className="text-xs font-bold text-teal-600 uppercase tracking-wide">Total Cost</p>
+                                                        <p className="text-base font-black text-slate-900">₹{currentTotalDisplay}</p>
                                                     </div>
                                                     <button onClick={(e) => { e.stopPropagation(); handleBook(p); }} className="h-7 px-3 brand-gradient text-white rounded-lg text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all">
                                                         Book
