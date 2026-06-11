@@ -70,7 +70,7 @@ const ProviderLayout = () => {
             <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 relative z-10">
                     <Link to="/provider" className="flex items-center gap-4 group">
                         <img src="/primesewa_logo.png" alt="PrimeSewa" className="w-20 h-20 object-contain transition-transform group-hover:rotate-6 duration-500" />
-                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-emerald-100 to-cyan-200 tracking-tighter drop-shadow-lg">PrimeSewa</span>
+                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-purple-200 tracking-tighter drop-shadow-lg">PrimeSewa</span>
                     </Link>
                 <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1">
                     <X className="w-5 h-5" />
