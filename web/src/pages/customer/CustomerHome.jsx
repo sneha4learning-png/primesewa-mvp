@@ -521,7 +521,7 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {activeBookings.map(b => (
-                                        <div key={b.id} className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 group">
+                                        <div key={b.id} className={`bg-white rounded-[2.5rem] border p-8 shadow-sm hover:shadow-xl transition-all duration-500 group ${b.status?.toLowerCase() === 'negotiating' ? 'border-amber-400 ring-2 ring-amber-400/20 shadow-lg shadow-amber-100/50' : 'border-slate-200'}`}>
                                             <div className="flex justify-between items-start mb-6">
                                                 <div className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase rounded-full tracking-widest">{b.status}</div>
                                                 <span className="text-[10px] font-bold text-slate-300">#{b.id.slice(-4).toUpperCase()}</span>
@@ -530,7 +530,7 @@ const ActivityOverviewModal = ({ activeBookings, pastBookings, submitRating, onC
                                             <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{b.provider || 'Assigning Hub Partner...'}</p>
 
                                             {(b.status?.toLowerCase() === 'negotiating') && (b.proposedPrice || b.offerPrice) && (
-                                                <div className="mt-8 p-6 bg-slate-950 rounded-[2rem] border border-white/10 text-white italic shadow-2xl">
+                                                <div className="mt-8 p-6 bg-slate-950 rounded-[2rem] border border-amber-400 text-white italic shadow-2xl animate-pulse">
                                                     <div className="flex items-center justify-between mb-6">
                                                         <p className="text-indigo-300 text-[10px] font-black uppercase tracking-widest">Counter Offer</p>
                                                         <p className="text-3xl font-black">₹{b.proposedPrice || b.offerPrice}</p>
@@ -1046,7 +1046,10 @@ const CustomerHome = () => {
                 createdAt: serverTimestamp()
             };
             await addDoc(collection(db, 'bookings'), booking);
-            if (pendingBookingData.providerUid) sendNotification(pendingBookingData.providerUid, 'New Request', 'You have a new service request!', 'success');
+            if (pendingBookingData.providerUid) {
+                sendNotification(pendingBookingData.providerUid, 'New Request', 'You have a new service request!', 'success');
+            }
+            sendNotification('admin', 'New Service Request', `A new service request for ${booking.service} has been created by ${booking.customer}.`, 'info');
             setBookingStep(2);
             setTimeout(() => setBookingStep(0), 3000);
         } catch (err) { console.error(err); }
@@ -1063,12 +1066,19 @@ const CustomerHome = () => {
                 offerPrice: null 
             });
             sendNotification('admin', 'Offer Accepted', `Accepted for ${booking.service}.`, 'success');
+            if (booking.providerUid) {
+                sendNotification(booking.providerUid, 'Quote Accepted', `Your proposed quote of ₹${finalPrice} for ${booking.service} has been accepted by the customer.`, 'success');
+            }
         } catch (e) { console.error(e); }
     };
 
     const rejectOffer = async (booking) => {
         try {
             await updateDoc(doc(db, 'bookings', booking.id), { status: 'rejected', proposedPrice: null, offerPrice: null });
+            if (booking.providerUid) {
+                sendNotification(booking.providerUid, 'Quote Declined', `Your quote proposal for ${booking.service} was declined by the customer.`, 'warning');
+            }
+            sendNotification('admin', 'Offer Declined', `Declined counter-offer for ${booking.service}.`, 'warning');
         } catch (e) { console.error(e); }
     };
 
@@ -1139,6 +1149,23 @@ const CustomerHome = () => {
 
                 {userData?.uid && bookingStep === 0 && (
                     <div className="space-y-4">
+                        {activeBookings.some(b => b.status?.toLowerCase() === 'negotiating') && (
+                            <div 
+                                onClick={() => setIsActivityModalOpen(true)}
+                                className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-4 rounded-[2rem] flex items-center justify-between shadow-xl cursor-pointer hover:scale-[1.01] active:scale-95 transition-all animate-pulse border border-amber-400"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-widest leading-none">New Price Proposal Received!</p>
+                                        <p className="text-[10px] font-bold text-amber-100 uppercase tracking-wider mt-1.5">Provider proposed a counter-offer. Click here to review and accept/reject.</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1.5 rounded-xl border border-white/20">Review Offer</span>
+                                </div>
+                            </div>
+                        )}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="bg-white p-5 rounded-3xl flex items-center gap-4 border border-slate-100 shadow-xl shadow-slate-200/20 group hover:scale-[1.02] transition-all hover:bg-slate-50">
                                 <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-white group-hover:shadow-lg transition-all">
@@ -1149,17 +1176,20 @@ const CustomerHome = () => {
                                     <h3 className="text-xl font-black text-slate-900 leading-none">{allMyBookings.length}</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setIsActivityModalOpen(true)} className="bg-indigo-600 p-5 rounded-3xl flex items-center gap-4 text-white relative overflow-hidden group shadow-2xl shadow-indigo-600/20 active:scale-95 transition-all outline-none">
+                            <button 
+                                onClick={() => setIsActivityModalOpen(true)} 
+                                className={`p-5 rounded-3xl flex items-center gap-4 text-white relative overflow-hidden group shadow-2xl active:scale-95 transition-all outline-none ${activeBookings.some(b => b.status?.toLowerCase() === 'negotiating') ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20 animate-pulse border-2 border-amber-300' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/20'}`}
+                            >
                                 <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                                 <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all">
                                     <Activity className="w-6 h-6 text-white relative z-10" />
                                 </div>
                                 <div className="relative z-10 text-left flex-1">
-                                    <p className="text-indigo-200 text-xs uppercase font-black tracking-widest mb-1">Live Status</p>
+                                    <p className={`${activeBookings.some(b => b.status?.toLowerCase() === 'negotiating') ? 'text-amber-100' : 'text-indigo-200'} text-xs uppercase font-black tracking-widest mb-1`}>Live Status</p>
                                     <h3 className="text-xl font-black italic leading-none">Activity Hub</h3>
                                 </div>
                                 {activeBookings.length > 0 && (
-                                    <span className="w-8 h-8 bg-rose-500 rounded-xl flex items-center justify-center text-[10px] font-black shadow-lg animate-bounce relative z-10">
+                                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black shadow-lg relative z-10 ${activeBookings.some(b => b.status?.toLowerCase() === 'negotiating') ? 'bg-red-600 animate-pulse text-white' : 'bg-rose-500 animate-bounce'}`}>
                                         {activeBookings.length}
                                     </span>
                                 )}
@@ -1195,7 +1225,11 @@ const CustomerHome = () => {
                                     ) : (
                                         <div className="space-y-6">
                                             {activeBookings.slice(0, 1).map(b => (
-                                                <div key={b.id} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 hover:border-indigo-200 transition-all cursor-pointer group" onClick={() => setIsActivityModalOpen(true)}>
+                                                <div 
+                                                    key={b.id} 
+                                                    className={`p-6 rounded-[2rem] border transition-all cursor-pointer group ${b.status?.toLowerCase() === 'negotiating' ? 'border-amber-400 bg-amber-50/20 animate-pulse shadow-md shadow-amber-200/30' : 'bg-slate-50 border-slate-100 hover:border-indigo-200'}`} 
+                                                    onClick={() => setIsActivityModalOpen(true)}
+                                                >
                                                     <div className="flex justify-between items-start mb-4">
                                                         <div className="px-3 py-1 bg-white text-indigo-600 text-[9px] font-black uppercase rounded-full shadow-sm">{b.status}</div>
                                                         <span className="text-[10px] font-bold text-slate-200 group-hover:text-indigo-200">#ACTIVE</span>
